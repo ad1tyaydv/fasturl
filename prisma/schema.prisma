@@ -9,12 +9,9 @@ datasource db {
 
 
 model User {
-  id             String      @id @default(cuid())
-  name           String?
-  email          String?     @unique
-  emailVerified  DateTime   
-  password       String?
-  provider       String?
+  id             String      @id @default(uuid())
+  email          String      @unique
+  password       String
   ipAddress      String?
 
   links          Link[]
@@ -23,12 +20,13 @@ model User {
 }
 
 model Link {
-  id       String      @id @default(uuid())
+  id           String      @id @default(uuid())
+  shorturl     String
   original     String
   clicks       Int         @default(0)
   
-  userId      String
-  user        User        @relation(fields: [id], references: [id], onDelete: Cascade)
+  userId       String
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt   DateTime    @default(now())
 }

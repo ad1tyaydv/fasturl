@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 export default function Login() {
   const router = useRouter();
 
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -21,15 +21,15 @@ export default function Login() {
     setMessage(null);
 
     try {
-      const res = await axios.post("/api/auth/login", {
-        username,
+      const res = await axios.post("/api/auth/signin", {
+        email,
         password
       });
       
-      setUsername("");
+      setEmail("");
       setPassword("");
 
-      router.push("/");
+      router.push("/dashboard");
 
     } catch (error: any) {
       setMessage({ type: "error", text: error.response?.data?.message || "Invalid credentials!" });
@@ -57,12 +57,12 @@ export default function Login() {
         <form className="flex flex-col gap-4" onSubmit={handleLogin}>
 
           <div className="flex flex-col gap-1">
-            <label className="text-gray-700 font-medium">Username</label>
+            <label className="text-gray-700 font-medium">email</label>
             <input
-              type="username"
-              placeholder="Enter your username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              type="email"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="px-4 py-3 question-font border border-gray-400 rounded-none focus:outline-none focus:border-black"
               required
             />
