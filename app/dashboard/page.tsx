@@ -33,6 +33,7 @@ export default function Dashboard() {
 
     } catch (error) {
       console.log("Can't short url", error);
+
     } finally {
       setLoading(false);
     }
@@ -57,23 +58,23 @@ export default function Dashboard() {
     }
   };
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const res = await axios.get("/api/auth/me");
+  // useEffect(() => {
+  //   const checkAuth = async () => {
+  //     try {
+  //       const res = await axios.get("/api/auth/me");
 
-        if (!res.data.authenticated) {
-          router.push("/auth/signin");
-        } else {
-          setIsLoggedIn(true);
-        }
-      } catch {
-        router.push("/auth/signin");
-      }
-    };
+  //       if (!res.data.authenticated) {
+  //         router.push("/auth/signin");
+  //       } else {
+  //         setIsLoggedIn(true);
+  //       }
+  //     } catch {
+  //       router.push("/auth/signin");
+  //     }
+  //   };
 
-    checkAuth();
-  }, [router]);
+  //   checkAuth();
+  // }, [router]);
 
   const handleLogout = async () => {
     await axios.post("/api/auth/logout");
@@ -163,22 +164,20 @@ export default function Dashboard() {
         </div>
       </section>
 
-      {isLoggedIn && (
-        <section className="flex flex-col items-center justify-center px-6 pb-24">
-          <div className="mt-8 border-t border-gray-200 pt-12 w-full max-w-3xl flex flex-col items-center text-center">
-            <h2 className="text-2xl font-bold text-black mb-3">Manage Your Links</h2>
-            <p className="text-gray-900 mb-6">See all your previously shortened URLs, copy them, or delete the ones you no longer need.</p>
-            
-            <button
-              onClick={() => router.push('/urls')} 
-              className="group flex items-center gap-2 border-2 border-black text-black px-8 py-3 rounded-lg hover:bg-black hover:text-white transition cursor-pointer font-semibold text-lg"
-            >
-              See all your short URLs
-              <IoArrowForwardOutline size={20} className="group-hover:translate-x-1 transition-transform" />
-            </button>
-          </div>
-        </section>
-      )}
+      <section className="flex flex-col items-center justify-center px-6 pb-24">
+        <div className="mt-8 border-t border-gray-200 pt-12 w-full max-w-3xl flex flex-col items-center text-center">
+          <h2 className="text-2xl font-bold text-black mb-3">Manage Your Links</h2>
+          <p className="text-gray-900 mb-6">See all your previously shortened URLs, copy them, or delete the ones you no longer need.</p>
+          
+          <button
+            onClick={() => router.push('/urls')} 
+            className="group flex items-center gap-2 border-2 border-black text-black px-8 py-3 rounded-lg hover:bg-black hover:text-white transition cursor-pointer font-semibold text-lg"
+          >
+            See all your short URLs
+            <IoArrowForwardOutline size={20} className="group-hover:translate-x-1 transition-transform" />
+          </button>
+        </div>
+      </section>
 
       {copied && (
         <div className="absolute top-24 left-1/2 -translate-x-1/2 mt-1 bg-black text-white px-6 py-2 rounded-md shadow-lg text-sm z-50 animate-bounce">

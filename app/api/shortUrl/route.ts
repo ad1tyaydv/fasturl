@@ -3,68 +3,89 @@ import jwt from "jsonwebtoken";
 import { prisma } from "@/lib/dbConfig";
 import shortUrlGenerator from "@/app/helpers/shortUrlGenerator";
 
-
 const JWT_SECRET = process.env.AUTH_SECRET!;
+const ANON_USER_ID = process.env.ANONYMOUS_USER_ID!;
 
 export async function POST(req: NextRequest) {
 
-    const data = await req.json();
 
+  try {
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0] || "unknown";
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    
+    const data = await req.json();
     const token = req.cookies.get("token")?.value;
 
-    if (!token) {
-        return NextResponse.json(
-            { message: "Unauthorized" },
-            { status: 401 }
-        );
-    }
+    let userId: string;
+    let count: number = 0;
 
-    const decoded = jwt.verify(token!, JWT_SECRET) as {
+    if (!token) {
+      userId = ANON_USER_ID;
+
+      count = await prisma.link.count({
+        where: {
+            ipAddress: ip,
+            userId: ANON_USER_ID,
+            createdAt: {
+                gte: today
+            }
+        }
+      });
+
+      if (count > 3) {
+        return NextResponse.json(
+          { message: "Anonymous users can only create 3 links per day" },
+          { status: 429 }
+        );
+      }
+
+    } else {
+      const decoded = jwt.verify(token, JWT_SECRET) as {
         userId: string;
         email: string;
-    }
-    
-    const userId = decoded.userId;
+      };
+      userId = decoded.userId;
 
-    try {
-        const user = await prisma.user.findUnique({
-            where: {
-                id: userId
-            },
-            select: {
-                email: true,
-            }
-        })
+      const user = await prisma.user.findUnique({
+        where: { 
+            id: userId
+        },
+        select: {
+            email: true
+        },
+      });
 
-        if (!user) {
-            return NextResponse.json(
-                { message: "User not found" },
-                { status: 404 }
-            );
-        }
-
-        const shortUrl = shortUrlGenerator();
-
-        const urlShort = await prisma.link.create({
-            data: {
-                userId: userId,
-                original: data.url,
-                shorturl: shortUrl!
-            }
-        })
-
-        return NextResponse.json({
-            message: "Short url created!",
-            shortUrl: urlShort.shorturl,
-            original: urlShort.original
-        });
-
-
-    } catch (error) {
-        console.log(error);
+      if (!user) {
         return NextResponse.json(
-            {message: "Can't short url right now, try again later"},
-            {status: 500}
-        )    
+            { message: "User not found" },
+            { status: 404 }
+        );
+      }
     }
+
+    const shortUrl = shortUrlGenerator();
+
+    const urlShort = await prisma.link.create({
+        data: {
+            userId: userId,
+            original: data.url,
+            shorturl: shortUrl,
+            ipAddress: ip
+        },
+    });
+
+    return NextResponse.json({
+      message: "Short URL created!",
+      shortUrl: urlShort.shorturl,
+      original: urlShort.original,
+    });
+
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json(
+      { message: "Can't shorten URL right now, try again later" },
+      { status: 500 }
+    );
+  }
 }

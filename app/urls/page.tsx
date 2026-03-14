@@ -85,7 +85,7 @@ export default function AllUrlsPage() {
 
   const handleDelete = async (id: string) => {
     try {
-      await axios.delete(`/api/shortUrl/${id}`);
+      await axios.delete(`/api/shortUrl/delete${id}`);
       setUrls(urls.filter((u) => u.id !== id));
 
     } catch (err) {

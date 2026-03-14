@@ -24,6 +24,7 @@ model Link {
   shorturl     String      @unique
   original     String
   clicks       Int         @default(0)
+  ipAddress    String?
   
   userId       String
   user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
