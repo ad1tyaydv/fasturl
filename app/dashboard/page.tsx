@@ -3,7 +3,7 @@
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { FiCopy } from "react-icons/fi";
+import { IoCopyOutline } from "react-icons/io5";
 
 
 const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN;
@@ -138,7 +138,7 @@ export default function HomePage() {
                   onClick={copyToClipboard}
                   className="text-gray-600 hover:text-black cursor-pointer"
                 >
-                  <FiCopy size={20} />
+                  <IoCopyOutline size={20} />
                 </button>
               </>
             ) : (
