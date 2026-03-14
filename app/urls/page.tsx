@@ -3,15 +3,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { 
-  IoCopyOutline, 
-  IoHomeOutline, 
-  IoListOutline, 
-  IoSettingsOutline, 
-  IoPersonOutline,
-  IoQrCodeOutline,
-  IoAnalyticsOutline
-} from "react-icons/io5";
+import { IoCopyOutline, IoHomeOutline, IoListOutline, IoSettingsOutline, IoPersonOutline, IoQrCodeOutline, IoAnalyticsOutline, IoMoonOutline, IoSunnyOutline } from "react-icons/io5";
 
 interface UrlItem {
   id: string;
@@ -33,8 +25,10 @@ export default function AllUrlsPage() {
   const [copiedUrlId, setCopiedUrlId] = useState<string | null>(null);
   const [copiedType, setCopiedType] = useState<"original" | "short" | null>(null);
   
-  // Modal State
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+
   const [selectedUrl, setSelectedUrl] = useState<UrlItem | null>(null);
+
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -52,6 +46,7 @@ export default function AllUrlsPage() {
     checkAuth();
   }, [router]);
 
+
   const fetchUrls = async () => {
     try {
       setLoading(true);
@@ -68,14 +63,17 @@ export default function AllUrlsPage() {
 
     } catch (err) {
       console.log("Error fetching URLs:", err);
+
     } finally {
       setLoading(false);
     }
   };
 
+
   useEffect(() => {
     fetchUrls();
   }, []);
+
 
   const copyToClipboard = (url: string, id: string, type: "original" | "short") => {
     navigator.clipboard.writeText(url);
@@ -87,61 +85,86 @@ export default function AllUrlsPage() {
     }, 2000);
   };
 
+
   const handleDelete = async (id: string) => {
     try {
       await axios.delete(`/api/shortUrl/delete${id}`);
       setUrls(urls.filter((u) => u.id !== id));
+
     } catch (err) {
       console.log("Error deleting URL:", err);
     }
   };
   
+
   const handleLogout = async () => {
     await axios.post("/api/auth/logout");
     setIsLoggedIn(false);
     router.push("/auth/signin");
   };
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === "light" ? "dark" : "light"));
+  };
+  
   
   return (
-    <div className="bg-white h-screen flex flex-col overflow-hidden relative">
+    <div className={`h-screen flex flex-col overflow-hidden relative transition-colors duration-300 ${theme === 'dark' ? 'bg-black text-white' : 'bg-white text-black'}`}>
       
-      <nav className="flex items-center justify-between px-4 sm:px-8 py-4 border-b z-20 bg-white shrink-0">
+      <nav className={`flex items-center justify-between px-4 sm:px-8 py-4 border-b z-20 shrink-0 ${theme === 'dark' ? 'bg-black border-gray-800' : 'bg-white border-gray-200'}`}>
         <h1 
-          className="text-lg sm:text-xl font-semibold text-black cursor-pointer" 
+          className="text-lg sm:text-xl font-semibold cursor-pointer" 
           onClick={() => router.push('/')}
         >
           SHORTLY
         </h1>
 
-        {isLoggedIn ? (
-          <button
-            onClick={handleLogout}
-            className="border border-black text-black px-4 py-1.5 rounded-md hover:bg-black hover:text-white transition cursor-pointer font-medium text-sm sm:text-base"
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={toggleTheme} 
+            className={`p-2 rounded-full transition cursor-pointer ${theme === 'dark' ? 'hover:bg-gray-800 text-gray-300' : 'hover:bg-gray-100 text-gray-700'}`}
           >
-            Logout
+            {theme === 'dark' ? <IoSunnyOutline size={20} /> : <IoMoonOutline size={20} />}
           </button>
-        ) : (
-          <button
-            onClick={() => router.push("/auth/signin")}
-            className="border border-black text-black px-4 py-1.5 rounded-md hover:bg-black hover:text-white transition font-medium cursor-pointer text-sm sm:text-base"
-          >
-            Login
-          </button>
-        )}
+
+          {isLoggedIn ? (
+            <button
+              onClick={handleLogout}
+              className={`border px-4 py-1.5 rounded-md transition cursor-pointer font-medium text-sm sm:text-base ${
+                theme === 'dark' 
+                  ? 'border-white text-white hover:bg-white hover:text-black' 
+                  : 'border-black text-black hover:bg-black hover:text-white'
+              }`}
+            >
+              Logout
+            </button>
+          ) : (
+            <button
+              onClick={() => router.push("/auth/signin")}
+              className={`border px-4 py-1.5 rounded-md transition cursor-pointer font-medium text-sm sm:text-base ${
+                theme === 'dark' 
+                  ? 'border-white text-white hover:bg-white hover:text-black' 
+                  : 'border-black text-black hover:bg-black hover:text-white'
+              }`}
+            >
+              Login
+            </button>
+          )}
+        </div>
       </nav>
 
       <div className="flex flex-1 overflow-hidden pb-16 md:pb-0">
         
-        <aside className="w-64 border-r bg-gray-50 flex-col py-6 px-4 shrink-0 hidden md:flex">
+        <aside className={`w-64 border-r flex-col py-6 px-4 shrink-0 hidden md:flex ${theme === 'dark' ? 'bg-[#0a0a0a] border-gray-800' : 'bg-gray-50 border-gray-200'}`}>
           <div>
-            <p className="text-xs font-bold text-gray-400 mb-4 px-2 uppercase tracking-wider">Menu</p>
+            <p className={`text-xs font-bold mb-4 px-2 uppercase tracking-wider ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Menu</p>
             <div className="flex flex-col gap-2">
               <button
                 onClick={() => router.push('/')}
                 className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition cursor-pointer ${
                   pathname === '/'
-                    ? 'bg-black text-white'
-                    : 'text-gray-600 hover:bg-gray-200 hover:text-black'
+                    ? (theme === 'dark' ? 'bg-white text-black' : 'bg-black text-white')
+                    : (theme === 'dark' ? 'text-gray-400 hover:bg-gray-800 hover:text-white' : 'text-gray-600 hover:bg-gray-200 hover:text-black')
                 }`}
               >
                 <IoHomeOutline size={20} />
@@ -152,8 +175,8 @@ export default function AllUrlsPage() {
                 onClick={() => router.push('/urls')}
                 className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition cursor-pointer ${
                   pathname === '/urls' 
-                    ? 'bg-black text-white' 
-                    : 'text-gray-600 hover:bg-gray-200 hover:text-black'
+                    ? (theme === 'dark' ? 'bg-white text-black' : 'bg-black text-white')
+                    : (theme === 'dark' ? 'text-gray-400 hover:bg-gray-800 hover:text-white' : 'text-gray-600 hover:bg-gray-200 hover:text-black')
                 }`}
               >
                 <IoListOutline size={20} />
@@ -164,8 +187,8 @@ export default function AllUrlsPage() {
                 onClick={() => router.push('/qrcodes')}
                 className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition cursor-pointer ${
                   pathname === '/qrcodes' 
-                    ? 'bg-black text-white' 
-                    : 'text-gray-600 hover:bg-gray-200 hover:text-black'
+                    ? (theme === 'dark' ? 'bg-white text-black' : 'bg-black text-white')
+                    : (theme === 'dark' ? 'text-gray-400 hover:bg-gray-800 hover:text-white' : 'text-gray-600 hover:bg-gray-200 hover:text-black')
                 }`}
               >
                 <IoQrCodeOutline size={20} />
@@ -176,8 +199,8 @@ export default function AllUrlsPage() {
                 onClick={() => router.push('/analytics')}
                 className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition cursor-pointer ${
                   pathname === '/analytics' 
-                    ? 'bg-black text-white' 
-                    : 'text-gray-600 hover:bg-gray-200 hover:text-black'
+                    ? (theme === 'dark' ? 'bg-white text-black' : 'bg-black text-white')
+                    : (theme === 'dark' ? 'text-gray-400 hover:bg-gray-800 hover:text-white' : 'text-gray-600 hover:bg-gray-200 hover:text-black')
                 }`}
               >
                 <IoAnalyticsOutline size={20} />
@@ -187,11 +210,11 @@ export default function AllUrlsPage() {
           </div>
 
           <div className="mt-auto">
-            <p className="text-xs font-bold text-gray-400 mb-4 px-2 uppercase tracking-wider">Account</p>
+            <p className={`text-xs font-bold mb-4 px-2 uppercase tracking-wider ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Account</p>
             <div className="flex flex-col gap-2">
               <button
                 onClick={() => console.log('Profile clicked')} 
-                className="flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition text-gray-600 hover:bg-gray-200 hover:text-black cursor-pointer"
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition cursor-pointer ${theme === 'dark' ? 'text-gray-400 hover:bg-gray-800 hover:text-white' : 'text-gray-600 hover:bg-gray-200 hover:text-black'}`}
               >
                 <IoPersonOutline size={20} />
                 Profile
@@ -199,7 +222,7 @@ export default function AllUrlsPage() {
 
               <button
                 onClick={() => console.log('Settings clicked')} 
-                className="flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition text-gray-600 hover:bg-gray-200 hover:text-black cursor-pointer"
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition cursor-pointer ${theme === 'dark' ? 'text-gray-400 hover:bg-gray-800 hover:text-white' : 'text-gray-600 hover:bg-gray-200 hover:text-black'}`}
               >
                 <IoSettingsOutline size={20} />
                 Settings
@@ -208,25 +231,25 @@ export default function AllUrlsPage() {
           </div>
         </aside>
 
-        <main className="flex-1 overflow-y-auto bg-white p-4 sm:p-8">
+        <main className={`flex-1 overflow-y-auto p-4 sm:p-8 ${theme === 'dark' ? 'bg-black' : 'bg-white'}`}>
           <div className="max-w-4xl mx-auto">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
-              <h1 className="text-2xl sm:text-3xl font-bold text-black">Your Saved URLs</h1>
-              <span className="px-3 bg-gray-200 rounded-xl py-1 text-base sm:text-xl font-medium w-fit">
+              <h1 className="text-2xl sm:text-3xl font-bold">Your Saved URLs</h1>
+              <span className={`px-3 rounded-xl py-1 text-base sm:text-xl font-medium w-fit ${theme === 'dark' ? 'bg-gray-800 text-gray-200' : 'bg-gray-200 text-black'}`}>
                 Total Links - {urls.length}
               </span>
             </div>
 
             {loading && urls.length === 0 ? (
               <div className="flex justify-center mt-24">
-                <div className="w-10 h-10 border-4 border-gray-200 border-t-black rounded-full animate-spin"></div>
+                <div className={`w-10 h-10 border-4 border-t-transparent rounded-full animate-spin ${theme === 'dark' ? 'border-gray-800 border-t-white' : 'border-gray-200 border-t-black'}`}></div>
               </div>
             ) : urls.length === 0 ? (
-              <div className="text-center mt-10 sm:mt-16 p-8 sm:p-12 border-2 border-dashed border-gray-300 rounded-2xl bg-gray-50">
-                <p className="text-gray-500 text-base sm:text-lg mb-6">You haven't saved any URLs yet.</p>
+              <div className={`text-center mt-10 sm:mt-16 p-8 sm:p-12 border-2 border-dashed rounded-2xl ${theme === 'dark' ? 'border-gray-800 bg-[#0a0a0a]' : 'border-gray-300 bg-gray-50'}`}>
+                <p className={`text-base sm:text-lg mb-6 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>You haven't saved any URLs yet.</p>
                 <button 
                   onClick={() => router.push('/')}
-                  className="w-full sm:w-auto bg-black text-white px-8 py-3 rounded-lg hover:bg-gray-800 transition font-medium cursor-pointer"
+                  className={`w-full sm:w-auto px-8 py-3 rounded-lg transition font-medium cursor-pointer ${theme === 'dark' ? 'bg-white text-black hover:bg-gray-200' : 'bg-black text-white hover:bg-gray-800'}`}
                 >
                   Shorten your first link
                 </button>
@@ -237,14 +260,16 @@ export default function AllUrlsPage() {
                   <div
                     key={url.id}
                     onClick={() => setSelectedUrl(url)}
-                    className="border border-gray-200 p-4 sm:p-6 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6 hover:shadow-md hover:border-gray-300 transition bg-white cursor-pointer group"
+                    className={`border p-4 sm:p-6 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6 hover:shadow-md transition cursor-pointer group ${
+                      theme === 'dark' ? 'border-gray-800 bg-[#0a0a0a] hover:border-gray-700' : 'border-gray-200 bg-white hover:border-gray-300'
+                    }`}
                   >
                     <div className="flex flex-col gap-2 sm:gap-3 w-full overflow-hidden min-w-0">
                       
                       <div className="flex items-center gap-2 sm:gap-3 w-full min-w-0">
-                        <div className="truncate text-black text-base sm:text-lg min-w-0 flex-1">
+                        <div className="truncate text-base sm:text-lg min-w-0 flex-1">
                             <strong>Short Url - </strong> 
-                            <span className="font-normal">{NEXT_DOMAIN}/{url.shorturl}</span>
+                            <span className={`font-normal ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>{NEXT_DOMAIN}/{url.shorturl}</span>
                         </div>
                         <button 
                           onClick={(e) => {
@@ -253,17 +278,17 @@ export default function AllUrlsPage() {
                           }} 
                           className="shrink-0 cursor-pointer p-1"
                         >
-                            <IoCopyOutline size={20} className="text-gray-400 hover:text-black transition" />
+                            <IoCopyOutline size={20} className={`transition ${theme === 'dark' ? 'text-gray-500 hover:text-white' : 'text-gray-400 hover:text-black'}`} />
                         </button>
                         {copiedUrlId === url.id && copiedType === "short" && (
-                            <span className="text-gray-700 bg-green-50 px-2 py-0.5 rounded text-[10px] sm:text-xs font-bold shrink-0">COPIED!</span>
+                            <span className={`px-2 py-0.5 rounded text-[10px] sm:text-xs font-bold shrink-0 ${theme === 'dark' ? 'bg-green-900/50 text-green-400' : 'bg-green-50 text-gray-700'}`}>COPIED!</span>
                         )}
                       </div>
 
                       <div className="flex items-center gap-2 sm:gap-3 w-full min-w-0">
-                        <div className="truncate text-black text-sm sm:text-lg min-w-0 flex-1">
+                        <div className="truncate text-sm sm:text-lg min-w-0 flex-1">
                             <strong>Original Url - </strong> 
-                            <span className="font-normal">{url.original}</span>
+                            <span className={`font-normal ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>{url.original}</span>
                         </div>
                         <button 
                           onClick={(e) => {
@@ -272,10 +297,10 @@ export default function AllUrlsPage() {
                           }} 
                           className="shrink-0 cursor-pointer p-1"
                         >
-                            <IoCopyOutline size={20} className="text-gray-400 hover:text-black transition" />
+                            <IoCopyOutline size={20} className={`transition ${theme === 'dark' ? 'text-gray-500 hover:text-white' : 'text-gray-400 hover:text-black'}`} />
                         </button>
                         {copiedUrlId === url.id && copiedType === "original" && (
-                            <span className="text-gray-700 bg-green-50 px-2 py-0.5 rounded text-[10px] sm:text-xs font-bold shrink-0">COPIED!</span>
+                            <span className={`px-2 py-0.5 rounded text-[10px] sm:text-xs font-bold shrink-0 ${theme === 'dark' ? 'bg-green-900/50 text-green-400' : 'bg-green-50 text-gray-700'}`}>COPIED!</span>
                         )}
                       </div>
                     </div>
@@ -285,7 +310,9 @@ export default function AllUrlsPage() {
                         e.stopPropagation();
                         handleDelete(url.id);
                       }}
-                      className="w-full md:w-auto mt-2 md:mt-0 bg-red-50 text-red-600 hover:bg-red-500 hover:text-white border border-red-100 px-6 py-2.5 rounded-lg font-medium transition cursor-pointer whitespace-nowrap shrink-0 opacity-100 md:opacity-80 group-hover:opacity-100"
+                      className={`w-full md:w-auto mt-2 md:mt-0 px-6 py-2.5 rounded-lg font-medium transition cursor-pointer whitespace-nowrap shrink-0 opacity-100 md:opacity-80 group-hover:opacity-100 ${
+                        theme === 'dark' ? 'bg-red-900/20 text-red-400 hover:bg-red-600 hover:text-white border border-red-900/50' : 'bg-red-50 text-red-600 hover:bg-red-500 hover:text-white border border-red-100'
+                      }`}
                     >
                       Delete
                     </button>
@@ -297,10 +324,10 @@ export default function AllUrlsPage() {
         </main>
       </div>
 
-      <nav className="md:hidden fixed bottom-0 w-full bg-white border-t border-gray-200 flex justify-around items-center pb-safe z-30">
+      <nav className={`md:hidden fixed bottom-0 w-full border-t flex justify-around items-center pb-safe z-30 ${theme === 'dark' ? 'bg-black border-gray-800' : 'bg-white border-gray-200'}`}>
         <button
           onClick={() => router.push('/')}
-          className={`flex flex-col items-center gap-1 py-3 px-2 ${pathname === '/' ? 'text-black' : 'text-gray-400 hover:text-black'}`}
+          className={`flex flex-col items-center gap-1 py-3 px-2 ${pathname === '/' ? (theme === 'dark' ? 'text-white' : 'text-black') : (theme === 'dark' ? 'text-gray-500 hover:text-white' : 'text-gray-400 hover:text-black')}`}
         >
           <IoHomeOutline size={24} />
           <span className="text-[10px] font-medium">Home</span>
@@ -308,7 +335,7 @@ export default function AllUrlsPage() {
         
         <button
           onClick={() => router.push('/urls')}
-          className={`flex flex-col items-center gap-1 py-3 px-2 ${pathname === '/urls' ? 'text-black' : 'text-gray-400 hover:text-black'}`}
+          className={`flex flex-col items-center gap-1 py-3 px-2 ${pathname === '/urls' ? (theme === 'dark' ? 'text-white' : 'text-black') : (theme === 'dark' ? 'text-gray-500 hover:text-white' : 'text-gray-400 hover:text-black')}`}
         >
           <IoListOutline size={24} />
           <span className="text-[10px] font-medium">Links</span>
@@ -316,7 +343,7 @@ export default function AllUrlsPage() {
 
         <button
           onClick={() => router.push('/qrcodes')}
-          className={`flex flex-col items-center gap-1 py-3 px-2 ${pathname === '/qrcodes' ? 'text-black' : 'text-gray-400 hover:text-black'}`}
+          className={`flex flex-col items-center gap-1 py-3 px-2 ${pathname === '/qrcodes' ? (theme === 'dark' ? 'text-white' : 'text-black') : (theme === 'dark' ? 'text-gray-500 hover:text-white' : 'text-gray-400 hover:text-black')}`}
         >
           <IoQrCodeOutline size={24} />
           <span className="text-[10px] font-medium">QR</span>
@@ -324,7 +351,7 @@ export default function AllUrlsPage() {
 
         <button
           onClick={() => router.push('/analytics')}
-          className={`flex flex-col items-center gap-1 py-3 px-2 ${pathname === '/analytics' ? 'text-black' : 'text-gray-400 hover:text-black'}`}
+          className={`flex flex-col items-center gap-1 py-3 px-2 ${pathname === '/analytics' ? (theme === 'dark' ? 'text-white' : 'text-black') : (theme === 'dark' ? 'text-gray-500 hover:text-white' : 'text-gray-400 hover:text-black')}`}
         >
           <IoAnalyticsOutline size={24} />
           <span className="text-[10px] font-medium">Analytics</span>
@@ -332,7 +359,7 @@ export default function AllUrlsPage() {
 
         <button
           onClick={() => console.log('Profile clicked')}
-          className="flex flex-col items-center gap-1 py-3 px-2 text-gray-400 hover:text-black"
+          className={`flex flex-col items-center gap-1 py-3 px-2 ${theme === 'dark' ? 'text-gray-500 hover:text-white' : 'text-gray-400 hover:text-black'}`}
         >
           <IoPersonOutline size={24} />
           <span className="text-[10px] font-medium">Profile</span>
@@ -341,26 +368,26 @@ export default function AllUrlsPage() {
 
       {selectedUrl && (
         <div 
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity p-4 cursor-pointer"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm transition-opacity p-4 cursor-pointer"
           onClick={() => setSelectedUrl(null)}
         >
           <div 
-            className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 sm:p-8 transform transition-all cursor-default"
+            className={`rounded-2xl shadow-2xl w-full max-w-md p-6 sm:p-8 transform transition-all cursor-default ${theme === 'dark' ? 'bg-[#111] border border-gray-800' : 'bg-white'}`}
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="text-xl sm:text-2xl font-bold text-black mb-5 sm:mb-6 border-b pb-4">Link Details</h3>
+            <h3 className={`text-xl sm:text-2xl font-bold mb-5 sm:mb-6 border-b pb-4 ${theme === 'dark' ? 'text-white border-gray-800' : 'text-black border-gray-200'}`}>Link Details</h3>
             
             <div className="space-y-5 sm:space-y-6 mb-6 sm:mb-8">
               <div>
-                <p className="text-[10px] sm:text-xs font-bold text-gray-600 uppercase tracking-widest mb-1">Total Clicks</p>
-                <p className="text-3xl sm:text-4xl font-extrabold text-black">
+                <p className={`text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-1 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-600'}`}>Total Clicks</p>
+                <p className={`text-3xl sm:text-4xl font-extrabold ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
                   {selectedUrl.clicks ?? 0}
                 </p>
               </div>
               
               <div>
-                <p className="text-[10px] sm:text-xs font-bold text-gray-600 uppercase tracking-widest mb-1">Created At</p>
-                <p className="text-base sm:text-lg font-medium text-gray-800">
+                <p className={`text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-1 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-600'}`}>Created At</p>
+                <p className={`text-base sm:text-lg font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-800'}`}>
                   {selectedUrl.createdAt 
                     ? new Date(selectedUrl.createdAt).toLocaleDateString('en-US', {
                         year: 'numeric',
@@ -377,7 +404,7 @@ export default function AllUrlsPage() {
             <div className="flex justify-end">
                 <button 
                   onClick={() => setSelectedUrl(null)}
-                  className="w-full sm:w-auto bg-black text-white px-6 py-2.5 sm:py-2 rounded-lg hover:bg-gray-800 transition font-medium cursor-pointer text-sm"
+                  className={`w-full sm:w-auto px-6 py-2.5 sm:py-2 rounded-lg transition font-medium cursor-pointer text-sm ${theme === 'dark' ? 'bg-white text-black hover:bg-gray-200' : 'bg-black text-white hover:bg-gray-800'}`}
                 >
                   Close
                 </button>
