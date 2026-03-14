@@ -14,19 +14,17 @@ export default function Signup() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<{ type: "error" | "success"; text: string } | null>(null);
 
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setMessage(null);
 
     try {
-      const res = await axios.post("/api/auth/signup", {
-        email,
-        password,
-      });
+      const res = await axios.post("/api/auth/signup", 
+        { email, password },
+        { headers: { "Content-Type": "application/json" } }
+      );
 
       router.push("/dashboard");
       router.refresh();
@@ -43,17 +41,6 @@ export default function Signup() {
     <div className="min-h-screen flex items-center justify-center px-4">
       <div className="p-8 rounded-2xl w-full max-w-md">
         <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">Sign Up</h1>
-
-        {message && (
-          <div
-            className={`mb-4 p-3 rounded text-sm text-center ${message.type === "success"
-                ? "bg-green-100 text-green-800"
-                : "bg-red-100 text-red-800"
-              }`}
-          >
-            {message.text}
-          </div>
-        )}
 
         <form className="flex flex-col gap-4" onSubmit={handleSignup}>
           <div className="flex flex-col gap-1">

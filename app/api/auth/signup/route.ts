@@ -2,8 +2,6 @@ import { prisma } from "@/lib/dbConfig";
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { strict } from "assert";
-import path from "path";
 
 
 const NEXTAUTH_SECRET = process.env.NEXTAUTH_SECRET;
@@ -54,7 +52,7 @@ export async function POST(req: NextRequest) {
 
         response.cookies.set("token", token, {
             httpOnly: true,
-            secure: true,
+            secure: process.env.NODE_ENV === "production",
             sameSite: "strict",
             path: "/",
             maxAge: 60 * 60 * 24 * 365,

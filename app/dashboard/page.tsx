@@ -8,7 +8,7 @@ import { IoCopyOutline } from "react-icons/io5";
 
 const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN;
 
-export default function HomePage() {
+export default function Dashboard() {
   const router = useRouter();
 
   const [url, setUrl] = useState("");
@@ -32,6 +32,7 @@ export default function HomePage() {
 
     } catch (error) {
       console.log("Can't short url", error);
+      
     } finally {
       setLoading(false);
     }
@@ -52,6 +53,7 @@ export default function HomePage() {
 
         if (!res.data.authenticated) {
           router.push("/auth/signin");
+          
         } else {
           setIsLoggedIn(true);
         }
