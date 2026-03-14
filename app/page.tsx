@@ -162,12 +162,24 @@ export default function Dashboard() {
             )}
           </div>
 
+          {!isLoggedIn && (
+            <div className="mt-4 flex flex-col items-center justify-center text-xl">
+              <p className="text-gray-800">You can only create 3 links/day</p>
+              <button 
+                onClick={() => router.push("/auth/signin")}
+                className="text-black font-semibold mt-1 hover:underline cursor-pointer"
+              >
+                Login to create more
+              </button>
+            </div>
+          )}
+
         </div>
       </section>
 
-      <section className="flex flex-col items-center justify-center px-6 pb-24">
-        <div className="mt-8 border-t border-gray-200 pt-12 w-full max-w-3xl flex flex-col items-center text-center">
-          <h2 className="text-2xl font-bold text-black mb-3">Manage Your Links</h2>
+      <section className="flex flex-col items-center justify-center px-6 pb-8">
+        <div className="mt-2 border-t border-gray-200 pt-12 w-full max-w-3xl flex flex-col items-center text-center">
+          <h2 className="text-3xl font-bold text-black mb-3">Manage Your Links</h2>
           <p className="text-gray-900 mb-6">See all your previously shortened URLs, copy them, or delete the ones you no longer need.</p>
           
           <button

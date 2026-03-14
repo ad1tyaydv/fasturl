@@ -9,8 +9,9 @@ interface UrlItem {
   id: string;
   original: string;
   shorturl: string;
+  clicks?: number;
+  createdAt?: string;
 }
-
 
 const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN;
 
@@ -23,8 +24,10 @@ export default function AllUrlsPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [copiedUrlId, setCopiedUrlId] = useState<string | null>(null);
   const [copiedType, setCopiedType] = useState<"original" | "short" | null>(null);
-
   
+  // Modal State
+  const [selectedUrl, setSelectedUrl] = useState<UrlItem | null>(null);
+
   useEffect(() => {
     const checkAuth = async () => {
       try {
@@ -41,7 +44,6 @@ export default function AllUrlsPage() {
     checkAuth();
   }, [router]);
 
-
   const fetchUrls = async () => {
     try {
       setLoading(true);
@@ -57,19 +59,15 @@ export default function AllUrlsPage() {
       setUrls(res.data.urls.reverse());
 
     } catch (err) {
-
       console.log("Error fetching URLs:", err);
-
     } finally {
       setLoading(false);
     }
   };
 
-
   useEffect(() => {
     fetchUrls();
   }, []);
-
 
   const copyToClipboard = (url: string, id: string, type: "original" | "short") => {
     navigator.clipboard.writeText(url);
@@ -79,30 +77,25 @@ export default function AllUrlsPage() {
       setCopiedUrlId(null);
       setCopiedType(null);
     }, 2000);
-
   };
-
 
   const handleDelete = async (id: string) => {
     try {
       await axios.delete(`/api/shortUrl/delete${id}`);
       setUrls(urls.filter((u) => u.id !== id));
-
     } catch (err) {
       console.log("Error deleting URL:", err);
     }
   };
-
   
   const handleLogout = async () => {
     await axios.post("/api/auth/logout");
     setIsLoggedIn(false);
     router.push("/auth/signin");
   };
-
   
   return (
-    <div className="bg-white h-screen flex flex-col overflow-hidden">
+    <div className="bg-white h-screen flex flex-col overflow-hidden relative">
       
       <nav className="flex items-center justify-between px-8 py-4 border-b z-20 bg-white shrink-0">
         <h1 className="text-xl font-semibold text-black">SHORTLY</h1>
@@ -117,7 +110,7 @@ export default function AllUrlsPage() {
         ) : (
           <button
             onClick={() => router.push("/auth/signin")}
-            className="border border-black text-black px-4 py-1.5 rounded-md hover:bg-black hover:text-white transition font-medium"
+            className="border border-black text-black px-4 py-1.5 rounded-md hover:bg-black hover:text-white transition font-medium cursor-pointer"
           >
             Login
           </button>
@@ -198,7 +191,7 @@ export default function AllUrlsPage() {
                 <p className="text-gray-500 text-lg mb-6">You haven't saved any URLs yet.</p>
                 <button 
                   onClick={() => router.push('/dashboard')}
-                  className="bg-black text-white px-8 py-3 rounded-lg hover:bg-gray-800 transition font-medium"
+                  className="bg-black text-white px-8 py-3 rounded-lg hover:bg-gray-800 transition font-medium cursor-pointer"
                 >
                   Shorten your first link
                 </button>
@@ -208,7 +201,8 @@ export default function AllUrlsPage() {
                 {urls.map((url) => (
                   <div
                     key={url.id}
-                    className="border border-gray-200 p-6 rounded-xl flex items-center justify-between gap-6 hover:shadow-md hover:border-gray-300 transition bg-white"
+                    onClick={() => setSelectedUrl(url)}
+                    className="border border-gray-200 p-6 rounded-xl flex items-center justify-between gap-6 hover:shadow-md hover:border-gray-300 transition bg-white cursor-pointer group"
                   >
                     <div className="flex flex-col gap-3 w-full overflow-hidden">
                       
@@ -217,8 +211,14 @@ export default function AllUrlsPage() {
                             <strong>Short Url - </strong> 
                             <span className="font-normal">{NEXT_DOMAIN}/{url.shorturl}</span>
                         </div>
-                        <button onClick={() => copyToClipboard(`${NEXT_DOMAIN}/${url.shorturl}`, url.id, "short")} className="shrink-0">
-                            <IoCopyOutline size={22} className="text-gray-400 hover:text-black transition cursor-pointer" />
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            copyToClipboard(`${NEXT_DOMAIN}/${url.shorturl}`, url.id, "short");
+                          }} 
+                          className="shrink-0 cursor-pointer"
+                        >
+                            <IoCopyOutline size={22} className="text-gray-400 hover:text-black transition" />
                         </button>
                         {copiedUrlId === url.id && copiedType === "short" && (
                             <span className="text-gray-700 bg-green-50 px-2 py-0.5 rounded text-xs font-bold shrink-0">COPIED!</span>
@@ -230,19 +230,27 @@ export default function AllUrlsPage() {
                             <strong>Original Url - </strong> 
                             <span className="font-normal">{url.original}</span>
                         </div>
-                        <button onClick={() => copyToClipboard(url.original, url.id, "original")} className="shrink-0">
-                            <IoCopyOutline size={22} className="text-gray-400 hover:text-black transition cursor-pointer" />
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            copyToClipboard(url.original, url.id, "original");
+                          }} 
+                          className="shrink-0 cursor-pointer"
+                        >
+                            <IoCopyOutline size={22} className="text-gray-400 hover:text-black transition" />
                         </button>
                             {copiedUrlId === url.id && copiedType === "original" && (
                                 <span className="text-gray-700 bg-green-50 px-2 py-0.5 rounded text-xs font-bold shrink-0">COPIED!</span>
                             )}
                         </div>
-  
                     </div>
 
                     <button
-                      onClick={() => handleDelete(url.id)}
-                      className="bg-red-50 text-red-600 hover:bg-red-500 hover:text-white border border-red-100 px-6 py-2.5 rounded-lg font-medium transition cursor-pointer whitespace-nowrap shrink-0"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(url.id);
+                      }}
+                      className="bg-red-50 text-red-600 hover:bg-red-500 hover:text-white border border-red-100 px-6 py-2.5 rounded-lg font-medium transition cursor-pointer whitespace-nowrap shrink-0 opacity-80 group-hover:opacity-100"
                     >
                       Delete
                     </button>
@@ -253,6 +261,53 @@ export default function AllUrlsPage() {
           </div>
         </main>
       </div>
+
+      {selectedUrl && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity p-4 cursor-pointer"
+          onClick={() => setSelectedUrl(null)}
+        >
+          <div 
+            className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 transform transition-all cursor-default"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-2xl font-bold text-black mb-6 border-b pb-4">Link Details</h3>
+            
+            <div className="space-y-6 mb-8">
+              <div>
+                <p className="text-xs font-bold text-gray-600 uppercase tracking-widest mb-1">Total Clicks</p>
+                <p className="text-4xl font-extrabold text-black">
+                  {selectedUrl.clicks ?? 0}
+                </p>
+              </div>
+              
+              <div>
+                <p className="text-xs font-bold text-gray-600 uppercase tracking-widest mb-1">Created At</p>
+                <p className="text-lg font-medium text-gray-800">
+                  {selectedUrl.createdAt 
+                    ? new Date(selectedUrl.createdAt).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      }) 
+                    : "Not Available"}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex justify-end">
+                <button 
+                  onClick={() => setSelectedUrl(null)}
+                  className="bg-black text-white px-6 py-2 rounded-lg hover:bg-gray-800 transition font-medium cursor-pointer text-sm"
+                >
+                  Close
+                </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
