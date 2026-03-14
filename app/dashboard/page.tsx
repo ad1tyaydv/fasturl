@@ -5,6 +5,9 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FiCopy } from "react-icons/fi";
 
+
+const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN;
+
 export default function HomePage() {
   const router = useRouter();
 
@@ -35,7 +38,7 @@ export default function HomePage() {
   };
 
   const copyToClipboard = () => {
-    const fullUrl = `shortly.com/${shortUrl}`;
+    const fullUrl = `${NEXT_DOMAIN}/${shortUrl}`;
     navigator.clipboard.writeText(fullUrl);
 
     setCopied(true);
@@ -128,7 +131,7 @@ export default function HomePage() {
             {shortUrl ? (
               <>
                 <span className="text-black font-medium">
-                  shortly.com/{shortUrl}
+                  short.ly/{shortUrl}
                 </span>
 
                 <button
