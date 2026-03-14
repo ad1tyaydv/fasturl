@@ -26,7 +26,7 @@ export default function Signup() {
         { headers: { "Content-Type": "application/json" } }
       );
 
-      router.push("/dashboard");
+      router.push("/");
       router.refresh();
 
     } catch (error: any) {

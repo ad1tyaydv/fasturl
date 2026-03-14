@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
         }
       });
 
-      if (count > 3) {
+      if (count > 2) {
         return NextResponse.json(
           { message: "Anonymous users can only create 3 links per day" },
           { status: 429 }

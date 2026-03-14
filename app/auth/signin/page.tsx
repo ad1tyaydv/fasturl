@@ -29,7 +29,7 @@ export default function Login() {
       setEmail("");
       setPassword("");
 
-      router.push("/dashboard");
+      router.push("/");
 
     } catch (error: any) {
       setMessage({ type: "error", text: error.response?.data?.message || "Invalid credentials!" });
