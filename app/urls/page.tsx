@@ -3,7 +3,15 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { IoCopyOutline, IoHomeOutline, IoListOutline, IoSettingsOutline, IoPersonOutline } from "react-icons/io5";
+import { 
+  IoCopyOutline, 
+  IoHomeOutline, 
+  IoListOutline, 
+  IoSettingsOutline, 
+  IoPersonOutline,
+  IoQrCodeOutline,
+  IoAnalyticsOutline
+} from "react-icons/io5";
 
 interface UrlItem {
   id: string;
@@ -149,7 +157,31 @@ export default function AllUrlsPage() {
                 }`}
               >
                 <IoListOutline size={20} />
-                My URLs
+                Links
+              </button>
+
+              <button
+                onClick={() => router.push('/qrcodes')}
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition cursor-pointer ${
+                  pathname === '/qrcodes' 
+                    ? 'bg-black text-white' 
+                    : 'text-gray-600 hover:bg-gray-200 hover:text-black'
+                }`}
+              >
+                <IoQrCodeOutline size={20} />
+                QR Codes
+              </button>
+
+              <button
+                onClick={() => router.push('/analytics')}
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition cursor-pointer ${
+                  pathname === '/analytics' 
+                    ? 'bg-black text-white' 
+                    : 'text-gray-600 hover:bg-gray-200 hover:text-black'
+                }`}
+              >
+                <IoAnalyticsOutline size={20} />
+                Analytics
               </button>
             </div>
           </div>
@@ -268,7 +300,7 @@ export default function AllUrlsPage() {
       <nav className="md:hidden fixed bottom-0 w-full bg-white border-t border-gray-200 flex justify-around items-center pb-safe z-30">
         <button
           onClick={() => router.push('/')}
-          className={`flex flex-col items-center gap-1 py-3 px-4 ${pathname === '/' ? 'text-black' : 'text-gray-400 hover:text-black'}`}
+          className={`flex flex-col items-center gap-1 py-3 px-2 ${pathname === '/' ? 'text-black' : 'text-gray-400 hover:text-black'}`}
         >
           <IoHomeOutline size={24} />
           <span className="text-[10px] font-medium">Home</span>
@@ -276,15 +308,31 @@ export default function AllUrlsPage() {
         
         <button
           onClick={() => router.push('/urls')}
-          className={`flex flex-col items-center gap-1 py-3 px-4 ${pathname === '/urls' ? 'text-black' : 'text-gray-400 hover:text-black'}`}
+          className={`flex flex-col items-center gap-1 py-3 px-2 ${pathname === '/urls' ? 'text-black' : 'text-gray-400 hover:text-black'}`}
         >
           <IoListOutline size={24} />
           <span className="text-[10px] font-medium">Links</span>
         </button>
 
         <button
+          onClick={() => router.push('/qrcodes')}
+          className={`flex flex-col items-center gap-1 py-3 px-2 ${pathname === '/qrcodes' ? 'text-black' : 'text-gray-400 hover:text-black'}`}
+        >
+          <IoQrCodeOutline size={24} />
+          <span className="text-[10px] font-medium">QR</span>
+        </button>
+
+        <button
+          onClick={() => router.push('/analytics')}
+          className={`flex flex-col items-center gap-1 py-3 px-2 ${pathname === '/analytics' ? 'text-black' : 'text-gray-400 hover:text-black'}`}
+        >
+          <IoAnalyticsOutline size={24} />
+          <span className="text-[10px] font-medium">Analytics</span>
+        </button>
+
+        <button
           onClick={() => console.log('Profile clicked')}
-          className="flex flex-col items-center gap-1 py-3 px-4 text-gray-400 hover:text-black"
+          className="flex flex-col items-center gap-1 py-3 px-2 text-gray-400 hover:text-black"
         >
           <IoPersonOutline size={24} />
           <span className="text-[10px] font-medium">Profile</span>

@@ -17,6 +17,24 @@ export async function POST(req: NextRequest) {
     const data = await req.json();
     const token = req.cookies.get("token")?.value;
 
+    const urlAlreadyExists = await prisma.link.findFirst({
+        where: {
+            original: data.url
+        },
+        select: {
+            shorturl: true,
+            original: true,
+        }
+    })
+
+    if(urlAlreadyExists) {
+        return NextResponse.json({
+            message: "Short URL already exists",
+            shortUrl: urlAlreadyExists.shorturl,
+            original: urlAlreadyExists.original
+        });
+    }
+
     let userId: string;
     let count: number = 0;
 
