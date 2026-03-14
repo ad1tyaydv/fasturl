@@ -129,10 +129,10 @@ export default function AllUrlsPage() {
             <p className="text-xs font-bold text-gray-400 mb-4 px-2 uppercase tracking-wider">Menu</p>
             <div className="flex flex-col gap-2">
               <button
-                onClick={() => router.push('/dashboard')}
+                onClick={() => router.push('/')}
                 className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition cursor-pointer ${
-                  pathname === '/dashboard' 
-                    ? 'bg-black text-white' 
+                  pathname === '/'
+                    ? 'bg-black text-white'
                     : 'text-gray-600 hover:bg-gray-200 hover:text-black'
                 }`}
               >
@@ -193,7 +193,7 @@ export default function AllUrlsPage() {
               <div className="text-center mt-10 sm:mt-16 p-8 sm:p-12 border-2 border-dashed border-gray-300 rounded-2xl bg-gray-50">
                 <p className="text-gray-500 text-base sm:text-lg mb-6">You haven't saved any URLs yet.</p>
                 <button 
-                  onClick={() => router.push('/dashboard')}
+                  onClick={() => router.push('/')}
                   className="w-full sm:w-auto bg-black text-white px-8 py-3 rounded-lg hover:bg-gray-800 transition font-medium cursor-pointer"
                 >
                   Shorten your first link
@@ -267,8 +267,8 @@ export default function AllUrlsPage() {
 
       <nav className="md:hidden fixed bottom-0 w-full bg-white border-t border-gray-200 flex justify-around items-center pb-safe z-30">
         <button
-          onClick={() => router.push('/dashboard')}
-          className={`flex flex-col items-center gap-1 py-3 px-4 ${pathname === '/dashboard' ? 'text-black' : 'text-gray-400 hover:text-black'}`}
+          onClick={() => router.push('/')}
+          className={`flex flex-col items-center gap-1 py-3 px-4 ${pathname === '/' ? 'text-black' : 'text-gray-400 hover:text-black'}`}
         >
           <IoHomeOutline size={24} />
           <span className="text-[10px] font-medium">Home</span>
