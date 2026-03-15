@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/dbConfig";
 import { NextRequest, NextResponse } from "next/server";
-
+import { stateMap } from "../helpers/getStateName";
 
 export async function GET(req: NextRequest, { params } : { params: Promise<{ shortUrl: string}> }) {
     
@@ -11,8 +11,10 @@ export async function GET(req: NextRequest, { params } : { params: Promise<{ sho
                "127.0.0.1";
         
     const country = req.headers.get("x-vercel-ip-country") || "Unknown";
-    // Can add a mapping table for the state
+
     const state = req.headers.get("x-vercel-ip-country-region") || "Unknown";
+    const stateFullNames = stateMap[state] ?? state;
+
     const city = req.headers.get("x-vercel-ip-city") || "Unknown";
 
     let getBrowser = req.headers.get("sec-ch-ua");
@@ -62,8 +64,8 @@ export async function GET(req: NextRequest, { params } : { params: Promise<{ sho
             linkId: findUrl.id,
             ip: ip,
             country: country,
+            state: stateFullNames,
             city: city,
-            state: state,
             browser: browser,
             device: device,
             OS: operatingSystem,
