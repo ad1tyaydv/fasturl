@@ -6,7 +6,9 @@ import { useEffect, useState } from "react";
 import { 
   IoCopyOutline, 
   IoRefreshOutline, 
-  IoArrowForwardOutline 
+  IoArrowForwardOutline,
+  IoLinkOutline,
+  IoQrCodeOutline
 } from "react-icons/io5";
 
 import { ModeToggle } from "./components/toggleTheme";
@@ -79,6 +81,17 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen transition-colors duration-300 bg-background text-foreground">
       
+      <style dangerouslySetInnerHTML={{__html: `
+        @keyframes gentleShake {
+          0%, 100% { transform: rotate(0deg); }
+          25% { transform: rotate(-0.5deg); }
+          75% { transform: rotate(0.5deg); }
+        }
+        .animate-gentle-shake {
+          animation: gentleShake 3s infinite ease-in-out;
+        }
+      `}} />
+
       <nav className="flex items-center justify-between px-4 sm:px-8 py-4 border-b border-border">
         <h1 className="text-lg sm:text-xl font-semibold">SHORTLY</h1>
 
@@ -177,8 +190,8 @@ export default function Dashboard() {
         </div>
       </section>
 
-      <section className="flex flex-col items-center justify-center px-4 sm:px-6 pb-8">
-        <div className="mt-2 border-t border-border pt-8 md:pt-12 w-full max-w-3xl flex flex-col items-center text-center">
+      <section className="flex flex-col items-center justify-center px-4 sm:px-6 pb-12 border-b border-border">
+        <div className="mt-2 w-full max-w-3xl flex flex-col items-center text-center">
           <h2 className="text-2xl sm:text-3xl font-bold mb-3">Manage Your Links</h2>
           <p className="mb-6 text-sm sm:text-base px-2 text-muted-foreground">
             See all your previously shortened URLs, copy them, or delete the ones you no longer need.
@@ -194,8 +207,91 @@ export default function Dashboard() {
         </div>
       </section>
 
+      <section className="px-4 sm:px-8 py-16 md:py-24 max-w-7xl mx-auto flex flex-col xl:flex-row gap-12 xl:gap-10 items-center xl:items-start">
+        <div className="xl:w-1/3 text-center xl:text-left pt-2">
+          <h2 className="text-3xl sm:text-4xl font-extrabold mb-5 leading-tight">
+            Unlock the Full Potential of Your Links.
+          </h2>
+          <p className="text-muted-foreground mb-5 text-base sm:text-lg">
+            Stop guessing and start tracking. Whether you are a solo creator or a growing enterprise, our advanced tools deliver the insights you need to succeed.
+          </p>
+          <p className="text-muted-foreground text-base sm:text-lg">
+            Build brand trust with custom short domains, generate dynamic QR codes, and monitor global engagement in real-time. Upgrade your toolkit today.
+          </p>
+        </div>
+
+        <div className="xl:w-2/3 grid grid-cols-1 md:grid-cols-3 gap-6 w-full items-stretch">
+          
+          <div className="border border-border rounded-2xl p-6 bg-card flex flex-col shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300">
+            <h3 className="text-xl font-bold text-center mb-4">Free</h3>
+            <div className="text-center text-4xl font-extrabold mb-6">$0</div>
+            <button className="w-full bg-foreground text-background py-2.5 rounded-lg font-semibold text-sm sm:text-base mb-6 transition hover:bg-foreground/90 cursor-pointer">
+              Start for free
+            </button>
+            <ul className="space-y-4 text-sm font-medium flex-1">
+              <li className="flex items-center">
+                <span className="bg-[#facc15] text-black px-2.5 py-1 rounded flex items-center gap-2 font-bold shadow-sm">
+                  <IoLinkOutline size={16} /> 3 Links/Day
+                </span>
+              </li>
+              <li className="flex items-center gap-2.5 px-1 text-muted-foreground">
+                <IoQrCodeOutline size={18} className="text-foreground"/> 1 QR Code/Day
+              </li>
+            </ul>
+          </div>
+
+          <div className="relative md:scale-105 z-10 flex flex-col">
+            <div className="animate-gentle-shake border-2 border-primary/50 bg-card rounded-2xl p-6 flex flex-col shadow-xl dark:shadow-[0_0_20px_-5px_hsl(var(--primary)/0.3)] hover:-translate-y-1 transition-transform duration-300 h-full">
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-primary text-primary-foreground px-3 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest shadow-sm">
+                Most Popular
+              </div>
+              <h3 className="text-xl font-bold text-center mb-4 text-foreground mt-2">Essentials</h3>
+              <div className="text-center mb-6 flex justify-center items-end gap-2.5">
+                <span className="line-through decoration-red-500 decoration-2 text-muted-foreground text-2xl font-bold mb-0.5">$15</span>
+                <span className="text-5xl font-extrabold text-foreground">$6<span className="text-lg font-bold text-muted-foreground">/mo</span></span>
+              </div>
+              <button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 py-2.5 rounded-lg font-semibold text-sm sm:text-base mb-6 transition shadow-sm cursor-pointer">
+                Upgrade Now
+              </button>
+              <ul className="space-y-4 text-sm font-medium flex-1">
+                <li className="flex items-center">
+                  <span className="bg-[#facc15] text-black px-2.5 py-1 rounded flex items-center gap-2 font-bold shadow-sm">
+                    <IoLinkOutline size={16} /> 400 Links/Mo
+                  </span>
+                </li>
+                <li className="flex items-center gap-2.5 px-1 text-muted-foreground">
+                  <IoQrCodeOutline size={18} className="text-foreground"/> 20 QR Codes/Mo
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="border border-border rounded-2xl p-6 bg-card flex flex-col shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300">
+            <h3 className="text-xl font-bold text-center mb-4">Premium</h3>
+            <div className="text-center mb-6 flex justify-center items-end gap-2.5">
+              <span className="line-through decoration-red-500 decoration-2 text-muted-foreground text-xl font-bold mb-1">$499</span>
+              <span className="text-4xl font-extrabold">$299<span className="text-lg font-bold text-muted-foreground">/mo</span></span>
+            </div>
+            <button className="w-full bg-secondary text-secondary-foreground py-2.5 rounded-lg font-semibold text-sm sm:text-base mb-6 transition hover:bg-secondary/80 cursor-pointer">
+              Go Premium
+            </button>
+            <ul className="space-y-4 text-sm font-medium flex-1">
+              <li className="flex items-center">
+                <span className="bg-[#facc15] text-black px-2.5 py-1 rounded flex items-center gap-2 font-bold shadow-sm">
+                  <IoLinkOutline size={16} /> Unlimited Links
+                </span>
+              </li>
+              <li className="flex items-center gap-2.5 px-1 text-muted-foreground">
+                <IoQrCodeOutline size={18} className="text-foreground"/> 500 QR Codes/Mo
+              </li>
+            </ul>
+          </div>
+
+        </div>
+      </section>
+
       {copied && (
-        <div className="absolute top-20 sm:top-24 left-1/2 -translate-x-1/2 mt-1 px-6 py-2 rounded-md shadow-lg text-xs sm:text-sm z-50 animate-bounce bg-primary text-primary-foreground">
+        <div className="fixed top-20 sm:top-24 left-1/2 -translate-x-1/2 mt-1 px-6 py-2 rounded-md shadow-lg text-xs sm:text-sm z-50 animate-bounce bg-primary text-primary-foreground">
           URL Copied!
         </div>
       )}
