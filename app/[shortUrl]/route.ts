@@ -15,6 +15,16 @@ export async function GET(req: NextRequest, { params } : { params: Promise<{ sho
     const state = req.headers.get("x-vercel-ip-country-region") || "Unknown";
     const city = req.headers.get("x-vercel-ip-city") || "Unknown";
 
+    const browser = req.headers.get("sec-ch-ua") ||
+                    req.headers.get("user-agents") ||
+                    "Unknown";
+
+    const deviceCheck = req.headers.get("sec-ch-ua-mobile");
+    const device = deviceCheck === "?1" ? "Mobile" : "Desktop";
+
+    const operatingSystem = req.headers.get("sec-ch-ua-platform");
+
+
     const findUrl = await prisma.link.findUnique({
         where: {
             shorturl: shortUrl
@@ -47,6 +57,9 @@ export async function GET(req: NextRequest, { params } : { params: Promise<{ sho
             country: country,
             city: city,
             state: state,
+            browser: browser,
+            device: device,
+            OS: operatingSystem,
             referrer: req.headers.get("referer") || "Direct",
         }
     })

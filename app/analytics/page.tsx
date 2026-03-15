@@ -17,12 +17,15 @@ import {
   IoLinkOutline,
   IoGlobeOutline,
   IoPhonePortraitOutline,
+  IoHardwareChipOutline,
+  IoShareSocialOutline,
+  IoCompassOutline
 } from "react-icons/io5";
 
 import { ModeToggle } from "../components/toggleTheme";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884d8"];
+const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899", "#14b8a6"];
 
 export default function AnalyticsPage() {
   const router = useRouter();
@@ -32,19 +35,7 @@ export default function AnalyticsPage() {
   const [selectedLink, setSelectedLink] = useState<any | null>(null);
   const [urls, setUrls] = useState<any[]>([]);
   const [analytics, setAnalytics] = useState<any>(null);
-
-  const analyticsData = {
-    countries: [
-      { name: "USA", value: 400 }, { name: "India", value: 300 }, { name: "UK", value: 200 }, { name: "Germany", value: 100 },
-    ],
-    devices: [
-      { name: "Mobile", value: 600 }, { name: "Desktop", value: 350 }, { name: "Tablet", value: 50 },
-    ],
-    browsers: [
-      { name: "Chrome", value: 500 }, { name: "Safari", value: 300 }, { name: "Firefox", value: 100 },
-    ]
-  };
-
+  const [isLoadingAnalytics, setIsLoadingAnalytics] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -52,13 +43,11 @@ export default function AnalyticsPage() {
         const res = await axios.get("/api/auth/me");
         if (!res.data.authenticated) {
           router.push("/auth/signin");
-
         } else {
           setIsLoggedIn(true);
           const urlRes = await axios.get("/api/fetchUrls");
           setUrls(urlRes.data.urls);
         }
-
       } catch {
         router.push("/auth/signin");
       }
@@ -66,30 +55,35 @@ export default function AnalyticsPage() {
     checkAuth();
   }, [router]);
   
-
   const handleLogout = async () => {
     await axios.post("/api/auth/logout");
     setIsLoggedIn(false);
     router.push("/auth/signin");
   };
 
-
   const handleLinkAnaltyics = async (linkId: string) => {
+    setIsLoadingAnalytics(true);
+    setAnalytics(null);
     try {
         const res = await axios.get("/api/analytics", {
-            params: {
-                linkId: linkId,
-            }
-        })
-
+            params: { linkId: linkId }
+        });
         setAnalytics(res.data);
-        console.log(res.data);
-
     } catch (error) {
         console.log("Something went wrong", error);
+    } finally {
+        setIsLoadingAnalytics(false);
     }
-  }
+  };
 
+
+  const tooltipStyle = {
+    backgroundColor: "hsl(var(--card))",
+    color: "hsl(var(--card-foreground))",
+    borderColor: "hsl(var(--border))",
+    borderRadius: "8px",
+    boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
+  };
 
   return (
     <div className="h-screen flex flex-col overflow-hidden relative transition-colors duration-300 bg-background text-foreground">
@@ -130,7 +124,7 @@ export default function AnalyticsPage() {
         </aside>
 
         <main className="flex-1 overflow-y-auto p-4 sm:p-8 bg-background">
-          <div className="max-w-5xl mx-auto">
+          <div className="max-w-6xl mx-auto">
             {!selectedLink ? (
               <>
                 <div className="mb-8">
@@ -165,9 +159,9 @@ export default function AnalyticsPage() {
               <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <button
                   onClick={() => setSelectedLink(null)}
-                  className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors mb-4"
+                  className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors mb-4 cursor-pointer"
                 >
-                  <IoArrowBackOutline size={18} /> Back to all links
+                  <IoArrowBackOutline size={18} /> Back
                 </button>
 
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -181,49 +175,116 @@ export default function AnalyticsPage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-20">
-                  <AnalyticsCard title="Geographic Distribution" icon={<IoGlobeOutline size={18}/>}>
-                    <div className="h-[300px] w-full mt-4 overflow-y-auto">
-                        {analytics?.countries?.map((c: any) => (
-                        <div
-                            key={`${c.country}-${c.state}`}
-                            className="flex justify-between text-sm border-b border-border pb-1"
-                        >
-                            <span className="text-muted-foreground font-medium">
-                                {c.country}, {c.state || "Unknown"}
-                            </span>
-                            <span className="font-bold">
-                                {c.count}
-                            </span>
+                {isLoadingAnalytics ? (
+                    <div className="flex justify-center items-center h-40">
+                        <p className="text-muted-foreground animate-pulse">Loading analytics data...</p>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-20">
+                    
+                    <AnalyticsCard title="Geographic Distribution" icon={<IoGlobeOutline size={18}/>}>
+                        <div className="h-[250px] w-full mt-4 overflow-y-auto pr-2">
+                            {analytics?.countries?.map((c: any) => (
+                            <div key={`${c.country}-${c.state}`} className="flex justify-between items-center text-sm border-b border-border py-2">
+                                <span className="text-foreground font-medium">
+                                    {c.country} <span className="text-muted-foreground text-xs ml-1">({c.state || "Unknown"})</span>
+                                </span>
+                                <span className="font-bold bg-muted px-2 py-1 rounded-md text-xs">
+                                    {c.count} clicks
+                                </span>
+                            </div>
+                            ))}
+                            {!analytics?.countries?.length && (
+                                <p className="text-xs text-muted-foreground pt-4">No location data available.</p>
+                            )}
                         </div>
-                        ))}
-                        {!analytics?.countries?.length && (
-                            <p className="text-xs text-muted-foreground">No data available.</p>
-                        )}
-                    </div>
-                  </AnalyticsCard>
+                    </AnalyticsCard>
 
-                  <AnalyticsCard title="Devices & Browsers" icon={<IoPhonePortraitOutline size={18}/>}>
-                    <div className="flex flex-col sm:flex-row items-center h-[300px] mt-4">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
-                          <Pie data={analyticsData.devices} innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value">
-                            {analyticsData.devices.map((_, index) => <Cell key={index} fill={COLORS[index % COLORS.length]} />)}
-                          </Pie>
-                          <Tooltip />
-                        </PieChart>
-                      </ResponsiveContainer>
-                      <div className="w-full space-y-3 px-4">
-                        {analyticsData.browsers.map((b) => (
-                          <div key={b.name} className="flex justify-between text-sm border-b border-border pb-1">
-                            <span className="text-muted-foreground font-medium">{b.name}</span>
-                            <span className="font-bold">{b.value}</span>
-                          </div>
-                        ))}
-                      </div>
+                    <AnalyticsCard title="Top Referrers" icon={<IoShareSocialOutline size={18}/>}>
+                        <div className="h-[250px] w-full mt-4">
+                            {analytics?.referrers?.length > 0 ? (
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <BarChart data={analytics.referrers} layout="vertical" margin={{ top: 0, right: 0, left: 20, bottom: 0 }}>
+                                        <XAxis type="number" hide />
+                                        <YAxis dataKey="referrer" type="category" width={80} stroke="#888" fontSize={12} tickLine={false} axisLine={false} />
+                                        <Tooltip cursor={{fill: 'var(--accent)', opacity: 0.2}} contentStyle={tooltipStyle} />
+                                        <Bar dataKey="count" fill="#10b981" radius={[0, 4, 4, 0]} barSize={24} />
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            ) : (
+                                <p className="text-xs text-muted-foreground pt-4">No referrer data available.</p>
+                            )}
+                        </div>
+                    </AnalyticsCard>
+
+                    <AnalyticsCard title="Browsers" icon={<IoCompassOutline size={18}/>}>
+                        <div className="flex flex-col sm:flex-row items-center h-[250px] mt-4">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <PieChart>
+                            <Pie data={analytics?.browsers || []} nameKey="browser" dataKey="count" innerRadius={50} outerRadius={80} paddingAngle={5}>
+                                {analytics?.browsers?.map((_: any, index: number) => <Cell key={index} fill={COLORS[index % COLORS.length]} />)}
+                            </Pie>
+                            <Tooltip contentStyle={tooltipStyle} />
+                            </PieChart>
+                        </ResponsiveContainer>
+                        <div className="w-full space-y-3 px-4 overflow-y-auto max-h-full">
+                            {analytics?.browsers?.map((b: any, index: number) => (
+                            <div key={b.browser} className="flex justify-between items-center text-sm border-b border-border pb-1">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
+                                    <span className="text-foreground font-medium">{b.browser}</span>
+                                </div>
+                                <span className="font-bold">{b.count}</span>
+                            </div>
+                            ))}
+                        </div>
+                        </div>
+                    </AnalyticsCard>
+
+                    <AnalyticsCard title="Devices" icon={<IoPhonePortraitOutline size={18}/>}>
+                        <div className="flex flex-col sm:flex-row items-center h-[250px] mt-4">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <PieChart>
+                            <Pie data={analytics?.devices || []} nameKey="devices" dataKey="count" innerRadius={50} outerRadius={80} paddingAngle={5}>
+                                {analytics?.devices?.map((_: any, index: number) => <Cell key={index} fill={COLORS[(index + 2) % COLORS.length]} />)}
+                            </Pie>
+                            <Tooltip contentStyle={tooltipStyle} />
+                            </PieChart>
+                        </ResponsiveContainer>
+                        <div className="w-full space-y-3 px-4 overflow-y-auto max-h-full">
+                            {analytics?.devices?.map((d: any, index: number) => (
+                            <div key={d.devices} className="flex justify-between items-center text-sm border-b border-border pb-1">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[(index + 2) % COLORS.length] }} />
+                                    <span className="text-foreground font-medium">{d.devices}</span>
+                                </div>
+                                <span className="font-bold">{d.count}</span>
+                            </div>
+                            ))}
+                        </div>
+                        </div>
+                    </AnalyticsCard>
+
+                    <AnalyticsCard title="Operating Systems" icon={<IoHardwareChipOutline size={18}/>}>
+                        <div className="h-[250px] w-full mt-4">
+                            {analytics?.os?.length > 0 ? (
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <BarChart data={analytics.os} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                                        <XAxis dataKey="os" stroke="#888" fontSize={12} tickLine={false} axisLine={false} />
+                                        <YAxis stroke="#888" fontSize={12} tickLine={false} axisLine={false} allowDecimals={false} />
+                                        <Tooltip cursor={{fill: 'var(--accent)', opacity: 0.2}} contentStyle={tooltipStyle} />
+                                        <Bar dataKey="count" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={40} />
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            ) : (
+                                <p className="text-xs text-muted-foreground pt-4">No OS data available.</p>
+                            )}
+                        </div>
+                    </AnalyticsCard>
+
                     </div>
-                  </AnalyticsCard>
-                </div>
+                )}
               </div>
             )}
           </div>
@@ -240,6 +301,7 @@ export default function AnalyticsPage() {
     </div>
   );
 }
+
 function SidebarItem({ icon, label, active, onClick }: any) {
   return (
     <button
@@ -265,7 +327,7 @@ function AnalyticsCard({ title, icon, children }: any) {
   return (
     <Card className="bg-card border-border shadow-sm">
       <CardHeader className="pb-2">
-        <CardTitle className="text-lg font-bold flex items-center gap-2">{icon} {title}</CardTitle>
+        <CardTitle className="text-lg font-bold flex items-center gap-2 text-foreground">{icon} {title}</CardTitle>
       </CardHeader>
       <CardContent>{children}</CardContent>
     </Card>

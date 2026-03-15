@@ -21,6 +21,7 @@ model User {
 
 model Link {
   id           String      @id @default(uuid())
+  linkName     String?
   shorturl     String      @unique
   original     String
   clicks       Int         @default(0)
@@ -47,6 +48,7 @@ model Click {
 
   device      String?
   browser     String?
+  OS          String?
 
   referrer     String?
 

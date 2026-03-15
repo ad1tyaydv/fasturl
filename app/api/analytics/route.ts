@@ -33,16 +33,76 @@ export async function GET(req: NextRequest) {
                 linkId: true
             }
         })
-
-        const formatted = clicks.map((c) => ({
-            country: c.country || "Unknown",
-            state: c.state || "Unknown",
-            count: c._count.linkId,
+        const formatted = clicks.map((a) => ({
+            country: a.country || "Unknown",
+            state: a.state || "Unknown",
+            count: a._count.linkId,
         }));
+
+
+        const browsers = await prisma.click.groupBy({
+            by: ["browser"],
+            where: {
+                linkId: linkId,
+            },
+            _count: {
+                browser: true
+            }
+        })
+        const browserData = browsers.map((b) => ({
+            browser: b.browser || "Unknown",
+            count: b._count.browser,
+        }))
+
+
+        const devices = await prisma.click.groupBy({
+            by: ["device"],
+            where: {
+                linkId: linkId,
+            },
+            _count: {
+                device: true
+            }
+        })
+        const deviceData = devices.map((c) => ({
+            devices: c.device || "Unknown",
+            count: c._count.device,
+        }))
+
+
+        const os = await prisma.click.groupBy({
+            by: ["OS"],
+            where: {
+                linkId: linkId,
+            },
+            _count: {
+                OS: true
+            }
+        })
+        const osData = os.map((d) => ({
+            os: d.OS || "Unknown",
+            count: d._count.OS,
+        }))
+
+
+        const referrers = await prisma.click.groupBy({
+            by: ["referrer"],
+            where: { linkId },
+            _count: { referrer: true }
+        });
+        const referrerData = referrers.map((e) => ({
+            referrer: e.referrer || "Direct",
+            count: e._count.referrer
+        }));
+
 
         return NextResponse.json({
             message: "Analytics fetched successfully",
             countries: formatted,
+            browsers: browserData,
+            devices: deviceData,
+            os: osData,
+            referrers: referrerData
         });
 
     } catch (error) {
