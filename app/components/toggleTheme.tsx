@@ -3,7 +3,6 @@
 import * as React from "react"
 import { Moon, Sun } from "lucide-react"
 import { useTheme } from "next-themes"
-
 import { Button } from "@/components/ui/button"
 
 export function ModeToggle() {
@@ -14,26 +13,58 @@ export function ModeToggle() {
     setMounted(true)
   }, [])
 
-  if (!mounted) {
-    return (
-      <Button variant="outline" size="icon" className="rounded-full">
-        <div className="h-[1.2rem] w-[1.2rem]" />
-      </Button>
+  const toggleTheme = (event: React.MouseEvent<HTMLButtonElement>) => {
+    const isAppearanceTransition =
+      document.startViewTransition &&
+      !window.matchMedia("(prefers-reduced-motion: reduce)").matches
+
+    if (!isAppearanceTransition) {
+      setTheme(theme === "dark" ? "light" : "dark")
+      return
+    }
+
+    const x = event.clientX
+    const y = event.clientY
+    const endRadius = Math.hypot(
+      Math.max(x, innerWidth - x),
+      Math.max(y, innerHeight - y)
     )
+
+    // @ts-ignore
+    const transition = document.startViewTransition(async () => {
+      setTheme(theme === "dark" ? "light" : "dark")
+    })
+
+    transition.ready.then(() => {
+      const clipPath = [
+        `circle(0px at ${x}px ${y}px)`,
+        `circle(${endRadius}px at ${x}px ${y}px)`,
+      ]
+      document.documentElement.animate(
+        {
+          clipPath: theme === "dark" ? [...clipPath].reverse() : clipPath,
+        },
+        {
+          duration: 500,
+          easing: "ease-in-out",
+          pseudoElement: theme === "dark" 
+            ? "::view-transition-old(root)" 
+            : "::view-transition-new(root)",
+        }
+      )
+    })
   }
 
-  const toggleTheme = () => {
-    setTheme(theme === "dark" ? "light" : "dark")
-  }
+  if (!mounted) return <Button variant="outline" className="w-15 h-8 rounded-full" />
 
   return (
     <Button
-        variant="outline"
-        onClick={toggleTheme}
-        className="w-15 h-8 rounded-full flex items-center justify-between px-2 cursor-pointer"
-        >
-        <Sun className="h-4 w-4 dark:text-muted-foreground/40" />
-        <Moon className="h-4 w-4 text-muted-foreground/40 dark:text-white" />
+      variant="outline"
+      onClick={toggleTheme}
+      className="w-15 h-8 rounded-full flex items-center justify-between px-2 cursor-pointer transition-all"
+    >
+      <Sun className="h-4 w-4 dark:text-muted-foreground/40" />
+      <Moon className="h-4 w-4 text-muted-foreground/40 dark:text-white" />
     </Button>
   )
 }

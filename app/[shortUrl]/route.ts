@@ -6,6 +6,15 @@ export async function GET(req: NextRequest, { params } : { params: Promise<{ sho
     
     const { shortUrl } = await params;
 
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0] || 
+               req.headers.get("x-real-ip") || 
+               "127.0.0.1";
+        
+    const country = req.headers.get("x-vercel-ip-country") || "Unknown";
+    // Add a mapping table for the state
+    const state = req.headers.get("x-vercel-ip-country-region") || "Unknown";
+    const city = req.headers.get("x-vercel-ip-city") || "Unknown";
+
     const findUrl = await prisma.link.findUnique({
         where: {
             shorturl: shortUrl
@@ -19,6 +28,7 @@ export async function GET(req: NextRequest, { params } : { params: Promise<{ sho
         )
     }
 
+
     await prisma.link.update({
         where: {
             shorturl: shortUrl
@@ -30,5 +40,16 @@ export async function GET(req: NextRequest, { params } : { params: Promise<{ sho
         }
     })
 
-    return Response.redirect(findUrl.original);
+    await prisma.click.create({
+        data: {
+            linkId: findUrl.id,
+            ip: ip,
+            country: country,
+            city: city,
+            state: state,
+            referrer: req.headers.get("referer") || "Direct",
+        }
+    })
+
+    return NextResponse.redirect(findUrl.original);
 }

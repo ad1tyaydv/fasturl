@@ -16,7 +16,7 @@ model User {
 
   links          Link[]
 
-  createdAT      DateTime    @default(now())
+  createdAt      DateTime    @default(now())
 }
 
 model Link {
@@ -24,10 +24,34 @@ model Link {
   shorturl     String      @unique
   original     String
   clicks       Int         @default(0)
+  clickLogs    Click[]
+
   ipAddress    String?
+
   
   userId       String
   user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt   DateTime    @default(now())
+}
+
+model Click {
+  id          String      @id @default(uuid())
+  linkId      String
+  link        Link        @relation(fields: [linkId], references: [id], onDelete: Cascade)
+
+  ip          String
+  country     String?
+  state       String?
+  city        String?
+
+  device      String?
+  browser     String?
+
+  referrer     String?
+
+  createdAt   DateTime    @default(now())
+
+  @@index([linkId])
+  @@index([country])
 }

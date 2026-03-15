@@ -3,14 +3,17 @@ import jwt from "jsonwebtoken";
 import { prisma } from "@/lib/dbConfig";
 import shortUrlGenerator from "@/app/helpers/shortUrlGenerator";
 
+
 const JWT_SECRET = process.env.AUTH_SECRET!;
 const ANON_USER_ID = process.env.ANONYMOUS_USER_ID!;
 
+
 export async function POST(req: NextRequest) {
 
-
   try {
-    const ip = req.headers.get("x-forwarded-for")?.split(",")[0] || "unknown";
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0] || 
+               req.headers.get("x-real-ip") || 
+               "127.0.0.1";
     const today = new Date();
     today.setHours(0,0,0,0);
     
@@ -89,7 +92,7 @@ export async function POST(req: NextRequest) {
             userId: userId,
             original: data.url,
             shorturl: shortUrl,
-            ipAddress: ip
+            ipAddress: ip,
         },
     });
 
