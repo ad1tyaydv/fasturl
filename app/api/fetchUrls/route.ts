@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import { prisma } from "@/lib/dbConfig";
 
 
-const JWT_SECRET = process.env.AUTH_SECRET!;
+const JWT_SECRET = process.env.NEXTAUTH_SECRET!;
 
 export async function GET(req: NextRequest) {
 
