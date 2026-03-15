@@ -31,6 +31,7 @@ export default function AnalyticsPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [selectedLink, setSelectedLink] = useState<any | null>(null);
   const [urls, setUrls] = useState<any[]>([]);
+  const [analytics, setAnalytics] = useState<any>(null);
 
   const analyticsData = {
     countries: [
@@ -44,29 +45,51 @@ export default function AnalyticsPage() {
     ]
   };
 
+
   useEffect(() => {
     const checkAuth = async () => {
       try {
         const res = await axios.get("/api/auth/me");
         if (!res.data.authenticated) {
           router.push("/auth/signin");
+
         } else {
           setIsLoggedIn(true);
           const urlRes = await axios.get("/api/fetchUrls");
           setUrls(urlRes.data.urls);
         }
+
       } catch {
         router.push("/auth/signin");
       }
     };
     checkAuth();
   }, [router]);
+  
 
   const handleLogout = async () => {
     await axios.post("/api/auth/logout");
     setIsLoggedIn(false);
     router.push("/auth/signin");
   };
+
+
+  const handleLinkAnaltyics = async (linkId: string) => {
+    try {
+        const res = await axios.get("/api/analytics", {
+            params: {
+                linkId: linkId,
+            }
+        })
+
+        setAnalytics(res.data);
+        console.log(res.data);
+
+    } catch (error) {
+        console.log("Something went wrong", error);
+    }
+  }
+
 
   return (
     <div className="h-screen flex flex-col overflow-hidden relative transition-colors duration-300 bg-background text-foreground">
@@ -119,7 +142,10 @@ export default function AnalyticsPage() {
                   {urls.map((url) => (
                     <div 
                       key={url.id}
-                      onClick={() => setSelectedLink(url)}
+                      onClick={() => {
+                        setSelectedLink(url);
+                        handleLinkAnaltyics(url.id);
+                      }}
                       className="p-6 rounded-xl border border-border bg-card hover:border-primary transition-all cursor-pointer shadow-sm hover:shadow-md"
                     >
                       <div className="flex justify-between items-start mb-4">
@@ -136,9 +162,8 @@ export default function AnalyticsPage() {
                 </div>
               </>
             ) : (
-              /* DETAILED VIEW */
               <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <button 
+                <button
                   onClick={() => setSelectedLink(null)}
                   className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors mb-4"
                 >
@@ -158,16 +183,23 @@ export default function AnalyticsPage() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-20">
                   <AnalyticsCard title="Geographic Distribution" icon={<IoGlobeOutline size={18}/>}>
-                    <div className="h-[300px] w-full mt-4">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={analyticsData.countries}>
-                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
-                          <XAxis dataKey="name" fontSize={12} stroke="hsl(var(--muted-foreground))" />
-                          <YAxis fontSize={12} stroke="hsl(var(--muted-foreground))" />
-                          <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", borderColor: "hsl(var(--border))", borderRadius: "8px" }} />
-                          <Bar dataKey="value" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-                        </BarChart>
-                      </ResponsiveContainer>
+                    <div className="h-[300px] w-full mt-4 overflow-y-auto">
+                        {analytics?.countries?.map((c: any) => (
+                        <div
+                            key={`${c.country}-${c.state}`}
+                            className="flex justify-between text-sm border-b border-border pb-1"
+                        >
+                            <span className="text-muted-foreground font-medium">
+                                {c.country}, {c.state || "Unknown"}
+                            </span>
+                            <span className="font-bold">
+                                {c.count}
+                            </span>
+                        </div>
+                        ))}
+                        {!analytics?.countries?.length && (
+                            <p className="text-xs text-muted-foreground">No data available.</p>
+                        )}
                     </div>
                   </AnalyticsCard>
 
