@@ -4,7 +4,7 @@ import { prisma } from "@/lib/dbConfig";
 import shortUrlGenerator from "@/app/helpers/shortUrlGenerator";
 
 
-const JWT_SECRET = process.env.AUTH_SECRET!;
+const JWT_SECRET = process.env.NEXTAUTH_SECRET!;
 const ANON_USER_ID = process.env.ANONYMOUS_USER_ID!;
 
 
