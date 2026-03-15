@@ -1,23 +1,25 @@
 import { prisma } from "@/lib/dbConfig";
 import { NextRequest, NextResponse } from "next/server";
 import { stateMap } from "../helpers/getStateName";
+import { countryMap } from "../helpers/getCountryName";
 
-export async function GET(req: NextRequest, { params } : { params: Promise<{ shortUrl: string}> }) {
-    
+export async function GET(req: NextRequest, { params }: { params: Promise<{ shortUrl: string }> }) {
+
     const { shortUrl } = await params;
 
-    const ip = req.headers.get("x-forwarded-for")?.split(",")[0] || 
-               req.headers.get("x-real-ip") || 
-               "127.0.0.1";
-        
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0] ||
+        req.headers.get("x-real-ip") ||
+        "127.0.0.1";
+
     const country = req.headers.get("x-vercel-ip-country") || "Unknown";
+    const countryFullName = countryMap[country] ?? country;
 
     const state = req.headers.get("x-vercel-ip-country-region") || "Unknown";
-    const stateFullNames = stateMap[state] ?? state;
+    const stateFullName = stateMap[state] ?? state;
 
     const city = req.headers.get("x-vercel-ip-city") || "Unknown";
 
-    let getBrowser = req.headers.get("sec-ch-ua");
+    let getBrowser = req.headers.get("sec-ch-ua")?.replace(/"/g, "");
     let browser = "Unknown";
 
     if (getBrowser) {
@@ -33,6 +35,22 @@ export async function GET(req: NextRequest, { params } : { params: Promise<{ sho
 
     const operatingSystem = req.headers.get("sec-ch-ua-platform");
 
+    let ref = req.headers.get("referer");
+    let referrer = "Direct";
+
+    if (ref) {
+        try {
+            const domain = new URL(ref).hostname.toLowerCase();
+
+            if (domain.includes("twitter")) referrer = "Twitter";
+            else if (domain.includes("facebook")) referrer = "Facebook";
+            else if (domain.includes("linkedin")) referrer = "LinkedIn";
+            else if (domain.includes("instagram")) referrer = "Instagram";
+            else if (domain.includes("google")) referrer = "Google";
+            else referrer = domain;
+        } catch { }
+    }
+
 
     const findUrl = await prisma.link.findUnique({
         where: {
@@ -40,10 +58,10 @@ export async function GET(req: NextRequest, { params } : { params: Promise<{ sho
         }
     })
 
-    if(!findUrl) {
+    if (!findUrl) {
         return NextResponse.json(
-            {message: "URL not found"},
-            {status: 404}
+            { message: "URL not found" },
+            { status: 404 }
         )
     }
 
@@ -63,8 +81,8 @@ export async function GET(req: NextRequest, { params } : { params: Promise<{ sho
         data: {
             linkId: findUrl.id,
             ip: ip,
-            country: country,
-            state: stateFullNames,
+            country: countryFullName,
+            state: stateFullName,
             city: city,
             browser: browser,
             device: device,
