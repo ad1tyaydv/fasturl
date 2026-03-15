@@ -5,7 +5,7 @@ import { prisma } from "@/lib/dbConfig";
 import jwt from "jsonwebtoken";
 
 
-const JWT_SECRET = process.env.AUTH_SECRET!;
+const JWT_SECRET = process.env.NEXTAUTH_SECRET!;
 
 export async function POST(req: NextRequest) {
   const data = await req.json();

@@ -11,7 +11,7 @@ export async function GET(req: NextRequest, { params } : { params: Promise<{ sho
                "127.0.0.1";
         
     const country = req.headers.get("x-vercel-ip-country") || "Unknown";
-    // Add a mapping table for the state
+    // Can add a mapping table for the state
     const state = req.headers.get("x-vercel-ip-country-region") || "Unknown";
     const city = req.headers.get("x-vercel-ip-city") || "Unknown";
 

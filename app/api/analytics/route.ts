@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/dbConfig";
 import { NextRequest, NextResponse } from "next/server";
 
-const JWT_SECRET = process.env.AUTH_SECRET!;
+const JWT_SECRET = process.env.NEXTAUTH_SECRET!;
 
 export async function GET(req: NextRequest) {
 
