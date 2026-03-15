@@ -3,7 +3,17 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { IoCopyOutline, IoHomeOutline, IoListOutline, IoSettingsOutline, IoPersonOutline, IoQrCodeOutline, IoAnalyticsOutline, IoMoonOutline, IoSunnyOutline } from "react-icons/io5";
+import { 
+  IoCopyOutline, 
+  IoHomeOutline, 
+  IoListOutline, 
+  IoSettingsOutline, 
+  IoPersonOutline, 
+  IoQrCodeOutline, 
+  IoAnalyticsOutline 
+} from "react-icons/io5";
+
+import { ModeToggle } from "../components/toggleTheme";
 
 interface UrlItem {
   id: string;
@@ -24,11 +34,7 @@ export default function AllUrlsPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [copiedUrlId, setCopiedUrlId] = useState<string | null>(null);
   const [copiedType, setCopiedType] = useState<"original" | "short" | null>(null);
-  
-  const [theme, setTheme] = useState<"light" | "dark">("light");
-
   const [selectedUrl, setSelectedUrl] = useState<UrlItem | null>(null);
-
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -46,7 +52,6 @@ export default function AllUrlsPage() {
     checkAuth();
   }, [router]);
 
-
   const fetchUrls = async () => {
     try {
       setLoading(true);
@@ -63,17 +68,14 @@ export default function AllUrlsPage() {
 
     } catch (err) {
       console.log("Error fetching URLs:", err);
-
     } finally {
       setLoading(false);
     }
   };
 
-
   useEffect(() => {
     fetchUrls();
   }, []);
-
 
   const copyToClipboard = (url: string, id: string, type: "original" | "short") => {
     navigator.clipboard.writeText(url);
@@ -85,33 +87,25 @@ export default function AllUrlsPage() {
     }, 2000);
   };
 
-
   const handleDelete = async (id: string) => {
     try {
       await axios.delete(`/api/shortUrl/delete${id}`);
       setUrls(urls.filter((u) => u.id !== id));
-
     } catch (err) {
       console.log("Error deleting URL:", err);
     }
   };
   
-
   const handleLogout = async () => {
     await axios.post("/api/auth/logout");
     setIsLoggedIn(false);
     router.push("/auth/signin");
   };
-
-  const toggleTheme = () => {
-    setTheme((prev) => (prev === "light" ? "dark" : "light"));
-  };
-  
   
   return (
-    <div className={`h-screen flex flex-col overflow-hidden relative transition-colors duration-300 ${theme === 'dark' ? 'bg-black text-white' : 'bg-white text-black'}`}>
+    <div className="h-screen flex flex-col overflow-hidden relative transition-colors duration-300 bg-background text-foreground">
       
-      <nav className={`flex items-center justify-between px-4 sm:px-8 py-4 border-b z-20 shrink-0 ${theme === 'dark' ? 'bg-black border-gray-800' : 'bg-white border-gray-200'}`}>
+      <nav className="flex items-center justify-between px-4 sm:px-8 py-4 border-b border-border z-20 shrink-0 bg-background">
         <h1 
           className="text-lg sm:text-xl font-semibold cursor-pointer" 
           onClick={() => router.push('/')}
@@ -119,33 +113,20 @@ export default function AllUrlsPage() {
           SHORTLY
         </h1>
 
-        <div className="flex items-center gap-4">
-          <button 
-            onClick={toggleTheme} 
-            className={`p-2 rounded-full transition cursor-pointer ${theme === 'dark' ? 'hover:bg-gray-800 text-gray-300' : 'hover:bg-gray-100 text-gray-700'}`}
-          >
-            {theme === 'dark' ? <IoSunnyOutline size={20} /> : <IoMoonOutline size={20} />}
-          </button>
+        <div className="flex items-center gap-4 cursor-pointer">
+          <ModeToggle />
 
           {isLoggedIn ? (
             <button
               onClick={handleLogout}
-              className={`border px-4 py-1.5 rounded-md transition cursor-pointer font-medium text-sm sm:text-base ${
-                theme === 'dark' 
-                  ? 'border-white text-white hover:bg-white hover:text-black' 
-                  : 'border-black text-black hover:bg-black hover:text-white'
-              }`}
+              className="border border-input bg-background hover:bg-accent hover:text-accent-foreground px-4 py-1.5 rounded-md transition cursor-pointer font-medium text-sm sm:text-base"
             >
               Logout
             </button>
           ) : (
             <button
               onClick={() => router.push("/auth/signin")}
-              className={`border px-4 py-1.5 rounded-md transition cursor-pointer font-medium text-sm sm:text-base ${
-                theme === 'dark' 
-                  ? 'border-white text-white hover:bg-white hover:text-black' 
-                  : 'border-black text-black hover:bg-black hover:text-white'
-              }`}
+              className="border border-input bg-background hover:bg-accent hover:text-accent-foreground px-4 py-1.5 rounded-md transition cursor-pointer font-medium text-sm sm:text-base"
             >
               Login
             </button>
@@ -155,16 +136,16 @@ export default function AllUrlsPage() {
 
       <div className="flex flex-1 overflow-hidden pb-16 md:pb-0">
         
-        <aside className={`w-64 border-r flex-col py-6 px-4 shrink-0 hidden md:flex ${theme === 'dark' ? 'bg-[#0a0a0a] border-gray-800' : 'bg-gray-50 border-gray-200'}`}>
+        <aside className="w-64 border-r border-border flex-col py-6 px-4 shrink-0 hidden md:flex bg-muted/20">
           <div>
-            <p className={`text-xs font-bold mb-4 px-2 uppercase tracking-wider ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Menu</p>
+            <p className="text-xs font-bold mb-4 px-2 uppercase tracking-wider text-muted-foreground">Menu</p>
             <div className="flex flex-col gap-2">
               <button
                 onClick={() => router.push('/')}
                 className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition cursor-pointer ${
                   pathname === '/'
-                    ? (theme === 'dark' ? 'bg-white text-black' : 'bg-black text-white')
-                    : (theme === 'dark' ? 'text-gray-400 hover:bg-gray-800 hover:text-white' : 'text-gray-600 hover:bg-gray-200 hover:text-black')
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
                 }`}
               >
                 <IoHomeOutline size={20} />
@@ -175,8 +156,8 @@ export default function AllUrlsPage() {
                 onClick={() => router.push('/urls')}
                 className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition cursor-pointer ${
                   pathname === '/urls' 
-                    ? (theme === 'dark' ? 'bg-white text-black' : 'bg-black text-white')
-                    : (theme === 'dark' ? 'text-gray-400 hover:bg-gray-800 hover:text-white' : 'text-gray-600 hover:bg-gray-200 hover:text-black')
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
                 }`}
               >
                 <IoListOutline size={20} />
@@ -187,8 +168,8 @@ export default function AllUrlsPage() {
                 onClick={() => router.push('/qrcodes')}
                 className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition cursor-pointer ${
                   pathname === '/qrcodes' 
-                    ? (theme === 'dark' ? 'bg-white text-black' : 'bg-black text-white')
-                    : (theme === 'dark' ? 'text-gray-400 hover:bg-gray-800 hover:text-white' : 'text-gray-600 hover:bg-gray-200 hover:text-black')
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
                 }`}
               >
                 <IoQrCodeOutline size={20} />
@@ -199,8 +180,8 @@ export default function AllUrlsPage() {
                 onClick={() => router.push('/analytics')}
                 className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition cursor-pointer ${
                   pathname === '/analytics' 
-                    ? (theme === 'dark' ? 'bg-white text-black' : 'bg-black text-white')
-                    : (theme === 'dark' ? 'text-gray-400 hover:bg-gray-800 hover:text-white' : 'text-gray-600 hover:bg-gray-200 hover:text-black')
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
                 }`}
               >
                 <IoAnalyticsOutline size={20} />
@@ -210,11 +191,11 @@ export default function AllUrlsPage() {
           </div>
 
           <div className="mt-auto">
-            <p className={`text-xs font-bold mb-4 px-2 uppercase tracking-wider ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`}>Account</p>
+            <p className="text-xs font-bold mb-4 px-2 uppercase tracking-wider text-muted-foreground">Account</p>
             <div className="flex flex-col gap-2">
               <button
                 onClick={() => console.log('Profile clicked')} 
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition cursor-pointer ${theme === 'dark' ? 'text-gray-400 hover:bg-gray-800 hover:text-white' : 'text-gray-600 hover:bg-gray-200 hover:text-black'}`}
+                className="flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition cursor-pointer text-muted-foreground hover:bg-accent hover:text-accent-foreground"
               >
                 <IoPersonOutline size={20} />
                 Profile
@@ -222,7 +203,7 @@ export default function AllUrlsPage() {
 
               <button
                 onClick={() => console.log('Settings clicked')} 
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition cursor-pointer ${theme === 'dark' ? 'text-gray-400 hover:bg-gray-800 hover:text-white' : 'text-gray-600 hover:bg-gray-200 hover:text-black'}`}
+                className="flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition cursor-pointer text-muted-foreground hover:bg-accent hover:text-accent-foreground"
               >
                 <IoSettingsOutline size={20} />
                 Settings
@@ -231,25 +212,25 @@ export default function AllUrlsPage() {
           </div>
         </aside>
 
-        <main className={`flex-1 overflow-y-auto p-4 sm:p-8 ${theme === 'dark' ? 'bg-black' : 'bg-white'}`}>
+        <main className="flex-1 overflow-y-auto p-4 sm:p-8 bg-background">
           <div className="max-w-4xl mx-auto">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
               <h1 className="text-2xl sm:text-3xl font-bold">Your Saved URLs</h1>
-              <span className={`px-3 rounded-xl py-1 text-base sm:text-xl font-medium w-fit ${theme === 'dark' ? 'bg-gray-800 text-gray-200' : 'bg-gray-200 text-black'}`}>
+              <span className="px-3 rounded-xl py-1 text-base sm:text-xl font-medium w-fit bg-secondary text-secondary-foreground">
                 Total Links - {urls.length}
               </span>
             </div>
 
             {loading && urls.length === 0 ? (
               <div className="flex justify-center mt-24">
-                <div className={`w-10 h-10 border-4 border-t-transparent rounded-full animate-spin ${theme === 'dark' ? 'border-gray-800 border-t-white' : 'border-gray-200 border-t-black'}`}></div>
+                <div className="w-10 h-10 border-4 border-muted border-t-primary rounded-full animate-spin"></div>
               </div>
             ) : urls.length === 0 ? (
-              <div className={`text-center mt-10 sm:mt-16 p-8 sm:p-12 border-2 border-dashed rounded-2xl ${theme === 'dark' ? 'border-gray-800 bg-[#0a0a0a]' : 'border-gray-300 bg-gray-50'}`}>
-                <p className={`text-base sm:text-lg mb-6 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>You haven't saved any URLs yet.</p>
+              <div className="text-center mt-10 sm:mt-16 p-8 sm:p-12 border-2 border-dashed border-border rounded-2xl bg-muted/30">
+                <p className="text-base sm:text-lg mb-6 text-muted-foreground">You haven't saved any URLs yet.</p>
                 <button 
                   onClick={() => router.push('/')}
-                  className={`w-full sm:w-auto px-8 py-3 rounded-lg transition font-medium cursor-pointer ${theme === 'dark' ? 'bg-white text-black hover:bg-gray-200' : 'bg-black text-white hover:bg-gray-800'}`}
+                  className="w-full sm:w-auto px-8 py-3 rounded-lg transition font-medium cursor-pointer bg-primary text-primary-foreground hover:bg-primary/90"
                 >
                   Shorten your first link
                 </button>
@@ -260,16 +241,14 @@ export default function AllUrlsPage() {
                   <div
                     key={url.id}
                     onClick={() => setSelectedUrl(url)}
-                    className={`border p-4 sm:p-6 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6 hover:shadow-md transition cursor-pointer group ${
-                      theme === 'dark' ? 'border-gray-800 bg-[#0a0a0a] hover:border-gray-700' : 'border-gray-200 bg-white hover:border-gray-300'
-                    }`}
+                    className="border border-border p-4 sm:p-6 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6 hover:shadow-md transition cursor-pointer group bg-card hover:border-primary/50"
                   >
                     <div className="flex flex-col gap-2 sm:gap-3 w-full overflow-hidden min-w-0">
                       
                       <div className="flex items-center gap-2 sm:gap-3 w-full min-w-0">
                         <div className="truncate text-base sm:text-lg min-w-0 flex-1">
                             <strong>Short Url - </strong> 
-                            <span className={`font-normal ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>{NEXT_DOMAIN}/{url.shorturl}</span>
+                            <span className="font-normal text-muted-foreground">{NEXT_DOMAIN}/{url.shorturl}</span>
                         </div>
                         <button 
                           onClick={(e) => {
@@ -278,17 +257,17 @@ export default function AllUrlsPage() {
                           }} 
                           className="shrink-0 cursor-pointer p-1"
                         >
-                            <IoCopyOutline size={20} className={`transition ${theme === 'dark' ? 'text-gray-500 hover:text-white' : 'text-gray-400 hover:text-black'}`} />
+                            <IoCopyOutline size={20} className="transition text-muted-foreground hover:text-foreground" />
                         </button>
                         {copiedUrlId === url.id && copiedType === "short" && (
-                            <span className={`px-2 py-0.5 rounded text-[10px] sm:text-xs font-bold shrink-0 ${theme === 'dark' ? 'bg-green-900/50 text-green-400' : 'bg-green-50 text-gray-700'}`}>COPIED!</span>
+                            <span className="px-2 py-0.5 rounded text-[10px] sm:text-xs font-bold shrink-0 bg-green-500/20 text-green-600 dark:text-green-400">COPIED!</span>
                         )}
                       </div>
 
                       <div className="flex items-center gap-2 sm:gap-3 w-full min-w-0">
                         <div className="truncate text-sm sm:text-lg min-w-0 flex-1">
                             <strong>Original Url - </strong> 
-                            <span className={`font-normal ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>{url.original}</span>
+                            <span className="font-normal text-muted-foreground">{url.original}</span>
                         </div>
                         <button 
                           onClick={(e) => {
@@ -297,10 +276,10 @@ export default function AllUrlsPage() {
                           }} 
                           className="shrink-0 cursor-pointer p-1"
                         >
-                            <IoCopyOutline size={20} className={`transition ${theme === 'dark' ? 'text-gray-500 hover:text-white' : 'text-gray-400 hover:text-black'}`} />
+                            <IoCopyOutline size={20} className="transition text-muted-foreground hover:text-foreground" />
                         </button>
                         {copiedUrlId === url.id && copiedType === "original" && (
-                            <span className={`px-2 py-0.5 rounded text-[10px] sm:text-xs font-bold shrink-0 ${theme === 'dark' ? 'bg-green-900/50 text-green-400' : 'bg-green-50 text-gray-700'}`}>COPIED!</span>
+                            <span className="px-2 py-0.5 rounded text-[10px] sm:text-xs font-bold shrink-0 bg-green-500/20 text-green-600 dark:text-green-400">COPIED!</span>
                         )}
                       </div>
                     </div>
@@ -310,9 +289,7 @@ export default function AllUrlsPage() {
                         e.stopPropagation();
                         handleDelete(url.id);
                       }}
-                      className={`w-full md:w-auto mt-2 md:mt-0 px-6 py-2.5 rounded-lg font-medium transition cursor-pointer whitespace-nowrap shrink-0 opacity-100 md:opacity-80 group-hover:opacity-100 ${
-                        theme === 'dark' ? 'bg-red-900/20 text-red-400 hover:bg-red-600 hover:text-white border border-red-900/50' : 'bg-red-50 text-red-600 hover:bg-red-500 hover:text-white border border-red-100'
-                      }`}
+                      className="w-full md:w-auto mt-2 md:mt-0 px-6 py-2.5 rounded-lg font-medium transition cursor-pointer whitespace-nowrap shrink-0 opacity-100 md:opacity-80 group-hover:opacity-100 bg-destructive/10 text-destructive hover:bg-destructive hover:text-destructive-foreground border border-destructive/20"
                     >
                       Delete
                     </button>
@@ -324,10 +301,10 @@ export default function AllUrlsPage() {
         </main>
       </div>
 
-      <nav className={`md:hidden fixed bottom-0 w-full border-t flex justify-around items-center pb-safe z-30 ${theme === 'dark' ? 'bg-black border-gray-800' : 'bg-white border-gray-200'}`}>
+      <nav className="md:hidden fixed bottom-0 w-full border-t border-border flex justify-around items-center pb-safe z-30 bg-background">
         <button
           onClick={() => router.push('/')}
-          className={`flex flex-col items-center gap-1 py-3 px-2 ${pathname === '/' ? (theme === 'dark' ? 'text-white' : 'text-black') : (theme === 'dark' ? 'text-gray-500 hover:text-white' : 'text-gray-400 hover:text-black')}`}
+          className={`flex flex-col items-center gap-1 py-3 px-2 ${pathname === '/' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
         >
           <IoHomeOutline size={24} />
           <span className="text-[10px] font-medium">Home</span>
@@ -335,7 +312,7 @@ export default function AllUrlsPage() {
         
         <button
           onClick={() => router.push('/urls')}
-          className={`flex flex-col items-center gap-1 py-3 px-2 ${pathname === '/urls' ? (theme === 'dark' ? 'text-white' : 'text-black') : (theme === 'dark' ? 'text-gray-500 hover:text-white' : 'text-gray-400 hover:text-black')}`}
+          className={`flex flex-col items-center gap-1 py-3 px-2 ${pathname === '/urls' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
         >
           <IoListOutline size={24} />
           <span className="text-[10px] font-medium">Links</span>
@@ -343,7 +320,7 @@ export default function AllUrlsPage() {
 
         <button
           onClick={() => router.push('/qrcodes')}
-          className={`flex flex-col items-center gap-1 py-3 px-2 ${pathname === '/qrcodes' ? (theme === 'dark' ? 'text-white' : 'text-black') : (theme === 'dark' ? 'text-gray-500 hover:text-white' : 'text-gray-400 hover:text-black')}`}
+          className={`flex flex-col items-center gap-1 py-3 px-2 ${pathname === '/qrcodes' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
         >
           <IoQrCodeOutline size={24} />
           <span className="text-[10px] font-medium">QR</span>
@@ -351,7 +328,7 @@ export default function AllUrlsPage() {
 
         <button
           onClick={() => router.push('/analytics')}
-          className={`flex flex-col items-center gap-1 py-3 px-2 ${pathname === '/analytics' ? (theme === 'dark' ? 'text-white' : 'text-black') : (theme === 'dark' ? 'text-gray-500 hover:text-white' : 'text-gray-400 hover:text-black')}`}
+          className={`flex flex-col items-center gap-1 py-3 px-2 ${pathname === '/analytics' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
         >
           <IoAnalyticsOutline size={24} />
           <span className="text-[10px] font-medium">Analytics</span>
@@ -359,7 +336,7 @@ export default function AllUrlsPage() {
 
         <button
           onClick={() => console.log('Profile clicked')}
-          className={`flex flex-col items-center gap-1 py-3 px-2 ${theme === 'dark' ? 'text-gray-500 hover:text-white' : 'text-gray-400 hover:text-black'}`}
+          className="flex flex-col items-center gap-1 py-3 px-2 text-muted-foreground hover:text-foreground"
         >
           <IoPersonOutline size={24} />
           <span className="text-[10px] font-medium">Profile</span>
@@ -372,22 +349,22 @@ export default function AllUrlsPage() {
           onClick={() => setSelectedUrl(null)}
         >
           <div 
-            className={`rounded-2xl shadow-2xl w-full max-w-md p-6 sm:p-8 transform transition-all cursor-default ${theme === 'dark' ? 'bg-[#111] border border-gray-800' : 'bg-white'}`}
+            className="rounded-2xl shadow-2xl w-full max-w-md p-6 sm:p-8 transform transition-all cursor-default bg-background border border-border"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className={`text-xl sm:text-2xl font-bold mb-5 sm:mb-6 border-b pb-4 ${theme === 'dark' ? 'text-white border-gray-800' : 'text-black border-gray-200'}`}>Link Details</h3>
+            <h3 className="text-xl sm:text-2xl font-bold mb-5 sm:mb-6 border-b border-border pb-4 text-foreground">Link Details</h3>
             
             <div className="space-y-5 sm:space-y-6 mb-6 sm:mb-8">
               <div>
-                <p className={`text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-1 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-600'}`}>Total Clicks</p>
-                <p className={`text-3xl sm:text-4xl font-extrabold ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
+                <p className="text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-1 text-muted-foreground">Total Clicks</p>
+                <p className="text-3xl sm:text-4xl font-extrabold text-foreground">
                   {selectedUrl.clicks ?? 0}
                 </p>
               </div>
               
               <div>
-                <p className={`text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-1 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-600'}`}>Created At</p>
-                <p className={`text-base sm:text-lg font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-800'}`}>
+                <p className="text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-1 text-muted-foreground">Created At</p>
+                <p className="text-base sm:text-lg font-medium text-muted-foreground">
                   {selectedUrl.createdAt 
                     ? new Date(selectedUrl.createdAt).toLocaleDateString('en-US', {
                         year: 'numeric',
@@ -404,7 +381,7 @@ export default function AllUrlsPage() {
             <div className="flex justify-end">
                 <button 
                   onClick={() => setSelectedUrl(null)}
-                  className={`w-full sm:w-auto px-6 py-2.5 sm:py-2 rounded-lg transition font-medium cursor-pointer text-sm ${theme === 'dark' ? 'bg-white text-black hover:bg-gray-200' : 'bg-black text-white hover:bg-gray-800'}`}
+                  className="w-full sm:w-auto px-6 py-2.5 sm:py-2 rounded-lg transition font-medium cursor-pointer text-sm bg-primary text-primary-foreground hover:bg-primary/90"
                 >
                   Close
                 </button>

@@ -3,7 +3,13 @@
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { IoCopyOutline, IoRefreshOutline, IoArrowForwardOutline, IoMoonOutline, IoSunnyOutline } from "react-icons/io5";
+import { 
+  IoCopyOutline, 
+  IoRefreshOutline, 
+  IoArrowForwardOutline 
+} from "react-icons/io5";
+
+import { ModeToggle } from "./components/toggleTheme";
 
 const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN;
 
@@ -15,27 +21,21 @@ export default function Dashboard() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
-  
-  const [theme, setTheme] = useState<"light" | "dark">("light");
 
   const handleShortUrl = async (originalUrl: string) => {
     if (!originalUrl) return;
 
     try {
       setLoading(true);
-
       const res = await axios.post("/api/shortUrl", {
         url: originalUrl
       });
 
       const generatedShortUrl = res.data.shortUrl;
       setShortUrl(generatedShortUrl);
-      
       setUrl(`${NEXT_DOMAIN}/${generatedShortUrl}`);
-
     } catch (error) {
       console.log("Can't short url", error);
-
     } finally {
       setLoading(false);
     }
@@ -44,7 +44,6 @@ export default function Dashboard() {
   const copyToClipboard = () => {
     const fullUrl = `${NEXT_DOMAIN}/${shortUrl}`;
     navigator.clipboard.writeText(fullUrl);
-
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -64,18 +63,11 @@ export default function Dashboard() {
     const checkAuth = async () => {
       try {
         const res = await axios.get("/api/auth/me");
-
-        if (!res.data.authenticated) {
-          setIsLoggedIn(false);
-
-        } else {
-          setIsLoggedIn(true);
-        }
+        setIsLoggedIn(!!res.data.authenticated);
       } catch {
         setIsLoggedIn(false);
       }
     };
-
     checkAuth();
   }, [router]);
 
@@ -84,42 +76,26 @@ export default function Dashboard() {
     setIsLoggedIn(false);
   };
 
-  const toggleTheme = () => {
-    setTheme((prev) => (prev === "light" ? "dark" : "light"));
-  };
-
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${theme === 'dark' ? 'bg-black text-white' : 'bg-white text-black'}`}>
-      <nav className={`flex items-center justify-between px-4 sm:px-8 py-4 border-b ${theme === 'dark' ? 'border-gray-800' : 'border-gray-200'}`}>
+    <div className="min-h-screen transition-colors duration-300 bg-background text-foreground">
+      
+      <nav className="flex items-center justify-between px-4 sm:px-8 py-4 border-b border-border">
         <h1 className="text-lg sm:text-xl font-semibold">SHORTLY</h1>
 
-        <div className="flex items-center gap-4">
-          <button 
-            onClick={toggleTheme} 
-            className={`p-2 rounded-full transition cursor-pointer ${theme === 'dark' ? 'hover:bg-gray-800 text-gray-300' : 'hover:bg-gray-100 text-gray-700'}`}
-          >
-            {theme === 'dark' ? <IoSunnyOutline size={20} /> : <IoMoonOutline size={20} />}
-          </button>
+        <div className="flex items-center gap-4 cursor-pointer">
+          <ModeToggle />
 
           {isLoggedIn ? (
             <button
               onClick={handleLogout}
-              className={`border px-4 py-1.5 rounded-md transition cursor-pointer font-medium text-sm sm:text-base ${
-                theme === 'dark' 
-                  ? 'border-white text-white hover:bg-white hover:text-black' 
-                  : 'border-black text-black hover:bg-black hover:text-white'
-              }`}
+              className="border border-input px-4 py-1.5 rounded-md transition cursor-pointer font-medium text-sm sm:text-base hover:bg-accent hover:text-accent-foreground"
             >
               Logout
             </button>
           ) : (
             <button
               onClick={() => router.push("/auth/signin")}
-              className={`border px-4 py-1.5 rounded-md transition cursor-pointer font-medium text-sm sm:text-base ${
-                theme === 'dark' 
-                  ? 'border-white text-white hover:bg-white hover:text-black' 
-                  : 'border-black text-black hover:bg-black hover:text-white'
-              }`}
+              className="border border-input px-4 py-1.5 rounded-md transition cursor-pointer font-medium text-sm sm:text-base hover:bg-accent hover:text-accent-foreground"
             >
               Login
             </button>
@@ -133,29 +109,23 @@ export default function Dashboard() {
             Shorten Your Links Instantly
           </h1>
 
-          <p className={`mb-8 text-base sm:text-lg px-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+          <p className="mb-8 text-base sm:text-lg px-2 text-muted-foreground">
             Turn long and messy URLs into short, clean links you can easily share.
           </p>
 
-          <div className={`flex flex-col sm:flex-row gap-3 border-2 rounded-xl p-2 sm:p-3 transition-colors shadow-sm ${
-            shortUrl 
-              ? (theme === 'dark' ? 'border-white bg-gray-900' : 'border-black bg-gray-50') 
-              : (theme === 'dark' ? 'border-gray-800 bg-black' : 'border-gray-300 bg-white')
+          <div className={`flex flex-col sm:flex-row gap-3 border-2 rounded-xl p-2 sm:p-3 transition-colors shadow-sm bg-card ${
+            shortUrl ? 'border-primary' : 'border-border'
           }`}>
             <input
               type="text"
               placeholder="Paste your long URL here..."
-              className={`flex-1 w-full outline-none px-3 sm:px-4 py-3 bg-transparent text-base sm:text-lg text-center sm:text-left ${
-                theme === 'dark'
-                  ? (shortUrl ? 'text-white font-semibold placeholder-gray-500' : 'text-white placeholder-gray-600')
-                  : (shortUrl ? 'text-black font-semibold' : 'text-black')
+              className={`flex-1 w-full outline-none px-3 sm:px-4 py-3 bg-transparent text-base sm:text-lg text-center sm:text-left text-foreground placeholder:text-muted-foreground ${
+                shortUrl ? 'font-semibold' : ''
               }`}
               value={url}
               onChange={(e) => {
                 setUrl(e.target.value);
-                if (shortUrl) {
-                  setShortUrl("");
-                }
+                if (shortUrl) setShortUrl("");
               }}
               onKeyDown={handleKeyDown}
             />
@@ -163,9 +133,7 @@ export default function Dashboard() {
             {shortUrl ? (
               <div className="flex gap-2 w-full sm:w-auto">
                 <button
-                  className={`flex-1 sm:flex-none px-4 sm:px-8 py-3 rounded-lg cursor-pointer flex items-center justify-center gap-2 transition font-medium ${
-                    theme === 'dark' ? 'bg-white text-black hover:bg-gray-200' : 'bg-black text-white hover:bg-gray-800'
-                  }`}
+                  className="flex-1 sm:flex-none px-4 sm:px-8 py-3 rounded-lg cursor-pointer flex items-center justify-center gap-2 transition font-medium bg-primary text-primary-foreground hover:bg-primary/90"
                   onClick={copyToClipboard}
                 >
                   <IoCopyOutline size={20} />
@@ -173,9 +141,7 @@ export default function Dashboard() {
                 </button>
                 
                 <button
-                  className={`px-4 sm:px-5 py-3 rounded-lg cursor-pointer flex items-center justify-center transition shrink-0 ${
-                    theme === 'dark' ? 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300 hover:text-black'
-                  }`}
+                  className="px-4 sm:px-5 py-3 rounded-lg cursor-pointer flex items-center justify-center transition shrink-0 bg-secondary text-secondary-foreground hover:bg-secondary/80"
                   onClick={handleReset}
                   title="Shorten a new link"
                 >
@@ -184,14 +150,12 @@ export default function Dashboard() {
               </div>
             ) : (
               <button
-                className={`w-full sm:w-auto px-6 sm:px-10 py-3 rounded-lg cursor-pointer flex items-center justify-center transition disabled:opacity-70 font-medium text-base sm:text-lg ${
-                  theme === 'dark' ? 'bg-white text-black hover:bg-gray-200' : 'bg-black text-white hover:bg-gray-900'
-                }`}
+                className="w-full sm:w-auto px-6 sm:px-10 py-3 rounded-lg cursor-pointer flex items-center justify-center transition disabled:opacity-50 font-medium text-base sm:text-lg bg-primary text-primary-foreground hover:bg-primary/90"
                 onClick={() => handleShortUrl(url)}
                 disabled={loading || !url}
               >
                 {loading ? (
-                  <div className={`w-6 h-6 border-2 border-t-transparent rounded-full animate-spin ${theme === 'dark' ? 'border-black' : 'border-white'}`}></div>
+                  <div className="w-6 h-6 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin"></div>
                 ) : (
                   "Shorten"
                 )}
@@ -200,34 +164,29 @@ export default function Dashboard() {
           </div>
 
           {!isLoggedIn && (
-            <div className={`mt-4 flex flex-col items-center justify-center text-sm sm:text-base md:text-xl ${theme === 'dark' ? 'text-gray-400' : 'text-gray-800'}`}>
+            <div className="mt-4 flex flex-col items-center justify-center text-sm sm:text-base md:text-xl text-muted-foreground">
               <p>You can only create 3 links/day</p>
               <button 
                 onClick={() => router.push("/auth/signin")}
-                className={`font-semibold mt-1 hover:underline cursor-pointer ${theme === 'dark' ? 'text-white' : 'text-black'}`}
+                className="font-semibold mt-1 hover:underline cursor-pointer text-foreground"
               >
                 Login to create more
               </button>
             </div>
           )}
-
         </div>
       </section>
 
       <section className="flex flex-col items-center justify-center px-4 sm:px-6 pb-8">
-        <div className={`mt-2 border-t pt-8 md:pt-12 w-full max-w-3xl flex flex-col items-center text-center ${theme === 'dark' ? 'border-gray-800' : 'border-gray-200'}`}>
+        <div className="mt-2 border-t border-border pt-8 md:pt-12 w-full max-w-3xl flex flex-col items-center text-center">
           <h2 className="text-2xl sm:text-3xl font-bold mb-3">Manage Your Links</h2>
-          <p className={`mb-6 text-sm sm:text-base px-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-900'}`}>
+          <p className="mb-6 text-sm sm:text-base px-2 text-muted-foreground">
             See all your previously shortened URLs, copy them, or delete the ones you no longer need.
           </p>
           
           <button
             onClick={() => router.push('/urls')} 
-            className={`w-full sm:w-auto group flex justify-center items-center gap-2 border-2 px-6 sm:px-8 py-3 rounded-lg transition cursor-pointer font-semibold text-base sm:text-lg ${
-              theme === 'dark' 
-                ? 'border-white text-white hover:bg-white hover:text-black' 
-                : 'border-black text-black hover:bg-black hover:text-white'
-            }`}
+            className="w-full sm:w-auto group flex justify-center items-center gap-2 border-2 border-input bg-background px-6 sm:px-8 py-3 rounded-lg transition cursor-pointer font-semibold text-base sm:text-lg hover:bg-accent hover:text-accent-foreground"
           >
             See all your short URLs
             <IoArrowForwardOutline size={20} className="group-hover:translate-x-1 transition-transform" />
@@ -236,9 +195,7 @@ export default function Dashboard() {
       </section>
 
       {copied && (
-        <div className={`absolute top-20 sm:top-24 left-1/2 -translate-x-1/2 mt-1 px-6 py-2 rounded-md shadow-lg text-xs sm:text-sm z-50 animate-bounce ${
-          theme === 'dark' ? 'bg-white text-black' : 'bg-black text-white'
-        }`}>
+        <div className="absolute top-20 sm:top-24 left-1/2 -translate-x-1/2 mt-1 px-6 py-2 rounded-md shadow-lg text-xs sm:text-sm z-50 animate-bounce bg-primary text-primary-foreground">
           URL Copied!
         </div>
       )}
