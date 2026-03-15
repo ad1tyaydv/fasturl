@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useRouter, usePathname } from "next/navigation";
 import { 
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell 
+  Tooltip, ResponsiveContainer, PieChart, Pie, Cell 
 } from "recharts";
 import { 
   IoHomeOutline, 
@@ -183,102 +183,151 @@ export default function AnalyticsPage() {
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-20">
                     
                     <AnalyticsCard title="Geographic Distribution" icon={<IoGlobeOutline size={18}/>}>
-                        <div className="h-[250px] w-full mt-4 overflow-y-auto pr-2">
-                            {analytics?.countries?.map((c: any) => (
-                            <div key={`${c.country}-${c.state}`} className="flex justify-between items-center text-sm border-b border-border py-2">
-                                <span className="text-foreground font-medium">
-                                    {c.country} <span className="text-muted-foreground text-xs ml-1">({c.state || "Unknown"})</span>
-                                </span>
-                                <span className="font-bold bg-muted px-2 py-1 rounded-md text-xs">
-                                    {c.count} clicks
-                                </span>
-                            </div>
-                            ))}
-                            {!analytics?.countries?.length && (
-                                <p className="text-xs text-muted-foreground pt-4">No location data available.</p>
+                        <div className="flex flex-col sm:flex-row items-center h-[250px] mt-4">
+                            {analytics?.countries?.length > 0 ? (
+                                <>
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <PieChart>
+                                        <Pie data={analytics?.countries || []} nameKey="country" dataKey="count" innerRadius={50} outerRadius={80} paddingAngle={5}>
+                                            {analytics?.countries?.map((_: any, index: number) => <Cell key={index} fill={COLORS[index % COLORS.length]} />)}
+                                        </Pie>
+                                        <Tooltip contentStyle={tooltipStyle} />
+                                        </PieChart>
+                                    </ResponsiveContainer>
+                                    <div className="w-full space-y-3 px-4 overflow-y-auto max-h-full">
+                                        {analytics?.countries?.map((c: any, index: number) => (
+                                        <div key={`${c.country}-${c.state}`} className="flex justify-between items-center text-sm border-b border-border pb-1">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
+                                                <span className="text-foreground font-medium truncate">{c.country} ({c.state || "Unknown"})</span>
+                                            </div>
+                                            <span className="font-bold ml-2">{c.count}</span>
+                                        </div>
+                                        ))}
+                                    </div>
+                                </>
+                            ) : (
+                                <p className="text-xs text-muted-foreground pt-4 w-full text-center">No location data available.</p>
                             )}
                         </div>
                     </AnalyticsCard>
 
                     <AnalyticsCard title="Top Referrers" icon={<IoShareSocialOutline size={18}/>}>
-                        <div className="h-[250px] w-full mt-4">
+                        <div className="flex flex-col sm:flex-row items-center h-[250px] mt-4">
                             {analytics?.referrers?.length > 0 ? (
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <BarChart data={analytics.referrers} layout="vertical" margin={{ top: 0, right: 0, left: 20, bottom: 0 }}>
-                                        <XAxis type="number" hide />
-                                        <YAxis dataKey="referrer" type="category" width={80} stroke="#888" fontSize={12} tickLine={false} axisLine={false} />
-                                        <Tooltip cursor={{fill: 'var(--accent)', opacity: 0.2}} contentStyle={tooltipStyle} />
-                                        <Bar dataKey="count" fill="#10b981" radius={[0, 4, 4, 0]} barSize={24} />
-                                    </BarChart>
-                                </ResponsiveContainer>
+                                <>
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <PieChart>
+                                        <Pie data={analytics?.referrers || []} nameKey="referrer" dataKey="count" innerRadius={50} outerRadius={80} paddingAngle={5}>
+                                            {analytics?.referrers?.map((_: any, index: number) => <Cell key={index} fill={COLORS[(index + 1) % COLORS.length]} />)}
+                                        </Pie>
+                                        <Tooltip contentStyle={tooltipStyle} />
+                                        </PieChart>
+                                    </ResponsiveContainer>
+                                    <div className="w-full space-y-3 px-4 overflow-y-auto max-h-full">
+                                        {analytics?.referrers?.map((r: any, index: number) => (
+                                        <div key={r.referrer} className="flex justify-between items-center text-sm border-b border-border pb-1">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: COLORS[(index + 1) % COLORS.length] }} />
+                                                <span className="text-foreground font-medium truncate max-w-[120px]" title={r.referrer}>{r.referrer}</span>
+                                            </div>
+                                            <span className="font-bold ml-2">{r.count}</span>
+                                        </div>
+                                        ))}
+                                    </div>
+                                </>
                             ) : (
-                                <p className="text-xs text-muted-foreground pt-4">No referrer data available.</p>
+                                <p className="text-xs text-muted-foreground pt-4 w-full text-center">No referrer data available.</p>
                             )}
                         </div>
                     </AnalyticsCard>
 
                     <AnalyticsCard title="Browsers" icon={<IoCompassOutline size={18}/>}>
                         <div className="flex flex-col sm:flex-row items-center h-[250px] mt-4">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <PieChart>
-                            <Pie data={analytics?.browsers || []} nameKey="browser" dataKey="count" innerRadius={50} outerRadius={80} paddingAngle={5}>
-                                {analytics?.browsers?.map((_: any, index: number) => <Cell key={index} fill={COLORS[index % COLORS.length]} />)}
-                            </Pie>
-                            <Tooltip contentStyle={tooltipStyle} />
-                            </PieChart>
-                        </ResponsiveContainer>
-                        <div className="w-full space-y-3 px-4 overflow-y-auto max-h-full">
-                            {analytics?.browsers?.map((b: any, index: number) => (
-                            <div key={b.browser} className="flex justify-between items-center text-sm border-b border-border pb-1">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
-                                    <span className="text-foreground font-medium">{b.browser}</span>
-                                </div>
-                                <span className="font-bold">{b.count}</span>
-                            </div>
-                            ))}
-                        </div>
+                            {analytics?.browsers?.length > 0 ? (
+                                <>
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <PieChart>
+                                        <Pie data={analytics?.browsers || []} nameKey="browser" dataKey="count" innerRadius={50} outerRadius={80} paddingAngle={5}>
+                                            {analytics?.browsers?.map((_: any, index: number) => <Cell key={index} fill={COLORS[(index + 2) % COLORS.length]} />)}
+                                        </Pie>
+                                        <Tooltip contentStyle={tooltipStyle} />
+                                        </PieChart>
+                                    </ResponsiveContainer>
+                                    <div className="w-full space-y-3 px-4 overflow-y-auto max-h-full">
+                                        {analytics?.browsers?.map((b: any, index: number) => (
+                                        <div key={b.browser} className="flex justify-between items-center text-sm border-b border-border pb-1">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: COLORS[(index + 2) % COLORS.length] }} />
+                                                <span className="text-foreground font-medium truncate">{b.browser}</span>
+                                            </div>
+                                            <span className="font-bold ml-2">{b.count}</span>
+                                        </div>
+                                        ))}
+                                    </div>
+                                </>
+                            ) : (
+                                <p className="text-xs text-muted-foreground pt-4 w-full text-center">No browser data available.</p>
+                            )}
                         </div>
                     </AnalyticsCard>
 
                     <AnalyticsCard title="Devices" icon={<IoPhonePortraitOutline size={18}/>}>
                         <div className="flex flex-col sm:flex-row items-center h-[250px] mt-4">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <PieChart>
-                            <Pie data={analytics?.devices || []} nameKey="devices" dataKey="count" innerRadius={50} outerRadius={80} paddingAngle={5}>
-                                {analytics?.devices?.map((_: any, index: number) => <Cell key={index} fill={COLORS[(index + 2) % COLORS.length]} />)}
-                            </Pie>
-                            <Tooltip contentStyle={tooltipStyle} />
-                            </PieChart>
-                        </ResponsiveContainer>
-                        <div className="w-full space-y-3 px-4 overflow-y-auto max-h-full">
-                            {analytics?.devices?.map((d: any, index: number) => (
-                            <div key={d.devices} className="flex justify-between items-center text-sm border-b border-border pb-1">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[(index + 2) % COLORS.length] }} />
-                                    <span className="text-foreground font-medium">{d.devices}</span>
-                                </div>
-                                <span className="font-bold">{d.count}</span>
-                            </div>
-                            ))}
-                        </div>
+                            {analytics?.devices?.length > 0 ? (
+                                <>
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <PieChart>
+                                        <Pie data={analytics?.devices || []} nameKey="devices" dataKey="count" innerRadius={50} outerRadius={80} paddingAngle={5}>
+                                            {analytics?.devices?.map((_: any, index: number) => <Cell key={index} fill={COLORS[(index + 3) % COLORS.length]} />)}
+                                        </Pie>
+                                        <Tooltip contentStyle={tooltipStyle} />
+                                        </PieChart>
+                                    </ResponsiveContainer>
+                                    <div className="w-full space-y-3 px-4 overflow-y-auto max-h-full">
+                                        {analytics?.devices?.map((d: any, index: number) => (
+                                        <div key={d.devices} className="flex justify-between items-center text-sm border-b border-border pb-1">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: COLORS[(index + 3) % COLORS.length] }} />
+                                                <span className="text-foreground font-medium truncate">{d.devices}</span>
+                                            </div>
+                                            <span className="font-bold ml-2">{d.count}</span>
+                                        </div>
+                                        ))}
+                                    </div>
+                                </>
+                            ) : (
+                                <p className="text-xs text-muted-foreground pt-4 w-full text-center">No device data available.</p>
+                            )}
                         </div>
                     </AnalyticsCard>
 
                     <AnalyticsCard title="Operating Systems" icon={<IoHardwareChipOutline size={18}/>}>
-                        <div className="h-[250px] w-full mt-4">
+                        <div className="flex flex-col sm:flex-row items-center h-[250px] mt-4">
                             {analytics?.os?.length > 0 ? (
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <BarChart data={analytics.os} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
-                                        <XAxis dataKey="os" stroke="#888" fontSize={12} tickLine={false} axisLine={false} />
-                                        <YAxis stroke="#888" fontSize={12} tickLine={false} axisLine={false} allowDecimals={false} />
-                                        <Tooltip cursor={{fill: 'var(--accent)', opacity: 0.2}} contentStyle={tooltipStyle} />
-                                        <Bar dataKey="count" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={40} />
-                                    </BarChart>
-                                </ResponsiveContainer>
+                                <>
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <PieChart>
+                                        <Pie data={analytics?.os || []} nameKey="os" dataKey="count" innerRadius={50} outerRadius={80} paddingAngle={5}>
+                                            {analytics?.os?.map((_: any, index: number) => <Cell key={index} fill={COLORS[(index + 4) % COLORS.length]} />)}
+                                        </Pie>
+                                        <Tooltip contentStyle={tooltipStyle} />
+                                        </PieChart>
+                                    </ResponsiveContainer>
+                                    <div className="w-full space-y-3 px-4 overflow-y-auto max-h-full">
+                                        {analytics?.os?.map((o: any, index: number) => (
+                                        <div key={o.os} className="flex justify-between items-center text-sm border-b border-border pb-1">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: COLORS[(index + 4) % COLORS.length] }} />
+                                                <span className="text-foreground font-medium truncate">{o.os}</span>
+                                            </div>
+                                            <span className="font-bold ml-2">{o.count}</span>
+                                        </div>
+                                        ))}
+                                    </div>
+                                </>
                             ) : (
-                                <p className="text-xs text-muted-foreground pt-4">No OS data available.</p>
+                                <p className="text-xs text-muted-foreground pt-4 w-full text-center">No OS data available.</p>
                             )}
                         </div>
                     </AnalyticsCard>

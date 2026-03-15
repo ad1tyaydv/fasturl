@@ -15,9 +15,16 @@ export async function GET(req: NextRequest, { params } : { params: Promise<{ sho
     const state = req.headers.get("x-vercel-ip-country-region") || "Unknown";
     const city = req.headers.get("x-vercel-ip-city") || "Unknown";
 
-    const browser = req.headers.get("sec-ch-ua") ||
-                    req.headers.get("user-agents") ||
-                    "Unknown";
+    let getBrowser = req.headers.get("sec-ch-ua");
+    let browser = "Unknown";
+
+    if (getBrowser) {
+        if (getBrowser.includes("Brave")) browser = "Brave";
+        else if (getBrowser.includes("Chrome")) browser = "Chrome";
+        else if (getBrowser.includes("Chromium")) browser = "Chromium";
+        else if (getBrowser.includes("Firefox")) browser = "Firefox";
+        else if (getBrowser.includes("Safari")) browser = "Safari";
+    }
 
     const deviceCheck = req.headers.get("sec-ch-ua-mobile");
     const device = deviceCheck === "?1" ? "Mobile" : "Desktop";
