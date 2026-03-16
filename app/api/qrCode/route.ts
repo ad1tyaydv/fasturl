@@ -34,24 +34,10 @@ export async function POST(req: NextRequest) {
         let count = 0;
 
         if(!token) {
-            count = await prisma.qr.count({
-                where: {
-                    userId: ANON_USER_ID,
-                    ipAddress: ip,
-                    createdAt: {
-                        gte: today
-                    }
-                }
-            })
-
-            userId = ANON_USER_ID;
-            
-            if (count >= 1) {
-                return NextResponse.json(
-                    { message: "Anonymous users can only create 1 QR per day" },
-                    { status: 429 }
-                );
-            }
+            return NextResponse.json(
+                {message: "Login to generate QR code"},
+                {status: 429}
+            )
 
         } else {
             const decoded = jwt.verify(token, JWT_SECRET) as {
@@ -78,6 +64,22 @@ export async function POST(req: NextRequest) {
                 );
             }
 
+        }
+
+        count = await prisma.qr.count({
+            where: {
+                userId: userId,
+                createdAt: {
+                    gte: today
+                }
+            }
+        })
+
+        if(count >= 1) {
+            return NextResponse.json(
+                {message: "Upgrade to generate utpo 500 QR Codes per month"},
+                {status: 429}
+            )
         }
 
         const fullShortUrl = `${process.env.NEXT_PUBLIC_DOMAIN}/${data.shortUrl}`;

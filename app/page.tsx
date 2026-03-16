@@ -8,10 +8,11 @@ import {
   IoRefreshOutline, 
   IoArrowForwardOutline,
   IoLinkOutline,
-  IoQrCodeOutline
+  IoQrCodeOutline,
+  IoCloseOutline,
+  IoCheckmarkCircle
 } from "react-icons/io5";
 import { ModeToggle } from "./components/toggleTheme";
-
 
 const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN;
 
@@ -25,6 +26,22 @@ export default function Dashboard() {
   const [copied, setCopied] = useState(false);
   const [showQr, setShowQr] = useState<string | boolean>(false);
 
+  // Modal State
+  const [modalConfig, setModalConfig] = useState<{
+    show: boolean;
+    title: string;
+    description: string;
+    buttonText: string;
+    action: () => void;
+    showPlans?: boolean;
+  }>({
+    show: false,
+    title: "",
+    description: "",
+    buttonText: "",
+    action: () => {},
+    showPlans: false,
+  });
 
   const handleShortUrl = async (originalUrl: string) => {
     if (!originalUrl) return;
@@ -39,16 +56,47 @@ export default function Dashboard() {
       setShortUrl(generatedShortUrl);
       setUrl(`${NEXT_DOMAIN}/${generatedShortUrl}`);
 
-    } catch (error) {
+    } catch (error: any) {
+      if (error.response?.status === 429) {
+        if (!isLoggedIn) {
+          setModalConfig({
+            show: true,
+            title: "Limit Reached",
+            description: "Login to generate more links",
+            buttonText: "Login Now",
+            action: () => router.push("/auth/signin"),
+            showPlans: false,
+          });
+        } else {
+          setModalConfig({
+            show: true,
+            title: "Upgrade Your Plan",
+            description: "You've reached your current link limit. Choose a plan to keep growing.",
+            buttonText: "Close",
+            action: () => setModalConfig(prev => ({ ...prev, show: false })),
+            showPlans: true,
+          });
+        }
+      }
       console.log("Can't short url", error);
-
     } finally {
       setLoading(false);
     }
   };
 
-
   const handleGenerateQr = async () => {
+    if (!isLoggedIn) {
+      setModalConfig({
+        show: true,
+        title: "Login Required",
+        description: "Login to generate more QR codes",
+        buttonText: "Login Now",
+        action: () => router.push("/auth/signin"),
+        showPlans: false,
+      });
+      return;
+    }
+
     if (typeof showQr === "string") {
       setShowQr(false);
       return;
@@ -62,11 +110,20 @@ export default function Dashboard() {
 
       setShowQr(res.data.qrImage);
 
-    } catch (error) {
+    } catch (error: any) {
+      if (error.response?.status === 429) {
+        setModalConfig({
+          show: true,
+          title: "Premium Feature",
+          description: "Upgrade to generate more QR codes and unlock advanced analytics.",
+          buttonText: "Close",
+          action: () => setModalConfig(prev => ({ ...prev, show: false })),
+          showPlans: true,
+        });
+      }
       console.log("Error while generating qr code", error);
     }
   };
-
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(url);
@@ -74,20 +131,17 @@ export default function Dashboard() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-
   const handleReset = () => {
     setShortUrl("");
     setUrl("");
     setShowQr(false);
   };
 
-
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && url && !shortUrl && !loading) {
       handleShortUrl(url);
     }
   };
-
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -99,19 +153,75 @@ export default function Dashboard() {
       }
     };
     checkAuth();
-
   }, [router]);
-
 
   const handleLogout = async () => {
     await axios.post("/api/auth/logout");
     setIsLoggedIn(false);
   };
 
-  
   return (
-    <div className="min-h-screen transition-colors duration-300 bg-background text-foreground">
+    <div className="min-h-screen transition-colors duration-300 bg-background text-foreground relative">
       
+      {modalConfig.show && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className={`bg-card border-2 border-border p-6 rounded-2xl shadow-2xl animate-in zoom-in-95 duration-200 ${modalConfig.showPlans ? 'max-w-4xl w-full' : 'max-w-sm w-full'}`}>
+            <div className="flex justify-between items-start mb-2">
+              <h3 className="text-xl font-bold font-one">{modalConfig.title}</h3>
+              <button 
+                onClick={() => setModalConfig({ ...modalConfig, show: false })}
+                className="p-1 hover:bg-accent rounded-full transition-colors"
+              >
+                <IoCloseOutline size={24} />
+              </button>
+            </div>
+            <p className="text-muted-foreground font-two mb-6">
+              {modalConfig.description}
+            </p>
+
+            {modalConfig.showPlans ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div className="border-2 border-primary/30 rounded-xl p-5 bg-background relative overflow-hidden">
+                  <div className="absolute top-2 right-2 bg-primary text-[10px] text-primary-foreground px-2 py-0.5 rounded-full font-bold">POPULAR</div>
+                  <h4 className="font-bold text-lg mb-1">Essentials</h4>
+                  <div className="flex items-baseline gap-1 mb-4">
+                    <span className="text-2xl font-bold">$6</span>
+                    <span className="text-muted-foreground text-sm">/mo</span>
+                  </div>
+                  <ul className="text-sm space-y-2 mb-6">
+                    <li className="flex items-center gap-2"><IoCheckmarkCircle className="text-primary"/> 200 Links / Mo</li>
+                    <li className="flex items-center gap-2"><IoCheckmarkCircle className="text-primary"/> 20 QR Codes / Mo</li>
+                    <li className="flex items-center gap-2"><IoCheckmarkCircle className="text-primary"/> Basic Analytics</li>
+                  </ul>
+                  <button className="w-full py-2 bg-primary text-primary-foreground rounded-lg font-bold hover:opacity-90 transition">Upgrade Essentials</button>
+                </div>
+
+                <div className="border border-border rounded-xl p-5 bg-background">
+                  <h4 className="font-bold text-lg mb-1">Premium</h4>
+                  <div className="flex items-baseline gap-1 mb-4">
+                    <span className="text-2xl font-bold">$299</span>
+                    <span className="text-muted-foreground text-sm">/mo</span>
+                  </div>
+                  <ul className="text-sm space-y-2 mb-6">
+                    <li className="flex items-center gap-2"><IoCheckmarkCircle className="text-primary"/> Unlimited Links</li>
+                    <li className="flex items-center gap-2"><IoCheckmarkCircle className="text-primary"/> 500 QR Codes / Mo</li>
+                    <li className="flex items-center gap-2"><IoCheckmarkCircle className="text-primary"/> Advanced Tracking</li>
+                  </ul>
+                  <button className="w-full py-2 bg-secondary text-secondary-foreground rounded-lg font-bold hover:bg-secondary/80 transition">Go Premium</button>
+                </div>
+              </div>
+            ) : (
+              <button 
+                onClick={modalConfig.action}
+                className="w-full py-3 bg-primary text-primary-foreground rounded-xl font-bold transition hover:opacity-90 active:scale-95"
+              >
+                {modalConfig.buttonText}
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes gentleShake {
           0%, 100% { transform: rotate(0deg); }
@@ -225,7 +335,7 @@ export default function Dashboard() {
 
           {!isLoggedIn && (
             <div className="mt-4 flex font-two flex-col items-center justify-center text-sm sm:text-base md:text-xl text-muted-foreground">
-              <p>You can only create 3 links/day</p>
+              <p>You can only create 1 link/day</p>
               <button 
                 onClick={() => router.push("/auth/signin")}
                 className="font-semibold font-two mt-1 hover:underline cursor-pointer text-foreground"
