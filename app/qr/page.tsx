@@ -125,7 +125,7 @@ export default function QRGenerator() {
     setIsLoggedIn(false);
   };
 
-  
+
   return (
     <div className="min-h-screen transition-colors duration-300 bg-background text-foreground relative">
       <style dangerouslySetInnerHTML={{__html: `
@@ -221,7 +221,7 @@ export default function QRGenerator() {
       <section className="flex flex-col items-center justify-center px-4 sm:px-6 pt-16 md:pt-24 pb-12">
         <div className="text-center max-w-3xl w-full mx-auto">
           <h1 className="text-3xl font-one sm:text-4xl md:text-5xl font-bold mb-4">
-            Generate QR Codes
+            Generate <span className="text-red-500">QR Codes</span> Instantly
           </h1>
           <p className="mb-8 font-two text-base sm:text-lg px-2 text-muted-foreground">
             Transform any URL into a high-quality, shareable QR code instantly.
@@ -299,7 +299,7 @@ export default function QRGenerator() {
         </div>
       </section>
 
-      <section className="flex flex-col items-center justify-center px-4 sm:px-6 py-12 border-t border-border mt-12">
+      <section className="flex flex-col items-center justify-center px-4 sm:px-6 py-12 mt-12">
         <div className="w-full max-w-3xl flex flex-col items-center text-center">
           <h2 className="text-2xl font-three sm:text-3xl font-bold mb-3">Manage Your QR</h2>
           <p className="mb-6 font-three text-sm sm:text-base px-2 text-muted-foreground">
@@ -312,6 +312,7 @@ export default function QRGenerator() {
             See all your QRs
             <IoArrowForwardOutline size={20} className="group-hover:translate-x-1 transition-transform" />
           </button>
+          <div className="w-full border-t border-border mt-8"></div>
         </div>
       </section>
 

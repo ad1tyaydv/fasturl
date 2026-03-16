@@ -17,6 +17,7 @@ const CustomTooltip = ({ active, payload }: any) => {
     );
   }
   return null;
+  
 };
 
 interface AnalyticsCardItemProps {
@@ -28,6 +29,7 @@ interface AnalyticsCardItemProps {
   onExpand: () => void;
 }
 
+
 export const AnalyticsCardItem = ({
   title,
   icon,
@@ -36,6 +38,8 @@ export const AnalyticsCardItem = ({
   colorOffset = 0,
   onExpand,
 }: AnalyticsCardItemProps) => {
+
+
   return (
     <Card className="bg-card border-border shadow-sm flex flex-col h-full hover:shadow-md transition-shadow">
       <CardHeader className="pb-2 flex flex-row items-center justify-between">
@@ -102,4 +106,5 @@ export const AnalyticsCardItem = ({
       </CardContent>
     </Card>
   );
+  
 };
