@@ -14,7 +14,7 @@ export default function Navbar({ isLoggedIn, handleLogout }: NavbarProps) {
   return (
     <nav className="flex items-center justify-between px-4 sm:px-8 py-4 border-b border-border z-20 shrink-0 bg-background">
       <h1 
-        className="text-lg sm:text-xl font-semibold cursor-pointer" 
+        className="text-lg sm:text-xl font-three cursor-pointer" 
         onClick={() => router.push('/')}
       >
         SHORTLY

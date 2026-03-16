@@ -95,7 +95,7 @@ export const AnalyticsCardItem = ({
               <div className="w-12 h-12 rounded-full bg-muted/30 flex items-center justify-center text-muted-foreground/50">
                 {icon}
               </div>
-              <p className="text-muted-foreground text-xs italic">No data available</p>
+              <p className="text-muted-foreground font-two text-xl italic">No data available</p>
             </div>
           )}
         </div>

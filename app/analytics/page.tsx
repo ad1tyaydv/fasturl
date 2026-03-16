@@ -14,6 +14,8 @@ import DashboardLayout from "../components/dashBoardComponent";
 import { AnalyticsCardItem } from "../components/analyticsCard";
 
 
+const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN;
+
 export default function AnalyticsPage() {
   const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -112,8 +114,8 @@ export default function AnalyticsPage() {
             {!selectedLink ? (
               <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
                 <div className="mb-8">
-                  <h1 className="text-3xl font-bold tracking-tight text-foreground">Link Analytics</h1>
-                  <p className="text-muted-foreground mt-2">Select a link to view detailed traffic performance.</p>
+                  <h1 className="text-3xl font-one tracking-tight text-foreground">Link Analytics</h1>
+                  <p className="text-muted-foreground font-three mt-2">Select a link to view detailed traffic performance.</p>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -128,13 +130,13 @@ export default function AnalyticsPage() {
                           <div className="p-2.5 bg-primary/10 rounded-xl text-primary">
                             <IoLinkOutline size={22} />
                           </div>
-                          <div className="bg-secondary px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider text-secondary-foreground">
+                          <div className="bg-secondary px-2.5 py-1 rounded-full text-[10px] font-three uppercase tracking-wider text-secondary-foreground">
                             Clicks: {url.clicks || 0}
                           </div>
                         </div>
-                        <h3 className="font-bold text-lg truncate mb-1">{url.shorturl}</h3>
-                        <p className="text-xs text-muted-foreground truncate mb-6">{url.original}</p>
-                        <div className="flex items-center gap-2 text-xs font-bold text-primary uppercase">
+                        <h3 className="font-three text-lg truncate mb-1">{url.shorturl}</h3>
+                        <p className="text-xs font-three text-muted-foreground truncate mb-6">{url.original}</p>
+                        <div className="flex items-center gap-2 text-xs font-three text-primary uppercase">
                           Detailed Report <IoArrowForwardOutline className="group-hover:translate-x-1 transition-transform" />
                         </div>
                       </div>
@@ -150,54 +152,93 @@ export default function AnalyticsPage() {
               <div className="space-y-8 animate-in fade-in duration-500">
                 <button 
                   onClick={() => setSelectedLink(null)} 
-                  className="flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-primary transition-colors cursor-pointer group"
+                  className="flex items-center gap-2 text-xl font-font-three text-muted-foreground hover:text-primary transition-colors cursor-pointer group"
                 >
-                  <IoArrowBackOutline className="group-hover:-translate-x-1 transition-transform" /> Back to Overview
+                  <IoArrowBackOutline className="group-hover:-translate-x-1 text-xl transition-transform" /> Back
                 </button>
 
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 bg-secondary/20 p-8 rounded-3xl border border-border/50">
-                  <div className="space-y-2">
-                    <span className="text-xs font-bold text-primary uppercase tracking-[0.2em]">Active Analytics</span>
-                    <h2 className="text-4xl font-black truncate max-w-[300px] md:max-w-md">{selectedLink.shorturl}</h2>
-                    <p className="text-muted-foreground text-sm truncate max-w-sm italic opacity-80">{selectedLink.original}</p>
+                  <div className="space-y-4">
+                    <div className="pb-2">
+                      <span className="text-2xl font-three text-primary uppercase tracking-[0.2em]">
+                        Active Analytics
+                      </span>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-3">
+                        <span className="text-xs uppercase tracking-widest text-muted-foreground font-three w-24">Short Link:</span>
+                        <h2 className="text-xl font-two truncate max-w-[300px] md:max-w-md">
+                          <a 
+                            href={`https://${NEXT_DOMAIN}${selectedLink.shorturl}`} 
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="transition-colors text-blue-600 dark:text-blue-400 hover:underline hover:text-blue-800 dark:hover:text-blue-300 decoration-primary/30 underline-offset-4"
+                          >
+                            {NEXT_DOMAIN}{selectedLink.shorturl}
+                          </a>
+                        </h2>
+                      </div>
+                      
+                      <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-3">
+                        <span className="text-xs uppercase tracking-widest text-muted-foreground font-three w-24">Original:</span>
+                        <p className="text-muted-foreground text-xl font-two truncate max-w-sm italic">
+                          <a 
+                            href={selectedLink.original} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="transition-colors text-blue-600 dark:text-blue-400 hover:underline hover:text-blue-800 dark:hover:text-blue-300 decoration-muted-foreground/30 underline-offset-4"
+                          >
+                            {selectedLink.original}
+                          </a>
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex flex-col items-end">
-                     <span className="text-xs font-bold text-muted-foreground uppercase mb-1">Total Audience</span>
-                     <p className="text-5xl font-black text-foreground">{selectedLink.clicks || 0}</p>
+
+                  <div className="flex flex-row items-baseline gap-3 md:justify-end">
+                    <span className="text-xl font-three text-muted-foreground uppercase">
+                      Total Clicks
+                    </span>
+                    <p className="text-3xl font-two text-foreground">
+                      {selectedLink.clicks || 0}
+                    </p>
                   </div>
                 </div>
 
                 {isLoadingAnalytics ? (
                   <div className="h-96 flex flex-col justify-center items-center gap-4 border border-border/40 rounded-3xl bg-card/30">
                     <div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
-                    <p className="text-muted-foreground font-medium animate-pulse">Analyzing traffic patterns...</p>
+                    <p className="text-muted-foreground font-medium animate-pulse">Loading traffic patterns...</p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-24">
+                  <div className="grid grid-cols-1 font-three md:grid-cols-2 lg:grid-cols-3 gap-6 pb-24">
                     <AnalyticsCardItem 
-                      title="Locations" icon={<IoGlobeOutline size={18}/>} 
-                      data={aggregatedCountries} nameKey="country" 
-                      onExpand={() => openModal("Geographic Distribution", <IoGlobeOutline size={20}/>, aggregatedCountries, "country")} 
+                      title="Locations" 
+                      icon={<IoGlobeOutline size={25}/>} 
+                      data={aggregatedCountries} 
+                      nameKey="country" 
+                      onExpand={() => openModal("Locations", <IoGlobeOutline size={25}/>, aggregatedCountries, "country")} 
                     />
                     <AnalyticsCardItem 
-                      title="Top Referrers" icon={<IoShareSocialOutline size={18}/>} 
+                      title="Top Referrers" icon={<IoShareSocialOutline size={25}/>} 
                       data={analytics?.referrers || []} nameKey="referrer" colorOffset={1}
-                      onExpand={() => openModal("Top Referrers", <IoShareSocialOutline size={20}/>, analytics?.referrers || [], "referrer")} 
+                      onExpand={() => openModal("Top Referrers", <IoShareSocialOutline size={25}/>, analytics?.referrers || [], "referrer")} 
                     />
                     <AnalyticsCardItem 
-                      title="Browsers" icon={<IoCompassOutline size={18}/>} 
+                      title="Browsers" icon={<IoCompassOutline size={25}/>}
                       data={analytics?.browsers || []} nameKey="browser" colorOffset={2}
-                      onExpand={() => openModal("Browsers", <IoCompassOutline size={20}/>, analytics?.browsers || [], "browser")} 
+                      onExpand={() => openModal("Browsers", <IoCompassOutline size={25}/>, analytics?.browsers || [], "browser")} 
                     />
-                    <AnalyticsCardItem 
-                      title="Devices" icon={<IoPhonePortraitOutline size={18}/>} 
+                    <AnalyticsCardItem
+                      title="Devices" icon={<IoPhonePortraitOutline size={25}/>} 
                       data={analytics?.devices || []} nameKey="devices" colorOffset={3}
-                      onExpand={() => openModal("Devices", <IoPhonePortraitOutline size={20}/>, analytics?.devices || [], "devices")} 
+                      onExpand={() => openModal("Devices", <IoPhonePortraitOutline size={25}/>, analytics?.devices || [], "devices")} 
                     />
                     <AnalyticsCardItem 
-                      title="Operating Systems" icon={<IoHardwareChipOutline size={18}/>} 
+                      title="Operating Systems" icon={<IoHardwareChipOutline size={25}/>} 
                       data={analytics?.os || []} nameKey="os" colorOffset={4}
-                      onExpand={() => openModal("Operating Systems", <IoHardwareChipOutline size={20}/>, analytics?.os || [], "os")} 
+                      onExpand={() => openModal("Operating Systems", <IoHardwareChipOutline size={25}/>, analytics?.os || [], "os")} 
                     />
                   </div>
                 )}
@@ -215,7 +256,7 @@ export default function AnalyticsPage() {
                 <span className="text-primary">
                   {modalContent.icon}
                 </span>
-                {modalContent.title}
+                <span className="font-one">{modalContent.title}</span>
               </h3>
               <button 
                 onClick={() => setIsModalOpen(false)} 
@@ -230,18 +271,18 @@ export default function AnalyticsPage() {
                 modalContent.data.map((item: any, index: number) => (
                   <div key={index} className="flex justify-between items-center group">
                     <div className="flex items-center gap-4">
-                      <span className="text-muted-foreground/30 font-mono text-xs">
+                      <span className="font-one">
                         {String(index + 1).padStart(2, '0')}
                       </span>
-                      <span className="font-semibold text-foreground group-hover:text-primary transition-colors">
+                      <span className="font-three text-foreground group-hover:text-primary transition-colors">
                         {item[modalContent.nameKey] || "Unknown"}
                       </span>
                     </div>
-                    <span className="font-black text-sm bg-secondary px-3 py-1 rounded-lg">{item.count} clicks</span>
+                    <span className="font-three text-sm bg-secondary px-3 py-1 rounded-lg">{item.count}</span>
                   </div>
                 ))
               ) : (
-                <p className="text-center py-20 text-muted-foreground">No data records found.</p>
+                <p className="text-center py-20 font-three text-muted-foreground">No data records found.</p>
               )}
             </div>
           </div>

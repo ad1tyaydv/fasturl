@@ -14,13 +14,14 @@ export function ModeToggle() {
   }, [])
 
   const toggleTheme = (event: React.MouseEvent<HTMLButtonElement>) => {
-
+    const isDark = theme === "dark"
+    
     const supportsTransition =
       "startViewTransition" in document &&
       !window.matchMedia("(prefers-reduced-motion: reduce)").matches
 
     if (!supportsTransition) {
-      setTheme(theme === "dark" ? "light" : "dark")
+      setTheme(isDark ? "light" : "dark")
       return
     }
 
@@ -32,51 +33,43 @@ export function ModeToggle() {
       Math.max(y, window.innerHeight - y)
     )
 
-    const transition = (document as any).startViewTransition(() => {
-      setTheme(theme === "dark" ? "light" : "dark")
+    const transition = (document as any).startViewTransition(async () => {
+      setTheme(isDark ? "light" : "dark")
     })
 
     transition.ready.then(() => {
       const clipPath = [
         `circle(0px at ${x}px ${y}px)`,
-        `circle(${endRadius}px at ${x}px ${y}px)`
+        `circle(${endRadius}px at ${x}px ${y}px)`,
       ]
 
       document.documentElement.animate(
         {
-          clipPath: theme === "dark"
-            ? [...clipPath].reverse()
-            : clipPath
+          clipPath: isDark ? [...clipPath].reverse() : clipPath,
         },
         {
-          duration: 500,
-          easing: "ease-in-out",
-          pseudoElement:
-            theme === "dark"
-              ? "::view-transition-old(root)"
-              : "::view-transition-new(root)"
+          duration: 1100,
+          easing: "cubic-bezier(0.7, 0, 0.2, 1)",
+          pseudoElement: isDark
+            ? "::view-transition-old(root)"
+            : "::view-transition-new(root)",
         }
       )
     })
   }
 
-  if (!mounted) {
-    return (
-      <Button
-        variant="outline"
-        className="w-15 h-8 rounded-full"
-      />
-    )
-  }
+  if (!mounted) return <Button variant="outline" className="w-14 h-8 rounded-full" />
 
   return (
     <Button
       variant="outline"
       onClick={toggleTheme}
-      className="w-15 h-8 rounded-full flex items-center justify-between px-2 cursor-pointer transition-all"
+      className="relative w-14 h-8 rounded-full flex items-center justify-between px-1.5 overflow-hidden group border-muted-foreground/100 hover:border-primary/200 transition-colors cursor-pointer"
     >
-      <Sun className="h-4 w-4 dark:text-muted-foreground/40" />
-      <Moon className="h-4 w-4 text-muted-foreground/40 dark:text-white" />
+      <Sun className={`h-4 w-4 transition-all duration-300 ${theme === 'dark' ? 'text-muted-foreground/40' : 'text-yellow-500'}`} />
+      <Moon className={`h-4 w-4 transition-all duration-300 ${theme === 'dark' ? 'text-blue-400' : 'text-muted-foreground/40'}`} />
+      
+      <div className={`absolute h-6 w-6 rounded-full bg-accent/50 -z-10 transition-all duration-300 ${theme === 'dark' ? 'translate-x-6' : 'translate-x-0'}`} />
     </Button>
   )
 }

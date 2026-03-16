@@ -32,13 +32,13 @@ export default function Sidebar() {
     <>
       <aside className="w-64 border-r border-border flex-col py-6 px-4 shrink-0 hidden md:flex bg-muted/20">
         <div>
-          <p className="text-xs font-bold mb-4 px-2 uppercase tracking-wider text-muted-foreground">Menu</p>
+          <p className="text-xl font-one mb-4 px-2 uppercase tracking-wider text-muted-foreground">Menu</p>
           <div className="flex flex-col gap-2">
             {menuItems.map((item) => (
               <button
                 key={item.path}
                 onClick={() => router.push(item.path)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition cursor-pointer ${
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg font-three transition cursor-pointer ${
                   pathname === item.path
                     ? 'bg-primary text-primary-foreground'
                     : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
@@ -52,18 +52,18 @@ export default function Sidebar() {
         </div>
 
         <div className="mt-auto">
-          <p className="text-xs font-bold mb-4 px-2 uppercase tracking-wider text-muted-foreground">Account</p>
+          <p className="text-xl font-one mb-4 px-2 uppercase tracking-wider text-muted-foreground">Account</p>
           <div className="flex flex-col gap-2">
             <button
               onClick={() => console.log('Profile clicked')} 
-              className="flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition cursor-pointer text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+              className="flex items-center gap-3 px-4 py-3 rounded-lg font-three transition cursor-pointer text-muted-foreground hover:bg-accent hover:text-accent-foreground"
             >
               <IoPersonOutline size={20} />
               Profile
             </button>
             <button
               onClick={() => console.log('Settings clicked')} 
-              className="flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition cursor-pointer text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+              className="flex items-center gap-3 px-4 py-3 rounded-lg font-three transition cursor-pointer text-muted-foreground hover:bg-accent hover:text-accent-foreground"
             >
               <IoSettingsOutline size={20} />
               Settings

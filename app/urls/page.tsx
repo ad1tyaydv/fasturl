@@ -100,13 +100,13 @@ export default function AllUrlsPage() {
     router.push("/auth/signin");
   };
 
-  
+
   return (
     <DashboardLayout isLoggedIn={isLoggedIn} handleLogout={handleLogout}>
       <div className="max-w-4xl mx-auto">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold">Your Saved URLs</h1>
-          <span className="px-3 rounded-xl py-1 text-base sm:text-xl font-medium w-fit bg-secondary text-secondary-foreground">
+          <h1 className="text-2xl sm:text-4xl font-one">Saved URLs</h1>
+          <span className="px-3 rounded-xl py-1 text-base sm:text-xl font-three w-fit bg-secondary text-secondary-foreground">
             Total Links - {urls.length}
           </span>
         </div>
@@ -117,10 +117,10 @@ export default function AllUrlsPage() {
           </div>
         ) : urls.length === 0 ? (
           <div className="text-center mt-10 sm:mt-16 p-8 sm:p-12 border-2 border-dashed border-border rounded-2xl bg-muted/30">
-            <p className="text-base sm:text-lg mb-6 text-muted-foreground">You haven't saved any URLs yet.</p>
+            <p className="text-base sm:text-lg font-two mb-6 text-muted-foreground">You haven't saved any URLs yet.</p>
             <button 
               onClick={() => router.push('/')}
-              className="w-full sm:w-auto px-8 py-3 rounded-lg transition font-medium cursor-pointer bg-primary text-primary-foreground hover:bg-primary/90"
+              className="w-full sm:w-auto px-8 font-one py-3 rounded-lg transition cursor-pointer bg-primary text-primary-foreground hover:bg-primary/90"
             >
               Shorten your first link
             </button>
@@ -135,7 +135,7 @@ export default function AllUrlsPage() {
               >
                 <div className="flex flex-col gap-2 sm:gap-3 w-full overflow-hidden min-w-0">
                   <div className="flex items-center gap-2 sm:gap-3 w-full min-w-0">
-                    <div className="truncate text-base sm:text-lg min-w-0 flex-1">
+                    <div className="truncate text-base font-three sm:text-lg min-w-0 flex-1">
                       <strong>Short Url - </strong> 
                       <span className="font-normal text-muted-foreground">{NEXT_DOMAIN}/{url.shorturl}</span>
                     </div>
@@ -154,7 +154,7 @@ export default function AllUrlsPage() {
                   </div>
 
                   <div className="flex items-center gap-2 sm:gap-3 w-full min-w-0">
-                    <div className="truncate text-sm sm:text-lg min-w-0 flex-1">
+                    <div className="truncate font-three text-sm sm:text-lg min-w-0 flex-1">
                       <strong>Original Url - </strong> 
                       <span className="font-normal text-muted-foreground">{url.original}</span>
                     </div>
@@ -197,15 +197,15 @@ export default function AllUrlsPage() {
             className="rounded-2xl shadow-2xl w-full max-w-md p-6 sm:p-8 transform transition-all cursor-default bg-background border border-border"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="text-xl sm:text-2xl font-bold mb-5 sm:mb-6 border-b border-border pb-4 text-foreground">Link Details</h3>
+            <h3 className="text-xl sm:text-2xl font-one mb-5 sm:mb-6 border-b border-border pb-4 text-foreground">Link Details</h3>
             <div className="space-y-5 sm:space-y-6 mb-6 sm:mb-8">
               <div>
-                <p className="text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-1 text-muted-foreground">Total Clicks</p>
-                <p className="text-3xl sm:text-4xl font-extrabold text-foreground">{selectedUrl.clicks ?? 0}</p>
+                <p className="text-[10px] sm:text-xs font-two uppercase tracking-widest mb-1 text-muted-foreground">Total Clicks</p>
+                <p className="text-3xl sm:text-4xl font-one text-foreground">{selectedUrl.clicks ?? 0}</p>
               </div>
               <div>
-                <p className="text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-1 text-muted-foreground">Created At</p>
-                <p className="text-base sm:text-lg font-medium text-muted-foreground">
+                <p className="text-[10px] sm:text-xs font-two uppercase tracking-widest mb-1 text-muted-foreground">Created At</p>
+                <p className="text-base sm:text-lg font-two text-muted-foreground">
                   {selectedUrl.createdAt 
                     ? new Date(selectedUrl.createdAt).toLocaleDateString('en-US', {
                         year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
@@ -217,7 +217,7 @@ export default function AllUrlsPage() {
             <div className="flex justify-end">
               <button 
                 onClick={() => setSelectedUrl(null)}
-                className="w-full sm:w-auto px-6 py-2.5 sm:py-2 rounded-lg transition font-medium cursor-pointer text-sm bg-primary text-primary-foreground hover:bg-primary/90"
+                className="w-full sm:w-auto px-6 py-2.5 sm:py-2 rounded-lg transition font-one cursor-pointer text-sm bg-primary text-primary-foreground hover:bg-primary/90"
               >
                 Close
               </button>
