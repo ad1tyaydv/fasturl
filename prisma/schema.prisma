@@ -15,6 +15,7 @@ model User {
   ipAddress      String?
 
   links          Link[]
+  qr             Qr[]
 
   createdAt      DateTime    @default(now())
 }
@@ -38,8 +39,12 @@ model Link {
 
 model Click {
   id          String      @id @default(uuid())
+
   linkId      String
   link        Link        @relation(fields: [linkId], references: [id], onDelete: Cascade)
+
+  qrId        String?
+  qr          Qr?         @relation(fields: [qrId], references: [id], onDelete: Cascade)
 
   ip          String
   country     String?
@@ -50,10 +55,30 @@ model Click {
   browser     String?
   OS          String?
 
-  referrer     String?
+  referrer    String?
 
   createdAt   DateTime    @default(now())
 
   @@index([linkId])
+  @@index([qrId])
   @@index([country])
+}
+
+model Qr {
+  id          String      @id @default(uuid())
+  qrName      String?
+  shortUrl    String
+  longUrl     String
+
+  qrImage     String
+
+  clicks      Int         @default(0)
+  clickLogs   Click[]
+
+  ipAddress   String?
+
+  userId      String
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt  DateTime    @default(now())
 }

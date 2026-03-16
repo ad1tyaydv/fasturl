@@ -10,8 +10,8 @@ import {
   IoLinkOutline,
   IoQrCodeOutline
 } from "react-icons/io5";
-
 import { ModeToggle } from "./components/toggleTheme";
+
 
 const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN;
 
@@ -23,6 +23,7 @@ export default function Dashboard() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [showQr, setShowQr] = useState<string | boolean>(false);
 
   const handleShortUrl = async (originalUrl: string) => {
     if (!originalUrl) return;
@@ -36,16 +37,36 @@ export default function Dashboard() {
       const generatedShortUrl = res.data.shortUrl;
       setShortUrl(generatedShortUrl);
       setUrl(`${NEXT_DOMAIN}/${generatedShortUrl}`);
+
     } catch (error) {
       console.log("Can't short url", error);
+
     } finally {
       setLoading(false);
     }
   };
 
+  const handleGenerateQr = async () => {
+    if (typeof showQr === "string") {
+      setShowQr(false);
+      return;
+    }
+
+    try {
+      const res = await axios.post("/api/qrCode", {
+        shortUrl: shortUrl,
+        longUrl: url
+      });
+
+      setShowQr(res.data.qrImage);
+
+    } catch (error) {
+      console.log("Error while generating qr code", error);
+    }
+  };
+
   const copyToClipboard = () => {
-    const fullUrl = `${NEXT_DOMAIN}/${shortUrl}`;
-    navigator.clipboard.writeText(fullUrl);
+    navigator.clipboard.writeText(url);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -53,6 +74,7 @@ export default function Dashboard() {
   const handleReset = () => {
     setShortUrl("");
     setUrl("");
+    setShowQr(false);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -94,10 +116,8 @@ export default function Dashboard() {
 
       <nav className="flex items-center justify-between px-4 sm:px-8 py-4 border-b border-border">
         <h1 className="text-lg sm:text-xl font-semibold">SHORTLY</h1>
-
         <div className="flex items-center gap-4 cursor-pointer">
           <ModeToggle />
-
           {isLoggedIn ? (
             <button
               onClick={handleLogout}
@@ -121,7 +141,6 @@ export default function Dashboard() {
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
             Shorten Your Links Instantly
           </h1>
-
           <p className="mb-8 text-base sm:text-lg px-2 text-muted-foreground">
             Turn long and messy URLs into short, clean links you can easily share.
           </p>
@@ -145,6 +164,16 @@ export default function Dashboard() {
 
             {shortUrl ? (
               <div className="flex gap-2 w-full sm:w-auto">
+                <button
+                  className={`px-4 sm:px-5 py-3 rounded-lg cursor-pointer flex items-center justify-center transition shrink-0 ${
+                    showQr ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                  }`}
+                  onClick={() => handleGenerateQr()}
+                  title="Generate QR Code"
+                >
+                  <IoQrCodeOutline size={22} />
+                </button>
+
                 <button
                   className="flex-1 sm:flex-none px-4 sm:px-8 py-3 rounded-lg cursor-pointer flex items-center justify-center gap-2 transition font-medium bg-primary text-primary-foreground hover:bg-primary/90"
                   onClick={copyToClipboard}
@@ -176,6 +205,15 @@ export default function Dashboard() {
             )}
           </div>
 
+          {showQr && typeof showQr === "string" && (
+            <div className="mt-6 flex flex-col items-center animate-in fade-in slide-in-from-top-4 duration-300">
+              <div className="bg-white p-4 rounded-xl shadow-lg border border-border">
+                <img src={showQr} alt="QR Code" className="w-40 h-40 object-contain" />
+              </div>
+              <p className="mt-3 text-sm font-medium text-muted-foreground">Your QR code is ready!</p>
+            </div>
+          )}
+
           {!isLoggedIn && (
             <div className="mt-4 flex flex-col items-center justify-center text-sm sm:text-base md:text-xl text-muted-foreground">
               <p>You can only create 3 links/day</p>
@@ -196,7 +234,6 @@ export default function Dashboard() {
           <p className="mb-6 text-sm sm:text-base px-2 text-muted-foreground">
             See all your previously shortened URLs, copy them, or delete the ones you no longer need.
           </p>
-          
           <button
             onClick={() => router.push('/urls')} 
             className="w-full sm:w-auto group flex justify-center items-center gap-2 border-2 border-input bg-background px-6 sm:px-8 py-3 rounded-lg transition cursor-pointer font-semibold text-base sm:text-lg hover:bg-accent hover:text-accent-foreground"
@@ -216,12 +253,11 @@ export default function Dashboard() {
             Stop guessing and start tracking. Whether you are a solo creator or a growing enterprise, our advanced tools deliver the insights you need to succeed.
           </p>
           <p className="text-muted-foreground text-base sm:text-lg">
-            Build brand trust with custom short domains, generate dynamic QR codes, and monitor global engagement in real-time. Upgrade your toolkit today.
+            Build brand trust with custom short domains and monitor global engagement in real-time.
           </p>
         </div>
 
         <div className="xl:w-2/3 grid grid-cols-1 md:grid-cols-3 gap-6 w-full items-stretch">
-          
           <div className="border border-border rounded-2xl p-6 bg-card flex flex-col shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300">
             <h3 className="text-xl font-bold text-center mb-4">Free</h3>
             <div className="text-center text-4xl font-extrabold mb-6">$0</div>
@@ -256,7 +292,7 @@ export default function Dashboard() {
               <ul className="space-y-4 text-sm font-medium flex-1">
                 <li className="flex items-center">
                   <span className="bg-[#facc15] text-black px-2.5 py-1 rounded flex items-center gap-2 font-bold shadow-sm">
-                    <IoLinkOutline size={16} /> 400 Links/Mo
+                    <IoLinkOutline size={16} /> 200 Links/Mo
                   </span>
                 </li>
                 <li className="flex items-center gap-2.5 px-1 text-muted-foreground">
@@ -286,7 +322,6 @@ export default function Dashboard() {
               </li>
             </ul>
           </div>
-
         </div>
       </section>
 
@@ -295,7 +330,6 @@ export default function Dashboard() {
           URL Copied!
         </div>
       )}
-
     </div>
   );
 }

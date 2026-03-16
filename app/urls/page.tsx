@@ -36,21 +36,7 @@ export default function AllUrlsPage() {
   const [copiedType, setCopiedType] = useState<"original" | "short" | null>(null);
   const [selectedUrl, setSelectedUrl] = useState<UrlItem | null>(null);
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const res = await axios.get("/api/auth/me");
-        if (!res.data.authenticated) {
-          router.push("/auth/signin");
-        } else {
-          setIsLoggedIn(true);
-        }
-      } catch {
-        router.push("/auth/signin");
-      }
-    };
-    checkAuth();
-  }, [router]);
+
 
   const fetchUrls = async () => {
     try {
@@ -68,6 +54,7 @@ export default function AllUrlsPage() {
 
     } catch (err) {
       console.log("Error fetching URLs:", err);
+
     } finally {
       setLoading(false);
     }
@@ -77,31 +64,38 @@ export default function AllUrlsPage() {
     fetchUrls();
   }, []);
 
+
   const copyToClipboard = (url: string, id: string, type: "original" | "short") => {
     navigator.clipboard.writeText(url);
     setCopiedUrlId(id);
     setCopiedType(type);
+
     setTimeout(() => {
       setCopiedUrlId(null);
       setCopiedType(null);
     }, 2000);
+
   };
+
 
   const handleDelete = async (id: string) => {
     try {
       await axios.delete(`/api/shortUrl/delete${id}`);
       setUrls(urls.filter((u) => u.id !== id));
+      
     } catch (err) {
       console.log("Error deleting URL:", err);
     }
   };
   
+
   const handleLogout = async () => {
     await axios.post("/api/auth/logout");
     setIsLoggedIn(false);
     router.push("/auth/signin");
   };
   
+
   return (
     <div className="h-screen flex flex-col overflow-hidden relative transition-colors duration-300 bg-background text-foreground">
       
@@ -165,9 +159,9 @@ export default function AllUrlsPage() {
               </button>
 
               <button
-                onClick={() => router.push('/qrcodes')}
+                onClick={() => router.push('/qr')}
                 className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition cursor-pointer ${
-                  pathname === '/qrcodes' 
+                  pathname === '/qr' 
                     ? 'bg-primary text-primary-foreground'
                     : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
                 }`}
