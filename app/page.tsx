@@ -25,6 +25,7 @@ export default function Dashboard() {
   const [copied, setCopied] = useState(false);
   const [showQr, setShowQr] = useState<string | boolean>(false);
 
+
   const handleShortUrl = async (originalUrl: string) => {
     if (!originalUrl) return;
 
@@ -46,6 +47,7 @@ export default function Dashboard() {
     }
   };
 
+
   const handleGenerateQr = async () => {
     if (typeof showQr === "string") {
       setShowQr(false);
@@ -65,11 +67,13 @@ export default function Dashboard() {
     }
   };
 
+
   const copyToClipboard = () => {
     navigator.clipboard.writeText(url);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
 
   const handleReset = () => {
     setShortUrl("");
@@ -77,11 +81,13 @@ export default function Dashboard() {
     setShowQr(false);
   };
 
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && url && !shortUrl && !loading) {
       handleShortUrl(url);
     }
   };
+
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -93,13 +99,16 @@ export default function Dashboard() {
       }
     };
     checkAuth();
+
   }, [router]);
+
 
   const handleLogout = async () => {
     await axios.post("/api/auth/logout");
     setIsLoggedIn(false);
   };
 
+  
   return (
     <div className="min-h-screen transition-colors duration-300 bg-background text-foreground">
       
