@@ -26,7 +26,6 @@ export default function Dashboard() {
   const [copied, setCopied] = useState(false);
   const [showQr, setShowQr] = useState<string | boolean>(false);
 
-  // Modal State
   const [modalConfig, setModalConfig] = useState<{
     show: boolean;
     title: string;
@@ -42,6 +41,7 @@ export default function Dashboard() {
     action: () => {},
     showPlans: false,
   });
+
 
   const handleShortUrl = async (originalUrl: string) => {
     if (!originalUrl) return;
@@ -79,10 +79,12 @@ export default function Dashboard() {
         }
       }
       console.log("Can't short url", error);
+
     } finally {
       setLoading(false);
     }
   };
+
 
   const handleGenerateQr = async () => {
     if (!isLoggedIn) {
@@ -125,11 +127,13 @@ export default function Dashboard() {
     }
   };
 
+
   const copyToClipboard = () => {
     navigator.clipboard.writeText(url);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
 
   const handleReset = () => {
     setShortUrl("");
@@ -137,28 +141,34 @@ export default function Dashboard() {
     setShowQr(false);
   };
 
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && url && !shortUrl && !loading) {
       handleShortUrl(url);
     }
   };
 
+
   useEffect(() => {
     const checkAuth = async () => {
       try {
         const res = await axios.get("/api/auth/me");
         setIsLoggedIn(!!res.data.authenticated);
+
       } catch {
         setIsLoggedIn(false);
       }
     };
     checkAuth();
+
   }, [router]);
+
 
   const handleLogout = async () => {
     await axios.post("/api/auth/logout");
     setIsLoggedIn(false);
   };
+
 
   return (
     <div className="min-h-screen transition-colors duration-300 bg-background text-foreground relative">
@@ -258,7 +268,7 @@ export default function Dashboard() {
       <section className="flex flex-col items-center justify-center px-4 sm:px-6 pt-16 md:pt-24 pb-12">
         <div className="text-center max-w-3xl w-full mx-auto">
           <h1 className="text-3xl font-one sm:text-4xl md:text-5xl font-bold mb-4">
-            Shorten Your Links Instantly
+            Shorten Your <span className="text-red-500">Links</span> Instantly
           </h1>
           <p className="mb-8 font-two text-base sm:text-lg px-2 text-muted-foreground">
             Turn long and messy URLs into short, clean links you can easily share.
