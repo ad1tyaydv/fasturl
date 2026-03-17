@@ -3,9 +3,9 @@
 import axios from "axios";
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import DashboardLayout from "../components/dashBoardComponent";
-import SavedQrs from "../components/savedQrs";
-import SavedLinks from "../components/savedLinks";
+import DashboardLayout from "../../components/dashBoardComponent";
+import SavedQrs from "../../components/savedQrs";
+import SavedLinks from "../../components/savedLinks";
 
 interface UrlItem {
   id: string;

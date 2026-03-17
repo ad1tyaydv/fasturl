@@ -2,26 +2,27 @@
 
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { 
-  IoCopyOutline, 
   IoRefreshOutline, 
   IoArrowForwardOutline,
-  IoQrCodeOutline,
   IoCloseOutline,
   IoCheckmarkCircle,
   IoDownloadOutline,
-  IoLinkOutline
 } from "react-icons/io5";
-import { ModeToggle } from "../components/toggleTheme";
+import { ModeToggle } from "../../components/toggleTheme";
+import PricingSection from "@/app/components/PricingSection";
+
 
 export default function QRGenerator() {
   const router = useRouter();
+  const pricingRef = useRef<HTMLDivElement>(null);
 
   const [url, setUrl] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showQr, setShowQr] = useState<string | null>(null);
+  const [upgradeMsg, setUpgradeMsg] = useState(false);
 
   const [modalConfig, setModalConfig] = useState<{
     show: boolean;
@@ -38,6 +39,35 @@ export default function QRGenerator() {
     action: () => {},
     showPlans: false,
   });
+
+  
+  const slowScrollToPricing = () => {
+    if (pricingRef.current) {
+      const targetPosition = pricingRef.current.offsetTop;
+      const startPosition = window.pageYOffset;
+      const distance = targetPosition - startPosition;
+      const duration = 1200; 
+      let start: number | null = null;
+
+      const step = (timestamp: number) => {
+        if (!start) start = timestamp;
+        const progress = timestamp - start;
+        const percentage = Math.min(progress / duration, 1);
+        
+        const easing = percentage < 0.5 
+          ? 4 * percentage * percentage * percentage 
+          : 1 - Math.pow(-2 * percentage + 2, 3) / 2;
+
+        window.scrollTo(0, startPosition + distance * easing);
+        if (progress < duration) window.requestAnimationFrame(step);
+      };
+
+      window.requestAnimationFrame(step);
+    }
+    
+    setUpgradeMsg(true);
+    setTimeout(() => setUpgradeMsg(false), 3000);
+  };
 
 
   const handleGenerateQr = async () => {
@@ -66,15 +96,10 @@ export default function QRGenerator() {
 
     } catch (error: any) {
       if (error.response?.status === 429) {
-        setModalConfig({
-          show: true,
-          title: "Upgrade Your Plan",
-          description: "You've reached your daily QR code limit. Upgrade to unlock unlimited generations.",
-          buttonText: "Close",
-          action: () => setModalConfig(prev => ({ ...prev, show: false })),
-          showPlans: true,
-        });
+
+        slowScrollToPricing();
       }
+
       console.log("Error while generating qr code", error);
 
     } finally {
@@ -93,12 +118,10 @@ export default function QRGenerator() {
     document.body.removeChild(link);
   };
 
-
   const handleReset = () => {
     setUrl("");
     setShowQr(null);
   };
-
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && url && !loading) {
@@ -118,7 +141,6 @@ export default function QRGenerator() {
     };
     checkAuth();
   }, [router]);
-
 
   const handleLogout = async () => {
     await axios.post("/api/auth/logout");
@@ -146,7 +168,7 @@ export default function QRGenerator() {
               <h3 className="text-xl font-bold font-one">{modalConfig.title}</h3>
               <button 
                 onClick={() => setModalConfig({ ...modalConfig, show: false })}
-                className="p-1 hover:bg-accent rounded-full transition-colors"
+                className="p-1 hover:bg-accent rounded-full transition-colors cursor-pointer"
               >
                 <IoCloseOutline size={24} />
               </button>
@@ -168,7 +190,7 @@ export default function QRGenerator() {
                     <li className="flex items-center gap-2"><IoCheckmarkCircle className="text-primary"/> 200 Links / Mo</li>
                     <li className="flex items-center gap-2"><IoCheckmarkCircle className="text-primary"/> 20 QR Codes / Mo</li>
                   </ul>
-                  <button className="w-full py-2 bg-primary text-primary-foreground rounded-lg font-bold hover:opacity-90 transition">Upgrade Essentials</button>
+                  <button className="w-full py-2 bg-primary text-primary-foreground rounded-lg font-bold hover:opacity-90 transition cursor-pointer">Upgrade Essentials</button>
                 </div>
 
                 <div className="border border-border rounded-xl p-5 bg-background text-left">
@@ -181,13 +203,13 @@ export default function QRGenerator() {
                     <li className="flex items-center gap-2"><IoCheckmarkCircle className="text-primary"/> Unlimited Links</li>
                     <li className="flex items-center gap-2"><IoCheckmarkCircle className="text-primary"/> 500 QR Codes / Mo</li>
                   </ul>
-                  <button className="w-full py-2 bg-secondary text-secondary-foreground rounded-lg font-bold hover:bg-secondary/80 transition">Go Premium</button>
+                  <button className="w-full py-2 bg-secondary text-secondary-foreground rounded-lg font-bold hover:bg-secondary/80 transition cursor-pointer">Go Premium</button>
                 </div>
               </div>
             ) : (
               <button 
                 onClick={modalConfig.action}
-                className="w-full py-3 bg-primary text-primary-foreground rounded-xl font-bold transition hover:opacity-90 active:scale-95"
+                className="w-full py-3 bg-primary text-primary-foreground rounded-xl font-bold transition hover:opacity-90 active:scale-95 cursor-pointer"
               >
                 {modalConfig.buttonText}
               </button>
@@ -198,7 +220,7 @@ export default function QRGenerator() {
 
       <nav className="flex items-center justify-between px-4 sm:px-8 py-4 border-b border-border">
         <h1 className="text-lg font-three sm:text-xl">SHORTLY</h1>
-        <div className="flex items-center gap-4 cursor-pointer">
+        <div className="flex items-center gap-4">
           <ModeToggle />
           {isLoggedIn ? (
             <button
@@ -316,86 +338,15 @@ export default function QRGenerator() {
         </div>
       </section>
 
-      <section className="px-4 sm:px-8 py-16 md:py-24 max-w-7xl mx-auto flex flex-col xl:flex-row gap-12 xl:gap-10 items-center xl:items-start">
-        <div className="xl:w-1/3 text-center xl:text-left pt-2">
-          <h2 className="text-3xl font-one sm:text-4xl font-extrabold mb-5 leading-tight">
-            Unlock the Full Potential of Your Links.
-          </h2>
-          <p className="text-muted-foreground font-two mb-5 text-base sm:text-lg">
-            Stop guessing and start tracking. Whether you are a solo creator or a growing enterprise, our advanced tools deliver the insights you need to succeed.
-          </p>
-          <p className="text-muted-foreground font-two text-base sm:text-lg">
-            Build brand trust with custom short domains and monitor global engagement in real-time.
-          </p>
+      <div ref={pricingRef}>
+        <PricingSection />
+      </div>
+
+      {upgradeMsg && (
+        <div className="fixed font-two bottom-10 left-1/2 -translate-x-1/2 px-8 py-3 rounded-full shadow-2xl text-sm sm:text-base z-50 animate-in slide-in-from-bottom-4 fade-in duration-300 bg-black text-white dark:bg-white dark:text-black font-bold border border-border">
+          Upgrade to generate more!
         </div>
-
-        <div className="xl:w-2/3 grid grid-cols-1 md:grid-cols-3 gap-6 w-full items-stretch">
-          <div className="border border-border rounded-2xl p-6 bg-card flex flex-col shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300">
-            <h3 className="text-2xl font-bold text-center mb-4">Free</h3>
-            <div className="text-center text-4xl font-extrabold mb-6">$0</div>
-            <button className="w-full font-two bg-foreground text-background py-2.5 rounded-lg font-semibold text-sm sm:text-base mb-6 transition hover:bg-foreground/90 cursor-pointer">
-              Start for free
-            </button>
-            <ul className="space-y-4 text-sm font-medium flex-1">
-              <li className="flex items-center">
-                <span className="bg-[#facc15] font-two text-black px-2.5 py-1 rounded flex items-center gap-2 font-bold shadow-sm">
-                  <IoLinkOutline size={16} /> 3 Links/Day
-                </span>
-              </li>
-              <li className="flex font-two items-center gap-2.5 px-1 text-muted-foreground">
-                <IoQrCodeOutline size={18} className="text-foreground"/> 1 QR Code/Day
-              </li>
-            </ul>
-          </div>
-
-          <div className="relative md:scale-105 z-10 flex flex-col">
-            <div className="animate-gentle-shake border-2 border-primary/50 bg-card rounded-2xl p-6 flex flex-col shadow-xl dark:shadow-[0_0_20px_-5px_hsl(var(--primary)/0.3)] hover:-translate-y-1 transition-transform duration-300 h-full">
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-primary text-primary-foreground px-3 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest shadow-sm">
-                Most Popular
-              </div>
-              <h3 className="text-2xl font-bold text-center mb-4 text-foreground mt-2">Essentials</h3>
-              <div className="text-center mb-6 flex justify-center items-end gap-2.5">
-                <span className="line-through decoration-red-500 decoration-2 text-muted-foreground text-2xl font-bold mb-0.5">$15</span>
-                <span className="text-5xl font-extrabold text-foreground">$6<span className="text-lg font-bold text-muted-foreground">/mo</span></span>
-              </div>
-              <button className="w-full font-two bg-primary text-primary-foreground hover:bg-primary/90 py-2.5 rounded-lg font-semibold text-sm sm:text-base mb-6 transition shadow-sm cursor-pointer">
-                Upgrade Now
-              </button>
-              <ul className="space-y-4 text-sm font-medium flex-1">
-                <li className="flex items-center">
-                  <span className="bg-[#facc15] font-two text-black px-2.5 py-1 rounded flex items-center gap-2 font-bold shadow-sm">
-                    <IoLinkOutline size={16} /> 200 Links/Mo
-                  </span>
-                </li>
-                <li className="flex items-center gap-2.5 px-1 text-muted-foreground">
-                  <IoQrCodeOutline size={18} className="font-two text-foreground"/> 20 QR Codes/Mo
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="border border-border rounded-2xl p-6 bg-card flex flex-col shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300">
-            <h3 className="text-2xl font-bold text-center mb-4">Premium</h3>
-            <div className="text-center mb-6 flex justify-center items-end gap-2.5">
-              <span className="line-through decoration-red-500 decoration-2 text-muted-foreground text-xl font-bold mb-1">$499</span>
-              <span className="text-4xl font-extrabold">$299<span className="text-lg font-bold text-muted-foreground">/mo</span></span>
-            </div>
-            <button className="w-full font-two bg-secondary text-secondary-foreground py-2.5 rounded-lg font-semibold text-sm sm:text-base mb-6 transition hover:bg-secondary/80 cursor-pointer">
-              Go Premium
-            </button>
-            <ul className="space-y-4 text-sm font-medium flex-1">
-              <li className="flex items-center">
-                <span className="bg-[#facc15] font-two text-black px-2.5 py-1 rounded flex items-center gap-2 font-bold shadow-sm">
-                  <IoLinkOutline size={16} /> Unlimited Links
-                </span>
-              </li>
-              <li className="flex items-center gap-2.5 px-1 text-muted-foreground">
-                <IoQrCodeOutline size={18} className="font-two text-foreground"/> 500 QR Codes/Mo
-              </li>
-            </ul>
-          </div>
-        </div>
-      </section>
+      )}
     </div>
   );
 }

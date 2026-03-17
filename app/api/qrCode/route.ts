@@ -75,9 +75,9 @@ export async function POST(req: NextRequest) {
             }
         })
 
-        if(count >= 1) {
+        if(count >= 2) {
             return NextResponse.json(
-                {message: "Upgrade to generate utpo 500 QR Codes per month"},
+                {message: "Upgrade to generate utpo 1000 QR Codes per month"},
                 {status: 429}
             )
         }

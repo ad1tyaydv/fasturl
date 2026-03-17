@@ -5,10 +5,11 @@ import {
   IoHomeOutline, 
   IoListOutline, 
   IoSettingsOutline, 
-  IoPersonOutline, 
   IoQrCodeOutline, 
-  IoAnalyticsOutline 
+  IoAnalyticsOutline,
+  IoStarOutline
 } from "react-icons/io5";
+
 
 export default function Sidebar() {
   const router = useRouter();
@@ -19,6 +20,8 @@ export default function Sidebar() {
     { name: 'Links', path: '/urls', icon: <IoListOutline size={20} /> },
     { name: 'QR Codes', path: '/qr', icon: <IoQrCodeOutline size={20} /> },
     { name: 'Analytics', path: '/analytics', icon: <IoAnalyticsOutline size={20} /> },
+    { name: 'Premium', path: '/premium', icon: <IoStarOutline size={20} /> },
+    { name: 'Settings', path: '/settings', icon: <IoSettingsOutline size={20} /> },
   ];
 
   const mobileItems = [
@@ -26,7 +29,10 @@ export default function Sidebar() {
     { name: 'Links', path: '/urls', icon: <IoListOutline size={24} /> },
     { name: 'QR', path: '/qrcodes', icon: <IoQrCodeOutline size={24} /> },
     { name: 'Analytics', path: '/analytics', icon: <IoAnalyticsOutline size={24} /> },
+    { name: 'Premium', path: '/premium', icon: <IoStarOutline size={24} /> },
+    { name: 'Settings', path: '/settings', icon: <IoSettingsOutline size={24} /> },
   ];
+
 
   return (
     <>
@@ -50,46 +56,23 @@ export default function Sidebar() {
             ))}
           </div>
         </div>
-
-        <div className="mt-auto">
-          <p className="text-xl font-one mb-4 px-2 uppercase tracking-wider text-muted-foreground">Account</p>
-          <div className="flex flex-col gap-2">
-            <button
-              onClick={() => console.log('Profile clicked')} 
-              className="flex items-center gap-3 px-4 py-3 rounded-lg font-three transition cursor-pointer text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-            >
-              <IoPersonOutline size={20} />
-              Profile
-            </button>
-            <button
-              onClick={() => console.log('Settings clicked')} 
-              className="flex items-center gap-3 px-4 py-3 rounded-lg font-three transition cursor-pointer text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-            >
-              <IoSettingsOutline size={20} />
-              Settings
-            </button>
-          </div>
-        </div>
       </aside>
 
-      <nav className="md:hidden fixed bottom-0 w-full border-t border-border flex justify-around items-center pb-safe z-30 bg-background">
+      <nav className="md:hidden fixed bottom-0 w-full border-t border-border flex justify-around items-center pb-safe z-30 bg-background overflow-x-auto">
         {mobileItems.map((item) => (
           <button
             key={item.path}
             onClick={() => router.push(item.path)}
-            className={`flex flex-col items-center gap-1 py-3 px-2 ${pathname === item.path ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+            className={`flex flex-col items-center gap-1 py-3 px-2 shrink-0 ${
+              pathname === item.path 
+                ? 'text-primary' 
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
           >
             {item.icon}
             <span className="text-[10px] font-medium">{item.name}</span>
           </button>
         ))}
-        <button
-          onClick={() => console.log('Profile clicked')}
-          className="flex flex-col items-center gap-1 py-3 px-2 text-muted-foreground hover:text-foreground"
-        >
-          <IoPersonOutline size={24} />
-          <span className="text-[10px] font-medium">Profile</span>
-        </button>
       </nav>
     </>
   );

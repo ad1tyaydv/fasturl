@@ -8,10 +8,10 @@ import {
   IoHardwareChipOutline, IoShareSocialOutline, IoCompassOutline, 
   IoCloseOutline, IoArrowBackOutline
 } from "react-icons/io5";
-import DashboardLayout from "../components/dashBoardComponent";
-import { AnalyticsCardItem } from "../components/analyticsCard";
-import LinkAnalyticsTab from "../components/linkAnalyticsTab";
-import QRAnalyticsTab from "../components/qrAnalyticsTab";
+import DashboardLayout from "../../components/dashBoardComponent";
+import { AnalyticsCardItem } from "../../components/analyticsCard";
+import LinkAnalyticsTab from "../../components/linkAnalyticsTab";
+import QRAnalyticsTab from "../../components/qrAnalyticsTab";
 
 
 const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN;
