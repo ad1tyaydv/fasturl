@@ -1,8 +1,11 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { IoCheckmarkOutline, IoCloseOutline } from "react-icons/io5";
 
 export default function PricingSection() {
+  const router = useRouter();
+  
   const Check = () => <IoCheckmarkOutline className="text-green-500 font-bold inline-block ml-2" size={22} />;
   const Cross = () => <IoCloseOutline className="text-red-500 font-bold inline-block ml-2" size={22} />;
 
@@ -42,7 +45,10 @@ export default function PricingSection() {
               </div>
             </div>
           </div>
-          <button className="mt-8 w-full px-6 border border-border bg-transparent py-2.5 rounded-lg text-base font-bold transition hover:bg-accent cursor-pointer">
+          <button 
+            className="mt-8 w-full px-6 border border-border bg-transparent py-2.5 rounded-lg text-base font-three transition hover:bg-accent cursor-pointer"
+            onClick={() => router.push("/")}
+          >
             Start Free
           </button>
         </div>
@@ -73,7 +79,7 @@ export default function PricingSection() {
               </div>
               </div>
             </div>
-            <button className="mt-8 w-full px-6 bg-primary text-primary-foreground py-2.5 rounded-lg text-base font-bold transition hover:opacity-90 cursor-pointer shadow-sm">
+            <button className="mt-8 w-full px-6 bg-primary text-primary-foreground py-2.5 rounded-lg text-base font-three transition hover:opacity-90 cursor-pointer shadow-sm">
               Upgrade
             </button>
           </div>
@@ -81,7 +87,7 @@ export default function PricingSection() {
 
         <div className="border border-border rounded-xl p-6 bg-card flex flex-col shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300">
           <div className="text-center border-b border-border pb-4 mb-5">
-            <h3 className="text-2xl font-bold mb-1">PRO</h3>
+            <h3 className="text-2xl font-three mb-1">PRO</h3>
             <p className="text-3xl font-extrabold mt-2">$30<span className="text-sm font-normal text-muted-foreground">/mo</span></p>
           </div>
           <div className="flex-1 space-y-3 text-base sm:text-lg font-medium">
@@ -99,7 +105,7 @@ export default function PricingSection() {
                 <p className="">Custom Domains <Check /></p>
                 <p className="">password protection / expiry <Check /></p>
           </div>
-          <button className="mt-8 w-full px-6 border border-border bg-secondary text-secondary-foreground py-2.5 rounded-lg text-base font-bold transition hover:bg-secondary/80 cursor-pointer">
+          <button className="mt-8 w-full px-6 border border-border bg-secondary text-secondary-foreground py-2.5 rounded-lg text-base font-three transition hover:bg-secondary/80 cursor-pointer">
             Upgrade
           </button>
         </div>

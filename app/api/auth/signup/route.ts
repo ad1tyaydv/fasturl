@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
 
         if(findUser) {
             return NextResponse.json(
-                {message: "user already exists!"},
+                {message: "User already exists!"},
                 {status: 400}
             )
         }
@@ -31,13 +31,16 @@ export async function POST(req: NextRequest) {
             data: {
                 email: data.email,
                 password: hashedPassword,
+                plan: "FREE"
             }
         })
 
         const token = jwt.sign(
             {
                 userId: userSignup.id,
-                email: data.email
+                email: data.email,
+                plan: userSignup.plan,
+                planExpiresAt: userSignup.planExpiresAt
             },
             NEXTAUTH_SECRET!,
             {

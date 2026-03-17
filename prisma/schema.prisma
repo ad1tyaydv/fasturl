@@ -8,11 +8,21 @@ datasource db {
 }
 
 
+enum Plan {
+  FREE
+  ESSENTIAL
+  PRO
+}
+
 model User {
   id             String      @id @default(uuid())
   email          String      @unique
   password       String
   ipAddress      String?
+
+  plan           Plan      @default(FREE)
+  planStatedAt   DateTime?
+  planExpiresAt  DateTime?
 
   links          Link[]
   qr             Qr[]

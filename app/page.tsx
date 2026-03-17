@@ -7,12 +7,12 @@ import {
   IoCopyOutline,
   IoRefreshOutline,
   IoArrowForwardOutline,
-  IoLinkOutline,
   IoQrCodeOutline,
   IoCloseOutline,
 } from "react-icons/io5";
-import { ModeToggle } from "./components/toggleTheme";
+import Navbar from "./components/navbar";
 import PricingSection from "./components/PricingSection";
+
 
 const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN;
 
@@ -76,13 +76,9 @@ export default function Dashboard() {
 
   const handleShortUrl = async (originalUrl: string) => {
     if (!originalUrl) return;
-
     try {
       setLoading(true);
-      const res = await axios.post("/api/shortUrl", {
-        url: originalUrl
-      });
-
+      const res = await axios.post("/api/shortUrl", { url: originalUrl });
       const generatedShortUrl = res.data.shortUrl;
       setShortUrl(generatedShortUrl);
       setUrl(`${NEXT_DOMAIN}/${generatedShortUrl}`);
@@ -136,9 +132,7 @@ export default function Dashboard() {
       setShowQr(res.data.qrImage);
 
     } catch (error: any) {
-      if (error.response?.status === 429) {
-        slowScrollToPricing();
-      }
+      if (error.response?.status === 429) slowScrollToPricing();
       console.log("Error while generating qr code", error);
     }
   };
@@ -150,11 +144,13 @@ export default function Dashboard() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+
   const handleReset = () => {
     setShortUrl("");
     setUrl("");
     setShowQr(false);
   };
+
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && url && !shortUrl && !loading) {
@@ -181,18 +177,19 @@ export default function Dashboard() {
   const handleLogout = async () => {
     await axios.post("/api/auth/logout");
     setIsLoggedIn(false);
+    setShortUrl("");
+    setUrl("");
   };
 
-  
+
   return (
     <div className="min-h-screen transition-colors duration-300 bg-background text-foreground relative">
+      
+      <Navbar isLoggedIn={isLoggedIn} handleLogout={handleLogout} />
 
       {modalConfig.show && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-md animate-in fade-in duration-500">
-          <div
-            className={`bg-card border border-border rounded-3xl shadow-2xl relative overflow-hidden transition-all duration-500 ease-out animate-in slide-in-from-bottom-8 zoom-in-95
-        ${modalConfig.showPlans ? 'max-w-5xl w-full' : 'max-w-sm w-full p-8'}`}
-          >
+          <div className={`bg-card border border-border rounded-3xl shadow-2xl relative overflow-hidden transition-all duration-500 ease-out animate-in slide-in-from-bottom-8 zoom-in-95 ${modalConfig.showPlans ? 'max-w-5xl w-full' : 'max-w-sm w-full p-8'}`}>
             <button
               onClick={() => setModalConfig({ ...modalConfig, show: false })}
               className="absolute top-5 right-5 z-[110] p-2 bg-background/50 backdrop-blur-md hover:bg-accent rounded-full transition-colors border border-border cursor-pointer"
@@ -214,22 +211,6 @@ export default function Dashboard() {
           </div>
         </div>
       )}
-
-      <nav className="flex items-center justify-between px-4 sm:px-8 py-4 border-b border-border">
-        <h1 className="text-lg font-three sm:text-xl font-bold">SHORTLY</h1>
-        <div className="flex items-center gap-4">
-          <ModeToggle />
-          {isLoggedIn ? (
-            <button onClick={handleLogout} className="border font-one border-input px-4 py-1.5 rounded-md hover:bg-accent transition text-sm sm:text-base cursor-pointer">
-              Logout
-            </button>
-          ) : (
-            <button onClick={() => router.push("/auth/signin")} className="border font-one border-input px-4 py-1.5 rounded-md hover:bg-accent transition font-medium text-sm sm:text-base cursor-pointer">
-              Login
-            </button>
-          )}
-        </div>
-      </nav>
 
       <section className="flex flex-col items-center justify-center px-4 sm:px-6 pt-16 md:pt-24 pb-12">
         <div className="text-center max-w-3xl w-full mx-auto">

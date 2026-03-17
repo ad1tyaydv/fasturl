@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 
+
+const NEXTAUTH_SECRET = process.env.NEXTAUTH_SECRET!;
+
 export async function middleware(request: NextRequest) {
+
     const token = request.cookies.get("token")?.value;
     const pathName = request.nextUrl.pathname;
+    
 
     const protectedRoutes = ['/urls', '/qr', '/analytics']
 
