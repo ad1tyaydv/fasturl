@@ -25,14 +25,14 @@ export default function Navbar({ isLoggedIn, handleLogout }: NavbarProps) {
     },
     {
       fallbackData: typeof window !== "undefined"
-      ? JSON.parse(localStorage.getItem("plan") || "")
+      ? JSON.parse(localStorage.getItem("plan") || "FREE")
       : null,
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
     }
   )
 
-  const tier = data?.plan || "";
+  const tier = data?.plan || "FREE";
   const isPaid = tier !== "FREE" && tier !== "";
 
 
