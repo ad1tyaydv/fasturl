@@ -21,7 +21,6 @@ export default function Navbar({ isLoggedIn, handleLogout }: NavbarProps) {
         if (res.data && res.data.plan) {
           setTier(res.data.plan);
         }
-        console.log(res.data.plan);
 
       } catch (error) {
         console.error("Error fetching tier:", error);

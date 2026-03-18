@@ -6,13 +6,12 @@ import { useRouter } from "next/navigation";
 import { 
   IoGlobeOutline, IoPhonePortraitOutline, 
   IoHardwareChipOutline, IoShareSocialOutline, IoCompassOutline, 
-  IoCloseOutline, IoArrowBackOutline
+  IoCloseOutline, IoArrowBackOutline, IoLockClosedOutline
 } from "react-icons/io5";
 import DashboardLayout from "../../components/dashBoardComponent";
 import { AnalyticsCardItem } from "../../components/analyticsCard";
 import LinkAnalyticsTab from "../../components/linkAnalyticsTab";
 import QRAnalyticsTab from "../../components/qrAnalyticsTab";
-
 
 const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN;
 
@@ -20,6 +19,7 @@ export default function AnalyticsPage() {
   const router = useRouter();
   const [viewMode, setViewMode] = useState<"link" | "qr">("link");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [tier, setTier] = useState("FREE");
   const [isPageLoading, setIsPageLoading] = useState(true); 
   const [selectedLink, setSelectedLink] = useState<any | null>(null);
   const [urls, setUrls] = useState<any[]>([]);
@@ -37,6 +37,7 @@ export default function AnalyticsPage() {
           router.push("/auth/signin");
         } else {
           setIsLoggedIn(true);
+          setTier(res.data.plan || "FREE");
           const urlRes = await axios.get("/api/fetchUrls");
           setUrls(urlRes.data.urls);
         }
@@ -50,7 +51,7 @@ export default function AnalyticsPage() {
       }
     };
     checkAuth();
-
+    
   }, [router]);
 
 
@@ -94,6 +95,14 @@ export default function AnalyticsPage() {
     setModalContent({ title, icon, data, nameKey });
     setIsModalOpen(true);
   };
+
+
+  const premiumMetrics = [
+    { title: "Top Referrers", icon: <IoShareSocialOutline size={25}/>, data: analytics?.referrers, key: "referrer", offset: 1 },
+    { title: "Browsers", icon: <IoCompassOutline size={25}/>, data: analytics?.browsers, key: "browser", offset: 2 },
+    { title: "Devices", icon: <IoPhonePortraitOutline size={25}/>, data: analytics?.devices, key: "devices", offset: 3 },
+    { title: "Operating Systems", icon: <IoHardwareChipOutline size={25}/>, data: analytics?.os, key: "os", offset: 4 },
+  ];
 
   
   return (
@@ -152,7 +161,7 @@ export default function AnalyticsPage() {
                         <span className="text-xs uppercase tracking-widest text-muted-foreground font-three w-24">Short Link:</span>
                         <h2 className="text-xl font-two truncate max-w-[300px] md:max-w-md">
                           <a 
-                            href={`https://${NEXT_DOMAIN}/${selectedLink.shorturl}`} 
+                          
                             target="_blank" 
                             rel="noopener noreferrer"
                             className="text-blue-600 dark:text-blue-400 hover:underline transition-all"
@@ -201,26 +210,38 @@ export default function AnalyticsPage() {
                       nameKey="country" 
                       onExpand={() => openModal("Locations", <IoGlobeOutline size={25}/>, aggregatedCountries, "country")} 
                     />
-                    <AnalyticsCardItem 
-                      title="Top Referrers" icon={<IoShareSocialOutline size={25}/>} 
-                      data={analytics?.referrers || []} nameKey="referrer" colorOffset={1}
-                      onExpand={() => openModal("Top Referrers", <IoShareSocialOutline size={25}/>, analytics?.referrers || [], "referrer")} 
-                    />
-                    <AnalyticsCardItem 
-                      title="Browsers" icon={<IoCompassOutline size={25}/>}
-                      data={analytics?.browsers || []} nameKey="browser" colorOffset={2}
-                      onExpand={() => openModal("Browsers", <IoCompassOutline size={25}/>, analytics?.browsers || [], "browser")} 
-                    />
-                    <AnalyticsCardItem
-                      title="Devices" icon={<IoPhonePortraitOutline size={25}/>} 
-                      data={analytics?.devices || []} nameKey="devices" colorOffset={3}
-                      onExpand={() => openModal("Devices", <IoPhonePortraitOutline size={25}/>, analytics?.devices || [], "devices")} 
-                    />
-                    <AnalyticsCardItem 
-                      title="Operating Systems" icon={<IoHardwareChipOutline size={25}/>} 
-                      data={analytics?.os || []} nameKey="os" colorOffset={4}
-                      onExpand={() => openModal("Operating Systems", <IoHardwareChipOutline size={25}/>, analytics?.os || [], "os")} 
-                    />
+
+                    {premiumMetrics.map((item, index) => (
+                      <div key={index} className="relative">
+                        <AnalyticsCardItem 
+                          title={item.title} 
+                          icon={item.icon} 
+                          data={item.data || []} 
+                          nameKey={item.key} 
+                          colorOffset={item.offset}
+                          onExpand={() => tier !== "FREE" && openModal(item.title, item.icon, item.data || [], item.key)} 
+                        />
+                        
+                        {tier === "FREE" && (
+                          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background/30 backdrop-blur-[6px] rounded-3xl border border-border/50 transition-all duration-300 group">
+                            <div className="flex flex-col items-center gap-4 p-6 bg-card/90 border border-border rounded-2xl shadow-2xl scale-95 md:scale-100">
+                              <div className="p-3 bg-primary/10 rounded-full text-primary">
+                                <IoLockClosedOutline size={24} />
+                              </div>
+                              <div className="text-center">
+                                <p className="text-xs text-muted-foreground font-three">Upgrade to see {item.title}</p>
+                              </div>
+                              <button 
+                                onClick={() => router.push("/premium")}
+                                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-2 px-6 rounded-xl font-one text-sm transition-all shadow-md active:scale-95 cursor-pointer"
+                              >
+                                Unlock Now
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
