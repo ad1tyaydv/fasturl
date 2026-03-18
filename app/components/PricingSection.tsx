@@ -79,8 +79,8 @@ export default function PricingSection() {
               </div>
             </div>
             <div className="flex-1 space-y-3 text-base sm:text-lg font-medium">
-              <p className="flex items-center">2000 links/mo <Check /></p>
-              <p className="flex items-center">100 QR Code/mo <Check /></p>
+              <p className="flex items-center">20,000 links/mo <Check /></p>
+              <p className="flex items-center">200 QR Code/mo <Check /></p>
 
               <div className="pt-4 border-t border-border/50">
                 <p className="mb-3 font-bold text-sm uppercase text-muted-foreground tracking-wider">Track:</p>
@@ -120,8 +120,8 @@ export default function PricingSection() {
             </div>
           </div>
           <div className="flex-1 space-y-3 text-base sm:text-lg font-medium">
-            <p className="flex items-center">20000 links/mo <Check /></p>
-            <p className="flex items-center">1000 QR Code/mo <Check /></p>
+            <p className="flex items-center">40,000 links/mo <Check /></p>
+            <p className="flex items-center">2,000 QR Code/mo <Check /></p>
 
             <div className="pt-4 border-t border-border/50">
               <p className="mb-3 font-bold text-sm uppercase text-muted-foreground tracking-wider">Track:</p>

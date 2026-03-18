@@ -5,66 +5,45 @@ import jwt from "jsonwebtoken";
 
 
 const JWT_SECRET = process.env.NEXTAUTH_SECRET!;
-const ANON_USER_ID = process.env.ANONYMOUS_USER_ID!;
 
 export async function POST(req: NextRequest) {
 
     try {
         const ip = req.headers.get("x-forwarded-for")?.split(",")[0] ||
-               req.headers.get("x-real-ip") || 
-               "127.0.0.1";
-    
+            req.headers.get("x-real-ip") ||
+            "127.0.0.1";
+
         const today = new Date()
-        today.setHours(0,0,0,0);
+        today.setHours(0, 0, 0, 0);
 
         const token = req.cookies.get("token")?.value;
 
         const data = await req.json();
-        console.log(data);
 
-        if(!data.shortUrl || !data.longUrl) {
+        if (!data.shortUrl || !data.longUrl) {
             return NextResponse.json(
-                {message: "Something went wrong!"},
-                {status: 500}
+                { message: "Something went wrong!" },
+                { status: 500 }
             )
         }
-
 
         let userId: string;
         let count = 0;
 
-        if(!token) {
+        if (!token) {
             return NextResponse.json(
-                {message: "Login to generate QR code"},
-                {status: 429}
+                { message: "Login to generate QR code" },
+                { status: 429 }
             )
 
-        } else {
-            const decoded = jwt.verify(token, JWT_SECRET) as {
-                userId: string;
-                emailId: string;
-            }
-
-            userId = decoded.userId;
-
-            const user = await prisma.user.findUnique({
-                where: {
-                    id: userId,
-                },
-                select: {
-                    email: true,
-                }
-            });
-
-
-            if (!user) {
-                return NextResponse.json(
-                    { message: "User not found" },
-                    { status: 404 }
-                );
-            }
-
         }
+
+        const decoded = jwt.verify(token, JWT_SECRET) as {
+            userId: string;
+            emailId: string;
+        }
+
+        userId = decoded.userId;
 
         count = await prisma.qr.count({
             where: {
@@ -75,11 +54,88 @@ export async function POST(req: NextRequest) {
             }
         })
 
-        if(count >= 2) {
+        if (count >= 2) {
             return NextResponse.json(
-                {message: "Upgrade to generate utpo 1000 QR Codes per month"},
-                {status: 429}
+                { message: "Upgrade to generate utpo 1000 QR Codes per month" },
+                { status: 429 }
             )
+        }
+
+        const user = await prisma.user.findUnique({
+            where: {
+                id: userId,
+            }
+        });
+
+
+        if (!user) {
+            return NextResponse.json(
+                { message: "User not found" },
+                { status: 404 }
+            );
+        }
+
+        if (token && user) {
+            if (user.plan === "FREE") {
+                count = await prisma.qr.count({
+                    where: {
+                        userId: userId,
+                        createdAt: {
+                            gte: today
+                        }
+                    }
+                });
+
+                if (count >= 2) {
+                    return NextResponse.json(
+                        { message: "Upgrade to generate up to 2,000 QR Codes every month" },
+                        { status: 429 }
+                    );
+                }
+            }
+
+            else if (user.plan === "ESSENTIAL") {
+                if (user.planExpiresAt && user.planExpiresAt < today) {
+                    return NextResponse.json(
+                        { message: "Your ESSENTIAL plan has expired. Upgrade to continue" },
+                        { status: 403 }
+                    );
+                }
+
+                count = await prisma.qr.count({
+                    where: {
+                        userId: userId,
+                        createdAt: {
+                            gte: today
+                        }
+                    }
+                });
+
+                if (count >= 200) {
+                    return NextResponse.json(
+                        { message: "Upgrade to generate up to 2,000 QR Codes every month" },
+                        { status: 429 }
+                    );
+                }
+            }
+
+            else {
+                count = await prisma.qr.count({
+                    where: {
+                        userId: userId,
+                        createdAt: {
+                            gte: today
+                        }
+                    }
+                });
+
+                if (count >= 2000) {
+                    return NextResponse.json(
+                        { message: "Upgrade again to generate up to 2,000 QR Codes every month" },
+                        { status: 429 }
+                    );
+                }
+            }
         }
 
         const fullShortUrl = `${process.env.NEXT_PUBLIC_DOMAIN}/${data.shortUrl}`;
@@ -114,8 +170,8 @@ export async function POST(req: NextRequest) {
     } catch (error) {
         console.log(error);
         return NextResponse.json(
-            {message: "Something went wrong!"},
-            {status: 500}
+            { message: "Something went wrong!" },
+            { status: 500 }
         )
     }
 }
