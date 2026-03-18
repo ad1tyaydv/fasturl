@@ -2,8 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { ModeToggle } from "./toggleTheme";
+import { useEffect, useState } from "react";
 import axios from "axios";
-import useSWR from "swr"
 
 
 interface NavbarProps {
@@ -11,28 +11,41 @@ interface NavbarProps {
   handleLogout: () => void;
 }
 
-
 export default function Navbar({ isLoggedIn, handleLogout }: NavbarProps) {
   const router = useRouter();
+  
+  const [tier, setTier] = useState("FREE");
 
-  const { data } = useSWR(isLoggedIn ? "/api/auth/me" : null,
-    async (url) => {
-      const res = await axios.get(url);
-
-      localStorage.setItem("plan", JSON.stringify(res.data));
-
-      return res.data;
-    },
-    {
-      fallbackData: typeof window !== "undefined"
-      ? JSON.parse(localStorage.getItem("plan") || "FREE")
-      : null,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
+  useEffect(() => {
+    const stored = localStorage.getItem("plan");
+    
+    if(stored) {
+      setTier(stored);
     }
-  )
 
-  const tier = data?.plan || "FREE";
+    if(!isLoggedIn) {
+      return;
+    }
+
+    const checkTier = async () => {
+      try {
+        const res = await axios.get("/api/auth/me");
+        if (res.data && res.data.plan) {
+          setTier(res.data.plan);
+          localStorage.setItem("plan", res.data.plan);
+        }
+
+      } catch (error) {
+        console.error("Error while fetching tier:", error);
+      }
+    };
+
+    if (isLoggedIn) {
+      checkTier();
+    }
+
+  }, [isLoggedIn]);
+
   const isPaid = tier !== "FREE" && tier !== "";
 
 
@@ -46,7 +59,7 @@ export default function Navbar({ isLoggedIn, handleLogout }: NavbarProps) {
       </h1>
 
       <div className="flex items-center gap-4">
-        {isLoggedIn && tier !== "" && (
+        {isLoggedIn && tier && (
           <div className="relative flex flex-col items-center">
             <button
               onClick={() => router.push('/premium')}
