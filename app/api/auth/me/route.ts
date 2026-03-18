@@ -26,6 +26,8 @@ export async function GET(req: NextRequest) {
                 id: decoded.userId
             },
             select: {
+                userName: true,
+                email: true,
                 plan: true,
                 planExpiresAt: true,
                 planStatedAt: true
@@ -53,6 +55,8 @@ export async function GET(req: NextRequest) {
 
 
         return NextResponse.json({
+            userName: checkPlan.userName,
+            email: checkPlan.email,
             authenticated: true,
             plan: currentPlan,
             isActive: isActive,

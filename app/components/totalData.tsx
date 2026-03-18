@@ -30,12 +30,12 @@ export default function TotalData({ totalLinks, totalQrs, totalClicks }: StatsPr
     }
   ];
 
-  
+
   return (
     <section className="w-full max-w-5xl mx-auto px-4 py-16">
       <div className="flex flex-col items-center mb-12 text-center">
-        <p className="text-2xl md:text-3xl font-one font-one text-foreground max-w-lg">
-          Track total number of Links and QR codes created till date and Clicks in real-time.
+        <p className="text-2xl md:text-3xl font-one font-one text-foreground">
+          Total Links, QR and Clicks are tracked live
         </p>
       </div>
 

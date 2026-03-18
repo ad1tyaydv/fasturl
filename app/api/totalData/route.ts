@@ -7,10 +7,10 @@ export async function GET() {
     try {
         const totalLinks = await prisma.link.count();
         const totalQrs = await prisma.qr.count();
-        const totalCliks = await prisma.click.count();
+        const totalClicks = await prisma.click.count();
 
         return NextResponse.json(
-            {message: "Total Data counted", totalLinks, totalQrs, totalCliks},
+            {message: "Total Data counted", totalLinks, totalQrs, totalClicks},
             {status: 200}
         )
 

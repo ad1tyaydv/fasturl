@@ -10,8 +10,8 @@ export default function SettingsPage() {
   const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  const [name, setName] = useState("Adi");
-  const [email, setEmail] = useState("codead0001@gmail.com");
+  const [userName, setUserName] = useState("");
+  const [email, setEmail] = useState("");
   
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -29,7 +29,12 @@ export default function SettingsPage() {
     const checkAuth = async () => {
       try {
         const res = await axios.get("/api/auth/me");
+
         setIsLoggedIn(!!res.data.authenticated);
+        setUserName(res.data.userName);
+        setEmail(res.data.email)
+
+
       } catch {
         setIsLoggedIn(false);
       }
@@ -45,11 +50,41 @@ export default function SettingsPage() {
   };
 
 
+  const handleUpdateUserName = async () => {
+    try {
+      await axios.post("/api/auth/update/userName", {
+        email: email,
+        userName: userName
+      })
+
+      router.refresh();
+
+    } catch (error) {
+      console.log("Error while updating User Name", error)
+    }
+  };
+
+
+  const handleUpdateEmail = async () => {
+    try {
+      await axios.post("/api/auth/update/email", {
+        email: email
+      })
+
+      router.refresh();
+      
+    } catch (error) {
+      console.log("Error while updating User Name", error)
+    }
+  };
+
+
   const handleDeleteAccount = async () => {
     if (deleteConfirmation === "delete my account") {
       try {
         console.log("Account deleted successfully");
         await handleLogout();
+        
       } catch (error) {
         console.error("Error deleting account", error);
       }
@@ -62,9 +97,6 @@ export default function SettingsPage() {
       <div className="max-w-5xl mx-auto py-8 px-4 sm:px-8">
         <div className="mb-10">
           <div className="mb-8">
-            <h4 className="text-muted-foreground text-sm font-semibold tracking-wide mb-1">
-              Profile Management
-            </h4>
             <h1 className="text-3xl sm:text-4xl font-bold text-[#2d3748]">
               Update Information
             </h1>
@@ -75,9 +107,9 @@ export default function SettingsPage() {
               <div className="w-16 h-16 rounded-full bg-[#277da1] flex items-center justify-center text-white text-3xl select-none" style={{ backgroundColor: '#2e7d32' }}>
                 A
               </div>
-              <button className="bg-[#2e7d32] hover:bg-[#2e7d32]/90 text-white px-6 py-2.5 rounded font-medium transition-colors shadow-sm">
-                Select a Photo
-              </button>
+              <span className="text-2xl font-three">
+                {userName}
+              </span>
             </div>
           </div>
 
@@ -86,29 +118,39 @@ export default function SettingsPage() {
               Contact Information
             </h2>
             
-            <div className="grid grid-cols-[120px_1fr] sm:grid-cols-[160px_1fr] gap-4 items-center mb-4 max-w-2xl">
+            <div className="grid grid-cols-[120px_1fr_auto] sm:grid-cols-[160px_1fr_auto] gap-4 items-center mb-4 max-w-2xl">
               <label className="text-right text-[#2d3748] font-medium pr-4">Name</label>
+
               <input 
                 type="text" 
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                value={userName}
+                placeholder="Enter your UserName"
+                onChange={(e) => setUserName(e.target.value)}
                 className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/50"
               />
+
+              <button 
+                className="bg-[#0288d1] hover:bg-[#0288d1]/90 text-white px-4 py-2 rounded shadow-sm cursor-pointer"
+                onClick={handleUpdateUserName}
+              >
+                Update
+              </button>
             </div>
 
-            <div className="grid grid-cols-[120px_1fr] sm:grid-cols-[160px_1fr] gap-4 items-center mb-6 max-w-2xl">
+            <div className="grid grid-cols-[120px_1fr_auto] sm:grid-cols-[160px_1fr_auto] gap-4 items-center mb-6 max-w-2xl">
               <label className="text-right text-[#2d3748] font-medium pr-4">Email Address</label>
+
               <input 
                 type="email" 
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/50"
               />
-            </div>
 
-            <div className="grid grid-cols-[120px_1fr] sm:grid-cols-[160px_1fr] gap-4 max-w-2xl">
-              <div></div>
-              <button className="bg-[#0288d1] hover:bg-[#0288d1]/90 text-white px-8 py-2.5 rounded shadow-sm transition-colors w-fit">
+              <button 
+                className="bg-[#0288d1] hover:bg-[#0288d1]/90 text-white px-4 py-2 rounded shadow-sm cursor-pointer"
+                onClick={handleUpdateEmail}
+              >
                 Update
               </button>
             </div>
@@ -117,9 +159,6 @@ export default function SettingsPage() {
 
         <div className="mb-12">
           <div className="mb-8">
-            <h4 className="text-muted-foreground text-sm font-semibold tracking-wide mb-1">
-              Security
-            </h4>
             <h1 className="text-3xl sm:text-4xl font-bold text-[#2d3748]">
               Update Password
             </h1>
@@ -147,7 +186,7 @@ export default function SettingsPage() {
             </div>
 
             <div className="grid grid-cols-[140px_1fr] sm:grid-cols-[180px_1fr] gap-4 items-center mb-4 max-w-2xl">
-              <label className="text-right text-[#2d3748] font-medium pr-4">Password</label>
+              <label className="text-right text-[#2d3748] font-medium pr-4">New Password</label>
               <div className="relative">
                 <input 
                   type={showNew ? "text" : "password"}
@@ -186,12 +225,14 @@ export default function SettingsPage() {
 
             <div className="grid grid-cols-[140px_1fr] sm:grid-cols-[180px_1fr] gap-4 max-w-2xl">
               <div></div>
-              <button className="bg-[#0288d1] hover:bg-[#0288d1]/90 text-white px-8 py-2.5 rounded shadow-sm transition-colors w-fit">
+              <button className="bg-[#0288d1] hover:bg-[#0288d1]/90 text-white px-8 py-2.5 rounded shadow-sm transition-colors w-fit cursor-pointer">
                 Update
               </button>
             </div>
           </div>
         </div>
+
+        <div className="w-full h-[1px] bg-border my-4"></div>
 
         <div className="mt-12 pt-12 border-t border-gray-200">
           <h2 className="text-2xl font-bold text-[#c62828] mb-4">Danger Zone</h2>
@@ -202,7 +243,7 @@ export default function SettingsPage() {
           {!isDeleting ? (
             <button 
               onClick={() => setIsDeleting(true)}
-              className="text-[#c62828] border border-[#c62828] hover:bg-red-50 px-6 py-2.5 rounded font-medium transition-colors shadow-sm bg-white"
+              className="text-[#c62828] border border-[#c62828] hover:bg-red-50 px-6 py-2.5 rounded font-medium transition-colors shadow-sm bg-white cursor-pointer"
             >
               Delete Account
             </button>
@@ -222,7 +263,7 @@ export default function SettingsPage() {
                 <button 
                   onClick={handleDeleteAccount}
                   disabled={deleteConfirmation !== "delete my account"}
-                  className="bg-[#c62828] hover:bg-[#c62828]/90 text-white px-6 py-2.5 rounded font-medium transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="bg-[#c62828] hover:bg-[#c62828]/90 text-white px-6 py-2.5 rounded font-medium transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
                   Confirm Delete
                 </button>
@@ -231,7 +272,7 @@ export default function SettingsPage() {
                     setIsDeleting(false);
                     setDeleteConfirmation("");
                   }}
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-2.5 rounded font-medium transition-colors shadow-sm"
+                  className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-2.5 rounded font-medium transition-colors shadow-sm cursor-pointer"
                 >
                   Cancel
                 </button>

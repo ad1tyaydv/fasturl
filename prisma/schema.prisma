@@ -18,6 +18,7 @@ model User {
   id             String      @id @default(uuid())
   email          String      @unique
   password       String
+  userName       String?
   ipAddress      String?
 
   plan           Plan      @default(FREE)

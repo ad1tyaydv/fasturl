@@ -310,6 +310,8 @@ export default function Dashboard() {
         </div>
       )}
 
+      <div className="w-full h-px bg-gray-300"></div>
+
       {isLoggedIn && (
         <TotalData 
           totalLinks={stats.links} 
@@ -317,7 +319,7 @@ export default function Dashboard() {
           totalClicks={stats.clicks} 
         />
       )}
-      
+
     </div>
   );
 }
