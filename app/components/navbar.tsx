@@ -31,7 +31,7 @@ export default function Navbar({ isLoggedIn, handleLogout }: NavbarProps) {
       checkTier();
     }
 
-    const interval = setInterval(checkTier, 5000);
+    const interval = setInterval(checkTier, 100000);
     return () => {
       clearInterval(interval);
     }
@@ -39,7 +39,7 @@ export default function Navbar({ isLoggedIn, handleLogout }: NavbarProps) {
   }, [isLoggedIn]);
 
   const isPaid = tier.toUpperCase() !== "FREE" && tier !== "";
-  
+
 
   return (
     <nav className="flex items-center justify-between px-4 sm:px-8 py-4 border-b border-border z-20 shrink-0 bg-background">

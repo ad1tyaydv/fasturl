@@ -30,6 +30,7 @@ export default function AllUrlsPage() {
   
   const [isCustomModalOpen, setIsCustomModalOpen] = useState(false);
   const [customUrl, setCustomUrl] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
 
   useEffect(() => {
@@ -37,6 +38,7 @@ export default function AllUrlsPage() {
       try {
         const res = await axios.get("api/auth/me");
         setTier(res.data.plan);
+
       } catch (err) {
         console.error("Tier check failed", err);
       }
@@ -106,6 +108,7 @@ export default function AllUrlsPage() {
       try {
         const res = await axios.get("/api/auth/me");
         setIsLoggedIn(!!res.data.authenticated);
+
       } catch { setIsLoggedIn(false); }
     };
     checkAuth();
@@ -117,12 +120,14 @@ export default function AllUrlsPage() {
     setSelectedUrl(null);
     setIsCustomModalOpen(false);
     setCustomUrl("");
+    setErrorMessage("");
   };
 
 
   const handleCustomUrlClick = () => {
     if (tier === "FREE" || tier === "ESSENTIAL") {
       router.push("/premium");
+
     } else {
       setIsCustomModalOpen(true);
     }
@@ -130,20 +135,28 @@ export default function AllUrlsPage() {
 
 
   const handleUpdateCustomUrl = async () => {
+    setErrorMessage("");
+
     try {
       await axios.post("/api/shortUrl/customUrl", {
         shortUrl: selectedUrl?.id,
         customUrl: customUrl,
-      })
+      });
 
-    } catch (error) {
-      console.log("Something went wrong", error);
+      closeAllModals();
+      router.refresh(); 
+      window.location.reload();
+
+    } catch (error: any) {
+      if (error.response && error.response.status === 409) {
+        setErrorMessage("Custom url with this name is already taken");
+      } else {
+        console.log("Something went wrong", error);
+      }
     }
-    closeAllModals();
-    
   };
 
-
+  
   return (
     <DashboardLayout isLoggedIn={isLoggedIn} handleLogout={async () => { await axios.post("/api/auth/logout"); router.push("/auth/signin"); }}>
       <div className="max-w-4xl mx-auto">
@@ -267,7 +280,7 @@ export default function AllUrlsPage() {
 
                 <div className="space-y-2">
                   <label className="text-lg font-two text-foreground">Custom Short Url</label>
-                  <div className="flex items-center border border-border bg-background focus-within:ring-1 focus-within:ring-primary rounded-none">
+                  <div className={`flex items-center border ${errorMessage ? 'border-red-500' : 'border-border'} bg-background focus-within:ring-1 focus-within:ring-primary rounded-none`}>
                     <span className="pl-3 py-3 text-muted-foreground font-two bg-secondary/10 border-r border-border px-2">
                       {NEXT_DOMAIN}/
                     </span>
@@ -276,11 +289,20 @@ export default function AllUrlsPage() {
                       maxLength={25}
                       placeholder="custom"
                       value={customUrl}
-                      onChange={(e) => setCustomUrl(e.target.value.replace(/[^a-zA-Z0-9]/g, ''))}
+                      onChange={(e) => {
+                        setCustomUrl(e.target.value.replace(/[^a-zA-Z0-9]/g, ''));
+                        if (errorMessage) setErrorMessage(""); // Reset error when typing
+                      }}
                       className="flex-1 p-3 bg-transparent text-foreground font-two focus:outline-none"
                     />
                   </div>
-                  <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Max 25 characters</p>
+                  {errorMessage ? (
+                    <p className="text-xs text-red-500 font-two mt-1 animate-pulse">
+                      {errorMessage}
+                    </p>
+                  ) : (
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Max 25 characters</p>
+                  )}
                 </div>
               </div>
 
