@@ -2,125 +2,172 @@
 
 import { useState } from "react";
 import axios from "axios";
-import { AiOutlineEye, AiOutlineEyeInvisible, AiOutlineLeft } from "react-icons/ai";
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+import { FcGoogle } from "react-icons/fc";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import toast, { Toaster } from "react-hot-toast";
 
 export default function Signup() {
   const router = useRouter();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [formData, setFormData] = useState({
+    userName: "",
+    email: "",
+    password: "",
+  });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [agreed, setAgreed] = useState(false);
+
+  
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!agreed) return toast.error("Please agree to the terms & conditions");
+
     setLoading(true);
+    const signupToast = toast.loading("Creating your account...");
 
     try {
-      const res = await axios.post("/api/auth/signup", 
-        { email, password },
-        { headers: { "Content-Type": "application/json" } }
-      );
+      await axios.post("/api/auth/signup", {
+        userName: formData.userName,
+        email: formData.email,
+        password: formData.password
+      });
+
+      toast.success("Account created successfully!", { 
+          id: signupToast 
+        });
 
       router.push("/");
       router.refresh();
 
     } catch (error: any) {
-        console.log("Error while signup, Please try again later", error)
-      }
-     finally {
+      toast.error(error.response?.data?.message || "Signup failed!", { id: signupToast });
+
+    } finally {
       setLoading(false);
     }
   };
 
+
   return (
-    <div className="min-h-screen flex flex-col md:flex-row w-full bg-white text-black dark:bg-black dark:text-white transition-colors">
-      
-      <div className="hidden md:flex md:w-1/2 relative bg-gray-100 dark:bg-black/90 p-12 lg:p-20 flex-col justify-between overflow-hidden">
-        <div className="flex items-center gap-3 z-10">
-          <div className="w-10 h-10 bg-black dark:bg-white rounded-full flex items-center justify-center text-white dark:text-black font-extrabold text-2xl">
+    <div className="min-h-screen flex w-full bg-white text-black selection:bg-purple-100">
+      <Toaster position="top-center" />
+
+      <div className="hidden md:flex md:w-1/2 relative overflow-hidden">
+        <img
+          src="https://image_5e3d7c.jpg"
+          alt="Purple Mountain Landscape"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        <div className="absolute top-12 left-12 flex items-center gap-3 z-10">
+          <div className="w-10 h-10 bg-[#1e1b2e] rounded-xl flex items-center justify-center text-white font-black text-2xl shadow-lg">
             S
           </div>
-          <h1 className="text-3xl font-bold text-black dark:text-white">Shortly</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-white">Shortly</h1>
         </div>
-
-        <div className="relative z-10 text-center flex-grow flex flex-col items-center justify-center gap-8">
-            <img
-                src="https://images.unsplash.com/photo-1549497538-303791108f94?q=80&w=2564&auto=format&fit=crop" 
-                alt="Cartoon people interacting with technology"
-                className="w-full max-w-sm h-auto object-contain rounded-2xl"
-            />
-          <p className="text-xl text-gray-700 dark:text-gray-300 font-medium">Fast, simple, and connected. Sign up to get started.</p>
-        </div>
-        
-        <div className="absolute inset-0 bg-black/10 dark:bg-black/40 z-0"></div>
       </div>
 
-    
-      <div className="w-full md:w-1/2 relative flex items-center justify-center p-8 sm:p-12 lg:p-16 bg-white dark:bg-black">
-        
-        <button 
-          onClick={() => router.push("/")}
-          className="absolute top-8 left-8 flex items-center gap-2 text-gray-500 hover:text-black dark:hover:text-white transition font-medium cursor-pointer"
-        >
-          <AiOutlineLeft size={20} />
-          Back
-        </button>
+      <div className="w-full md:w-1/2 flex items-center justify-center p-6 sm:p-12 lg:p-20 bg-white">
+        <div className="w-full max-w-md">
+          <div className="mb-8">
+            <h1 className="text-4xl font-bold mb-2 text-gray-900">Create an account</h1>
+            <p className="text-gray-500">
+              Already have an account?{" "}
+              <button 
+                onClick={() => router.push("/auth/signin")}
+                className="text-purple-600 hover:underline font-medium cursor-pointer"
+              >
+                Log in
+              </button>
+            </p>
+          </div>
 
-        <div className="w-full max-w-lg mt-12 md:mt-0">
-          <h1 className="text-4xl font-bold mb-8 text-center text-black dark:text-white">Sign Up</h1>
-
-          <form className="flex flex-col gap-5" onSubmit={handleSignup}>
-            <div className="flex flex-col gap-1.5">
-              <label className="text-black dark:text-gray-200 font-medium text-base">Email</label>
+          <form className="space-y-4" onSubmit={handleSignup}>
+            <div className="space-y-1">
               <input
-                type="text"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="px-4 py-4 text-lg border border-gray-400 dark:border-gray-600 rounded-none bg-white dark:bg-gray-800 text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white transition-colors"
+                name="userName"
+                placeholder="Username"
+                value={formData.userName}
+                onChange={handleChange}
+                className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:border-purple-500 focus:bg-white outline-none transition-all placeholder:text-gray-400 text-gray-900"
                 required
               />
             </div>
 
-            <div className="flex flex-col gap-1.5 relative">
-              <label className="text-black dark:text-gray-200 font-medium text-base">Password</label>
+            <input
+              name="email"
+              type="email"
+              placeholder="Email"
+              value={formData.email}
+              onChange={handleChange}
+              className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:border-purple-500 focus:bg-white outline-none transition-all placeholder:text-gray-400 text-gray-900"
+              required
+            />
+
+            <div className="relative">
               <input
+                name="password"
                 type={showPassword ? "text" : "password"}
                 placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="px-4 py-4 text-lg border border-gray-400 dark:border-gray-600 rounded-none w-full bg-white dark:bg-gray-800 text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white pr-12 transition-colors"
+                value={formData.password}
+                onChange={handleChange}
+                className="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-200 focus:border-purple-500 focus:bg-white outline-none transition-all pr-12 placeholder:text-gray-400 text-gray-900"
                 required
               />
-              <span
-                className="absolute right-4 top-[52px] transform -translate-y-1/2 cursor-pointer text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white transition-colors"
+              <button
+                type="button"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-purple-600 cursor-pointer"
                 onClick={() => setShowPassword(!showPassword)}
               >
-                {showPassword ? <AiOutlineEyeInvisible size={28} /> : <AiOutlineEye size={28} />}
-              </span>
+                {showPassword ? <AiOutlineEyeInvisible size={22} /> : <AiOutlineEye size={22} />}
+              </button>
+            </div>
+
+            <div className="flex items-center gap-2 py-2">
+              <input 
+                type="checkbox" 
+                id="terms"
+                checked={agreed}
+                onChange={(e) => setAgreed(e.target.checked)}
+                className="w-4 h-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500 cursor-pointer"
+              />
+              <label htmlFor="terms" className="text-sm text-gray-600 cursor-pointer">
+                I agree to the <span className="text-purple-600 underline">terms & conditions</span>
+              </label>
             </div>
 
             <Button
               type="submit"
               disabled={loading}
-              className={`py-6 text-lg rounded-none font-semibold transition cursor-pointer mt-4
-                bg-black text-white hover:bg-gray-900 
-                dark:bg-white dark:text-black dark:hover:bg-gray-100
-                ${loading ? "opacity-70 dark:opacity-50 cursor-not-allowed" : ""}`}
+              className="w-full py-6 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-lg transition-all active:scale-[0.98] mt-2 shadow-md cursor-pointer"
             >
-              {loading ? "Signing up..." : "Sign Up"}
+              {loading ? "Creating account..." : "Create account"}
             </Button>
           </form>
 
-          <p className="mt-8 text-center text-gray-600 dark:text-gray-400 text-sm">
-            Already have an account? <a href="/auth/signin" className="text-black dark:text-white font-bold underline hover:text-gray-700 dark:hover:text-gray-200 transition-colors">Sign In</a>
-          </p>
+          <div className="mt-8">
+            <div className="relative flex items-center justify-center mb-6">
+              <div className="w-full border-t border-gray-200"></div>
+              <span className="absolute bg-white px-4 text-sm text-gray-400 font-medium">Or register with</span>
+            </div>
+
+            <button
+              type="button"
+              className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-all font-medium text-gray-700 shadow-sm cursor-pointer"
+            >
+              <FcGoogle size={20} />
+              Google
+            </button>
+          </div>
         </div>
       </div>
-
     </div>
   );
 }

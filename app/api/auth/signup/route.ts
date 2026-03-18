@@ -8,9 +8,15 @@ const NEXTAUTH_SECRET = process.env.NEXTAUTH_SECRET!;
 
 export async function POST(req: NextRequest) {
 
-    const data = await req.json();
-
     try {
+
+        const data = await req.json();
+
+        if (!data.email || !data.password || !data.userName) {
+            return NextResponse.json(
+                {message: "All fields are required"},
+                {status: 400});
+        }
 
         const findUser = await prisma.user.findUnique({
             where: {
@@ -29,6 +35,7 @@ export async function POST(req: NextRequest) {
 
         const userSignup = await prisma.user.create({
             data: {
+                userName: data.userName,
                 email: data.email,
                 password: hashedPassword,
                 plan: "FREE"

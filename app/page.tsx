@@ -231,7 +231,7 @@ export default function Dashboard() {
           <h1 className="text-3xl font-one sm:text-4xl md:text-5xl font-bold mb-4">
             Shorten Your <span className="text-red-500">Links</span> Instantly
           </h1>
-          <p className="mb-8 font-two text-base sm:text-lg text-muted-foreground">
+          <p className="mb-8 font-one text-base sm:text-lg text-muted-foreground">
             Turn long and messy URLs into short, clean links you can easily share.
           </p>
 
@@ -273,9 +273,11 @@ export default function Dashboard() {
           )}
 
           {!isLoggedIn && (
-            <div className="mt-4 font-two text-sm sm:text-base text-muted-foreground">
+            <div className="mt-4 font-one text-xl text-muted-foreground">
               <p>You can only create 1 link/day</p>
-              <button onClick={() => router.push("/auth/signin")} className="font-semibold mt-1 hover:underline cursor-pointer text-foreground">
+              <button 
+                onClick={() => router.push("/auth/signin")}
+                className="font-one mt-1 underline cursor-pointer text-foreground">
                 Login to create more
               </button>
             </div>

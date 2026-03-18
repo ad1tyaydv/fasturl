@@ -81,9 +81,11 @@ export default function SettingsPage() {
 
   const handleDeleteAccount = async () => {
     if (deleteConfirmation === "delete my account") {
+      
       try {
-        console.log("Account deleted successfully");
+        await axios.post("api/auth/deleteAccount");
         await handleLogout();
+        router.push("/");
         
       } catch (error) {
         console.error("Error deleting account", error);
