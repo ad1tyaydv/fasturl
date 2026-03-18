@@ -41,17 +41,15 @@ export default function AnalyticsPage() {
           const urlRes = await axios.get("/api/fetchUrls");
           setUrls(urlRes.data.urls);
         }
-
       } catch (error) {
         console.error("Auth check failed", error);
         router.push("/auth/signin");
-
       } finally {
         setIsPageLoading(false);
       }
     };
     checkAuth();
-    
+
   }, [router]);
 
 
@@ -64,6 +62,7 @@ export default function AnalyticsPage() {
   const handleLinkAnalytics = async (linkId: string) => {
     setIsLoadingAnalytics(true);
     setAnalytics(null);
+
     try {
       const res = await axios.get("/api/analytics/link", {
         params: { linkId }
@@ -110,13 +109,13 @@ export default function AnalyticsPage() {
       <div className="max-w-6xl mx-auto px-4 py-6">
         {isPageLoading ? (
           <div className="flex flex-col items-center justify-center min-h-[70vh] gap-4">
-            <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
-            <p className="text-muted-foreground font-medium animate-pulse tracking-tight">Loading analytics...</p>
+            <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-none animate-spin"></div>
+            <p className="text-muted-foreground font-medium tracking-tight">Loading analytics...</p>
           </div>
         ) : (
           <>
             {!selectedLink ? (
-              <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+              <div className="fade-in">
                 <div className="mb-8 flex items-center gap-4">
                   <h1 
                     className={`text-3xl font-one tracking-tight cursor-pointer transition-colors ${viewMode === "link" ? "text-foreground" : "text-muted-foreground/40"}`}
@@ -140,15 +139,15 @@ export default function AnalyticsPage() {
                 )}
               </div>
             ) : (
-              <div className="space-y-8 animate-in fade-in duration-500">
+              <div className="space-y-8">
                 <button 
                   onClick={() => setSelectedLink(null)} 
                   className="flex items-center gap-2 text-xl font-three text-muted-foreground hover:text-primary transition-colors cursor-pointer group"
                 >
-                  <IoArrowBackOutline className="group-hover:-translate-x-1 transition-transform" /> Back
+                  <IoArrowBackOutline /> Back
                 </button>
 
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 bg-secondary/20 p-8 rounded-3xl border border-border/50">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 bg-secondary/20 p-8 rounded-none border border-border/50">
                   <div className="space-y-4">
                     <div className="pb-2">
                       <span className="text-2xl font-three text-primary uppercase tracking-[0.2em]">
@@ -159,28 +158,14 @@ export default function AnalyticsPage() {
                     <div className="space-y-3">
                       <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-3">
                         <span className="text-xs uppercase tracking-widest text-muted-foreground font-three w-24">Short Link:</span>
-                        <h2 className="text-xl font-two truncate max-w-[300px] md:max-w-md">
-                          <a 
-                          
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="text-blue-600 dark:text-blue-400 hover:underline transition-all"
-                          >
-                            {NEXT_DOMAIN}/{selectedLink.shorturl}
-                          </a>
+                        <h2 className="text-xl font-two truncate max-w-[300px] md:max-w-md text-foreground">
+                          {NEXT_DOMAIN}/{selectedLink.shorturl}
                         </h2>
                       </div>
                       <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-3">
                         <span className="text-xs uppercase tracking-widest text-muted-foreground font-three w-24">Original:</span>
                         <p className="text-muted-foreground text-xl font-two truncate max-w-sm italic">
-                          <a 
-                            href={selectedLink.original} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="hover:text-primary transition-colors hover:underline"
-                          >
-                            {selectedLink.original}
-                          </a>
+                          {selectedLink.original}
                         </p>
                       </div>
                     </div>
@@ -197,9 +182,9 @@ export default function AnalyticsPage() {
                 </div>
 
                 {isLoadingAnalytics ? (
-                  <div className="h-96 flex flex-col justify-center items-center gap-4 border border-border/40 rounded-3xl bg-card/30">
-                    <div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
-                    <p className="text-muted-foreground font-medium animate-pulse">Loading traffic patterns...</p>
+                  <div className="h-96 flex flex-col justify-center items-center gap-4 border border-border/40 rounded-none bg-card/30">
+                    <div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-none animate-spin"></div>
+                    <p className="text-muted-foreground font-medium">Loading traffic patterns...</p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 font-three md:grid-cols-2 lg:grid-cols-3 gap-6 pb-24">
@@ -212,7 +197,7 @@ export default function AnalyticsPage() {
                     />
 
                     {premiumMetrics.map((item, index) => (
-                      <div key={index} className="relative">
+                      <div key={index} className="relative group">
                         <AnalyticsCardItem 
                           title={item.title} 
                           icon={item.icon} 
@@ -223,17 +208,17 @@ export default function AnalyticsPage() {
                         />
                         
                         {tier === "FREE" && (
-                          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background/30 backdrop-blur-[6px] rounded-3xl border border-border/50 transition-all duration-300 group">
-                            <div className="flex flex-col items-center gap-4 p-6 bg-card/90 border border-border rounded-2xl shadow-2xl scale-95 md:scale-100">
-                              <div className="p-3 bg-primary/10 rounded-full text-primary">
+                          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/60 backdrop-blur-[2px] rounded-none border border-border/50 transition-opacity duration-150">
+                            <div className="flex flex-col items-center gap-4 p-6 bg-card border border-border rounded-none shadow-2xl">
+                              <div className="p-3 bg-primary/10 rounded-none text-primary">
                                 <IoLockClosedOutline size={24} />
                               </div>
                               <div className="text-center">
-                                <p className="text-xs text-muted-foreground font-three">Upgrade to see {item.title}</p>
+                                <p className="text-xs text-muted-foreground font-three uppercase tracking-widest">Upgrade to see {item.title}</p>
                               </div>
                               <button 
                                 onClick={() => router.push("/premium")}
-                                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-2 px-6 rounded-xl font-one text-sm transition-all shadow-md active:scale-95 cursor-pointer"
+                                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-2 px-6 rounded-none font-one text-sm transition-colors active:scale-95 cursor-pointer"
                               >
                                 Unlock Now
                               </button>
@@ -251,14 +236,20 @@ export default function AnalyticsPage() {
       </div>
 
       {isModalOpen && modalContent && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-md animate-in fade-in duration-300">
-          <div className="bg-card w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden border border-border flex flex-col max-h-[85vh]">
+        <div 
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 transition-opacity duration-150"
+          onClick={() => setIsModalOpen(false)}
+        >
+          <div 
+            className="bg-card w-full max-w-lg rounded-none shadow-2xl overflow-hidden border border-border flex flex-col max-h-[85vh]"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex justify-between items-center p-6 border-b border-border bg-secondary/10">
               <h3 className="text-xl font-bold flex items-center gap-3">
                 <span className="text-primary">{modalContent.icon}</span>
                 <span className="font-one">{modalContent.title}</span>
               </h3>
-              <button onClick={() => setIsModalOpen(false)} className="p-2 rounded-full hover:bg-muted transition-colors">
+              <button onClick={() => setIsModalOpen(false)} className="p-2 rounded-none hover:bg-muted transition-colors cursor-pointer">
                 <IoCloseOutline size={24} />
               </button>
             </div>
@@ -266,13 +257,13 @@ export default function AnalyticsPage() {
               {modalContent.data.length > 0 ? (
                 modalContent.data.map((item: any, index: number) => (
                   <div key={index} className="flex justify-between items-center group">
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-4 text-foreground">
                       <span className="font-one">{String(index + 1).padStart(2, '0')}</span>
-                      <span className="font-three text-foreground group-hover:text-primary transition-colors">
+                      <span className="font-three group-hover:text-primary transition-colors">
                         {item[modalContent.nameKey] || "Unknown"}
                       </span>
                     </div>
-                    <span className="font-three text-sm bg-secondary px-3 py-1 rounded-lg">{item.count}</span>
+                    <span className="font-three text-sm bg-secondary px-3 py-1 rounded-none text-foreground">{item.count}</span>
                   </div>
                 ))
               ) : (

@@ -13,7 +13,6 @@ import {
 import Navbar from "./components/navbar";
 import PricingSection from "./components/PricingSection";
 
-
 const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN;
 
 export default function Dashboard() {
@@ -44,7 +43,7 @@ export default function Dashboard() {
     showPlans: false,
   });
 
-
+  
   const slowScrollToPricing = () => {
     if (pricingRef.current) {
       const targetPosition = pricingRef.current.offsetTop;
@@ -76,6 +75,7 @@ export default function Dashboard() {
 
   const handleShortUrl = async (originalUrl: string) => {
     if (!originalUrl) return;
+
     try {
       setLoading(true);
       const res = await axios.post("/api/shortUrl", { url: originalUrl });
@@ -94,6 +94,7 @@ export default function Dashboard() {
             action: () => router.push("/auth/signin"),
             showPlans: false,
           });
+
         } else {
           slowScrollToPricing();
         }
@@ -119,10 +120,12 @@ export default function Dashboard() {
       return;
     }
 
+
     if (typeof showQr === "string") {
       setShowQr(false);
       return;
     }
+
 
     try {
       const res = await axios.post("/api/qrCode", {
@@ -170,7 +173,6 @@ export default function Dashboard() {
       }
     };
     checkAuth();
-
   }, [router]);
 
 
@@ -183,26 +185,31 @@ export default function Dashboard() {
 
 
   return (
-    <div className="min-h-screen transition-colors duration-300 bg-background text-foreground relative">
-      
+    <div className="min-h-screen bg-background text-foreground relative">
       <Navbar isLoggedIn={isLoggedIn} handleLogout={handleLogout} />
 
       {modalConfig.show && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-md animate-in fade-in duration-500">
-          <div className={`bg-card border border-border rounded-3xl shadow-2xl relative overflow-hidden transition-all duration-500 ease-out animate-in slide-in-from-bottom-8 zoom-in-95 ${modalConfig.showPlans ? 'max-w-5xl w-full' : 'max-w-sm w-full p-8'}`}>
+        <div 
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 transition-opacity duration-150"
+          onClick={() => setModalConfig({ ...modalConfig, show: false })}
+        >
+          <div 
+            className={`bg-card border border-border rounded-none shadow-2xl relative transition-all duration-200 ${modalConfig.showPlans ? 'max-w-5xl w-full' : 'max-w-sm w-full p-8'}`}
+            onClick={(e) => e.stopPropagation()}
+          >
             <button
               onClick={() => setModalConfig({ ...modalConfig, show: false })}
-              className="absolute top-5 right-5 z-[110] p-2 bg-background/50 backdrop-blur-md hover:bg-accent rounded-full transition-colors border border-border cursor-pointer"
+              className="absolute top-5 right-5 z-[110] p-2 hover:bg-accent rounded-none transition-colors border border-border cursor-pointer bg-background"
             >
               <IoCloseOutline size={24} />
             </button>
             {!modalConfig.showPlans && (
               <div className="text-center">
-                <h2 className="text-2xl font-bold mb-2">{modalConfig.title}</h2>
-                <p className="text-muted-foreground mb-6">{modalConfig.description}</p>
+                <h2 className="text-2xl font-bold mb-2 font-one">{modalConfig.title}</h2>
+                <p className="text-muted-foreground mb-6 font-two">{modalConfig.description}</p>
                 <button 
                   onClick={modalConfig.action}
-                  className="w-full py-3 bg-primary text-primary-foreground rounded-xl font-semibold cursor-pointer"
+                  className="w-full py-3 bg-primary text-primary-foreground rounded-none font-semibold cursor-pointer hover:bg-primary/90 transition-colors"
                 >
                   {modalConfig.buttonText}
                 </button>
@@ -221,7 +228,7 @@ export default function Dashboard() {
             Turn long and messy URLs into short, clean links you can easily share.
           </p>
 
-          <div className={`flex flex-col sm:flex-row gap-3 border-2 rounded-xl p-2 sm:p-3 transition-colors shadow-sm bg-card ${shortUrl ? 'border-primary' : 'border-border'}`}>
+          <div className={`flex flex-col sm:flex-row gap-3 border-2 rounded-none p-2 sm:p-3 transition-colors shadow-sm bg-card ${shortUrl ? 'border-primary' : 'border-border'}`}>
             <input
               type="text"
               placeholder="Paste your long URL here..."
@@ -233,26 +240,26 @@ export default function Dashboard() {
 
             {shortUrl ? (
               <div className="flex gap-2 w-full sm:w-auto">
-                <button onClick={handleGenerateQr} className={`px-4 sm:px-5 py-3 rounded-lg flex items-center justify-center transition cursor-pointer ${showQr ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'}`}>
+                <button onClick={handleGenerateQr} className={`px-4 sm:px-5 py-3 rounded-none flex items-center justify-center transition-colors cursor-pointer ${showQr ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'}`}>
                   <IoQrCodeOutline size={22} />
                 </button>
-                <button onClick={copyToClipboard} className="flex-1 sm:flex-none px-4 sm:px-8 py-3 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition font-medium flex items-center justify-center gap-2 cursor-pointer">
+                <button onClick={copyToClipboard} className="flex-1 sm:flex-none px-4 sm:px-8 py-3 rounded-none bg-primary text-primary-foreground hover:bg-primary/90 transition-colors font-medium flex items-center justify-center gap-2 cursor-pointer">
                   <IoCopyOutline size={20} /> Copy
                 </button>
-                <button onClick={handleReset} className="px-4 sm:px-5 py-3 rounded-lg bg-secondary text-secondary-foreground hover:bg-secondary/80 transition flex items-center justify-center cursor-pointer">
+                <button onClick={handleReset} className="px-4 sm:px-5 py-3 rounded-none bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors flex items-center justify-center cursor-pointer">
                   <IoRefreshOutline size={22} />
                 </button>
               </div>
             ) : (
-              <button onClick={() => handleShortUrl(url)} disabled={loading || !url} className="w-full sm:w-auto px-6 sm:px-10 py-3 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition disabled:opacity-50 font-medium text-base sm:text-lg cursor-pointer">
+              <button onClick={() => handleShortUrl(url)} disabled={loading || !url} className="w-full sm:w-auto px-6 sm:px-10 py-3 rounded-none bg-primary text-primary-foreground hover:bg-primary/90 transition disabled:opacity-50 font-medium text-base sm:text-lg cursor-pointer">
                 {loading ? <div className="w-6 h-6 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin"></div> : "Shorten"}
               </button>
             )}
           </div>
 
           {showQr && typeof showQr === "string" && (
-            <div className="mt-6 flex flex-col items-center animate-in fade-in slide-in-from-top-4 duration-300">
-              <div className="bg-white p-4 rounded-xl shadow-lg border border-border">
+            <div className="mt-6 flex flex-col items-center">
+              <div className="bg-white p-4 rounded-none shadow-lg border border-border">
                 <img src={showQr} alt="QR Code" className="w-40 h-40 object-contain" />
               </div>
               <p className="mt-3 text-sm font-three">Your QR code is ready!</p>
@@ -276,7 +283,7 @@ export default function Dashboard() {
       <section className="flex flex-col items-center justify-center px-4 sm:px-6 pb-12 border-b border-border">
         <div className="mt-2 w-full max-w-3xl flex flex-col items-center text-center">
           <h2 className="text-2xl font-three sm:text-3xl font-bold mb-3">Manage Your Links</h2>
-          <button onClick={() => router.push('/urls')} className="w-full font-one sm:w-auto group flex justify-center items-center gap-2 border-2 border-input bg-background px-6 sm:px-8 py-3 rounded-lg transition font-semibold text-base sm:text-lg hover:bg-accent cursor-pointer">
+          <button onClick={() => router.push('/urls')} className="w-full font-one sm:w-auto group flex justify-center items-center gap-2 border-2 border-input bg-background px-6 sm:px-8 py-3 rounded-none transition font-semibold text-base sm:text-lg hover:bg-accent cursor-pointer">
             See all your short URLs <IoArrowForwardOutline size={20} className="group-hover:translate-x-1 transition-transform" />
           </button>
         </div>
@@ -287,13 +294,13 @@ export default function Dashboard() {
       </div>
 
       {copied && (
-        <div className="fixed font-two top-20 sm:top-24 left-1/2 -translate-x-1/2 mt-1 px-6 py-2 rounded-md shadow-lg text-xs sm:text-sm z-50 animate-bounce bg-primary text-primary-foreground">
+        <div className="fixed font-two top-20 sm:top-24 left-1/2 -translate-x-1/2 mt-1 px-6 py-2 shadow-lg text-xs sm:text-sm z-50 bg-primary text-primary-foreground rounded-none">
           URL Copied!
         </div>
       )}
 
       {upgradeMsg && (
-        <div className="fixed font-two bottom-10 left-1/2 -translate-x-1/2 px-8 py-3 rounded-full shadow-2xl text-sm sm:text-base z-50 animate-in slide-in-from-bottom-4 fade-in duration-300 bg-black text-white dark:bg-white dark:text-black font-bold border border-border">
+        <div className="fixed font-two bottom-10 left-1/2 -translate-x-1/2 px-8 py-3 shadow-2xl text-sm sm:text-base z-50 bg-black text-white dark:bg-white dark:text-black font-bold border border-border rounded-none">
           Upgrade to generate more!
         </div>
       )}
