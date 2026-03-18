@@ -45,31 +45,33 @@ export function ModeToggle() {
 
       document.documentElement.animate(
         {
-          clipPath: isDark ? [...clipPath].reverse() : clipPath,
+          clipPath: clipPath,
         },
         {
-          duration: 1100,
-          easing: "cubic-bezier(0.7, 0, 0.2, 1)",
-          pseudoElement: isDark
-            ? "::view-transition-old(root)"
-            : "::view-transition-new(root)",
+          duration: 1000,
+          easing: "cubic-bezier(0.4, 0, 0.2, 1)",
+          pseudoElement: "::view-transition-new(root)",
         }
       )
     })
   }
 
-  if (!mounted) return <Button variant="outline" className="w-14 h-8 rounded-full" />
+  if (!mounted) return <Button variant="outline" className="w-14 h-8 rounded-full border-muted-foreground/20" />
 
   return (
     <Button
       variant="outline"
       onClick={toggleTheme}
-      className="relative w-14 h-8 rounded-full flex items-center justify-between px-1.5 overflow-hidden group border-muted-foreground/100 hover:border-primary/200 transition-colors cursor-pointer"
+      className="relative w-14 h-8 rounded-full flex items-center justify-between px-1.5 overflow-hidden group border-muted-foreground/40 hover:border-primary/60 transition-colors cursor-pointer"
     >
-      <Sun className={`h-4 w-4 transition-all duration-300 ${theme === 'dark' ? 'text-muted-foreground/40' : 'text-yellow-500'}`} />
-      <Moon className={`h-4 w-4 transition-all duration-300 ${theme === 'dark' ? 'text-blue-400' : 'text-muted-foreground/40'}`} />
+      <Sun className={`h-3.5 w-3.5 transition-all duration-300 z-10 ${theme === 'dark' ? 'text-muted-foreground/50' : 'text-orange-500'}`} />
+      <Moon className={`h-3.5 w-3.5 transition-all duration-300 z-10 ${theme === 'dark' ? 'text-blue-400' : 'text-muted-foreground/50'}`} />
       
-      <div className={`absolute h-6 w-6 rounded-full bg-accent/50 -z-10 transition-all duration-300 ${theme === 'dark' ? 'translate-x-6' : 'translate-x-0'}`} />
+      <div
+        className={`absolute h-6 w-6 rounded-full bg-accent border border-border shadow-sm transition-all duration-300 ease-in-out ${
+          theme === 'dark' ? 'translate-x-6' : 'translate-x-0'
+        }`} 
+      />
     </Button>
   )
 }

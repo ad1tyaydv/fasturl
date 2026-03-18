@@ -43,7 +43,7 @@ export default function Dashboard() {
     showPlans: false,
   });
 
-  
+
   const slowScrollToPricing = () => {
     if (pricingRef.current) {
       const targetPosition = pricingRef.current.offsetTop;
@@ -117,6 +117,7 @@ export default function Dashboard() {
         action: () => router.push("/auth/signin"),
         showPlans: false,
       });
+
       return;
     }
 
@@ -283,7 +284,9 @@ export default function Dashboard() {
       <section className="flex flex-col items-center justify-center px-4 sm:px-6 pb-12 border-b border-border">
         <div className="mt-2 w-full max-w-3xl flex flex-col items-center text-center">
           <h2 className="text-2xl font-three sm:text-3xl font-bold mb-3">Manage Your Links</h2>
-          <button onClick={() => router.push('/urls')} className="w-full font-one sm:w-auto group flex justify-center items-center gap-2 border-2 border-input bg-background px-6 sm:px-8 py-3 rounded-none transition font-semibold text-base sm:text-lg hover:bg-accent cursor-pointer">
+          <button 
+            onClick={() => router.push('/urls')} 
+            className="w-full font-one sm:w-auto group flex justify-center items-center gap-2 border-2 border-input bg-background px-6 sm:px-8 py-3 rounded-none transition font-semibold text-base sm:text-lg hover:bg-accent cursor-pointer">
             See all your short URLs <IoArrowForwardOutline size={20} className="group-hover:translate-x-1 transition-transform" />
           </button>
         </div>

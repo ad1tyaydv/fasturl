@@ -27,7 +27,7 @@ export default function Sidebar() {
   const mobileItems = [
     { name: 'Home', path: '/', icon: <IoHomeOutline size={24} /> },
     { name: 'Links', path: '/urls', icon: <IoListOutline size={24} /> },
-    { name: 'QR', path: '/qrcodes', icon: <IoQrCodeOutline size={24} /> },
+    { name: 'QR', path: '/qr', icon: <IoQrCodeOutline size={24} /> },
     { name: 'Analytics', path: '/analytics', icon: <IoAnalyticsOutline size={24} /> },
     { name: 'Premium', path: '/premium', icon: <IoStarOutline size={24} /> },
     { name: 'Settings', path: '/settings', icon: <IoSettingsOutline size={24} /> },

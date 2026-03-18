@@ -149,14 +149,14 @@ export default function AllUrlsPage() {
 
     } catch (error: any) {
       if (error.response && error.response.status === 409) {
-        setErrorMessage("Custom url with this name is already taken");
+        setErrorMessage("Custom URL with this name is already taken");
       } else {
         console.log("Something went wrong", error);
       }
     }
   };
 
-  
+
   return (
     <DashboardLayout isLoggedIn={isLoggedIn} handleLogout={async () => { await axios.post("/api/auth/logout"); router.push("/auth/signin"); }}>
       <div className="max-w-4xl mx-auto">
@@ -214,7 +214,7 @@ export default function AllUrlsPage() {
 
               <div className="space-y-5 sm:space-y-6 mb-6 sm:mb-8">
                 <div>
-                  <p className="text-[10px] sm:text-xs font-two uppercase tracking-widest mb-1 text-muted-foreground">
+                  <p className="text-[10px] sm:text-xs font-three uppercase tracking-widest mb-1 text-muted-foreground">
                     {view === "links" ? "TOTAL CLICKS" : "TOTAL SCANS"}
                   </p>
                   <p className="text-3xl sm:text-4xl font-one text-foreground">
@@ -222,8 +222,8 @@ export default function AllUrlsPage() {
                   </p>
                 </div>
                 <div>
-                  <p className="text-[10px] sm:text-xs font-two uppercase tracking-widest mb-1 text-muted-foreground">CREATED AT</p>
-                  <p className="text-base sm:text-lg font-two text-muted-foreground">
+                  <p className="text-[10px] sm:text-xs font-three uppercase tracking-widest mb-1 text-muted-foreground">CREATED AT</p>
+                  <p className="text-base sm:text-lg font-two muted-foreground">
                     {selectedUrl.createdAt ? new Date(selectedUrl.createdAt).toLocaleString('en-US', {
                       year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
                     }) : "Not Available"}
@@ -236,7 +236,7 @@ export default function AllUrlsPage() {
                    {view === "links" && (
                      <button 
                       onClick={handleCustomUrlClick}
-                      className="cursor-pointer px-4 py-2 border border-border font-one text-sm hover:bg-secondary transition-colors active:scale-95 text-foreground rounded-none"
+                      className="cursor-pointer px-8 py-2 font-three text-sm bg-black text-white hover:bg-black/80 transition-colors active:scale-95 border border-white/20 rounded-none"
                     >
                       Add Custom Short Url
                     </button>
@@ -244,7 +244,7 @@ export default function AllUrlsPage() {
                    {view === "qrs" && selectedUrl.qrImage && (
                     <button 
                       onClick={() => downloadQrAction(selectedUrl.qrImage!, selectedUrl.shorturl)}
-                      className="cursor-pointer px-6 py-2 bg-primary text-primary-foreground font-one text-sm hover:bg-primary/90 transition-colors active:scale-95 rounded-none"
+                      className="cursor-pointer px-6 py-2 bg-primary text-primary-foreground font-three text-sm hover:bg-primary/90 transition-colors active:scale-95 rounded-none"
                     >
                       Download PNG
                     </button>
@@ -253,7 +253,7 @@ export default function AllUrlsPage() {
                 
                 <button 
                   onClick={closeAllModals}
-                  className="cursor-pointer px-8 py-2 font-one text-sm bg-black text-white hover:bg-black/80 transition-colors active:scale-95 border border-white/20 rounded-none"
+                  className="cursor-pointer px-8 py-2 font-three text-sm bg-black text-white hover:bg-black/80 transition-colors active:scale-95 border border-white/20 rounded-none"
                 >
                   Close
                 </button>
@@ -266,22 +266,22 @@ export default function AllUrlsPage() {
               className="bg-background shadow-2xl w-full max-w-lg p-6 sm:p-10 cursor-default border border-border rounded-none" 
               onClick={(e) => e.stopPropagation()}
             >
-              <h3 className="text-xl sm:text-2xl font-one mb-8 text-center text-foreground">
+              <h3 className="text-xl sm:text-2xl font-three mb-8 text-center text-foreground">
                 Add a custom short url to your link
               </h3>
 
               <div className="space-y-6 mb-8">
                 <div className="space-y-2">
-                  <label className="text-lg font-two text-foreground">Current Short Url</label>
-                  <div className="w-full p-3 border border-border bg-secondary/30 text-muted-foreground font-two rounded-none">
+                  <label className="text-xl font-one text-foreground">Current Short Url</label>
+                  <div className="w-full p-3 border border-border bg-secondary/30 muted-foreground font-three rounded-none">
                     {NEXT_DOMAIN}/{selectedUrl.shorturl}
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-lg font-two text-foreground">Custom Short Url</label>
+                  <label className="text-xl font-one text-foreground">Custom Short Url</label>
                   <div className={`flex items-center border ${errorMessage ? 'border-red-500' : 'border-border'} bg-background focus-within:ring-1 focus-within:ring-primary rounded-none`}>
-                    <span className="pl-3 py-3 text-muted-foreground font-two bg-secondary/10 border-r border-border px-2">
+                    <span className="pl-3 py-3 muted-foreground font-three bg-secondary/10 border-r border-border px-2">
                       {NEXT_DOMAIN}/
                     </span>
                     <input 
@@ -291,17 +291,17 @@ export default function AllUrlsPage() {
                       value={customUrl}
                       onChange={(e) => {
                         setCustomUrl(e.target.value.replace(/[^a-zA-Z0-9]/g, ''));
-                        if (errorMessage) setErrorMessage(""); // Reset error when typing
+                        if (errorMessage) setErrorMessage("");
                       }}
-                      className="flex-1 p-3 bg-transparent text-foreground font-two focus:outline-none"
+                      className="flex-1 p-3 bg-transparent text-foreground font-three focus:outline-none"
                     />
                   </div>
                   {errorMessage ? (
-                    <p className="text-xs text-red-500 font-two mt-1 animate-pulse">
+                    <p className="text-lg text-red-500 font-two mt-1">
                       {errorMessage}
                     </p>
                   ) : (
-                    <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Max 25 characters</p>
+                    <p className="text-[10px] font-three muted-foreground uppercase tracking-widest">Max 25 characters</p>
                   )}
                 </div>
               </div>
@@ -309,7 +309,7 @@ export default function AllUrlsPage() {
               <div className="flex justify-end">
                 <button 
                   onClick={handleUpdateCustomUrl}
-                  className="cursor-pointer px-8 py-2 font-one text-sm border border-border hover:bg-secondary transition-colors active:scale-95 text-foreground rounded-none"
+                  className="cursor-pointer px-8 py-2 font-three text-sm border border-border hover:bg-secondary transition-colors active:scale-95 muted-foreground rounded-none"
                 >
                   Update
                 </button>
