@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 const NEXTAUTH_SECRET = process.env.NEXTAUTH_SECRET!;
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
 
     const token = request.cookies.get("token")?.value;
     const pathName = request.nextUrl.pathname;
