@@ -234,7 +234,7 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        <div className="w-full h-[1px] bg-border my-4"></div>
+        <div className="w-full h-px bg-border my-4"></div>
 
         <div className="mt-12 pt-12 border-t border-gray-200">
           <h2 className="text-2xl font-bold text-[#c62828] mb-4">Danger Zone</h2>

@@ -162,7 +162,7 @@ export default function QRGenerator() {
       `}} />
 
       {modalConfig.show && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+        <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
           <div className={`bg-card border-2 border-border p-6 rounded-2xl shadow-2xl animate-in zoom-in-95 duration-200 ${modalConfig.showPlans ? 'max-w-4xl w-full' : 'max-w-sm w-full'}`}>
             <div className="flex justify-between items-start mb-2">
               <h3 className="text-xl font-bold font-one">{modalConfig.title}</h3>

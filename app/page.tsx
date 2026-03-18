@@ -210,7 +210,7 @@ export default function Dashboard() {
       <Navbar isLoggedIn={isLoggedIn} handleLogout={handleLogout} />
 
       {modalConfig.show && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 transition-opacity duration-150" onClick={() => setModalConfig({ ...modalConfig, show: false })}>
+        <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/60 transition-opacity duration-150" onClick={() => setModalConfig({ ...modalConfig, show: false })}>
           <div className="bg-card border border-border rounded-none shadow-2xl relative p-8 max-w-sm w-full" onClick={(e) => e.stopPropagation()}>
             <button onClick={() => setModalConfig({ ...modalConfig, show: false })} className="absolute top-5 right-5 p-2 hover:bg-accent border border-border cursor-pointer bg-background">
               <IoCloseOutline size={24} />

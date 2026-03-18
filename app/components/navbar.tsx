@@ -65,7 +65,7 @@ export default function Navbar({ isLoggedIn, handleLogout }: NavbarProps) {
               onClick={() => router.push('/premium')}
               className={`border font-three px-4 py-1.5 rounded-md font-bold text-sm uppercase transition-all duration-500 cursor-pointer shadow-sm
                 ${isPaid 
-                  ? "bg-gradient-to-r from-amber-400 via-yellow-200 to-amber-500 text-black border-amber-500 animate-pulse shadow-[0_0_15px_rgba(251,191,36,0.5)] hover:shadow-[0_0_25px_rgba(251,191,36,0.8)]" 
+                  ? "bg-linear-to-r from-amber-400 via-yellow-200 to-amber-500 text-black border-amber-500 animate-pulse shadow-[0_0_15px_rgba(251,191,36,0.5)] hover:shadow-[0_0_25px_rgba(251,191,36,0.8)]" 
                   : "bg-secondary text-secondary-foreground border-input hover:bg-secondary/80"
                 }`}
             >
