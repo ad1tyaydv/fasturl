@@ -12,6 +12,7 @@ import {
 } from "react-icons/io5";
 import Navbar from "./components/navbar";
 import PricingSection from "./components/PricingSection";
+import TotalData from "./components/totalData";
 
 const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN;
 
@@ -26,6 +27,9 @@ export default function Dashboard() {
   const [copied, setCopied] = useState(false);
   const [showQr, setShowQr] = useState<string | boolean>(false);
   const [upgradeMsg, setUpgradeMsg] = useState(false);
+
+
+  const [stats, setStats] = useState({ links: 0, qrs: 0, clicks: 0 });
 
   const [modalConfig, setModalConfig] = useState<{
     show: boolean;
@@ -56,7 +60,6 @@ export default function Dashboard() {
         if (!start) start = timestamp;
         const progress = timestamp - start;
         const percentage = Math.min(progress / duration, 1);
-        
         const easing = percentage < 0.5 
           ? 4 * percentage * percentage * percentage 
           : 1 - Math.pow(-2 * percentage + 2, 3) / 2;
@@ -64,10 +67,8 @@ export default function Dashboard() {
         window.scrollTo(0, startPosition + distance * easing);
         if (progress < duration) window.requestAnimationFrame(step);
       };
-
       window.requestAnimationFrame(step);
     }
-    
     setUpgradeMsg(true);
     setTimeout(() => setUpgradeMsg(false), 3000);
   };
@@ -79,9 +80,13 @@ export default function Dashboard() {
     try {
       setLoading(true);
       const res = await axios.post("/api/shortUrl", { url: originalUrl });
+
       const generatedShortUrl = res.data.shortUrl;
+
       setShortUrl(generatedShortUrl);
       setUrl(`${NEXT_DOMAIN}/${generatedShortUrl}`);
+
+      fetchUserStats();
 
     } catch (error: any) {
       if (error.response?.status === 429) {
@@ -92,14 +97,12 @@ export default function Dashboard() {
             description: "Login to generate more links",
             buttonText: "Login Now",
             action: () => router.push("/auth/signin"),
-            showPlans: false,
           });
 
         } else {
           slowScrollToPricing();
         }
       }
-      console.log("Can't short url", error);
 
     } finally {
       setLoading(false);
@@ -115,31 +118,61 @@ export default function Dashboard() {
         description: "Login to generate more QR codes",
         buttonText: "Login Now",
         action: () => router.push("/auth/signin"),
-        showPlans: false,
       });
-
       return;
     }
-
 
     if (typeof showQr === "string") {
       setShowQr(false);
       return;
     }
 
-
     try {
       const res = await axios.post("/api/qrCode", {
         shortUrl: shortUrl,
         longUrl: url
       });
+
       setShowQr(res.data.qrImage);
+
+      fetchUserStats();
 
     } catch (error: any) {
       if (error.response?.status === 429) slowScrollToPricing();
-      console.log("Error while generating qr code", error);
     }
   };
+
+
+  const fetchUserStats = async () => {
+    try {
+      const res = await axios.get("/api/totalData"); 
+      setStats({
+        links: res.data.totalLinks || 0,
+        qrs: res.data.totalQrs || 0,
+        clicks: res.data.totalClicks || 0
+      });
+      
+    } catch (e) {
+      console.log("Stats not available yet");
+    }
+  };
+
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const res = await axios.get("/api/auth/me");
+        const authenticated = !!res.data.authenticated;
+        setIsLoggedIn(authenticated);
+        if (authenticated) fetchUserStats();
+
+      } catch {
+        setIsLoggedIn(false);
+      }
+    };
+    checkAuth();
+
+  }, [router]);
 
 
   const copyToClipboard = () => {
@@ -163,25 +196,12 @@ export default function Dashboard() {
   };
 
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const res = await axios.get("/api/auth/me");
-        setIsLoggedIn(!!res.data.authenticated);
-
-      } catch {
-        setIsLoggedIn(false);
-      }
-    };
-    checkAuth();
-  }, [router]);
-
-
   const handleLogout = async () => {
     await axios.post("/api/auth/logout");
     setIsLoggedIn(false);
     setShortUrl("");
     setUrl("");
+    setStats({ links: 0, qrs: 0, clicks: 0 });
   };
 
 
@@ -190,32 +210,18 @@ export default function Dashboard() {
       <Navbar isLoggedIn={isLoggedIn} handleLogout={handleLogout} />
 
       {modalConfig.show && (
-        <div 
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 transition-opacity duration-150"
-          onClick={() => setModalConfig({ ...modalConfig, show: false })}
-        >
-          <div 
-            className={`bg-card border border-border rounded-none shadow-2xl relative transition-all duration-200 ${modalConfig.showPlans ? 'max-w-5xl w-full' : 'max-w-sm w-full p-8'}`}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              onClick={() => setModalConfig({ ...modalConfig, show: false })}
-              className="absolute top-5 right-5 z-[110] p-2 hover:bg-accent rounded-none transition-colors border border-border cursor-pointer bg-background"
-            >
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 transition-opacity duration-150" onClick={() => setModalConfig({ ...modalConfig, show: false })}>
+          <div className="bg-card border border-border rounded-none shadow-2xl relative p-8 max-w-sm w-full" onClick={(e) => e.stopPropagation()}>
+            <button onClick={() => setModalConfig({ ...modalConfig, show: false })} className="absolute top-5 right-5 p-2 hover:bg-accent border border-border cursor-pointer bg-background">
               <IoCloseOutline size={24} />
             </button>
-            {!modalConfig.showPlans && (
-              <div className="text-center">
-                <h2 className="text-2xl font-bold mb-2 font-one">{modalConfig.title}</h2>
-                <p className="text-muted-foreground mb-6 font-two">{modalConfig.description}</p>
-                <button 
-                  onClick={modalConfig.action}
-                  className="w-full py-3 bg-primary text-primary-foreground rounded-none font-semibold cursor-pointer hover:bg-primary/90 transition-colors"
-                >
-                  {modalConfig.buttonText}
-                </button>
-              </div>
-            )}
+            <div className="text-center">
+              <h2 className="text-2xl font-bold mb-2 font-one">{modalConfig.title}</h2>
+              <p className="text-muted-foreground mb-6 font-two">{modalConfig.description}</p>
+              <button onClick={modalConfig.action} className="w-full py-3 bg-primary text-primary-foreground font-semibold cursor-pointer hover:bg-primary/90">
+                {modalConfig.buttonText}
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -225,7 +231,7 @@ export default function Dashboard() {
           <h1 className="text-3xl font-one sm:text-4xl md:text-5xl font-bold mb-4">
             Shorten Your <span className="text-red-500">Links</span> Instantly
           </h1>
-          <p className="mb-8 font-two text-base sm:text-lg px-2 text-muted-foreground">
+          <p className="mb-8 font-two text-base sm:text-lg text-muted-foreground">
             Turn long and messy URLs into short, clean links you can easily share.
           </p>
 
@@ -238,21 +244,20 @@ export default function Dashboard() {
               onChange={(e) => { setUrl(e.target.value); if (shortUrl) setShortUrl(""); }}
               onKeyDown={handleKeyDown}
             />
-
             {shortUrl ? (
               <div className="flex gap-2 w-full sm:w-auto">
-                <button onClick={handleGenerateQr} className={`px-4 sm:px-5 py-3 rounded-none flex items-center justify-center transition-colors cursor-pointer ${showQr ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'}`}>
+                <button onClick={handleGenerateQr} className={`px-4 sm:px-5 py-3 rounded-none flex items-center justify-center cursor-pointer ${showQr ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'}`}>
                   <IoQrCodeOutline size={22} />
                 </button>
-                <button onClick={copyToClipboard} className="flex-1 sm:flex-none px-4 sm:px-8 py-3 rounded-none bg-primary text-primary-foreground hover:bg-primary/90 transition-colors font-medium flex items-center justify-center gap-2 cursor-pointer">
+                <button onClick={copyToClipboard} className="flex-1 sm:flex-none px-4 sm:px-8 py-3 rounded-none bg-primary text-primary-foreground font-medium flex items-center justify-center gap-2 cursor-pointer">
                   <IoCopyOutline size={20} /> Copy
                 </button>
-                <button onClick={handleReset} className="px-4 sm:px-5 py-3 rounded-none bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors flex items-center justify-center cursor-pointer">
+                <button onClick={handleReset} className="px-4 sm:px-5 py-3 rounded-none bg-secondary text-secondary-foreground flex items-center justify-center cursor-pointer">
                   <IoRefreshOutline size={22} />
                 </button>
               </div>
             ) : (
-              <button onClick={() => handleShortUrl(url)} disabled={loading || !url} className="w-full sm:w-auto px-6 sm:px-10 py-3 rounded-none bg-primary text-primary-foreground hover:bg-primary/90 transition disabled:opacity-50 font-medium text-base sm:text-lg cursor-pointer">
+              <button onClick={() => handleShortUrl(url)} disabled={loading || !url} className="w-full sm:w-auto px-6 sm:px-10 py-3 bg-primary text-primary-foreground disabled:opacity-50 font-medium text-lg cursor-pointer">
                 {loading ? <div className="w-6 h-6 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin"></div> : "Shorten"}
               </button>
             )}
@@ -268,12 +273,9 @@ export default function Dashboard() {
           )}
 
           {!isLoggedIn && (
-            <div className="mt-4 flex font-two flex-col items-center justify-center text-sm sm:text-base md:text-xl text-muted-foreground">
+            <div className="mt-4 font-two text-sm sm:text-base text-muted-foreground">
               <p>You can only create 1 link/day</p>
-              <button
-                onClick={() => router.push("/auth/signin")}
-                className="font-semibold font-two mt-1 hover:underline cursor-pointer text-foreground"
-              >
+              <button onClick={() => router.push("/auth/signin")} className="font-semibold mt-1 hover:underline cursor-pointer text-foreground">
                 Login to create more
               </button>
             </div>
@@ -286,7 +288,7 @@ export default function Dashboard() {
           <h2 className="text-2xl font-three sm:text-3xl font-bold mb-3">Manage Your Links</h2>
           <button 
             onClick={() => router.push('/urls')} 
-            className="w-full font-one sm:w-auto group flex justify-center items-center gap-2 border-2 border-input bg-background px-6 sm:px-8 py-3 rounded-none transition font-semibold text-base sm:text-lg hover:bg-accent cursor-pointer">
+            className="w-full font-one sm:w-auto group flex justify-center items-center gap-2 border-2 border-input bg-background px-6 sm:px-8 py-3 rounded-none transition font-semibold text-lg hover:bg-accent cursor-pointer">
             See all your short URLs <IoArrowForwardOutline size={20} className="group-hover:translate-x-1 transition-transform" />
           </button>
         </div>
@@ -297,16 +299,25 @@ export default function Dashboard() {
       </div>
 
       {copied && (
-        <div className="fixed font-two top-20 sm:top-24 left-1/2 -translate-x-1/2 mt-1 px-6 py-2 shadow-lg text-xs sm:text-sm z-50 bg-primary text-primary-foreground rounded-none">
+        <div className="fixed font-two top-20 sm:top-24 left-1/2 -translate-x-1/2 px-6 py-2 shadow-lg text-sm z-50 bg-primary text-primary-foreground rounded-none">
           URL Copied!
         </div>
       )}
 
       {upgradeMsg && (
-        <div className="fixed font-two bottom-10 left-1/2 -translate-x-1/2 px-8 py-3 shadow-2xl text-sm sm:text-base z-50 bg-black text-white dark:bg-white dark:text-black font-bold border border-border rounded-none">
+        <div className="fixed font-two bottom-10 left-1/2 -translate-x-1/2 px-8 py-3 shadow-2xl z-50 bg-black text-white dark:bg-white dark:text-black font-bold border border-border rounded-none">
           Upgrade to generate more!
         </div>
       )}
+
+      {isLoggedIn && (
+        <TotalData 
+          totalLinks={stats.links} 
+          totalQrs={stats.qrs} 
+          totalClicks={stats.clicks} 
+        />
+      )}
+      
     </div>
   );
 }
