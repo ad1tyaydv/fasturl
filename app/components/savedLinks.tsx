@@ -35,7 +35,7 @@ export default function SavedLinks({ links, onSelect, onDelete, domain }: SavedL
           <div className="flex flex-col gap-2 sm:gap-3 w-full overflow-hidden min-w-0">
             <div className="flex items-center gap-2 sm:gap-3 w-full min-w-0">
               <div className="truncate text-base font-three sm:text-lg min-w-0 flex-1">
-                <strong>Short Url - </strong> 
+                <strong>Short Url - </strong>
                 <span className="font-normal text-muted-foreground">{domain}/{url.shorturl}</span>
               </div>
               <button onClick={(e) => copyToClipboard(e, `${domain}/${url.shorturl}`, url.id, "short")} className="shrink-0 cursor-pointer p-1">

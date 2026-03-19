@@ -41,6 +41,8 @@ model Link {
 
   ipAddress    String?
 
+  password     String?
+  expiresAt    DateTime?
   
   userId       String
   user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -52,10 +54,10 @@ model Click {
   id          String      @id @default(uuid())
 
   linkId      String
-  link        Link        @relation(fields: [linkId], references: [id], onDelete: Cascade)
+  link        Link        @relation(fields: [linkId], references: [id])
 
   qrId        String?
-  qr          Qr?         @relation(fields: [qrId], references: [id], onDelete: Cascade)
+  qr          Qr?         @relation(fields: [qrId], references: [id])
 
   ip          String
   country     String?
@@ -92,4 +94,11 @@ model Qr {
   user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt   DateTime    @default(now())
+}
+
+model Count {
+  countId     String      @id @default(uuid())
+  linkCount   Int         @default(0)
+  qrCount     Int         @default(0)
+  totalClicks Int         @default(0)
 }

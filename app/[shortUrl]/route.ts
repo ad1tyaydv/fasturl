@@ -3,6 +3,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { stateMap } from "../helpers/getStateName";
 import { countryMap } from "../helpers/getCountryName";
 
+
+const ANON_USER_CLICK = process.env.ANONYMOUS_USER_CLICK!;
+
 export async function GET(req: NextRequest, { params }: { params: Promise<{ shortUrl: string }> }) {
 
     const { shortUrl } = await params;
@@ -66,30 +69,50 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ shor
     }
 
 
-    await prisma.link.update({
-        where: {
-            shorturl: shortUrl
-        },
-        data: {
-            clicks: {
-                increment: 1
+    await prisma.$transaction([
+        prisma.link.update({
+            where: {
+                shorturl: shortUrl 
+            },
+            data: {
+                clicks: {
+                    increment: 1
+                }
             }
-        }
-    })
+        }),
 
-    await prisma.click.create({
-        data: {
-            linkId: findUrl.id,
-            ip: ip,
-            country: countryFullName,
-            state: stateFullName,
-            city: city,
-            browser: browser,
-            device: device,
-            OS: operatingSystem,
-            referrer: req.headers.get("referer") || "Direct",
-        }
-    })
+        prisma.click.create({
+            data: {
+                linkId: findUrl.id,
+                ip,
+                country: countryFullName,
+                state: stateFullName,
+                city,
+                browser,
+                device,
+                OS: operatingSystem,
+                referrer
+            }
+        }),
+
+            prisma.count.upsert({
+                where: {
+                    countId: ANON_USER_CLICK
+                },
+                update: {
+                    totalClicks: {
+                        increment: 1 
+                    }
+                },
+                create: {
+                    countId: ANON_USER_CLICK,
+                    linkCount: 0,
+                    qrCount: 0,
+                    totalClicks: 1
+                }
+            })
+        ]);
 
     return NextResponse.redirect(findUrl.original);
+    
 }

@@ -2,27 +2,28 @@ import { prisma } from "@/lib/dbConfig";
 import { NextRequest, NextResponse } from "next/server";
 
 
-export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string}> } ) {
+const ANON_USER_CLICK = process.env.ANONYMOUS_USER_CLICK!;
+
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string}> } ) {
 
     const { id } = await params;
 
     try {
 
-        await prisma.link.delete({
+        await prisma.qr.delete({
             where: {
                 id: id
             }
         })
 
         return NextResponse.json(
-            {message: "Link deleted successfully"},
+            {message: "QR deleted successfully"},
             {status: 200}
         )
         
     } catch (error) {
-        console.log(error);
         return NextResponse.json(
-            {message: "Error while deleting the url"},
+            {message: "Error while deleting the QR"},
             {status: 500}
         )
     }

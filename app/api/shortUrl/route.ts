@@ -6,6 +6,7 @@ import shortUrlGenerator from "@/app/helpers/shortUrlGenerator";
 
 const JWT_SECRET = process.env.NEXTAUTH_SECRET!;
 const ANON_USER_ID = process.env.ANONYMOUS_USER_ID!;
+const ANON_USER_CLICK = process.env.ANONYMOUS_USER_CLICK!;
 
 export async function POST(req: NextRequest) {
 
@@ -220,6 +221,23 @@ export async function POST(req: NextRequest) {
         shorturl: shortUrl,
         ipAddress: ip,
       },
+    });
+
+    await prisma.count.upsert({
+      where: {
+        countId: ANON_USER_CLICK
+      },
+      update: {
+        linkCount: {
+          increment: 1
+        }
+      },
+      create: {
+        countId: ANON_USER_CLICK,
+        linkCount: 1,
+        qrCount: 0,
+        totalClicks: 0
+      }
     });
 
     return NextResponse.json({

@@ -1,12 +1,13 @@
 "use client";
 
-import { IoDownloadOutline } from "react-icons/io5";
+import { useState } from "react";
+import { IoCopyOutline } from "react-icons/io5";
 
 interface QrItem {
   id: string;
   original: string;
   shorturl: string;
-  qrImage?: string; 
+  qrImage?: string;
   scans?: number;
   createdAt?: string;
 }
@@ -14,28 +15,35 @@ interface QrItem {
 interface SavedQrsProps {
   qrs: QrItem[];
   onSelect: (qr: QrItem) => void;
+  onDelete: (id: string) => void;
+  domain: string;
 }
 
-export default function SavedQrs({ qrs, onSelect }: SavedQrsProps) {
 
-  const downloadQr = (e: React.MouseEvent, qrImage: string, name: string) => {
+export default function SavedQrs({ qrs, onSelect, onDelete, domain }: SavedQrsProps) {
+  const [copiedUrlId, setCopiedUrlId] = useState<string | null>(null);
+  const [copiedType, setCopiedType] = useState<"original" | "short" | null>(null);
+
+
+  const copyToClipboard = (e: React.MouseEvent, url: string, id: string, type: "original" | "short") => {
     e.stopPropagation();
-    const link = document.createElement("a");
-    link.href = qrImage;
-    link.download = `qr-${name}.png`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    navigator.clipboard.writeText(url);
+    setCopiedUrlId(id);
+    setCopiedType(type);
+    setTimeout(() => {
+      setCopiedUrlId(null);
+      setCopiedType(null);
+    }, 2000);
   };
 
 
   return (
-    <div className="flex flex-col gap-3 sm:gap-4 pb-16">
+    <div className="flex flex-col gap-4 sm:gap-5 pb-16">
       {qrs.map((qr) => (
         <div
           key={qr.id}
           onClick={() => onSelect(qr)}
-          className="border border-border/60 p-3 sm:p-5 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-4 hover:shadow-sm transition cursor-pointer group bg-card hover:border-primary/30"
+          className="border border-border p-4 sm:p-6 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6 hover:shadow-md transition cursor-pointer group bg-card hover:border-primary/50"
         >
           <div className="flex items-center gap-4 w-full overflow-hidden min-w-0">
             <div className="shrink-0 bg-white p-1.5 rounded-lg border border-border/50 shadow-sm">
@@ -43,29 +51,62 @@ export default function SavedQrs({ qrs, onSelect }: SavedQrsProps) {
                 <img
                   src={qr.qrImage}
                   alt="QR"
-                  className="w-16 h-16 sm:w-20 sm:h-20 object-contain" 
+                  className="w-16 h-16 sm:w-20 sm:h-20 object-contain"
                 />
               ) : (
                 <div className="w-16 h-16 sm:w-20 sm:h-20 bg-muted animate-pulse rounded-md" />
               )}
             </div>
 
-            <div className="flex flex-col gap-0.5 w-full overflow-hidden">
-              <div className="truncate text-base font-one sm:text-lg min-w-0">
-                <span className="text-primary/70 text-[15px] uppercase tracking-tighter block font-bold">Target</span>
-                <span className="font-normal text-foreground group-hover:text-primary transition-colors">
-                  {qr.original}
-                </span>
+            <div className="flex flex-col gap-2 sm:gap-3 w-full overflow-hidden min-w-0">
+              <div className="flex items-center gap-2 sm:gap-3 w-full min-w-0">
+                <div className="truncate text-base font-three sm:text-lg min-w-0 flex-1">
+                  <strong>Short Url - </strong>
+                  <span className="font-normal text-muted-foreground">
+                    {domain}/{qr.shorturl}
+                  </span>
+                </div>
+                <button
+                  onClick={(e) => copyToClipboard(e, `${domain}/${qr.shorturl}`, qr.id, "short")}
+                  className="shrink-0 cursor-pointer p-1"
+                >
+                  <IoCopyOutline size={20} className="transition text-muted-foreground hover:text-foreground" />
+                </button>
+                {copiedUrlId === qr.id && copiedType === "short" && (
+                  <span className="px-2 py-0.5 rounded text-[10px] sm:text-xs font-bold shrink-0 bg-green-500/20 text-green-600 dark:text-green-400 uppercase">
+                    COPIED!
+                  </span>
+                )}
+              </div>
+
+              <div className="flex items-center gap-2 sm:gap-3 w-full min-w-0">
+                <div className="truncate font-three text-sm sm:text-lg min-w-0 flex-1">
+                  <strong>Original Url - </strong>
+                  <span className="font-normal text-muted-foreground">{qr.original}</span>
+                </div>
+                <button
+                  onClick={(e) => copyToClipboard(e, qr.original, qr.id, "original")}
+                  className="shrink-0 cursor-pointer p-1"
+                >
+                  <IoCopyOutline size={20} className="transition text-muted-foreground hover:text-foreground" />
+                </button>
+                {copiedUrlId === qr.id && copiedType === "original" && (
+                  <span className="px-2 py-0.5 rounded text-[10px] sm:text-xs font-bold shrink-0 bg-green-500/20 text-green-600 dark:text-green-400 uppercase">
+                    COPIED!
+                  </span>
+                )}
               </div>
             </div>
           </div>
 
           <button
-            onClick={(e) => qr.qrImage && downloadQr(e, qr.qrImage, qr.shorturl)}
-            className="whitespace-nowrap shrink-0 px-5 py-2.5 rounded-lg font-one text-sm transition flex items-center justify-center gap-2 bg-secondary text-secondary-foreground hover:bg-primary hover:text-primary-foreground border border-border/40 active:scale-95 cursor-pointer"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(qr.id);
+            }}
+            className="w-full md:w-auto mt-2 md:mt-0 px-6 py-2.5 rounded-lg font-medium transition cursor-pointer whitespace-nowrap shrink-0 opacity-100 md:opacity-80 group-hover:opacity-100 bg-destructive/10 text-destructive hover:bg-destructive hover:text-white border border-destructive/20"
           >
-            <IoDownloadOutline size={18} />
-            Download QR
+            Delete
           </button>
         </div>
       ))}
