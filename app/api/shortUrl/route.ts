@@ -106,7 +106,7 @@ export async function POST(req: NextRequest) {
           }
         });
 
-        if (count >= 20) {
+        if (count >= 1) {
           return NextResponse.json(
             { message: "Upgrade to generate up to 40,000 URLs every month" },
             { status: 429 }
