@@ -43,25 +43,6 @@ export async function POST(req: NextRequest) {
           { message: "Anonymous users can only create 1 link every day" },
           { status: 429 }
         );
-
-      } else {
-        const urlAlreadyExists = await prisma.link.findFirst({
-          where: {
-            original: data.url
-          },
-          select: {
-            shorturl: true,
-            original: true,
-          }
-        })
-
-        if (urlAlreadyExists) {
-          return NextResponse.json({
-            message: "Short URL already exists",
-            shortUrl: urlAlreadyExists.shorturl,
-            original: urlAlreadyExists.original
-          });
-        }
       }
 
     } else {
@@ -106,33 +87,14 @@ export async function POST(req: NextRequest) {
           }
         });
 
-        if (count >= 1) {
+        if (count >= 20) {
           return NextResponse.json(
             { message: "Upgrade to generate up to 40,000 URLs every month" },
             { status: 429 }
           );
         }
 
-        urlAlreadyExists = await prisma.link.findFirst({
-          where: {
-            original: data.url
-          },
-          select: {
-            shorturl: true,
-            original: true,
-          }
-        })
-
-        if (urlAlreadyExists) {
-          return NextResponse.json({
-            message: "Short URL already exists",
-            shortUrl: urlAlreadyExists.shorturl,
-            original: urlAlreadyExists.original
-          });
-        }
-      }
-
-      else if (user.plan === "ESSENTIAL") {
+      } else if (user.plan === "ESSENTIAL") {
         if (user.planExpiresAt && user.planExpiresAt < today) {
           return NextResponse.json(
             { message: "Your ESSENTIAL plan has expired. Upgrade to continue" },
@@ -156,26 +118,7 @@ export async function POST(req: NextRequest) {
           );
         }
 
-        urlAlreadyExists = await prisma.link.findFirst({
-          where: {
-            original: data.url
-          },
-          select: {
-            shorturl: true,
-            original: true,
-          }
-        })
-
-        if (urlAlreadyExists) {
-          return NextResponse.json({
-            message: "Short URL already exists",
-            shortUrl: urlAlreadyExists.shorturl,
-            original: urlAlreadyExists.original
-          });
-        }
-      }
-
-      else {
+      } else {
         count = await prisma.link.count({
           where: {
             userId: userId,
@@ -192,24 +135,6 @@ export async function POST(req: NextRequest) {
           );
         }
       }
-
-      urlAlreadyExists = await prisma.link.findFirst({
-        where: {
-          original: data.url
-        },
-        select: {
-          shorturl: true,
-          original: true,
-        }
-      })
-
-      if (urlAlreadyExists) {
-        return NextResponse.json({
-          message: "Short URL already exists",
-          shortUrl: urlAlreadyExists.shorturl,
-          original: urlAlreadyExists.original
-        });
-      }
     }
 
     const shortUrl = shortUrlGenerator();
@@ -221,23 +146,6 @@ export async function POST(req: NextRequest) {
         shorturl: shortUrl,
         ipAddress: ip,
       },
-    });
-
-    await prisma.count.upsert({
-      where: {
-        countId: ANON_USER_CLICK
-      },
-      update: {
-        linkCount: {
-          increment: 1
-        }
-      },
-      create: {
-        countId: ANON_USER_CLICK,
-        linkCount: 1,
-        qrCount: 0,
-        totalClicks: 0
-      }
     });
 
     return NextResponse.json({

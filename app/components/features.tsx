@@ -50,7 +50,7 @@ export default function ShortlyFeatures({ isLoggedIn, userPlan }: ShortlyFeature
       title: "QR Code Generation",
       desc: "Create custom QR codes for every shortened link.",
       icon: <IoQrCodeOutline size={28} />,
-      path: "/qrCode",
+      path: "/qr",
       color: "bg-emerald-600 hover:bg-emerald-700",
       border: "border-emerald-200 dark:border-emerald-900/30",
     },

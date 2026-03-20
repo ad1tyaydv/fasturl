@@ -4,6 +4,7 @@ import csv from "csv-parser";
 import shortUrlGenerator from "@/app/helpers/shortUrlGenerator";
 import { prisma } from "@/lib/dbConfig";
 import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
 
 
 const NEXT_PUBLIC_BASE_URL = process.env.NEXT_PUBLIC_DOMAIN!
@@ -30,12 +31,29 @@ export async function POST(req: NextRequest) {
         const formData = await req.formData();
         const file = formData.get("file") as File;
 
+        const pass = formData.get("password") as string | null;
+        const password = pass?.trim() || null;
+        let hashedPassword = "";
+        if(password) {
+            hashedPassword = await bcrypt.hash(password!, 10);
+        }
+
+        const expiryDate = formData.get("expiryDate") as string | null;
+        const expiresAt = expiryDate ? new Date(expiryDate) : null
+
+        if (expiresAt && isNaN(expiresAt.getTime())) {
+            return NextResponse.json(
+                {message: "Invalid expiry date"}, 
+                {status: 400});
+        }
+
         if(!file) {
             return NextResponse.json(
                 {error: "No file uploaded"}
             );
         }
 
+        
         const buffer = Buffer.from(await file.arrayBuffer());
         const stream = Readable.from(buffer);
 
@@ -121,7 +139,9 @@ export async function POST(req: NextRequest) {
                     data: {
                         userId: decoded.userId,
                         original: url,
-                        shorturl: shortUrl
+                        shorturl: shortUrl,
+                        password: hashedPassword,
+                        expiresAt: expiresAt
                     }
                 })
 

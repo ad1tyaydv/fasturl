@@ -12,40 +12,68 @@ import {
   IoDownloadOutline,
   IoFileTrayFullOutline,
   IoRocketOutline,
-  IoRefreshOutline
+  IoRefreshOutline,
+  IoEyeOutline,
+  IoEyeOffOutline,
+  IoCalendarOutline
 } from "react-icons/io5";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import DashboardLayout from "@/app/components/dashBoardComponent";
 
-
 export default function BulkCreateLinks() {
   const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
+  const [authLoading, setAuthLoading] = useState(true);
   const [status, setStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const [createdLinks, setCreatedLinks] = useState<any[]>([]);
   const [showDownloadModal, setShowDownloadModal] = useState(false);
   const [showLimitModal, setShowLimitModal] = useState(false);
   const [userPlan, setUserPlan] = useState<string>("FREE");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  
+  const [password, setPassword] = useState("");
+  const [expiryDate, setExpiryDate] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  
+
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    setIsLoggedIn(!!token);
+    const checkAuth = async () => {
+      try {
+        const res = await axios.get("/api/auth/me");
+        const authenticated = !!res.data.authenticated;
+        setIsLoggedIn(authenticated);
+        
+        if (authenticated) {
+          setUserPlan(res.data.plan || "FREE");
+          localStorage.setItem("plan", res.data.plan || "FREE");
+        }
 
-    const storedPlan = localStorage.getItem("plan");
-    if (storedPlan) setUserPlan(storedPlan);
-  }, []);
+      } catch {
+        setIsLoggedIn(false);
+
+      } finally {
+        setAuthLoading(false);
+      }
+    };
+    checkAuth();
+
+  }, [router]);
 
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("plan");
-    setIsLoggedIn(false);
-    router.push("/auth/signin");
+  const handleLogout = async () => {
+    try {
+      await axios.post("/api/auth/logout");
+      localStorage.removeItem("plan");
+      setIsLoggedIn(false);
+      router.push("/auth/signin");
+
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
   };
 
 
@@ -53,6 +81,8 @@ export default function BulkCreateLinks() {
     setFile(null);
     setStatus(null);
     setCreatedLinks([]);
+    setPassword("");
+    setExpiryDate("");
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
@@ -68,7 +98,7 @@ export default function BulkCreateLinks() {
     }
   };
 
-
+  
   const handleUpload = async () => {
     if (userPlan === "FREE") {
       router.push("/premium");
@@ -76,11 +106,24 @@ export default function BulkCreateLinks() {
     }
 
     if (!file) return;
+
+    if (expiryDate) {
+        const selected = new Date(expiryDate);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        if (selected < today) {
+            setStatus({ type: "error", message: "Invalid Date: Expiry cannot be in the past." });
+            return;
+        }
+    }
+
     setLoading(true);
     setStatus(null);
 
     const formData = new FormData();
     formData.append("file", file);
+    if (password) formData.append("password", password);
+    if (expiryDate) formData.append("expiryDate", expiryDate);
 
     try {
       const res = await axios.post("/api/shortUrl/bulkLinks", formData, {
@@ -89,7 +132,8 @@ export default function BulkCreateLinks() {
 
       setStatus({
         type: "success",
-        message: `Successfully created ${res.data.success.length} short links!` });
+        message: `Successfully created ${res.data.success.length} short links!` 
+      });
       setCreatedLinks(res.data.success || []);
       setFile(null);
 
@@ -132,6 +176,9 @@ export default function BulkCreateLinks() {
     a.click();
   };
 
+
+  if (authLoading) return null;
+
   
   return (
     <DashboardLayout isLoggedIn={isLoggedIn} handleLogout={handleLogout}>
@@ -147,28 +194,30 @@ export default function BulkCreateLinks() {
           <div className="flex flex-col gap-3">
             <div 
               onClick={() => !createdLinks.length && fileInputRef.current?.click()}
-              className={`border-2 border-dashed rounded-xl p-10 flex flex-col items-center justify-center transition-all duration-200
+              className={`border-2 border-dashed rounded-xl p-10 flex flex-col items-center justify-center transition-all duration-200 relative
                 ${createdLinks.length > 0 ? 'border-neutral-200 dark:border-neutral-800 bg-secondary/20 cursor-default' : file ? 'border-primary bg-primary/5 cursor-pointer' : 'border-neutral-300 dark:border-neutral-700 hover:border-primary cursor-pointer'}`}
             >
               <input type="file" accept=".csv" hidden ref={fileInputRef} onChange={handleFileChange} disabled={createdLinks.length > 0} className="cursor-pointer" />
               
               {file ? (
-                <div className="flex items-center gap-3">
-                  <IoDocumentTextOutline size={40} className="text-primary" />
-                  <div className="text-left">
-                    <p className="font-medium truncate max-w-[250px] text-foreground">{file.name}</p>
-                    <p className="text-xs text-muted-foreground">{(file.size / 1024).toFixed(2)} KB</p>
+                <div className="flex items-center justify-between w-full">
+                  <div className="flex items-center gap-4">
+                    <IoDocumentTextOutline size={44} className="text-primary" />
+                    <div className="text-left">
+                      <p className="font-semibold truncate max-w-[200px] sm:max-w-[350px] text-foreground text-lg">{file.name}</p>
+                      <p className="text-sm text-muted-foreground">{(file.size / 1024).toFixed(2)} KB</p>
+                    </div>
                   </div>
                   {!loading && (
-                    <button onClick={(e) => { e.stopPropagation(); setFile(null); }} className="p-1 hover:bg-destructive/10 rounded-full text-destructive cursor-pointer transition-colors">
-                      <IoCloseOutline size={20} />
+                    <button onClick={(e) => { e.stopPropagation(); setFile(null); }} className="p-2 hover:bg-destructive/10 rounded-full text-destructive cursor-pointer transition-colors">
+                      <IoCloseOutline size={32} />
                     </button>
                   )}
                 </div>
               ) : createdLinks.length > 0 ? (
                 <div className="flex flex-col items-center gap-2 text-green-500">
                   <IoCheckmarkCircleOutline size={48} />
-                  <p className="font-medium">File Processed Successfully</p>
+                  <p className="font-medium text-lg">File Processed Successfully</p>
                 </div>
               ) : (
                 <>
@@ -178,6 +227,49 @@ export default function BulkCreateLinks() {
               )}
             </div>
           </div>
+
+          {file && !createdLinks.length && (
+            <div className="grid grid-cols-1 gap-6 animate-in fade-in duration-300 border-t border-border pt-6">
+              <div className="space-y-2">
+                <label className="text-sm font-medium flex items-center gap-1">
+                  Password <span className="text-muted-foreground font-normal">(Optional)</span>
+                </label>
+                <div className="relative group">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Enter password"
+                    className="w-full p-3 bg-background border border-border rounded-lg outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all pr-12 text-foreground"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                  >
+                    {showPassword ? <IoEyeOffOutline size={20} /> : <IoEyeOutline size={20} />}
+                  </button>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium flex items-center gap-1">
+                  Set Expiry Date <span className="text-muted-foreground font-normal">(Optional)</span>
+                </label>
+                <div className="relative group">
+                  <input
+                    type="date"
+                    value={expiryDate}
+                    onChange={(e) => setExpiryDate(e.target.value)}
+                    className="w-full p-3 bg-background border border-border rounded-lg outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all pr-12 text-foreground appearance-none cursor-pointer"
+                  />
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
+                    <IoCalendarOutline size={20} />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {status && (
             <div className={`p-4 rounded-xl flex items-center gap-3 border ${
@@ -206,13 +298,13 @@ export default function BulkCreateLinks() {
             <button
               onClick={handleUpload}
               disabled={!file || loading}
-              className={`w-full py-4 rounded-xl font-bold text-white transition-all flex flex-col items-center justify-center cursor-pointer
-                ${!file || loading ? 'bg-neutral-400 dark:bg-neutral-800 cursor-not-allowed' : 'bg-primary hover:shadow-lg active:scale-[0.98]'}`}
+              className={`w-full py-4 rounded-xl font-bold transition-all flex flex-col items-center justify-center cursor-pointer
+                ${!file || loading ? 'bg-neutral-400 dark:bg-neutral-800 cursor-not-allowed text-white' : 'bg-primary hover:shadow-lg active:scale-[0.98] text-white dark:text-black'}`}
             >
               {loading ? (
                 <>
                   <div className="flex items-center gap-2">
-                    <div className="w-5 h-5 border-2 border-white/30 border-t-white animate-spin rounded-full" />
+                    <div className="w-5 h-5 border-2 border-current border-t-transparent animate-spin rounded-full" />
                     <span>Processing...</span>
                   </div>
                   <span className="text-[10px] font-normal opacity-80 uppercase tracking-widest mt-1">This may take some time, Please wait</span>
@@ -223,7 +315,10 @@ export default function BulkCreateLinks() {
             </button>
           ) : (
             <div className="flex flex-col sm:flex-row gap-3">
-              <button onClick={() => setShowDownloadModal(true)} className="flex-1 py-3 bg-primary text-primary-foreground rounded-xl font-bold flex items-center justify-center gap-2 hover:shadow-lg transition-all cursor-pointer">
+              <button 
+                onClick={() => setShowDownloadModal(true)} 
+                className="flex-1 py-3 bg-primary text-white dark:text-black rounded-xl font-bold flex items-center justify-center gap-2 hover:shadow-lg transition-all cursor-pointer"
+              >
                 <IoDownloadOutline size={20} /> Download Results
               </button>
             </div>
@@ -269,14 +364,14 @@ export default function BulkCreateLinks() {
               <div className="flex flex-col w-full gap-3">
                 <button 
                   onClick={() => router.push('/premium')}
-                  className="w-full py-4 bg-primary text-primary-foreground rounded-xl font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-all cursor-pointer"
+                  className="w-full py-4 bg-primary text-white dark:text-black rounded-xl font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-all cursor-pointer"
                 >
                   <IoRocketOutline size={20} />
                   Upgrade Now
                 </button>
                 <button 
                   onClick={() => setShowLimitModal(false)}
-                  className="w-full py-3 bg-secondary text-secondary-foreground rounded-xl font-bold cursor-pointer hover:bg-secondary/80 transition-colors"
+                  className="w-full py-3 bg-secondary text-secondary-foreground rounded-xl font-bold cursor-pointer transition-colors hover:bg-secondary/80"
                 >
                   Maybe Later
                 </button>
