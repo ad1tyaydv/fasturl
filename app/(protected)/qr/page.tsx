@@ -23,6 +23,7 @@ export default function QRGenerator() {
   const [loading, setLoading] = useState(false);
   const [showQr, setShowQr] = useState<string | null>(null);
   const [upgradeMsg, setUpgradeMsg] = useState(false);
+  const [authLoading, setAuthLoading] = useState(true);
 
   const [modalConfig, setModalConfig] = useState<{
     show: boolean;
@@ -82,6 +83,7 @@ export default function QRGenerator() {
         action: () => router.push("/auth/signin"),
         showPlans: false,
       });
+
       return;
     }
 
@@ -135,11 +137,17 @@ export default function QRGenerator() {
       try {
         const res = await axios.get("/api/auth/me");
         setIsLoggedIn(!!res.data.authenticated);
+
       } catch {
         setIsLoggedIn(false);
       }
+      finally {
+        setAuthLoading(false);
+      }
     };
+
     checkAuth();
+    
   }, [router]);
 
   const handleLogout = async () => {
@@ -307,12 +315,12 @@ export default function QRGenerator() {
             </div>
           )}
 
-          {!isLoggedIn && (
-            <div className="mt-6 flex font-two flex-col items-center justify-center text-sm sm:text-base text-muted-foreground">
+          {!authLoading && !isLoggedIn && (
+            <div className="mt-6 flex font-one flex-col items-center justify-center text-sm sm:text-base text-muted-foreground">
               <p>Sign in to download and save your QR codes</p>
               <button 
                 onClick={() => router.push("/auth/signin")}
-                className="font-semibold font-two mt-1 hover:underline cursor-pointer text-foreground"
+                className="font-semibold font-one mt-1 hover:underline cursor-pointer text-foreground"
               >
                 Login now
               </button>

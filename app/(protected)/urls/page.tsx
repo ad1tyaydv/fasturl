@@ -12,6 +12,7 @@ interface UrlItem {
   id: string;
   original: string;
   shorturl: string;
+  name?: string;
   clicks?: number;
   scans?: number; 
   qrImage?: string; 
@@ -29,8 +30,9 @@ export default function AllUrlsPage() {
   const [tier, setTier] = useState("FREE");
   const [loading, setLoading] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [selectedUrl, setSelectedUrl] = useState<UrlItem | null>(null);
+  const [updatingLinkId, setUpdatingLinkId] = useState<string | null>(null);
   
+  const [selectedUrl, setSelectedUrl] = useState<UrlItem | null>(null);
   const [isCustomModalOpen, setIsCustomModalOpen] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   
@@ -39,7 +41,6 @@ export default function AllUrlsPage() {
   const [expiryDate, setExpiryDate] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-
   const [isEditingPassword, setIsEditingPassword] = useState(false);
   const [isEditingExpiry, setIsEditingExpiry] = useState(false);
 
@@ -49,14 +50,13 @@ export default function AllUrlsPage() {
       try {
         const res = await axios.get("api/auth/me");
         setTier(res.data.plan);
-
       } catch (err) {
         console.error("Tier check failed", err);
       }
-    }
+    };
     checkTier();
 
-  }, [])
+  }, []);
 
 
   const fetchData = useCallback(async () => {
@@ -81,6 +81,7 @@ export default function AllUrlsPage() {
         }));
         setData(mappedQrs);
       }
+
     } catch (err) {
       console.error(`Error fetching ${view}:`, err);
 
@@ -89,20 +90,31 @@ export default function AllUrlsPage() {
     }
   }, [view]);
 
-  
+
   useEffect(() => {
     fetchData();
 
   }, [fetchData]);
 
 
-  const downloadQrAction = (qrImage: string, name: string) => {
-    const link = document.createElement("a");
-    link.href = qrImage;
-    link.download = `qr-${name}.png`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const handleUpdateName = async (id: string, newName: string) => {
+    setUpdatingLinkId(id);
+    try {
+      await axios.post("/api/shortUrl/linkName", {
+        linkId: id,
+        name: newName
+      });
+
+      setData((prev) =>
+        prev.map((link) => (link.id === id ? { ...link, name: newName } : link))
+      );
+
+    } catch (err) {
+      console.error("Failed to update name:", err);
+
+    } finally {
+      setUpdatingLinkId(null);
+    }
   };
 
 
@@ -110,7 +122,7 @@ export default function AllUrlsPage() {
     try {
       await axios.post(`/api/shortUrl/delete/${id}`);
       setData(data.filter((u) => u.id !== id));
-      
+
     } catch (err) {
       console.log("Error deleting item:", err);
     }
@@ -133,8 +145,8 @@ export default function AllUrlsPage() {
       try {
         const res = await axios.get("/api/auth/me");
         setIsLoggedIn(!!res.data.authenticated);
-      } catch { setIsLoggedIn(false); }
 
+      } catch { setIsLoggedIn(false); }
     };
     checkAuth();
 
@@ -158,7 +170,6 @@ export default function AllUrlsPage() {
   const handleCustomUrlClick = () => {
     if (tier === "FREE" || tier === "ESSENTIAL") {
       router.push("/premium");
-
     } else {
       setIsCustomModalOpen(true);
     }
@@ -176,7 +187,7 @@ export default function AllUrlsPage() {
   };
 
 
-const handleAddPassword = async () => {
+  const handleAddPassword = async () => {
     try {
       const finalPassword = isEditingPassword ? password : selectedUrl?.password;
       const finalExpiry = isEditingExpiry ? expiryDate : selectedUrl?.expiresAt;
@@ -217,6 +228,16 @@ const handleAddPassword = async () => {
   };
 
 
+  const downloadQrAction = (qrImage: string, name: string) => {
+    const link = document.createElement("a");
+    link.href = qrImage;
+    link.download = `qr-${name}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  
   return (
     <DashboardLayout isLoggedIn={isLoggedIn} handleLogout={async () => { await axios.post("/api/auth/logout"); router.push("/auth/signin"); }}>
       <div className="max-w-4xl mx-auto">
@@ -247,8 +268,20 @@ const handleAddPassword = async () => {
           </div>
         ) : (
           view === "links" ? 
-            <SavedLinks links={data} onSelect={setSelectedUrl} onDelete={handleDeleteLink} domain={NEXT_DOMAIN!} /> : 
-            <SavedQrs qrs={data} onSelect={setSelectedUrl} onDelete={handleDeleteQR} domain={NEXT_DOMAIN!} />
+            <SavedLinks 
+              links={data} 
+              onSelect={setSelectedUrl} 
+              onDelete={handleDeleteLink} 
+              domain={NEXT_DOMAIN!} 
+              onUpdateName={handleUpdateName}
+              updatingLinkId={updatingLinkId}
+            /> : 
+            <SavedQrs 
+              qrs={data} 
+              onSelect={setSelectedUrl} 
+              onDelete={handleDeleteQR} 
+              domain={NEXT_DOMAIN!} 
+            />
         )}
       </div>
 
@@ -283,7 +316,7 @@ const handleAddPassword = async () => {
                 </div>
                 <div>
                   <p className="text-[10px] sm:text-xs font-three uppercase tracking-widest mb-1 text-muted-foreground">CREATED AT</p>
-                  <p className="text-base sm:text-lg font-two muted-foreground">
+                  <p className="text-base sm:text-lg font-two text-foreground">
                     {selectedUrl.createdAt ? new Date(selectedUrl.createdAt).toLocaleString('en-US', {
                       year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
                     }) : "Not Available"}
@@ -340,14 +373,14 @@ const handleAddPassword = async () => {
               <div className="space-y-6 mb-8">
                 <div className="space-y-2">
                   <label className="text-xl font-one text-foreground">Current Short Url</label>
-                  <div className="w-full p-3 border border-border bg-secondary/30 muted-foreground font-three rounded-none">
+                  <div className="w-full p-3 border border-border bg-secondary/30 text-muted-foreground font-three rounded-none">
                     {NEXT_DOMAIN}/{selectedUrl.shorturl}
                   </div>
                 </div>
                 <div className="space-y-2">
                   <label className="text-xl font-one text-foreground">Custom Short Url</label>
                   <div className={`flex items-center border ${errorMessage ? 'border-red-500' : 'border-border'} bg-background focus-within:ring-1 focus-within:ring-primary rounded-none`}>
-                    <span className="pl-3 py-3 muted-foreground font-three bg-secondary/10 border-r border-border px-2">{NEXT_DOMAIN}/</span>
+                    <span className="pl-3 py-3 text-muted-foreground font-three bg-secondary/10 border-r border-border px-2">{NEXT_DOMAIN}/</span>
                     <input 
                       type="text"
                       maxLength={25}
@@ -360,7 +393,7 @@ const handleAddPassword = async () => {
                       className="flex-1 p-3 bg-transparent text-foreground font-three focus:outline-none"
                     />
                   </div>
-                  {errorMessage ? <p className="text-lg text-red-500 font-two mt-1">{errorMessage}</p> : <p className="text-[10px] font-three muted-foreground uppercase tracking-widest">Max 25 characters</p>}
+                  {errorMessage ? <p className="text-lg text-red-500 font-two mt-1">{errorMessage}</p> : <p className="text-[10px] font-three text-muted-foreground uppercase tracking-widest">Max 25 characters</p>}
                 </div>
               </div>
               <div className="flex justify-end">

@@ -68,50 +68,30 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ shor
         )
     }
 
-
-    await prisma.$transaction([
-        prisma.link.update({
-            where: {
-                shorturl: shortUrl 
-            },
-            data: {
-                clicks: {
-                    increment: 1
-                }
+    prisma.link.update({
+        where: {
+            shorturl: shortUrl
+        },
+        data: {
+            clicks: {
+                increment: 1
             }
-        }),
+        }
+    }),
 
-        prisma.click.create({
-            data: {
-                linkId: findUrl.id,
-                ip,
-                country: countryFullName,
-                state: stateFullName,
-                city,
-                browser,
-                device,
-                OS: operatingSystem,
-                referrer
-            }
-        }),
-
-            prisma.count.upsert({
-                where: {
-                    countId: ANON_USER_CLICK
-                },
-                update: {
-                    totalClicks: {
-                        increment: 1 
-                    }
-                },
-                create: {
-                    countId: ANON_USER_CLICK,
-                    linkCount: 0,
-                    qrCount: 0,
-                    totalClicks: 1
-                }
-            })
-        ]);
+    prisma.click.create({
+        data: {
+            linkId: findUrl.id,
+            ip,
+            country: countryFullName,
+            state: stateFullName,
+            city,
+            browser,
+            device,
+            OS: operatingSystem,
+            referrer
+        }
+    })
 
     return NextResponse.redirect(findUrl.original);
     

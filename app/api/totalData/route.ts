@@ -7,15 +7,10 @@ const ANON_USER_CLICK = process.env.ANONYMOUS_USER_CLICK!;
 export async function GET() {
 
     try {
-        const totalData = await prisma.count.findUnique({
-            where: {
-                countId: ANON_USER_CLICK
-            }
-        })
 
-        const totalLinks = totalData?.linkCount;
-        const totalQrs = totalData?.qrCount;
-        const totalClicks = totalLinks! + totalQrs!;
+        const totalLinks = await prisma.link.count();
+        const totalQrs = await prisma.qr.count();
+        const totalClicks = await prisma.click.count();
 
         return NextResponse.json(
             {message: "Total Data counted", totalLinks, totalQrs, totalClicks},

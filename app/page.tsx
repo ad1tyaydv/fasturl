@@ -14,6 +14,7 @@ import Navbar from "./components/navbar";
 import PricingSection from "./components/PricingSection";
 import TotalData from "./components/totalData";
 
+
 const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN;
 
 export default function Dashboard() {
@@ -27,6 +28,7 @@ export default function Dashboard() {
   const [copied, setCopied] = useState(false);
   const [showQr, setShowQr] = useState<string | boolean>(false);
   const [upgradeMsg, setUpgradeMsg] = useState(false);
+  const [authLoading, setAuthLoading] = useState(true);
 
 
   const [stats, setStats] = useState({ links: 0, qrs: 0, clicks: 0 });
@@ -160,16 +162,25 @@ export default function Dashboard() {
 
   useEffect(() => {
     const checkAuth = async () => {
+      
       try {
         const res = await axios.get("/api/auth/me");
         const authenticated = !!res.data.authenticated;
+
         setIsLoggedIn(authenticated);
-        if (authenticated) fetchUserStats();
+        if (authenticated) {
+          fetchUserStats();
+        }
 
       } catch {
         setIsLoggedIn(false);
       }
+
+      finally {
+        setAuthLoading(false);
+      }
     };
+
     checkAuth();
 
   }, [router]);
@@ -228,8 +239,16 @@ export default function Dashboard() {
 
       <section className="flex flex-col items-center justify-center px-4 sm:px-6 pt-16 md:pt-24 pb-12">
         <div className="text-center max-w-3xl w-full mx-auto">
-          <h1 className="text-3xl font-one sm:text-4xl md:text-5xl font-bold mb-4">
-            Shorten Your <span className="text-red-500">Links</span> Instantly
+          <h1 className="text-3xl font-one sm:text-4xl md:text-5xl font-bold mb-4 pt-12"> 
+            <span className="relative inline-block">
+              <span className="absolute -top-10 left-1/2 -translate-x-1/2 text-lg sm:text-xl md:text-5xl text-black">
+                Track
+              </span>
+
+              <span className="relative after:content-[''] after:absolute after:left-0 after:top-[55%] after:w-full after:h-[3px] after:bg-red-500">
+                Shorten
+              </span>
+            </span> Your <span className="text-red-500">Links</span> Instantly
           </h1>
           <p className="mb-8 font-one text-base sm:text-lg text-muted-foreground">
             Turn long and messy URLs into short, clean links you can easily share.
@@ -272,7 +291,7 @@ export default function Dashboard() {
             </div>
           )}
 
-          {!isLoggedIn && (
+          {!authLoading && !isLoggedIn && (
             <div className="mt-4 font-one text-xl text-muted-foreground">
               <p>You can only create 1 link/day</p>
               <button 
