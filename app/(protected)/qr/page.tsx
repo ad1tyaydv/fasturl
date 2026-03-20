@@ -12,6 +12,9 @@ import {
 } from "react-icons/io5";
 import { ModeToggle } from "../../components/toggleTheme";
 import PricingSection from "@/app/components/PricingSection";
+import FaqSection from "@/app/components/faqSection";
+import TotalData from "@/app/components/totalData";
+import Footer from "@/app/components/footer";
 
 
 export default function QRGenerator() {
@@ -380,6 +383,15 @@ export default function QRGenerator() {
           Upgrade to generate more!
         </div>
       )}
+
+      <div className="w-full h-px bg-gray-300 my-6"></div>
+
+      <FaqSection />
+      <div className="w-full h-px bg-gray-300 my-6"></div>
+      
+      <TotalData />
+
+      <Footer />      
     </div>
   );
 }

@@ -51,7 +51,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ shor
             else if (domain.includes("instagram")) referrer = "Instagram";
             else if (domain.includes("google")) referrer = "Google";
             else referrer = domain;
-            
+
         } catch {
 
         }
@@ -71,7 +71,11 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ shor
         )
     }
 
-    prisma.link.update({
+    if(findUrl.password) {
+        return NextResponse.redirect(new URL(`/verify/${shortUrl}`, req.url));
+    }
+
+    await prisma.link.update({
         where: {
             shorturl: shortUrl
         },
@@ -82,7 +86,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ shor
         }
     }),
 
-    prisma.click.create({
+    await prisma.click.create({
         data: {
             linkId: findUrl.id,
             ip,

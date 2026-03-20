@@ -27,7 +27,6 @@ export default function SavedLinks({
   const [tempName, setTempName] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   
-  // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
@@ -54,7 +53,6 @@ export default function SavedLinks({
     );
   });
 
-  // Pagination Logic
   const totalPages = Math.ceil(filteredLinks.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -71,7 +69,7 @@ export default function SavedLinks({
           value={searchQuery}
           onChange={(e) => {
             setSearchQuery(e.target.value);
-            setCurrentPage(1); // Reset to page 1 on search
+            setCurrentPage(1);
           }}
         />
       </div>

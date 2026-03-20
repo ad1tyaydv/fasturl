@@ -35,8 +35,6 @@ export default function Dashboard() {
   const [upgradeMsg, setUpgradeMsg] = useState(false);
   const [authLoading, setAuthLoading] = useState(true);
 
-  const [stats, setStats] = useState({ links: 0, qrs: 0, clicks: 0 });
-
   const [modalConfig, setModalConfig] = useState<{
     show: boolean;
     title: string;
@@ -70,7 +68,6 @@ export default function Dashboard() {
 
       setShortUrl(generatedShortUrl);
       setUrl(`${NEXT_DOMAIN}/${generatedShortUrl}`);
-      fetchUserStats();
 
     } catch (error: any) {
       if (error.response?.status === 429) {
@@ -116,25 +113,9 @@ export default function Dashboard() {
         longUrl: url
       });
       setShowQr(res.data.qrImage);
-      fetchUserStats();
 
     } catch (error: any) {
       if (error.response?.status === 429) slowScrollToPricing();
-    }
-  };
-
-
-  const fetchUserStats = async () => {
-    try {
-      const res = await axios.get("/api/totalData");
-      setStats({
-        links: res.data.totalLinks || 0,
-        qrs: res.data.totalQrs || 0,
-        clicks: res.data.totalClicks || 0
-      });
-
-    } catch (e) {
-      console.log("Stats not available yet");
     }
   };
 
@@ -153,7 +134,6 @@ export default function Dashboard() {
         if (authenticated) {
           setUserPlan(res.data.plan || "FREE");
           localStorage.setItem("plan", res.data.plan || "FREE");
-          fetchUserStats();
         }
 
       } catch {
@@ -196,7 +176,6 @@ export default function Dashboard() {
     setUrl("");
     setUserPlan("FREE");
     localStorage.removeItem("plan");
-    setStats({ links: 0, qrs: 0, clicks: 0 });
   };
 
   
@@ -337,11 +316,7 @@ export default function Dashboard() {
       <div className="w-full h-px bg-gray-300 my-6"></div>
 
       {isLoggedIn && (
-        <TotalData
-          totalLinks={stats.links}
-          totalQrs={stats.qrs}
-          totalClicks={stats.clicks}
-        />
+        <TotalData />
       )}
 
       <Footer />
