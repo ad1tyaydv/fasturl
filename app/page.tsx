@@ -15,6 +15,8 @@ import Navbar from "./components/navbar";
 import PricingSection from "./components/PricingSection";
 import TotalData from "./components/totalData";
 import ShortlyFeatures from "./components/features";
+import FaqSection from "./components/faqSection";
+import Footer from "./components/footer";
 
 const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN;
 
@@ -26,6 +28,7 @@ export default function Dashboard() {
   const [shortUrl, setShortUrl] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userPlan, setUserPlan] = useState("FREE");
+  const [linksLeft, setLinksLeft] = useState(0);
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const [showQr, setShowQr] = useState<string | boolean>(false);
@@ -48,15 +51,14 @@ export default function Dashboard() {
     action: () => { },
   });
 
-
   const slowScrollToPricing = () => {
     if (pricingRef.current) {
       pricingRef.current.scrollIntoView({ behavior: "smooth" });
     }
+
     setUpgradeMsg(true);
     setTimeout(() => setUpgradeMsg(false), 3000);
   };
-
 
   const handleShortUrl = async (originalUrl: string) => {
     if (!originalUrl) return;
@@ -103,12 +105,10 @@ export default function Dashboard() {
       return;
     }
 
-
     if (typeof showQr === "string") {
       setShowQr(false);
       return;
     }
-
 
     try {
       const res = await axios.post("/api/qrCode", {
@@ -126,7 +126,7 @@ export default function Dashboard() {
 
   const fetchUserStats = async () => {
     try {
-      const res = await axios.get("/api/totalData"); 
+      const res = await axios.get("/api/totalData");
       setStats({
         links: res.data.totalLinks || 0,
         qrs: res.data.totalQrs || 0,
@@ -143,9 +143,13 @@ export default function Dashboard() {
     const checkAuth = async () => {
       try {
         const res = await axios.get("/api/auth/me");
+        const count = await axios.get("/api/shortUrl/linksLeft")
+
         const authenticated = !!res.data.authenticated;
         setIsLoggedIn(authenticated);
-        
+
+        setLinksLeft(count.data.linksLeft);
+
         if (authenticated) {
           setUserPlan(res.data.plan || "FREE");
           localStorage.setItem("plan", res.data.plan || "FREE");
@@ -170,13 +174,14 @@ export default function Dashboard() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+
   const handleReset = () => {
     setShortUrl("");
     setUrl("");
     setShowQr(false);
   };
 
-
+  
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && url && !shortUrl && !loading) {
       handleShortUrl(url);
@@ -194,19 +199,19 @@ export default function Dashboard() {
     setStats({ links: 0, qrs: 0, clicks: 0 });
   };
 
-
+  
   return (
-    <div className="min-h-screen bg-background text-foreground relative transition-colors duration-300">
+    <div className="min-h-screen bg-background text-foreground relative transition-colors duration-300 overflow-x-hidden">
       <Navbar isLoggedIn={isLoggedIn} handleLogout={handleLogout} />
 
       {modalConfig.show && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 transition-opacity duration-150 cursor-pointer" onClick={() => setModalConfig({ ...modalConfig, show: false })}>
           <div className="bg-card border border-border rounded-none shadow-2xl relative p-8 max-w-sm w-full cursor-default" onClick={(e) => e.stopPropagation()}>
-            <button onClick={() => setModalConfig({ ...modalConfig, show: false })} className="absolute top-5 right-5 p-2 hover:bg-accent border border-border cursor-pointer bg-background">
+            <button onClick={() => setModalConfig({ ...modalConfig, show: false })} className="absolute top-5 right-5 p-2 hover:bg-accent border border-border cursor-pointer bg-background transition-colors">
               <IoCloseOutline size={24} />
             </button>
             <div className="text-center">
-              <h2 className="text-2xl font-bold mb-2 font-one text-foreground">{modalConfig.title}</h2>
+              <h2 className="text-2xl font-one font-bold mb-2 text-foreground">{modalConfig.title}</h2>
               <p className="text-muted-foreground mb-6 font-two">{modalConfig.description}</p>
               <button onClick={modalConfig.action} className="w-full py-3 bg-primary text-primary-foreground font-semibold cursor-pointer hover:bg-primary/90 transition-colors rounded-none">
                 {modalConfig.buttonText}
@@ -218,7 +223,7 @@ export default function Dashboard() {
 
       <section className="flex flex-col items-center justify-center px-4 sm:px-6 pt-16 md:pt-24 pb-12">
         <div className="text-center max-w-3xl w-full mx-auto">
-          <h1 className="text-3xl font-one sm:text-4xl md:text-5xl font-bold mb-4 pt-12 text-foreground"> 
+          <h1 className="text-3xl font-one sm:text-4xl md:text-5xl font-bold mb-4 pt-12 text-foreground">
             <span className="relative inline-block">
               <span className="absolute -top-10 left-1/2 -translate-x-1/2 text-lg sm:text-xl md:text-5xl text-foreground">
                 Track
@@ -260,6 +265,18 @@ export default function Dashboard() {
             )}
           </div>
 
+          {isLoggedIn && (
+            <div className="mt-4 text-center animate-in fade-in slide-in-from-top-2">
+              <span className="px-3 py-1.5 bg-secondary/50 border border-border text-sm font-medium text-muted-foreground">
+                {userPlan === "FREE" ? (
+                  <>You have <strong className="text-foreground">{linksLeft}</strong> links left for today</>
+                ) : (
+                  <>You have <strong className="text-foreground">{linksLeft}</strong> links left this month</>
+                )}
+              </span>
+            </div>
+          )}
+
           {showQr && typeof showQr === "string" && (
             <div className="mt-6 flex flex-col items-center animate-in fade-in zoom-in duration-300">
               <div className="bg-white p-4 rounded-none shadow-lg border border-border">
@@ -272,7 +289,7 @@ export default function Dashboard() {
           {!authLoading && !isLoggedIn && (
             <div className="mt-4 font-one text-xl text-muted-foreground">
               <p>You can only create 1 link/day</p>
-              <button 
+              <button
                 onClick={() => router.push("/auth/signin")}
                 className="font-one mt-1 underline cursor-pointer text-foreground hover:text-primary transition-colors">
                 Login to create more
@@ -285,21 +302,25 @@ export default function Dashboard() {
       <section className="flex flex-col items-center justify-center px-4 sm:px-6 py-12 border-b border-border bg-neutral-50 dark:bg-transparent transition-colors duration-300">
         <div className="mt-2 w-full max-w-3xl flex flex-col items-center text-center">
           <h2 className="text-2xl font-three sm:text-3xl font-bold mb-3 text-foreground">Manage Your Content</h2>
-          <button 
-            onClick={() => router.push('/urls')} 
+          <button
+            onClick={() => router.push('/urls')}
             className="w-full font-one sm:w-auto group flex justify-center items-center gap-2 border-2 border-input bg-background px-6 sm:px-8 py-3 rounded-none transition font-semibold text-lg hover:bg-accent cursor-pointer">
             See all your short URLs <IoArrowForwardOutline size={20} className="group-hover:translate-x-1 transition-transform" />
           </button>
         </div>
       </section>
 
-      <div className="pb-12">
-        <ShortlyFeatures isLoggedIn={isLoggedIn} userPlan={userPlan} />
-      </div>
+      <ShortlyFeatures isLoggedIn={isLoggedIn} userPlan={userPlan} />
+
+      <div className="w-full h-px bg-gray-300 my-6"></div>
 
       <div ref={pricingRef}>
         <PricingSection />
       </div>
+
+      <div className="w-full h-px bg-gray-300 my-6"></div>
+
+      <FaqSection />
 
       {copied && (
         <div className="fixed font-two top-20 sm:top-24 left-1/2 -translate-x-1/2 px-6 py-2 shadow-lg text-sm z-[100] bg-primary text-primary-foreground rounded-none animate-in fade-in slide-in-from-top-4 duration-300">
@@ -313,13 +334,17 @@ export default function Dashboard() {
         </div>
       )}
 
+      <div className="w-full h-px bg-gray-300 my-6"></div>
+
       {isLoggedIn && (
-        <TotalData 
+        <TotalData
           totalLinks={stats.links}
-          totalQrs={stats.qrs} 
-          totalClicks={stats.clicks} 
+          totalQrs={stats.qrs}
+          totalClicks={stats.clicks}
         />
       )}
+
+      <Footer />
     </div>
   );
 }

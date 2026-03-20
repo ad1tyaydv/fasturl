@@ -51,7 +51,10 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ shor
             else if (domain.includes("instagram")) referrer = "Instagram";
             else if (domain.includes("google")) referrer = "Google";
             else referrer = domain;
-        } catch { }
+            
+        } catch {
+
+        }
     }
 
 

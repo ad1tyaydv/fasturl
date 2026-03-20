@@ -7,10 +7,10 @@ export default function PricingSection() {
   const router = useRouter();
 
   const Check = () => (
-    <IoCheckmarkOutline className="text-green-500 font-bold ml-2 shrink-0" size={22} />
+    <IoCheckmarkOutline className="text-green-500 font-bold ml-2 shrink-0" size={25} />
   );
   const Cross = () => (
-    <IoCloseOutline className="text-red-500 font-bold ml-2 shrink-0" size={22} />
+    <IoCloseOutline className="text-red-500 font-bold ml-2 shrink-0" size={25} />
   );
 
   return (
@@ -29,7 +29,7 @@ export default function PricingSection() {
         <div className="border border-border rounded-xl p-6 bg-card flex flex-col shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300">
           <div className="text-center border-b border-border pb-4 mb-5">
             <h3 className="text-2xl font-bold tracking-wide">FREE</h3>
-            <p className="text-3xl font-extrabold mt-2">$0</p>
+            <p className="text-3xl font-extrabold mt-2">₹0</p>
           </div>
           <div className="flex-1 space-y-3 text-base sm:text-lg font-medium">
             <p className="flex items-center">20 links/day <Check /></p>
@@ -49,11 +49,12 @@ export default function PricingSection() {
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
                   <span className="flex items-center whitespace-nowrap">Devices <Cross /></span>
                   <span className="flex items-center whitespace-nowrap">Top Referrers <Cross /></span>
+                  <span className="flex items-center whitespace-nowrap">⭐Bulk Link Creation <Cross /></span>
                 </div>
                 <div className="pt-2 space-y-2 border-t border-border/30">
-                  <p className="flex items-center justify-between">Custom short URLs <Cross /></p>
-                  <p className="flex items-center justify-between">Custom Domains <Cross /></p>
-                  <p className="flex items-center justify-between">Password protection <Cross /></p>
+                  <p className="flex items-center justify-between">⭐Custom short URLs <Cross /></p>
+                  <p className="flex items-center justify-between">⭐Custom Domains <Cross /></p>
+                  <p className="flex items-center justify-between">⭐Password protection <Cross /></p>
                 </div>
               </div>
             </div>
@@ -74,8 +75,8 @@ export default function PricingSection() {
             <div className="text-center border-b border-border pb-4 mb-5 pt-2">
               <h3 className="text-2xl font-bold mb-1">Essentials</h3>
               <div className="flex items-center justify-center gap-2 mt-2">
-                <span className="text-3xl line-through text-red-500 decoration-2 decoration-red-500">$12</span>
-                <p className="text-4xl font-extrabold">$6<span className="text-sm font-normal text-muted-foreground">/mo</span></p>
+                <span className="text-3xl line-through text-red-500 decoration-2 decoration-red-500">₹1200</span>
+                <p className="text-4xl font-extrabold">₹600<span className="text-sm font-normal text-muted-foreground">/mo</span></p>
               </div>
             </div>
             <div className="flex-1 space-y-3 text-base sm:text-lg font-medium">
@@ -96,11 +97,12 @@ export default function PricingSection() {
                   <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
                     <span className="flex items-center whitespace-nowrap">Devices <Check /></span>
                     <span className="flex items-center whitespace-nowrap">Top Referrers <Check /></span>
+                    <span className="flex items-center whitespace-nowrap">⭐Bulk Link Creation <Check /></span>
                   </div>
                   <div className="pt-2 space-y-2 border-t border-border/30">
-                    <p className="flex items-center justify-between">Custom short URLs <Cross /></p>
-                    <p className="flex items-center justify-between">Custom Domains <Cross /></p>
-                    <p className="flex items-center justify-between">Password protection <Cross /></p>
+                    <p className="flex items-center justify-between">⭐Custom short URLs <Cross /></p>
+                    <p className="flex items-center justify-between">⭐Custom Domains <Cross /></p>
+                    <p className="flex items-center justify-between">⭐Password protection <Cross /></p>
                   </div>
                 </div>
               </div>
@@ -113,10 +115,10 @@ export default function PricingSection() {
 
         <div className="border border-border rounded-xl p-6 bg-card flex flex-col shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300">
           <div className="text-center border-b border-border pb-4 mb-5">
-            <h3 className="text-2xl font-three mb-1">PRO</h3>
+            <h3 className="text-2xl font-bold mb-1">PRO</h3>
             <div className="flex items-center justify-center gap-2 mt-2">
-              <span className="text-3xl line-through text-red-500 decoration-2 decoration-red-500">$60</span>
-              <p className="text-3xl font-extrabold">$30<span className="text-sm font-normal text-muted-foreground">/mo</span></p>
+              <span className="text-3xl line-through text-red-500 decoration-2 decoration-red-500">₹5600</span>
+              <p className="text-3xl font-extrabold">₹2700<span className="text-sm font-normal text-muted-foreground">/mo</span></p>
             </div>
           </div>
           <div className="flex-1 space-y-3 text-base sm:text-lg font-medium">
@@ -137,11 +139,12 @@ export default function PricingSection() {
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
                   <span className="flex items-center whitespace-nowrap">Devices <Check /></span>
                   <span className="flex items-center whitespace-nowrap">Top Referrers <Check /></span>
+                  <span className="flex items-center whitespace-nowrap">⭐Bulk Link Creation <Check /></span>
                 </div>
                 <div className="pt-2 space-y-2 border-t border-border/30">
-                  <p className="flex items-center justify-between">Custom short URLs <Check /></p>
-                  <p className="flex items-center justify-between">Custom Domains <Check /></p>
-                  <p className="flex items-center justify-between">Password protection <Check /></p>
+                  <p className="flex items-center justify-between">⭐Custom short URLs <Check /></p>
+                  <p className="flex items-center justify-between">⭐Custom Domains <Check /></p>
+                  <p className="flex items-center justify-between">⭐Password protection <Check /></p>
                 </div>
               </div>
             </div>

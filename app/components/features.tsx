@@ -68,8 +68,8 @@ export default function ShortlyFeatures({ isLoggedIn, userPlan }: ShortlyFeature
     <section className="py-20 px-4 bg-background border-t border-border transition-colors duration-300">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-one font-bold mb-3 text-foreground">Shortly Plan Includes</h2>
-          <p className="text-muted-foreground font-two">Premium tools to help you manage and track your brand's reach.</p>
+          <h2 className="text-4xl font-three font-bold mb-3 text-foreground">Shortly Plan Includes</h2>
+          <p className="text-muted-foreground font-one">Premium tools to help you manage and track your brand's reach.</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -79,12 +79,12 @@ export default function ShortlyFeatures({ isLoggedIn, userPlan }: ShortlyFeature
                 {f.icon}
               </div>
               <h3 className="text-xl font-one font-bold mb-2 text-foreground">{f.title}</h3>
-              <p className="text-sm text-muted-foreground font-two mb-8 flex-1 leading-relaxed">
+              <p className="text-sm text-muted-foreground font-three mb-8 flex-1 leading-relaxed">
                 {f.desc}
               </p>
               <button
                 onClick={() => handleAccess(f.path)}
-                className={`w-full py-4 text-white font-bold flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-[0.97] rounded-none ${f.color}`}
+                className={`w-full py-4 text-white font-one flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-[0.97] rounded-none ${f.color}`}
               >
                 Access Feature <IoArrowForwardOutline size={18} />
               </button>

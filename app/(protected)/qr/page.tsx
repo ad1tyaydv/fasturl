@@ -20,6 +20,8 @@ export default function QRGenerator() {
 
   const [url, setUrl] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userPlan, setUserPlan] = useState("FREE");
+  const [qrsLeft, setQrsLeft] = useState(0);
   const [loading, setLoading] = useState(false);
   const [showQr, setShowQr] = useState<string | null>(null);
   const [upgradeMsg, setUpgradeMsg] = useState(false);
@@ -96,14 +98,14 @@ export default function QRGenerator() {
 
       setShowQr(res.data.qrImage);
 
+      const count = await axios.get("/api/shortUrl/linksLeft");
+      setQrsLeft(count.data.linksLeft);
+
     } catch (error: any) {
       if (error.response?.status === 429) {
-
         slowScrollToPricing();
       }
-
       console.log("Error while generating qr code", error);
-
     } finally {
       setLoading(false);
     }
@@ -136,7 +138,16 @@ export default function QRGenerator() {
     const checkAuth = async () => {
       try {
         const res = await axios.get("/api/auth/me");
-        setIsLoggedIn(!!res.data.authenticated);
+        const count = await axios.get("/api/qrCode/qrLeft");
+        
+        const authenticated = !!res.data.authenticated;
+        setIsLoggedIn(authenticated);
+        setQrsLeft(count.data.qrLeft);
+        console.log(count.data);
+
+        if (authenticated) {
+          setUserPlan(res.data.plan || "FREE");
+        }
 
       } catch {
         setIsLoggedIn(false);
@@ -153,6 +164,8 @@ export default function QRGenerator() {
   const handleLogout = async () => {
     await axios.post("/api/auth/logout");
     setIsLoggedIn(false);
+    setUserPlan("FREE");
+    setQrsLeft(0);
   };
 
 
@@ -305,6 +318,18 @@ export default function QRGenerator() {
               )}
             </div>
           </div>
+
+          {isLoggedIn && (
+            <div className="mt-4 text-center animate-in fade-in slide-in-from-top-2">
+              <span className="px-3 py-1.5 bg-secondary/50 border border-border text-sm font-medium text-muted-foreground rounded-lg">
+                {userPlan === "FREE" ? (
+                  <>You have <strong className="text-foreground">{qrsLeft}</strong> QR codes left for today</>
+                ) : (
+                  <>You have <strong className="text-foreground">{qrsLeft}</strong> QR codes left this month</>
+                )}
+              </span>
+            </div>
+          )}
 
           {showQr && (
             <div className="mt-8 flex flex-col items-center animate-in fade-in slide-in-from-top-4 duration-500">
