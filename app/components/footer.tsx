@@ -8,6 +8,7 @@ import {
   IoLogoTwitter 
 } from "react-icons/io5";
 
+
 export default function Footer() {
   const currentYear = new Date().getFullYear();
 
@@ -53,20 +54,21 @@ export default function Footer() {
     },
   ];
 
+  
   return (
-    <footer className="bg-background text-foreground border-t border-border transition-colors duration-300">
+    <footer className="bg-[#141414] text-white border-t border-neutral-800 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-6 py-16">
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-10">
           
           {footerLinks.map((section, idx) => (
             <div key={idx} className="flex flex-col gap-4">
-              <h4 className="font-one font-bold text-lg">{section.title}</h4>
+              <h4 className="font-one font-bold text-lg text-white">{section.title}</h4>
               <ul className="flex flex-col gap-2">
                 {section.links.map((link, lIdx) => (
                   <li key={lIdx}>
                     <Link 
                       href={link.href} 
-                      className="text-muted-foreground hover:text-primary transition-colors text-sm font-two"
+                      className="text-neutral-400 hover:text-blue-500 transition-colors text-sm font-two"
                     >
                       {link.name}
                     </Link>
@@ -78,25 +80,25 @@ export default function Footer() {
 
           <div className="col-span-2 flex flex-col items-center lg:items-end justify-center lg:justify-start gap-6 lg:ml-auto">
             <div className="flex gap-6">
-              <Link href="#" className="hover:text-primary transition-colors cursor-pointer">
+              <Link href="#" className="text-neutral-400 hover:text-white transition-colors cursor-pointer">
                 <IoLogoFacebook size={22} />
               </Link>
-              <Link href="#" className="hover:text-primary transition-colors cursor-pointer">
+              <Link href="#" className="text-neutral-400 hover:text-white transition-colors cursor-pointer">
                 <IoLogoInstagram size={22} />
               </Link>
-              <Link href="#" className="hover:text-primary transition-colors cursor-pointer">
+              <Link href="#" className="text-neutral-400 hover:text-white transition-colors cursor-pointer">
                 <IoLogoLinkedin size={22} />
               </Link>
-              <Link href="#" className="hover:text-primary transition-colors cursor-pointer">
+              <Link href="#" className="text-neutral-400 hover:text-white transition-colors cursor-pointer">
                 <IoLogoTwitter size={22} />
               </Link>
             </div>
 
             <div className="text-center lg:text-right">
-              <h2 className="text-4xl font-one font-black tracking-tighter mb-2">
+              <h2 className="text-4xl font-one font-black tracking-tighter mb-2 text-white">
                 SHORTLY
               </h2>
-              <p className="text-xs text-muted-foreground font-two leading-relaxed">
+              <p className="text-xs text-neutral-500 font-two leading-relaxed">
                 © {currentYear} Shortly LLC <br />
                 All Rights Reserved
               </p>

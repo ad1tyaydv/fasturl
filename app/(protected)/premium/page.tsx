@@ -3,13 +3,13 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import DashboardLayout from "../../components/dashBoardComponent";
+import Navbar from "../../components/navbar";
 import PricingSection from "@/app/components/PricingSection";
+
 
 export default function PremiumPage() {
   const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -21,24 +21,31 @@ export default function PremiumPage() {
       }
     };
     checkAuth();
+
   }, [router]);
 
 
   const handleLogout = async () => {
-    await axios.post("/api/auth/logout");
-    router.push("/auth/signin");
+    try {
+      await axios.post("/api/auth/logout");
+      setIsLoggedIn(false);
+      router.push("/auth/signin");
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
   };
 
-
   return (
-    <DashboardLayout isLoggedIn={isLoggedIn} handleLogout={handleLogout}>
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-[#141414] text-white transition-colors duration-300">
+      <Navbar isLoggedIn={isLoggedIn} handleLogout={handleLogout} />
+
+      <main className="max-w-7xl mx-auto px-4 py-10">
         <section className="px-4 sm:px-8 py-0 max-w-6xl mx-auto flex flex-col items-center justify-start">
-          <div>
+          <div className="w-full">
             <PricingSection />
           </div>
         </section>
-      </div>
-    </DashboardLayout>
+      </main>
+    </div>
   );
 }

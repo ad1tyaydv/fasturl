@@ -3,22 +3,22 @@
 import React from "react";
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from "recharts";
 import { IoArrowForwardOutline } from "react-icons/io5";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899", "#14b8a6"];
+
 
 const CustomTooltip = ({ active, payload }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-card border border-border p-3 rounded-lg shadow-md text-foreground z-50">
+      <div className="bg-[#1c1c1c] border border-neutral-800 p-3 rounded-lg shadow-md text-white z-50">
         <p className="font-semibold text-sm">{payload[0].name}</p>
-        <p className="text-xs text-primary font-bold mt-1">{payload[0].value} clicks</p>
+        <p className="text-xs text-blue-500 font-bold mt-1">{payload[0].value} clicks</p>
       </div>
     );
   }
   return null;
-  
 };
+
 
 interface AnalyticsCardItemProps {
   title: string;
@@ -39,21 +39,21 @@ export const AnalyticsCardItem = ({
   onExpand,
 }: AnalyticsCardItemProps) => {
 
-
   return (
-    <Card className="bg-card border-border shadow-sm flex flex-col h-full hover:shadow-md transition-shadow">
-      <CardHeader className="pb-2 flex flex-row items-center justify-between">
-        <CardTitle className="text-md font-bold flex items-center gap-2 text-foreground">
-          <span className="text-primary">{icon}</span> {title}
-        </CardTitle>
+    <div className="bg-[#1c1c1c] border border-neutral-800 rounded-xl shadow-sm flex flex-col h-full hover:shadow-lg hover:shadow-black/50 transition-all">
+      <div className="p-6 pb-2 flex flex-row items-center justify-between">
+        <h3 className="text-md font-bold flex items-center gap-2 text-white">
+          <span className="text-blue-500">{icon}</span> {title}
+        </h3>
         <button
           onClick={onExpand}
-          className="p-1.5 rounded-full text-muted-foreground hover:bg-secondary hover:text-foreground transition-all cursor-pointer"
+          className="p-1.5 rounded-full text-neutral-400 hover:bg-[#2a2a2a] hover:text-white transition-all cursor-pointer"
         >
           <IoArrowForwardOutline size={18} />
         </button>
-      </CardHeader>
-      <CardContent className="flex-1">
+      </div>
+      
+      <div className="p-6 pt-0 flex-1">
         <div className="flex flex-col sm:flex-row items-center h-[220px] mt-2">
           {data && data.length > 0 ? (
             <>
@@ -84,27 +84,26 @@ export const AnalyticsCardItem = ({
                 {data.slice(0, 4).map((item: any, index: number) => (
                   <div
                     key={`${item[nameKey]}-${index}`}
-                    className="flex justify-between items-center text-xs border-b border-border/50 pb-1.5"
+                    className="flex justify-between items-center text-xs border-b border-neutral-800 pb-1.5"
                   >
-                    <span className="truncate max-w-[110px] font-medium text-muted-foreground">
+                    <span className="truncate max-w-[110px] font-medium text-neutral-400">
                       {item[nameKey] || "Unknown"}
                     </span>
-                    <span className="font-bold text-foreground">{item.count}</span>
+                    <span className="font-bold text-white">{item.count}</span>
                   </div>
                 ))}
               </div>
             </>
           ) : (
             <div className="flex flex-col items-center justify-center w-full h-full space-y-2">
-              <div className="w-12 h-12 rounded-full bg-muted/30 flex items-center justify-center text-muted-foreground/50">
+              <div className="w-12 h-12 rounded-full bg-[#2a2a2a] flex items-center justify-center text-neutral-600">
                 {icon}
               </div>
-              <p className="text-muted-foreground font-two text-xl italic">No data available</p>
+              <p className="text-neutral-500 font-two text-xl italic">No data available</p>
             </div>
           )}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
-  
 };

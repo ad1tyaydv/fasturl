@@ -35,6 +35,7 @@ const faqs: FaqItem[] = [
   }
 ];
 
+
 export default function FaqSection() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
@@ -42,35 +43,36 @@ export default function FaqSection() {
     setOpenIndex(openIndex === index ? null : index);
   };
 
+  
   return (
-    <section className="py-24 px-4 bg-background transition-colors duration-300">
+    <section className="py-24 px-4 bg-[#141414] transition-colors duration-300">
       <div className="max-w-6xl mx-auto flex flex-col lg:flex-row gap-12 lg:gap-24">
         
         <div className="lg:w-1/3">
-          <h2 className="text-4xl sm:text-5xl font-three font-bold text-foreground leading-tight">
+          <h2 className="text-4xl sm:text-5xl font-three font-bold text-white leading-tight">
             Frequently Asked Questions
           </h2>
-          <p className="mt-4 text-muted-foreground font-one text-lg">
+          <p className="mt-4 text-neutral-400 font-one text-lg">
             Have questions about Shortly? We've got answers. If you can't find what you're looking for, feel free to contact our support team.
           </p>
         </div>
 
-        <div className="lg:w-2/3 border-t border-border">
+        <div className="lg:w-2/3 border-t border-neutral-800">
           {faqs.map((faq, index) => (
             <div 
               key={index} 
-              className="border-b border-border transition-all duration-200"
+              className="border-b border-neutral-800 transition-all duration-200"
             >
               <button
                 onClick={() => toggleFaq(index)}
                 className="w-full py-6 flex items-center justify-between text-left group cursor-pointer"
               >
-                <span className={`text-lg font-three font-bold transition-colors ${openIndex === index ? 'text-primary' : 'text-foreground group-hover:text-primary'}`}>
+                <span className={`text-lg font-three font-bold transition-colors ${openIndex === index ? 'text-blue-500' : 'text-white group-hover:text-blue-500'}`}>
                   {faq.question}
                 </span>
                 <IoChevronDownOutline 
                   size={20} 
-                  className={`text-muted-foreground transition-transform duration-300 ${openIndex === index ? 'rotate-180 text-primary' : ''}`} 
+                  className={`text-neutral-400 transition-transform duration-300 ${openIndex === index ? 'rotate-180 text-blue-500' : ''}`} 
                 />
               </button>
               
@@ -79,7 +81,7 @@ export default function FaqSection() {
                   openIndex === index ? 'max-h-96 opacity-100 pb-6' : 'max-h-0 opacity-0'
                 }`}
               >
-                <p className="text-muted-foreground font-one leading-relaxed">
+                <p className="text-neutral-400 font-one leading-relaxed">
                   {faq.answer}
                 </p>
               </div>
