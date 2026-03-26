@@ -233,7 +233,7 @@ export default function BulkCreateLinks() {
 
   const handleDelete = async (id: string) => {
     try {
-      await axios.post(`/api/shortUrl/bulkLinks/delete/${id}`);
+      await axios.delete(`/api/shortUrl/bulkLinks/delete/${id}`);
 
       setPastBulkLinks((prev) => prev.filter((link) => link.id !== id));
       

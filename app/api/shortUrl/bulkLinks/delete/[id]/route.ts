@@ -2,7 +2,7 @@ import { prisma } from "@/lib/dbConfig";
 import { NextRequest, NextResponse } from "next/server";
 
 
-export async function POST(req: NextRequest, { params } : {params: { id: string } }) {
+export async function DELETE(req: NextRequest, { params } : {params: { id: string } }) {
 
     const { id } = params;
 

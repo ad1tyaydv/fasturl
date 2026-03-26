@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/dbConfig";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
 
 export async function POST({ params }: { params: Promise<{ id: string}> } ) {
