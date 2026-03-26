@@ -2,9 +2,9 @@ import { prisma } from "@/lib/dbConfig";
 import { NextRequest, NextResponse } from "next/server";
 
 
-export async function POST(req: NextRequest, context : {params: Promise<{ id: string }> }) {
+export async function POST(req: NextRequest, { params } : {params: { id: string } }) {
 
-    const { id } = await context.params;
+    const { id } = params;
 
     try {
 
