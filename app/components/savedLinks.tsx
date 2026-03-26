@@ -14,8 +14,9 @@ import {
   IoOpenOutline,
   IoQrCodeOutline,
   IoShareSocialOutline,
-  IoColorWandOutline // Icon for Custom URL
+  IoColorWandOutline
 } from "react-icons/io5";
+
 
 interface SavedLinksProps {
   links: any[];
@@ -45,9 +46,10 @@ const getRelativeTime = (dateString?: string) => {
 };
 
 
+const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN;
+
 export default function SavedLinks({ 
-  links, 
-  onSelect, 
+  links,
   onDelete, 
   onUpdateName, 
   domain,
@@ -89,7 +91,7 @@ export default function SavedLinks({
     );
   });
 
-  
+
   const totalPages = Math.ceil(filteredLinks.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -120,7 +122,6 @@ export default function SavedLinks({
             {currentLinks.map((url) => (
               <div
                 key={url.id}
-                // Box click removed, cursor changed to default to prevent modal popping
                 className="flex items-center justify-between py-5 px-4 border-b border-neutral-800/60 hover:bg-[#1a1a1a] transition-colors cursor-default group w-full"
               >
                 <div className="flex items-start gap-4 w-[40%] min-w-0 pr-4">
@@ -186,13 +187,13 @@ export default function SavedLinks({
                   <button 
                     onClick={() => window.open(`${domain}/${url.shorturl}`, '_blank')} 
                     className="hover:text-white hover:bg-neutral-800 p-2 rounded-md transition-colors cursor-pointer"
-                    title="Open Link in New Tab"
+                    title="Open Link"
                   >
                     <IoOpenOutline size={18} />
                   </button>
 
                   <button 
-                    onClick={(e) => copyToClipboard(e, `${domain}/${url.shorturl}`, url.id)} 
+                    onClick={(e) => copyToClipboard(e, `${NEXT_DOMAIN}/${url.shorturl}`, url.id)} 
                     className={`transition-colors p-2 rounded-md hover:bg-neutral-800 cursor-pointer ${copiedUrlId === url.id ? "text-green-500" : "hover:text-white"}`}
                     title="Copy Short URL"
                   >

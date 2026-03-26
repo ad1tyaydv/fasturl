@@ -129,6 +129,16 @@ export async function POST(req: NextRequest) {
         const success: any[] = [];
         const failed: any[] = [];
 
+
+        const bulkLinks = await prisma.bulkLinks.create({
+            data: {
+                userId: decoded.userId,
+                name: "Fix the name",
+                password: hashedPassword,
+                expiresAt: expiresAt
+            }
+        })
+
         for (let row of validLinks) {
             const url = row.url?.trim();
 
@@ -141,7 +151,9 @@ export async function POST(req: NextRequest) {
                         original: url,
                         shorturl: shortUrl,
                         password: hashedPassword,
-                        expiresAt: expiresAt
+                        expiresAt: expiresAt,
+                        bulkLinksId: bulkLinks.id,
+                        checkBulk: true
                     }
                 })
 

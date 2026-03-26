@@ -42,8 +42,15 @@ export async function GET(req: NextRequest) {
                 id: userId
             },
             select: {
-                links: true
-            }
+                links: {
+                    where: {
+                        checkBulk: false
+                    },
+                     orderBy: {
+                        createdAt: "asc"
+                    }
+                }
+            },
         })
 
         return NextResponse.json(

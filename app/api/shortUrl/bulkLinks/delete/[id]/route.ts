@@ -2,27 +2,26 @@ import { prisma } from "@/lib/dbConfig";
 import { NextRequest, NextResponse } from "next/server";
 
 
-export async function POST({ params }: { params: Promise<{ id: string}> } ) {
+export async function POST(req: NextRequest, { params }: {params: Promise<{ id: string }> }) {
 
     const { id } = await params;
 
     try {
 
-        await prisma.link.delete({
+        await prisma.bulkLinks.delete({
             where: {
-                id: id
+                id: id,
             }
         })
 
         return NextResponse.json(
-            {message: "Link deleted successfully"},
+            {message: "Bulk link deleted"},
             {status: 200}
         )
-        
+
     } catch (error) {
-        console.log(error);
         return NextResponse.json(
-            {message: "Error while deleting the url"},
+            {message: "Error while deleting bulk links"},
             {status: 500}
         )
     }

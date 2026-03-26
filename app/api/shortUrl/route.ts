@@ -23,7 +23,6 @@ export async function POST(req: NextRequest) {
     let userId: string;
     let count: number = 0;
     let decoded;
-    let urlAlreadyExists = null;
 
     if (!token) {
       userId = ANON_USER_ID;
@@ -137,16 +136,26 @@ export async function POST(req: NextRequest) {
       }
     }
 
+
+    let originalLink = ""
+    let link = data.url;
+    if(link.startsWith("https://") && link.startsWith("http://")) {
+      originalLink = "https://" + link;
+    } else {
+      originalLink = link;
+    }
+
+
     const shortUrl = shortUrlGenerator();
 
-    const urlShort = await prisma.link.create({
-      data: {
-        userId: userId,
-        original: data.url,
-        shorturl: shortUrl,
-        ipAddress: ip,
-      },
-    });
+      const urlShort = await prisma.link.create({
+        data: {
+          userId: userId,
+          original: originalLink,
+          shorturl: shortUrl,
+          ipAddress: ip,
+        },
+      });
 
     return NextResponse.json({
       message: "Short URL created!",

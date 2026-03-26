@@ -27,6 +27,7 @@ model User {
 
   links          Link[]
   qr             Qr[]
+  bulkLinks      BulkLinks[]
 
   createdAt      DateTime    @default(now())
 }
@@ -36,8 +37,14 @@ model Link {
   linkName     String?
   shorturl     String      @unique
   original     String
+
   clicks       Int         @default(0)
   clickLogs    Click[]
+
+  bulkLinksId  String?
+  bulk         BulkLinks?  @relation(fields: [bulkLinksId], references: [id])
+
+  checkBulk  Boolean     @default(false)
 
   ipAddress    String?
 
@@ -94,6 +101,22 @@ model Qr {
   user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt   DateTime    @default(now())
+}
+
+model BulkLinks {
+  id         String      @id @default(uuid())
+
+  name       String      @default("")
+
+  password   String?
+  expiresAt  DateTime?
+
+  links      Link[]
+
+  userId     String
+  user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt  DateTime     @default(now())
 }
 
 model Count {
