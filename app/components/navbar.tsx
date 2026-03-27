@@ -2,19 +2,20 @@
 
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import axios from "axios";
-
-interface NavbarProps {
-  isLoggedIn: boolean;
-  handleLogout: () => void;
-}
+import { useUser } from "./userContext";
 
 
-export default function Navbar({ isLoggedIn, handleLogout }: NavbarProps) {
+export default function Navbar() {
   const router = useRouter();
+  const { user, setUser } = useUser();
   const pathname = usePathname();
+  const loggedIn = !!user;
   
-  const [tier, setTier] = useState("FREE");
+  const [tier, setTier] = useState(() => {
+    return localStorage.getItem("plan") || "FREE";
+  });
+
+
 
   const menuItems = [
     { name: 'Dashboard', path: '/' },
@@ -28,29 +29,22 @@ export default function Navbar({ isLoggedIn, handleLogout }: NavbarProps) {
 
 
   useEffect(() => {
-    const stored = localStorage.getItem("plan");
-    if (stored) setTier(stored);
+    if(user && user.plan) {
+      setTier(user.plan);
+      localStorage.setItem("plan", user.plan);
+    }
 
-    if (!isLoggedIn) return;
-
-    const checkTier = async () => {
-      try {
-        const res = await axios.get("/api/auth/me");
-        if (res.data && res.data.plan) {
-          setTier(res.data.plan);
-          localStorage.setItem("plan", res.data.plan);
-        }
-
-      } catch (error) {
-        console.error("Error while fetching tier:", error);
-      }
-    };
-    checkTier();
-
-  }, [isLoggedIn]);
+  }, [user]);
 
 
   const isPaid = tier !== "FREE" && tier !== "";
+
+  const handleLogout = () => {
+    setUser(null);
+    localStorage.removeItem("user");
+    localStorage.removeItem("plan");
+    localStorage.removeItem("linksLeft_cache");
+  };
 
 
   return (
@@ -85,7 +79,7 @@ export default function Navbar({ isLoggedIn, handleLogout }: NavbarProps) {
       </div>
 
       <div className="flex items-center gap-6">
-        {isLoggedIn && tier && (
+        {loggedIn && tier && (
           <div className="relative flex flex-col items-center">
             <button
               onClick={() => router.push('/premium')}
@@ -109,7 +103,7 @@ export default function Navbar({ isLoggedIn, handleLogout }: NavbarProps) {
           </div>
         )}
 
-        {isLoggedIn ? (
+        {loggedIn ? (
           <button
             onClick={handleLogout}
             className="border border-neutral-700 bg-transparent text-white hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/50 px-6 py-2.5 rounded-lg transition-all cursor-pointer font-three text-sm font-semibold"

@@ -66,6 +66,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ shor
 
     const cachedUrl = await redis.get(`link:${shortUrl}`);
 
+    const start = Date.now();
+
     const findUrl = await prisma.link.findUnique({
         where: {
         shorturl: shortUrl,

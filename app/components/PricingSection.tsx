@@ -77,7 +77,7 @@ export default function PricingSection() {
               <h3 className="text-2xl font-bold mb-1">Essentials</h3>
               <div className="flex items-center justify-center gap-2 mt-2">
                 <span className="text-3xl line-through text-red-500 decoration-2 decoration-red-500">₹1200</span>
-                <p className="text-4xl font-extrabold">₹600<span className="text-sm font-normal text-neutral-400">/mo</span></p>
+                <p className="text-4xl font-extrabold">₹300<span className="text-sm font-normal text-neutral-400">/mo</span></p>
               </div>
             </div>
             <div className="flex-1 space-y-3 text-base sm:text-lg font-medium">
@@ -119,7 +119,7 @@ export default function PricingSection() {
             <h3 className="text-2xl font-bold mb-1 text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-yellow-500">PRO</h3>
             <div className="flex items-center justify-center gap-2 mt-2">
               <span className="text-3xl line-through text-red-500 decoration-2 decoration-red-500">₹5600</span>
-              <p className="text-3xl font-extrabold">₹2700<span className="text-sm font-normal text-neutral-400">/mo</span></p>
+              <p className="text-3xl font-extrabold">₹1200<span className="text-sm font-normal text-neutral-400">/mo</span></p>
             </div>
           </div>
           <div className="flex-1 space-y-3 text-base sm:text-lg font-medium">

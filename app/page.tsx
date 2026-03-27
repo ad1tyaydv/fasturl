@@ -16,12 +16,14 @@ import TotalData from "./components/totalData";
 import ShortlyFeatures from "./components/features";
 import FaqSection from "./components/faqSection";
 import Footer from "./components/footer";
+import { useUser } from "./components/userContext";
 
 
 const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN;
 
 export default function Dashboard() {
   const router = useRouter();
+  const { setUser } = useUser();
   const pricingRef = useRef<HTMLDivElement>(null);
 
   const [url, setUrl] = useState("");
@@ -183,7 +185,7 @@ export default function Dashboard() {
   
   return (
     <div className="min-h-screen bg-[#141414] text-white relative transition-colors duration-300 overflow-x-hidden">
-      <Navbar isLoggedIn={isLoggedIn} handleLogout={handleLogout} />
+      <Navbar />
 
       {modalConfig.show && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 transition-opacity duration-150 cursor-pointer" onClick={() => setModalConfig({ ...modalConfig, show: false })}>

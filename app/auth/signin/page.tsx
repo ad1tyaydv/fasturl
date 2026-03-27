@@ -7,10 +7,12 @@ import { FcGoogle } from "react-icons/fc";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
+import { useUser } from "@/app/components/userContext";
 
 
 export default function Login() {
   const router = useRouter();
+  const { setUser } = useUser();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -31,17 +33,24 @@ export default function Login() {
     const loginToast = toast.loading("Logging in...");
 
     try {
-      await axios.post("/api/auth/signin", {
+      const res = await axios.post("/api/auth/signin", {
         email: formData.email,
         password: formData.password
       });
+      
+      const loggedInUser = res.data.user;
+
+      if(loggedInUser) {
+        localStorage.setItem("user", loggedInUser.plan);
+      }
+      
+      setUser(loggedInUser);
 
       toast.success("Welcome back!", {
         id: loginToast
       });
 
       router.push("/");
-      router.refresh();
 
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Login failed!", { id: loginToast });

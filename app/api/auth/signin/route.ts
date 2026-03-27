@@ -47,6 +47,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const linksLeft = await prisma.link.count({
+      where: {
+        userId: user.id
+      }
+    })
+
     const token = jwt.sign(
       { userId: user.id, email: user.email },
       JWT_SECRET,
@@ -54,8 +60,8 @@ export async function POST(req: NextRequest) {
     );
 
     const response = NextResponse.json(
-      { message: "User logged in successfully" },
-      { status: 200 }
+      { message: "User logged in successfully", user},
+      { status: 200 },
     );
 
     response.cookies.set("token", token, {
