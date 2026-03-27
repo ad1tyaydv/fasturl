@@ -3,13 +3,15 @@
 import axios from "axios";
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { IoEyeOutline, IoEyeOffOutline, IoPencilOutline, IoCloseOutline, IoCalendarOutline } from "react-icons/io5";
+import { 
+  IoEyeOutline, IoEyeOffOutline, IoPencilOutline, IoCloseOutline, IoCalendarOutline 
+} from "react-icons/io5";
 
 import Navbar from "../../components/navbar"; 
-import SavedQrs from "../../components/savedQrs";
 import SavedLinks from "../../components/savedLinks";
+import BulkLinks from "../../components/bulkLinks";
 import { SkeletonLoader } from "@/app/loaders/links";
-import { Skeleton } from "@/components/ui/skeleton"; // Added Skeleton import
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface UrlItem {
   id: string;
@@ -29,7 +31,7 @@ const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN;
 
 export default function AllUrlsPage() {
   const router = useRouter();
-  const [view, setView] = useState<"links" | "qrs">("links");
+  const [view, setView] = useState<"links" | "bulk">("links");
   const [data, setData] = useState<UrlItem[]>([]);
   const [tier, setTier] = useState("FREE");
   
@@ -53,27 +55,18 @@ export default function AllUrlsPage() {
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const endpoint = view === "links" ? "/api/fetchUrls" : "/api/fetchQR";
+      const endpoint = view === "links" ? "/api/fetchUrls" : "/api/shortUrl/bulkLinks/fetchBulkLinks";
       const res = await axios.get(endpoint);
-
+      
       if (view === "links") {
-        setData(res.data.urls.reverse());
+        setData(res.data.urls?.reverse() || []);
       } else {
-        const mappedQrs = res.data.qrs.map((qr: any) => ({
-          id: qr.id,
-          original: qr.longUrl,
-          shorturl: qr.shortUrl,
-          scans: qr.clicks,
-          qrImage: qr.qrImage,
-          createdAt: qr.createdAt,
-          password: qr.password,
-          expiresAt: qr.expiresAt,
-        }));
-        setData(mappedQrs);
+        setData(res.data.bulkLinks?.reverse() || res.data?.reverse() || []);
       }
 
     } catch (err) {
       console.error(`Error fetching ${view}:`, err);
+      setData([]);
 
     } finally {
       setLoading(false);
@@ -91,7 +84,7 @@ export default function AllUrlsPage() {
         } else {
           router.push("/auth/signin");
         }
-
+        
       } catch (error) {
         console.error("Initialization failed", error);
         setIsLoggedIn(false);
@@ -99,14 +92,13 @@ export default function AllUrlsPage() {
       }
     };
     initAuth();
-    
+
   }, [router]);
 
 
   useEffect(() => {
-    if (isLoggedIn) {
-      fetchData();
-    }
+    if (isLoggedIn) fetchData();
+
   }, [fetchData, isLoggedIn, view]);
 
 
@@ -114,9 +106,7 @@ export default function AllUrlsPage() {
     setUpdatingLinkId(id);
     try {
       await axios.post("/api/shortUrl/linkName", { linkId: id, name: newName });
-      setData((prev) =>
-        prev.map((link) => (link.id === id ? { ...link, name: newName } : link))
-      );
+      setData((prev) => prev.map((link) => (link.id === id ? { ...link, name: newName } : link)));
 
     } catch (err) {
       console.error("Failed to update name:", err);
@@ -128,6 +118,7 @@ export default function AllUrlsPage() {
 
 
   const handleDeleteLink = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this link?")) return;
     try {
       await axios.post(`/api/shortUrl/delete/${id}`);
       setData(data.filter((u) => u.id !== id));
@@ -136,39 +127,6 @@ export default function AllUrlsPage() {
     } catch (err) {
       console.log("Error deleting item:", err);
     }
-  };
-
-
-  const handleDeleteQR = async (id: string) => {
-    try {
-      await axios.post(`/api/qrCode/delete/${id}`);
-      setData(data.filter((u) => u.id !== id));
-      setSelectedUrl(null);
-
-    } catch (err) {
-      console.log("Error deleting item:", err);
-    }
-  };
-
-
-  const handleLogout = async () => {
-    await axios.post("/api/auth/logout");
-    setIsLoggedIn(false);
-    router.push("/auth/signin");
-  };
-
-
-  const closeAllModals = () => {
-    setSelectedUrl(null);
-    setIsCustomModalOpen(false);
-    setIsPasswordModalOpen(false);
-    setCustomUrl("");
-    setPassword("");
-    setExpiryDate("");
-    setErrorMessage("");
-    setShowPassword(false);
-    setIsEditingPassword(false);
-    setIsEditingExpiry(false);
   };
 
 
@@ -191,6 +149,20 @@ export default function AllUrlsPage() {
       setIsEditingPassword(!url.password);
       setIsEditingExpiry(!url.expiresAt);
     }
+  };
+
+
+  const closeAllModals = () => {
+    setSelectedUrl(null);
+    setIsCustomModalOpen(false);
+    setIsPasswordModalOpen(false);
+    setCustomUrl("");
+    setPassword("");
+    setExpiryDate("");
+    setErrorMessage("");
+    setShowPassword(false);
+    setIsEditingPassword(false);
+    setIsEditingExpiry(false);
   };
 
 
@@ -221,7 +193,7 @@ export default function AllUrlsPage() {
         customUrl: customUrl,
       });
       closeAllModals();
-      window.location.reload();
+      fetchData();
 
     } catch (error: any) {
       if (error.response && error.response.status === 409) {
@@ -233,57 +205,34 @@ export default function AllUrlsPage() {
   };
 
 
-  const downloadQrAction = (qrImage: string, name: string) => {
-    const link = document.createElement("a");
-    link.href = qrImage;
-    link.download = `qr-${name}.png`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
-
   return (
-    <div className="min-h-screen bg-[#141414] text-white">
+    <div className="min-h-screen bg-[#141414] text-white transition-colors duration-300">
       <Navbar />
 
-      <main className="w-full max-w-[1600px] mx-auto px-6 sm:px-12 lg:px-20 py-10">
+      <main className="w-full max-w-6xl mx-auto px-6 sm:px-12 lg:px-20 py-10">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 border-b border-neutral-800 pb-4">
-          <div className="flex items-center gap-2 text-2xl sm:text-4xl font-one">
+          <div className="flex items-center gap-2 text-2xl sm:text-4xl font-one tracking-tight">
             <button
-              onClick={() => {
-                if (view !== "links") {
-                  setLoading(true);
-                  setView("links");
-                }
-              }}
-              className={`cursor-pointer transition-colors ${
-                view === "links" ? "text-white" : "text-neutral-600 hover:text-white"
-              }`}
+              onClick={() => { if (view !== "links") { setLoading(true); setView("links"); } }}
+              className={`cursor-pointer font-one transition-colors ${view === "links" ? "text-white" : "text-neutral-600 hover:text-white"}`}
             >
               Saved URLs
             </button>
             <span className="text-neutral-700">/</span>
             <button
-              onClick={() => {
-                if (view !== "qrs") {
-                  setLoading(true);
-                  setView("qrs");
-                }
-              }}
-              className={`cursor-pointer transition-colors ${
-                view === "qrs" ? "text-white" : "text-neutral-600 hover:text-white"
-              }`}
+              onClick={() => { if (view !== "bulk") { setLoading(true); setView("bulk"); } }}
+              className={`cursor-pointer font-one transition-colors ${view === "bulk" ? "text-white" : "text-neutral-600 hover:text-white"}`}
             >
-              Saved QRs
+              Bulk Links
             </button>
           </div>
+          
           <div className="flex justify-end">
             {loading ? (
               <Skeleton className="h-[36px] w-[140px] bg-neutral-800 rounded-lg" />
             ) : (
-              <span className="px-4 py-1.5 text-sm sm:text-base font-three bg-[#1c1c1c] text-white border border-neutral-700 rounded-lg">
-                Total {view === "links" ? "Links" : "QRs"} - {data.length}
+              <span className="px-4 py-1.5 text-sm sm:text-base font-bold font-three bg-[#1c1c1c] text-white border border-neutral-700 rounded-lg">
+                Total {view === "links" ? "Links" : "Bulk Links"} - {data.length}
               </span>
             )}
           </div>
@@ -292,7 +241,7 @@ export default function AllUrlsPage() {
         {loading ? (
           <SkeletonLoader />
         ) : (
-          <>
+          <div className="fade-in">
             {view === "links" ? (
               <SavedLinks
                 links={data}
@@ -304,90 +253,23 @@ export default function AllUrlsPage() {
                 onOpenCustomUrlModal={handleOpenCustomUrlModal}
               />
             ) : (
-              <SavedQrs
-                qrs={data}
-                onSelect={setSelectedUrl}
-                onDelete={handleDeleteQR}
+              <BulkLinks
+                bulkLinks={data}
+                onRefresh={fetchData}
                 domain={NEXT_DOMAIN!}
+                userPlan={tier}
               />
             )}
-          </>
+          </div>
         )}
       </main>
 
-      {(selectedUrl || isCustomModalOpen || isPasswordModalOpen) && (
+      {(isCustomModalOpen || isPasswordModalOpen) && selectedUrl && (
         <div
           className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 p-4 transition-opacity duration-150"
           onClick={closeAllModals}
         >
-          {selectedUrl && !isCustomModalOpen && !isPasswordModalOpen && view === "qrs" && (
-            <div
-              className="bg-[#1c1c1c] shadow-2xl w-full max-w-lg p-6 sm:p-10 cursor-default border border-neutral-800 rounded-xl"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <h3 className="text-xl sm:text-2xl font-one mb-5 sm:mb-6 border-b border-neutral-800 pb-4 text-white flex justify-between items-center">
-                QR Details
-                <button onClick={closeAllModals} className="text-neutral-500 hover:text-white transition-colors cursor-pointer">
-                  <IoCloseOutline size={24} />
-                </button>
-              </h3>
-
-              {selectedUrl.qrImage && (
-                <div className="flex justify-center mb-6 bg-white p-4 border border-neutral-800 rounded-lg">
-                  <img src={selectedUrl.qrImage} alt="QR" className="w-40 h-40 object-contain" />
-                </div>
-              )}
-
-              <div className="space-y-5 sm:space-y-6 mb-6 sm:mb-8">
-                <div>
-                  <p className="text-[10px] sm:text-xs font-three uppercase tracking-widest mb-1 text-neutral-400">
-                    TOTAL SCANS
-                  </p>
-                  <p className="text-3xl sm:text-4xl font-one text-white">
-                    {selectedUrl.scans ?? 0}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-[10px] sm:text-xs font-three uppercase tracking-widest mb-1 text-neutral-400">
-                    CREATED AT
-                  </p>
-                  <p className="text-base sm:text-lg font-two text-white">
-                    {selectedUrl.createdAt
-                      ? new Date(selectedUrl.createdAt).toLocaleString("en-US", {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })
-                      : "Not Available"}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-3">
-                <div className="flex flex-wrap gap-2">
-                  {selectedUrl.qrImage && (
-                    <button
-                      onClick={() => downloadQrAction(selectedUrl.qrImage!, selectedUrl.shorturl)}
-                      className="flex-1 cursor-pointer px-6 py-3 bg-blue-600 text-white font-three text-sm hover:bg-blue-700 transition-colors active:scale-95 rounded-lg"
-                    >
-                      Download PNG
-                    </button>
-                  )}
-                </div>
-
-                <button
-                  onClick={closeAllModals}
-                  className="w-full cursor-pointer px-8 py-3 font-three text-sm bg-[#2a2a2a] text-white hover:bg-[#333333] transition-colors active:scale-95 border border-neutral-700 rounded-lg"
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          )}
-
-          {isCustomModalOpen && selectedUrl && (
+          {isCustomModalOpen && (
             <div
               className="bg-[#1c1c1c] shadow-2xl w-full max-w-lg p-6 sm:p-10 cursor-default border border-neutral-800 rounded-xl"
               onClick={(e) => e.stopPropagation()}
@@ -446,7 +328,7 @@ export default function AllUrlsPage() {
             </div>
           )}
 
-          {isPasswordModalOpen && selectedUrl && (
+          {isPasswordModalOpen && (
             <div
               className="bg-[#1c1c1c] shadow-2xl w-full max-w-lg p-6 sm:p-10 cursor-default border border-neutral-800 rounded-xl"
               onClick={(e) => e.stopPropagation()}
@@ -454,7 +336,6 @@ export default function AllUrlsPage() {
               <h3 className="text-xl sm:text-2xl font-three mb-8 text-center text-white">
                 Add Link Protection
               </h3>
-
               <div className="space-y-6 mb-8">
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">

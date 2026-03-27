@@ -6,21 +6,47 @@ import { useRouter } from "next/navigation";
 import { 
   IoGlobeOutline, IoPhonePortraitOutline, 
   IoHardwareChipOutline, IoShareSocialOutline, IoCompassOutline, 
-  IoCloseOutline, IoArrowBackOutline, IoLockClosedOutline
+  IoCloseOutline, IoArrowBackOutline, IoLockClosedOutline,
+  IoChevronForwardOutline, IoChevronBackOutline
 } from "react-icons/io5";
 
 import Navbar from "../../components/navbar"; 
 import { AnalyticsCardItem } from "../../components/analyticsCard";
-import LinkAnalyticsTab from "../../components/linkAnalyticsTab";
-import QRAnalyticsTab from "../../components/qrAnalyticsTab";
-import { SkeletonLoader } from "@/app/loaders/links"; // Import the loader
+import { SkeletonLoader } from "@/app/loaders/links";
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 
 const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN;
 
+type TimeFilter = "today" | "7days" | "30days" | "lifetime";
+
+
+const getTimeAgo = (dateString: string) => {
+  if (!dateString) return "Unknown";
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+  if (diffInSeconds < 60) return "Just now";
+  const diffInMinutes = Math.floor(diffInSeconds / 60);
+  if (diffInMinutes < 60) return `${diffInMinutes} mins ago`;
+  const diffInHours = Math.floor(diffInMinutes / 60);
+  if (diffInHours < 24) return `${diffInHours} hours ago`;
+  const diffInDays = Math.floor(diffInHours / 24);
+  if (diffInDays === 1) return "1 day ago";
+  return `${diffInDays} days ago`;
+};
+
+
 export default function AnalyticsPage() {
   const router = useRouter();
-  const [viewMode, setViewMode] = useState<"link" | "qr">("link");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [tier, setTier] = useState("FREE");
   
@@ -32,6 +58,10 @@ export default function AnalyticsPage() {
   const [isLoadingAnalytics, setIsLoadingAnalytics] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState<any>(null);
+
+  const [timeFilter, setTimeFilter] = useState<TimeFilter>("today");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
 
   useEffect(() => {
@@ -60,6 +90,43 @@ export default function AnalyticsPage() {
   }, [router]);
 
 
+  const filteredUrls = useMemo(() => {
+    if (timeFilter === "lifetime") return urls;
+
+    const now = new Date();
+    const filterDate = new Date();
+
+    if (timeFilter === "today") {
+      filterDate.setHours(0, 0, 0, 0);
+    } else if (timeFilter === "7days") {
+      filterDate.setDate(now.getDate() - 7);
+    } else if (timeFilter === "30days") {
+      filterDate.setDate(now.getDate() - 30);
+    }
+
+    return urls.filter(url => {
+      const created = new Date(url.createdAt); 
+      return created >= filterDate;
+    });
+
+  }, [urls, timeFilter]);
+
+
+  const totalPages = Math.ceil(filteredUrls.length / itemsPerPage);
+  
+
+  const paginatedUrls = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredUrls.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredUrls, currentPage]);
+
+
+  useEffect(() => {
+    setCurrentPage(1);
+
+  }, [timeFilter]);
+
+
   const handleSelectLink = (url: any) => {
     setSelectedLink(url);
     handleLinkAnalytics(url.id);
@@ -70,9 +137,7 @@ export default function AnalyticsPage() {
     setIsLoadingAnalytics(true);
     setAnalytics(null);
     try {
-      const res = await axios.get("/api/analytics/link", {
-        params: { linkId }
-      });
+      const res = await axios.get("/api/analytics/link", { params: { linkId } });
       setAnalytics(res.data);
 
     } catch (error) {
@@ -102,13 +167,6 @@ export default function AnalyticsPage() {
   };
 
 
-  const handleLogout = async () => {
-    await axios.post("/api/auth/logout");
-    setIsLoggedIn(false);
-    router.push("/auth/signin");
-  };
-
-
   const premiumMetrics = [
     { title: "Top Referrers", icon: <IoShareSocialOutline size={25}/>, data: analytics?.referrers, key: "referrer", offset: 1 },
     { title: "Browsers", icon: <IoCompassOutline size={25}/>, data: analytics?.browsers, key: "browser", offset: 2 },
@@ -116,7 +174,7 @@ export default function AnalyticsPage() {
     { title: "Operating Systems", icon: <IoHardwareChipOutline size={25}/>, data: analytics?.os, key: "os", offset: 4 },
   ];
 
-
+  
   return (
     <div className="min-h-screen bg-[#141414] text-white transition-colors duration-300">
       <Navbar />
@@ -128,26 +186,89 @@ export default function AnalyticsPage() {
           <>
             {!selectedLink ? (
               <div className="fade-in">
-                <div className="mb-8 flex items-center gap-4">
-                  <h1 
-                    className={`text-3xl font-one tracking-tight cursor-pointer transition-colors ${viewMode === "link" ? "text-white" : "text-neutral-600 hover:text-white"}`}
-                    onClick={() => setViewMode("link")}
-                  >
+                
+                <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-800 pb-6">
+                  <h1 className="text-2xl sm:text-3xl font-one tracking-tight text-white">
                     Link Analytics
                   </h1>
-                  <span className="text-3xl font-one text-neutral-700">/</span>
-                  <h1 
-                    className={`text-3xl font-one tracking-tight cursor-pointer transition-colors ${viewMode === "qr" ? "text-white" : "text-neutral-600 hover:text-white"}`}
-                    onClick={() => setViewMode("qr")}
-                  >
-                    QR Analytics
-                  </h1>
+
+                  <Select value={timeFilter} onValueChange={(value) => setTimeFilter(value as TimeFilter)}>
+                    <SelectTrigger className="w-[180px] bg-[#1a1a1a] border-neutral-800 text-white font-three focus:ring-1 focus:ring-blue-500 rounded-lg">
+                      <SelectValue placeholder="Select timeframe" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#1a1a1a] border-neutral-800 text-white font-three rounded-lg">
+                      <SelectItem value="today" className="text-neutral-200 focus:bg-[#2a2a2a] focus:text-white data-[state=checked]:text-white cursor-pointer">Created Today</SelectItem>
+                      <SelectItem value="7days" className="text-neutral-200 focus:bg-[#2a2a2a] focus:text-white data-[state=checked]:text-white cursor-pointer">Last 7 Days</SelectItem>
+                      <SelectItem value="30days" className="text-neutral-200 focus:bg-[#2a2a2a] focus:text-white data-[state=checked]:text-white cursor-pointer">Last 30 Days</SelectItem>
+                      <SelectItem value="lifetime" className="text-neutral-200 focus:bg-[#2a2a2a] focus:text-white data-[state=checked]:text-white cursor-pointer">Lifetime</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
-                {viewMode === "link" ? (
-                  <LinkAnalyticsTab urls={urls} onSelect={handleSelectLink} />
+                {filteredUrls.length > 0 ? (
+                  <div className="flex flex-col rounded-xl overflow-hidden">
+                    {paginatedUrls.map((url, index) => (
+                      <div
+                        key={url.id || index}
+                        onClick={() => handleSelectLink(url)}
+                        className="flex flex-col sm:flex-row items-start sm:items-center justify-between py-5 px-4 border-b border-neutral-800 last:border-0 hover:bg-[#1a1a1a] transition-colors cursor-pointer group gap-4 sm:gap-0"
+                      >
+                        <div className="flex items-center gap-4 w-full sm:w-[50%] overflow-hidden">
+                          <div className="w-10 h-10 rounded-full bg-[#1c2a3a] text-blue-400 flex items-center justify-center shrink-0">
+                            <IoGlobeOutline size={20} />
+                          </div>
+                          <div className="flex flex-col overflow-hidden w-full">
+                            <span className="font-bold text-white font-three text-base truncate">
+                              {url.title || "Untitled Link"}
+                            </span>
+                            <span className="text-sm text-neutral-400 font-three truncate">
+                              {url.original || `${NEXT_DOMAIN}/${url.shorturl}`}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="w-full sm:w-[20%] pl-14 sm:pl-0">
+                          <span className="text-sm text-white font-three">
+                            {url.clicks === 1 ? "1 click" : `${url.clicks || 0} clicks`}
+                          </span>
+                        </div>
+
+                        <div className="w-full sm:w-[20%] pl-14 sm:pl-0 sm:text-right">
+                          <span className="text-sm text-neutral-400 font-three">
+                            {getTimeAgo(url.createdAt)}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 ) : (
-                  <QRAnalyticsTab urls={urls} onSelect={handleSelectLink} />
+                  <div className="py-12 text-center text-neutral-500 font-three border border-dashed border-neutral-800 rounded-lg mt-4">
+                    No links found for this timeframe.
+                  </div>
+                )}
+
+                {totalPages > 1 && (
+                  <div className="mt-8 flex items-center justify-center gap-4 font-three">
+                    <button
+                      onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                      disabled={currentPage === 1}
+                      className="p-2 flex items-center justify-center rounded-full bg-[#1a1a1a] border border-neutral-800 text-neutral-400 hover:text-white hover:border-neutral-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all cursor-pointer"
+                    >
+                      <IoChevronBackOutline size={20} />
+                    </button>
+                    
+                    <span className="text-sm text-neutral-400">
+                      Page <strong className="text-white">{currentPage}</strong> of <strong className="text-white">{totalPages}</strong>
+                    </span>
+
+                    <button
+                      onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                      disabled={currentPage === totalPages}
+                      className="p-2 flex items-center justify-center rounded-full bg-[#1a1a1a] border border-neutral-800 text-neutral-400 hover:text-white hover:border-neutral-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all cursor-pointer"
+                    >
+                      <IoChevronForwardOutline size={20} />
+                    </button>
+                  </div>
                 )}
               </div>
             ) : (
@@ -163,7 +284,7 @@ export default function AnalyticsPage() {
                   <div className="space-y-4">
                     <div className="pb-2">
                       <span className="text-2xl font-three text-blue-500 uppercase tracking-[0.2em]">
-                        {viewMode === "link" ? "Link" : "QR"} Analytics
+                        Link Analytics
                       </span>
                     </div>
                     
@@ -185,7 +306,7 @@ export default function AnalyticsPage() {
 
                   <div className="flex flex-row items-baseline gap-3 md:justify-end">
                     <span className="text-xl font-three text-neutral-500 uppercase">
-                      Total {viewMode === "link" ? "Clicks" : "Visits"}
+                      Total Clicks
                     </span>
                     <p className="text-3xl font-two text-white">
                       {selectedLink.clicks || 0}

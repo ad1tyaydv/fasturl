@@ -150,19 +150,19 @@ export default function SavedLinks({
                           </button>
                         </div>
                       ) : (
-                        <span className="text-white font-bold text-xl truncate tracking-wide">
+                        <span className="text-white font-one text-xl truncate tracking-wide">
                           {url.name || "Untitled Link"}
                         </span>
                       )}
                     </div>
 
-                    <span className="text-neutral-400 font-medium text-base truncate">
+                    <span className="text-neutral-400 font-three text-base truncate">
                       {domain}/{url.shorturl}
                     </span>
                   </div>
                 </div>
 
-                <div className="w-[10%] pl-2 text-neutral-300 font-medium text-base shrink-0">
+                <div className="w-[10%] pl-2 text-neutral-300 font-three text-base shrink-0">
                   {url.clicks || 0} click{(url.clicks || 0) !== 1 ? 's' : ''}
                 </div>
 
@@ -201,7 +201,7 @@ export default function SavedLinks({
                   </button>
 
                   <button 
-                    onClick={() => { /* Do nothing currently */ }} 
+                    onClick={() => {}} 
                     className="hover:text-white hover:bg-neutral-800 p-2 rounded-md transition-colors cursor-pointer"
                     title="QR Code"
                   >
@@ -209,7 +209,7 @@ export default function SavedLinks({
                   </button>
 
                   <button 
-                    onClick={() => { /* Do nothing currently */ }} 
+                    onClick={() => {}} 
                     className="hover:text-white hover:bg-neutral-800 p-2 rounded-md transition-colors cursor-pointer"
                     title="Share"
                   >
