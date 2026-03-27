@@ -12,7 +12,7 @@ import {
 
 import Navbar from "../../components/navbar"; 
 import { AnalyticsCardItem } from "../../components/analyticsCard";
-import { SkeletonLoader } from "@/app/loaders/links";
+import { SkeletonLoader } from "@/app/loaders/links"; 
 
 import {
   Select,
@@ -21,12 +21,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
 
 
 const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN;
 
 type TimeFilter = "today" | "7days" | "30days" | "lifetime";
-
 
 const getTimeAgo = (dateString: string) => {
   if (!dateString) return "Unknown";
@@ -44,6 +44,22 @@ const getTimeAgo = (dateString: string) => {
   return `${diffInDays} days ago`;
 };
 
+
+export function SkeletonForm() {
+  return (
+    <div className="flex w-full flex-col gap-7 p-6 rounded-2xl border border-neutral-800 bg-[#1c1c1c]">
+      <div className="flex flex-col gap-3">
+        <Skeleton className="h-4 w-20 bg-neutral-800" />
+        <Skeleton className="h-8 w-full bg-neutral-800" />
+      </div>
+      <div className="flex flex-col gap-3">
+        <Skeleton className="h-4 w-24 bg-neutral-800" />
+        <Skeleton className="h-8 w-full bg-neutral-800" />
+      </div>
+      <Skeleton className="h-8 w-24 bg-neutral-800" />
+    </div>
+  );
+}
 
 export default function AnalyticsPage() {
   const router = useRouter();
@@ -88,6 +104,19 @@ export default function AnalyticsPage() {
     checkAuthAndFetch();
 
   }, [router]);
+
+
+  useEffect(() => {
+    if (isModalOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+
+  }, [isModalOpen]);
 
 
   const filteredUrls = useMemo(() => {
@@ -157,7 +186,6 @@ export default function AnalyticsPage() {
     });
 
     return Array.from(map.entries()).map(([country, count]) => ({ country, count }));
-
   }, [analytics]);
 
 
@@ -174,14 +202,24 @@ export default function AnalyticsPage() {
     { title: "Operating Systems", icon: <IoHardwareChipOutline size={25}/>, data: analytics?.os, key: "os", offset: 4 },
   ];
 
+
+  const handleLinkClick = (e: React.MouseEvent, urlPath: string) => {
+    e.stopPropagation();
+    if (!urlPath) return;
+    const finalUrl = urlPath.startsWith('http') ? urlPath : `https://${urlPath}`;
+    window.open(finalUrl, '_blank', 'noopener,noreferrer');
+  };
   
+
   return (
     <div className="min-h-screen bg-[#141414] text-white transition-colors duration-300">
       <Navbar />
 
       <main className="max-w-6xl mx-auto px-4 py-10">
         {isPageLoading ? (
-          <SkeletonLoader />
+          <div className="w-full fade-in pt-8">
+             <SkeletonLoader />
+          </div>
         ) : (
           <>
             {!selectedLink ? (
@@ -219,9 +257,13 @@ export default function AnalyticsPage() {
                           </div>
                           <div className="flex flex-col overflow-hidden w-full">
                             <span className="font-bold text-white font-three text-base truncate">
-                              {url.title || "Untitled Link"}
+                              {url.title || url.name || "Untitled Link"}
                             </span>
-                            <span className="text-sm text-neutral-400 font-three truncate">
+                            {/* Clickable URL */}
+                            <span 
+                              onClick={(e) => handleLinkClick(e, url.original || `${NEXT_DOMAIN}/${url.shorturl}`)}
+                              className="text-sm text-neutral-400 font-three truncate mt-0.5 hover:text-blue-400 hover:underline transition-colors relative z-10 inline-block w-fit cursor-pointer"
+                            >
                               {url.original || `${NEXT_DOMAIN}/${url.shorturl}`}
                             </span>
                           </div>
@@ -250,7 +292,7 @@ export default function AnalyticsPage() {
                 {totalPages > 1 && (
                   <div className="mt-8 flex items-center justify-center gap-4 font-three">
                     <button
-                      onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                      onClick={(e) => { e.stopPropagation(); setCurrentPage(p => Math.max(1, p - 1)); }}
                       disabled={currentPage === 1}
                       className="p-2 flex items-center justify-center rounded-full bg-[#1a1a1a] border border-neutral-800 text-neutral-400 hover:text-white hover:border-neutral-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all cursor-pointer"
                     >
@@ -262,7 +304,7 @@ export default function AnalyticsPage() {
                     </span>
 
                     <button
-                      onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                      onClick={(e) => { e.stopPropagation(); setCurrentPage(p => Math.min(totalPages, p + 1)); }}
                       disabled={currentPage === totalPages}
                       className="p-2 flex items-center justify-center rounded-full bg-[#1a1a1a] border border-neutral-800 text-neutral-400 hover:text-white hover:border-neutral-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all cursor-pointer"
                     >
@@ -291,13 +333,19 @@ export default function AnalyticsPage() {
                     <div className="space-y-3">
                       <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-3">
                         <span className="text-xs uppercase tracking-widest text-neutral-500 font-three w-24">Short Link:</span>
-                        <h2 className="text-xl font-two truncate max-w-[300px] md:max-w-md text-white">
+                        <h2 
+                          onClick={(e) => handleLinkClick(e, `${NEXT_DOMAIN}/${selectedLink.shorturl}`)}
+                          className="text-xl font-two truncate max-w-[300px] md:max-w-md text-white hover:text-blue-400 hover:underline cursor-pointer transition-colors"
+                        >
                           {NEXT_DOMAIN}/{selectedLink.shorturl}
                         </h2>
                       </div>
                       <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-3">
                         <span className="text-xs uppercase tracking-widest text-neutral-500 font-three w-24">Original:</span>
-                        <p className="text-neutral-400 text-xl font-two truncate max-w-sm italic">
+                        <p 
+                          onClick={(e) => handleLinkClick(e, selectedLink.original)}
+                          className="text-neutral-400 text-xl font-two truncate max-w-sm italic hover:text-blue-400 hover:underline cursor-pointer transition-colors"
+                        >
                           {selectedLink.original}
                         </p>
                       </div>
@@ -315,9 +363,12 @@ export default function AnalyticsPage() {
                 </div>
 
                 {isLoadingAnalytics ? (
-                  <div className="h-96 flex flex-col justify-center items-center gap-4 border border-neutral-800 rounded-none bg-[#1c1c1c]/50">
-                    <div className="w-8 h-8 border-4 border-blue-500/20 border-t-blue-500 rounded-none animate-spin"></div>
-                    <p className="text-neutral-400 font-medium">Loading traffic patterns...</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-24">
+                    <SkeletonForm />
+                    <SkeletonForm />
+                    <SkeletonForm />
+                    <SkeletonForm />
+                    <SkeletonForm />
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 font-three md:grid-cols-2 lg:grid-cols-3 gap-6 pb-24">

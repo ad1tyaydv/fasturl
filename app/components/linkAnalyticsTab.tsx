@@ -11,6 +11,8 @@ interface LinkTabProps {
 const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN;
 
 export default function LinkAnalyticsTab({ urls, onSelect }: LinkTabProps) {
+
+  
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {urls.length > 0 ? (

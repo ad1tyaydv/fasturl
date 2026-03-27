@@ -39,6 +39,7 @@ export const AnalyticsCardItem = ({
   onExpand,
 }: AnalyticsCardItemProps) => {
 
+
   return (
     <div className="bg-[#1c1c1c] border border-neutral-800 rounded-xl shadow-sm flex flex-col h-full hover:shadow-lg hover:shadow-black/50 transition-all">
       <div className="p-6 pb-2 flex flex-row items-center justify-between">
@@ -86,7 +87,7 @@ export const AnalyticsCardItem = ({
                     key={`${item[nameKey]}-${index}`}
                     className="flex justify-between items-center text-xs border-b border-neutral-800 pb-1.5"
                   >
-                    <span className="truncate max-w-[110px] font-medium text-neutral-400">
+                    <span className="truncate max-w-[110px] font-medium">
                       {item[nameKey] || "Unknown"}
                     </span>
                     <span className="font-bold text-white">{item.count}</span>
