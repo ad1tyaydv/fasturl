@@ -166,14 +166,6 @@ export default function QRGenerator() {
     
   }, [router]);
 
-  
-  const handleLogout = async () => {
-    await axios.post("/api/auth/logout");
-    setIsLoggedIn(false);
-    setUserPlan("FREE");
-    setQrsLeft(0);
-  };
-
 
   return (
     <div className="min-h-screen transition-colors duration-300 bg-[#141414] text-white relative">

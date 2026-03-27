@@ -61,6 +61,7 @@ export function SkeletonForm() {
   );
 }
 
+
 export default function AnalyticsPage() {
   const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -90,7 +91,7 @@ export default function AnalyticsPage() {
           setIsLoggedIn(true);
           setTier(res.data.plan || "FREE");
           const urlRes = await axios.get("/api/fetchUrls");
-          setUrls(urlRes.data.urls);
+          setUrls(urlRes.data.urls.reverse());
         }
 
       } catch (error) {
@@ -161,17 +162,14 @@ export default function AnalyticsPage() {
     handleLinkAnalytics(url.id);
   };
 
-
   const handleLinkAnalytics = async (linkId: string) => {
     setIsLoadingAnalytics(true);
     setAnalytics(null);
     try {
       const res = await axios.get("/api/analytics/link", { params: { linkId } });
       setAnalytics(res.data);
-
     } catch (error) {
       console.error("Failed to fetch analytics:", error);
-
     } finally {
       setIsLoadingAnalytics(false);
     }
@@ -186,6 +184,7 @@ export default function AnalyticsPage() {
     });
 
     return Array.from(map.entries()).map(([country, count]) => ({ country, count }));
+
   }, [analytics]);
 
 
@@ -210,7 +209,7 @@ export default function AnalyticsPage() {
     window.open(finalUrl, '_blank', 'noopener,noreferrer');
   };
   
-
+  
   return (
     <div className="min-h-screen bg-[#141414] text-white transition-colors duration-300">
       <Navbar />
@@ -259,7 +258,6 @@ export default function AnalyticsPage() {
                             <span className="font-bold text-white font-three text-base truncate">
                               {url.title || url.name || "Untitled Link"}
                             </span>
-                            {/* Clickable URL */}
                             <span 
                               onClick={(e) => handleLinkClick(e, url.original || `${NEXT_DOMAIN}/${url.shorturl}`)}
                               className="text-sm text-neutral-400 font-three truncate mt-0.5 hover:text-blue-400 hover:underline transition-colors relative z-10 inline-block w-fit cursor-pointer"
@@ -332,19 +330,19 @@ export default function AnalyticsPage() {
                     
                     <div className="space-y-3">
                       <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-3">
-                        <span className="text-xs uppercase tracking-widest text-neutral-500 font-three w-24">Short Link:</span>
+                        <span className="text-xs uppercase tracking-widest text-neutral-500 font-one w-24">Short Link:</span>
                         <h2 
                           onClick={(e) => handleLinkClick(e, `${NEXT_DOMAIN}/${selectedLink.shorturl}`)}
-                          className="text-xl font-two truncate max-w-[300px] md:max-w-md text-white hover:text-blue-400 hover:underline cursor-pointer transition-colors"
+                          className="text-xl font-three truncate max-w-[300px] md:max-w-md text-white hover:text-blue-400 hover:underline cursor-pointer transition-colors"
                         >
                           {NEXT_DOMAIN}/{selectedLink.shorturl}
                         </h2>
                       </div>
                       <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-3">
-                        <span className="text-xs uppercase tracking-widest text-neutral-500 font-three w-24">Original:</span>
+                        <span className="text-xs uppercase tracking-widest text-neutral-500 font-one w-24">Original:</span>
                         <p 
                           onClick={(e) => handleLinkClick(e, selectedLink.original)}
-                          className="text-neutral-400 text-xl font-two truncate max-w-sm italic hover:text-blue-400 hover:underline cursor-pointer transition-colors"
+                          className="text-neutral-400 text-xl font-three truncate max-w-sm italic hover:text-blue-400 hover:underline cursor-pointer transition-colors"
                         >
                           {selectedLink.original}
                         </p>

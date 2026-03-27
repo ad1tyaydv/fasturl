@@ -45,22 +45,6 @@ export async function POST(req: NextRequest) {
 
         userId = decoded.userId;
 
-        count = await prisma.qr.count({
-            where: {
-                userId: userId,
-                createdAt: {
-                    gte: today
-                }
-            }
-        })
-
-        if (count >= 2) {
-            return NextResponse.json(
-                { message: "Upgrade to generate utpo 1000 QR Codes per month" },
-                { status: 429 }
-            )
-        }
-
         const user = await prisma.user.findUnique({
             where: {
                 id: userId,
@@ -159,6 +143,8 @@ export async function POST(req: NextRequest) {
                 ipAddress: ip,
             }
         })
+
+        console.log(saveQR.qrImage);
 
         return NextResponse.json({
             message: "Short URL created!",
