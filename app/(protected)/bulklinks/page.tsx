@@ -310,7 +310,7 @@ export default function BulkCreateLinks() {
 
   return (
     <div className="min-h-screen bg-[#141414] text-white transition-colors duration-300">
-      <Navbar isLoggedIn={isLoggedIn} handleLogout={handleLogout} />
+      <Navbar />
 
       <main className="w-full max-w-[1600px] mx-auto px-6 sm:px-12 lg:px-20 py-12">
         {authLoading ? (

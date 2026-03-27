@@ -245,7 +245,7 @@ export default function AllUrlsPage() {
 
   return (
     <div className="min-h-screen bg-[#141414] text-white">
-      <Navbar isLoggedIn={isLoggedIn} handleLogout={handleLogout} />
+      <Navbar />
 
       <main className="w-full max-w-[1600px] mx-auto px-6 sm:px-12 lg:px-20 py-10">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 border-b border-neutral-800 pb-4">

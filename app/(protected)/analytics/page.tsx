@@ -119,7 +119,7 @@ export default function AnalyticsPage() {
 
   return (
     <div className="min-h-screen bg-[#141414] text-white transition-colors duration-300">
-      <Navbar isLoggedIn={isLoggedIn} handleLogout={handleLogout} />
+      <Navbar />
 
       <main className="max-w-6xl mx-auto px-4 py-10">
         {isPageLoading ? (

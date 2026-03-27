@@ -177,7 +177,7 @@ export default function QRGenerator() {
 
   return (
     <div className="min-h-screen transition-colors duration-300 bg-[#141414] text-white relative">
-      <Navbar isLoggedIn={isLoggedIn} handleLogout={handleLogout} />
+      <Navbar />
 
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes gentleShake {

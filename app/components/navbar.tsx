@@ -3,6 +3,7 @@
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useUser } from "./userContext";
+import axios from "axios";
 
 
 export default function Navbar() {
@@ -12,7 +13,10 @@ export default function Navbar() {
   const loggedIn = !!user;
   
   const [tier, setTier] = useState(() => {
-    return localStorage.getItem("plan") || "FREE";
+    if(typeof window !== "undefined") {
+      return localStorage.getItem("plan") || "FREE";
+    }
+    return "FREE";
   });
 
 
@@ -39,7 +43,9 @@ export default function Navbar() {
 
   const isPaid = tier !== "FREE" && tier !== "";
 
-  const handleLogout = () => {
+  const handleLogout =  async () => {
+    await axios.post("api/auth/logout")
+
     setUser(null);
     localStorage.removeItem("user");
     localStorage.removeItem("plan");

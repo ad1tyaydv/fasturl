@@ -92,7 +92,7 @@ export default function SettingsPage() {
   
   return (
     <div className="min-h-screen bg-[#141414] text-white transition-colors duration-300">
-      <Navbar isLoggedIn={isLoggedIn} handleLogout={handleLogout} />
+      <Navbar />
 
       <main className="max-w-5xl mx-auto py-12 px-4 sm:px-8">
         <div className="mb-10">

@@ -7,9 +7,11 @@ import { FcGoogle } from "react-icons/fc";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
+import { useUser } from "@/app/components/userContext";
 
 export default function Signup() {
   const router = useRouter();
+  const { setUser } = useUser();
 
   const [formData, setFormData] = useState({
     userName: "",
@@ -39,13 +41,23 @@ export default function Signup() {
         email: formData.email,
         password: formData.password
       });
+      
+      const newUser = {
+        userName: formData.userName,
+        email: formData.email,
+        plan: "FREE"
+      }
+
+      localStorage.setItem("user", JSON.stringify(newUser));
+      localStorage.setItem("plan", "FREE");
+
+      setUser(newUser);
 
       toast.success("Account created successfully!", { 
-          id: signupToast 
+          id: signupToast
         });
 
       router.push("/");
-      router.refresh();
 
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Signup failed!", { id: signupToast });

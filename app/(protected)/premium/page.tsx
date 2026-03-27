@@ -37,7 +37,7 @@ export default function PremiumPage() {
 
   return (
     <div className="min-h-screen bg-[#141414] text-white transition-colors duration-300">
-      <Navbar isLoggedIn={isLoggedIn} handleLogout={handleLogout} />
+      <Navbar />
 
       <main className="max-w-7xl mx-auto px-4 py-10">
         <section className="px-4 sm:px-8 py-0 max-w-6xl mx-auto flex flex-col items-center justify-start">
