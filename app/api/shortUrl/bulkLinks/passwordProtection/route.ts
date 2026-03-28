@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
     try {
         const data = await req.json();
 
-        if (!data.shortUrlId) {
+        if (!data.bulkLinkId) {
             return NextResponse.json(
                 { message: "Invalid URL ID" },
                 { status: 400 }
@@ -23,14 +23,15 @@ export async function POST(req: NextRequest) {
 
         const expiresAt = new Date(data.expiryDate);
 
-        await prisma.link.update({
+        await prisma.link.updateMany({
             where: {
-                id: data.shortUrlId
+                bulkLinksId: data.bulkLinkId,
+                checkBulk: true
             },
             data: {
                 password: hashedPassword,
                 expiresAt: expiresAt
-            },
+            }
         })
 
         return NextResponse.json(
@@ -39,6 +40,7 @@ export async function POST(req: NextRequest) {
         )
         
     } catch (error) {
+        console.log(error);
         return NextResponse.json(
             {message: "Error while adding password protection"},
             {status: 500}

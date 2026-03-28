@@ -8,6 +8,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     try {
 
+        await prisma.click.deleteMany({
+            where: {
+                linkId: id
+            }
+        })
+
         await prisma.link.delete({
             where: {
                 id: id
@@ -20,7 +26,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         )
         
     } catch (error) {
-        console.log(error);
         return NextResponse.json(
             {message: "Error while deleting the url"},
             {status: 500}

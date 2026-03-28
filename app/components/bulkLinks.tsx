@@ -1,24 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
-import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 import { 
-  IoSearchOutline, IoChevronBack, IoChevronForward,
-  IoTrashOutline, IoLockOpenOutline, IoPencilOutline,
+  IoSearchOutline, IoTrashOutline, IoLockOpenOutline, IoPencilOutline,
   IoCheckmarkOutline, IoFileTrayFullOutline, IoDownloadOutline,
-  IoCloseOutline, IoDocumentTextOutline, IoLockClosedOutline
+  IoCloseOutline, IoDocumentTextOutline, IoLockClosedOutline, IoFilterOutline
 } from "react-icons/io5";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
-import PasswordProtectionModal from "../modals/passwordProtection";
 
-interface BulkLinksProps {
-  bulkLinks: any[];
-  onRefresh: () => void;
-  domain: string;
-  userPlan: string;
-}
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
+import BulkPasswordModal from "../modals/bulkPasswordProtection";
 
 
 const getRelativeTime = (dateString?: string) => {
@@ -26,181 +23,172 @@ const getRelativeTime = (dateString?: string) => {
   const date = new Date(dateString);
   const now = new Date();
   const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-  if (diffInSeconds < 60) return "Just now";
+  if (diffInSeconds < 60) return `${diffInSeconds}s ago`;
   const diffInMinutes = Math.floor(diffInSeconds / 60);
-  if (diffInMinutes < 60) return `${diffInMinutes} minute${diffInMinutes !== 1 ? 's' : ''} ago`;
+  if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
   const diffInHours = Math.floor(diffInMinutes / 60);
-  if (diffInHours < 24) return `${diffInHours} hour${diffInHours !== 1 ? 's' : ''} ago`;
-  const diffInDays = Math.floor(diffInHours / 24);
-  if (diffInDays === 1) return "1 day ago";
-  if (diffInDays < 30) return `${diffInDays} days ago`;
+  if (diffInHours < 24) return `${diffInHours}h ago`;
   return date.toLocaleDateString();
 };
 
 
-export default function BulkLinks({ bulkLinks, onRefresh, domain, userPlan }: BulkLinksProps) {
-  const router = useRouter();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
-  
+export default function BulkLinks({ 
+  bulkLinks, 
+  onRefresh, 
+  searchQuery, 
+  setSearchQuery, 
+  statusFilter, 
+  setStatusFilter 
+}: any) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [tempName, setTempName] = useState("");
   const [showDownloadModal, setShowDownloadModal] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
-  const [selectedUrl, setSelectedUrl] = useState<any | null>(null);
+  const [selectedBatch, setSelectedBatch] = useState<any>(null);
+
+  const [displaySearch, setDisplaySearch] = useState(searchQuery);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setSearchQuery(displaySearch);
+    }, 300);
+
+    return () => clearTimeout(handler);
+
+  }, [displaySearch, setSearchQuery]);
 
 
   const saveName = async (id: string) => {
-    if (tempName.trim()) {
-      try {
-        await axios.post("/api/shortUrl/bulkLinks/updateName", { linkId: id, name: tempName });
-        onRefresh();
+    if (!tempName.trim()) { setEditingId(null); return; }
+    try {
+      await axios.post("/api/shortUrl/bulkLinks/updateName", { linkId: id, name: tempName.trim() });
+      toast.success("Updated");
+      onRefresh();
 
-      } catch (err) {
-        console.error("Failed to update name:", err);
-      }
+    } catch { 
+      toast.error("Failed to update name"); 
     }
     setEditingId(null);
   };
 
-
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this bulk batch?")) return;
-    try {
-      await axios.delete(`/api/shortUrl/bulkLinks/delete/${id}`);
-      onRefresh();
-
-    } catch (error) {
-      console.error("Failed to delete bulk job", error);
-    }
-  };
-
-
-  const exportPDF = () => {
-    if (!selectedUrl?.links) return;
-    const doc = new jsPDF();
-    doc.text(`Shortly - Bulk Batch: ${selectedUrl.name || "Links"}`, 14, 15);
-    autoTable(doc, {
-      head: [['#', 'Original URL', 'Short URL']],
-      body: selectedUrl.links.map((l: any, i: number) => [i + 1, l.original, `${domain}/${l.shorturl || l.short}`]),
-      startY: 20,
-    });
-    doc.save(`bulk-links-${selectedUrl.id}.pdf`);
-  };
-
-
-  const exportCSV = () => {
-    if (!selectedUrl?.links) return;
-    const headers = "Original URL,Short URL\n";
-    const rows = selectedUrl.links.map((l: any) => `${l.original},${domain}/${l.shorturl || l.short}`).join("\n");
-    const blob = new Blob([headers + rows], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `bulk-links-${selectedUrl.id}.csv`;
-    a.click();
-  };
-
-
-  const filteredLinks = bulkLinks.filter((link) => {
-    const query = searchQuery.toLowerCase();
-    return link.name?.toLowerCase().includes(query) || "bulk batch".includes(query);
-  });
-
-
-  const totalPages = Math.ceil(filteredLinks.length / itemsPerPage);
-  const currentLinks = filteredLinks.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-
-
+  
   return (
-    <div className="flex flex-col gap-2 pb-16 w-full">
-      <div className="flex justify-end w-full mb-4 mt-2">
-        <div className="relative w-full sm:w-[280px]">
+    <div className="flex flex-col gap-2 w-full">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 mt-2">
+        <div className="relative w-full sm:w-[320px]">
           <IoSearchOutline className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500" size={18} />
           <input 
-            type="text"
-            placeholder="Search bulk batches..."
-            className="w-full pl-9 pr-4 py-2 bg-[#111111] border border-neutral-800 rounded-lg text-white font-three text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-            value={searchQuery}
-            onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
+            type="text" 
+            placeholder="Search batches..." 
+            className="w-full pl-10 pr-4 py-2 bg-[#111111] border border-neutral-800 rounded-lg text-white text-sm outline-none focus:border-neutral-600 transition-all" 
+            value={displaySearch} 
+            onChange={(e) => setDisplaySearch(e.target.value)} 
           />
         </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger className="flex items-center gap-2 px-4 py-2 bg-[#111111] border border-neutral-800 rounded-lg text-sm text-neutral-400 outline-none hover:text-white transition-colors cursor-pointer">
+            <IoFilterOutline size={18} /> {statusFilter === "all" ? "All Batches" : "Protected Only"}
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="bg-[#1c1c1c] border-neutral-800 text-white min-w-[180px]">
+            <DropdownMenuItem onClick={() => setStatusFilter("all")} className="cursor-pointer">All Batches</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setStatusFilter("protected")} className="cursor-pointer">Protected Only</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       <div className="flex flex-col w-full">
-        {currentLinks.map((url) => (
-          <div key={url.id} className="flex items-center justify-between py-5 px-4 border-b border-neutral-800/60 hover:bg-[#1a1a1a] transition-colors group w-full">
-            <div className="flex items-start gap-4 w-[40%] min-w-0 pr-4">
-              <div className="mt-1 w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 shrink-0">
-                <IoFileTrayFullOutline size={18} />
-              </div>
-              <div className="flex flex-col min-w-0 w-full gap-1">
-                <div className="flex items-center min-w-0 w-full h-8">
+        {bulkLinks.length > 0 ? (
+          bulkLinks.map((url: any) => (
+            <div key={url.id} className="flex items-center justify-between py-5 px-4 border-b border-neutral-800/60 hover:bg-[#1a1a1a] group transition-colors">
+              <div className="flex items-start gap-4 w-[40%] min-w-0 pr-4">
+                <div className="mt-1 w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500 shrink-0">
+                  <IoFileTrayFullOutline size={18} />
+                </div>
+                <div className="flex flex-col min-w-0 w-full">
                   {editingId === url.id ? (
-                    <div className="flex items-center gap-2 w-full max-w-[250px]">
-                      <input autoFocus className="bg-[#111111] border border-neutral-700 rounded px-2 py-1 text-lg font-semibold text-white font-three focus:outline-none w-full" value={tempName} onChange={(e) => setTempName(e.target.value)} onKeyDown={(e) => e.key === "Enter" && saveName(url.id)} />
-                      <button onClick={() => saveName(url.id)} className="text-green-500 p-1"><IoCheckmarkOutline size={22} /></button>
+                    <div className="flex items-center gap-2">
+                      <input 
+                        autoFocus 
+                        className="bg-[#111111] border border-neutral-700 rounded px-2 py-1 text-white w-full outline-none" 
+                        value={tempName} 
+                        onChange={(e) => setTempName(e.target.value)} 
+                        onKeyDown={(e) => e.key === "Enter" && saveName(url.id)} 
+                      />
+                      <button onClick={() => saveName(url.id)} className="text-green-500 cursor-pointer"><IoCheckmarkOutline size={22} /></button>
                     </div>
                   ) : (
-                    <span className="text-white font-bold font-three text-xl truncate">{url.name || "Bulk Batch"}</span>
+                    <span className="text-white font-one text-xl truncate tracking-wide">
+                      {url.name || "Bulk link"}
+                    </span>
                   )}
+                  <span className="text-neutral-500 font-three text-base">{url.links?.length || 0} items</span>
                 </div>
-                <span className="text-neutral-400 font-three text-base truncate mt-0.5">Generated Batch</span>
+              </div>
+
+              <div className="hidden md:flex w-[15%] shrink-0">
+                {url.password && (
+                  <span className="text-[10px] uppercase tracking-widest font-bold px-2 py-1 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                    Protected
+                  </span>
+                )}
+              </div>
+
+              <div className="flex items-center justify-end gap-3 text-neutral-400 w-[30%] opacity-0 group-hover:opacity-100 transition-opacity">
+                <button 
+                  onClick={() => { setSelectedBatch(url); setIsPasswordModalOpen(true); }} 
+                  className={`p-2 rounded-md transition-colors cursor-pointer ${url.password ? 'text-blue-500' : 'hover:text-white'}`}
+                >
+                    {url.password ? <IoLockClosedOutline size={18} /> : <IoLockOpenOutline size={18} />}
+                </button>
+                <button onClick={() => { setEditingId(url.id); setTempName(url.name || ""); }} className="p-2 hover:text-white rounded-md transition-colors cursor-pointer">
+                  <IoPencilOutline size={18} />
+                </button>
+                <button onClick={() => { setSelectedBatch(url); setShowDownloadModal(true); }} className="p-2 hover:text-white rounded-md transition-colors cursor-pointer">
+                  <IoDownloadOutline size={18} />
+                </button>
+                <button onClick={async () => { 
+                  if(confirm("Are you sure?")) {
+                    await axios.post(`/api/shortUrl/bulkLinks/delete/${url.id}`); 
+                    onRefresh();
+                  }
+                }} className="p-2 hover:text-red-500 rounded-md transition-colors cursor-pointer">
+                  <IoTrashOutline size={18} />
+                </button>
+              </div>
+
+              <div className="w-[15%] text-right text-neutral-500 font-medium text-sm whitespace-nowrap">
+                {getRelativeTime(url.createdAt)}
               </div>
             </div>
-
-            <div className="w-[10%] text-neutral-300 font-three text-base shrink-0">
-              {url.links?.length || 0} link{(url.links?.length || 0) !== 1 ? 's' : ''}
-            </div>
-
-            <div className="flex items-center justify-end gap-3 text-neutral-300 w-[35%] opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-              <button 
-                onClick={() => {
-                  if (userPlan !== "PRO" && userPlan !== "ULTRA") router.push("/premium");
-                  else { setSelectedUrl(url); setIsPasswordModalOpen(true); }
-                }} 
-                className={`p-2 rounded-md hover:bg-neutral-800 ${url.password ? 'text-blue-500' : 'hover:text-white'}`}
-                title="Password Protection"
-              >
-                {url.password ? <IoLockClosedOutline size={18} /> : <IoLockOpenOutline size={18} />}
-              </button>
-
-              <button onClick={() => { setEditingId(url.id); setTempName(url.name || ""); }} className="hover:text-white hover:bg-neutral-800 p-2 rounded-md transition-colors"><IoPencilOutline size={18} /></button>
-              <button onClick={() => { setSelectedUrl(url); setShowDownloadModal(true); }} className="hover:text-white hover:bg-neutral-800 p-2 rounded-md transition-colors"><IoDownloadOutline size={18} /></button>
-              <button onClick={() => handleDelete(url.id)} className="hover:text-red-500 hover:bg-red-500/10 p-2 rounded-md transition-colors"><IoTrashOutline size={18} /></button>
-            </div>
-
-            <div className="w-[15%] text-right text-neutral-400 font-three text-sm">
-              {getRelativeTime(url.createdAt)}
-            </div>
-          </div>
-        ))}
+          ))
+        ) : (
+          <div className="text-center py-20 text-neutral-500">No batches found.</div>
+        )}
       </div>
 
-      <PasswordProtectionModal 
-        isOpen={isPasswordModalOpen}
-        onClose={() => setIsPasswordModalOpen(false)}
-        selectedUrl={selectedUrl}
-        onSuccess={onRefresh}
+      <BulkPasswordModal 
+        isOpen={isPasswordModalOpen} 
+        onClose={() => setIsPasswordModalOpen(false)} 
+        selectedBatch={selectedBatch} 
+        onSuccess={onRefresh} 
       />
 
       {showDownloadModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center font-three">
-          <div className="absolute inset-0 bg-black/80 cursor-pointer" onClick={() => setShowDownloadModal(false)} />
-          <div className="relative bg-[#1c1c1c] border border-neutral-800 w-full max-w-[320px] rounded-xl p-5 shadow-2xl">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="font-bold text-base text-white">Download As</h3>
-              <button onClick={() => setShowDownloadModal(false)} className="text-neutral-400 hover:text-white"><IoCloseOutline size={22} /></button>
-            </div>
-            <div className="flex flex-col gap-2">
-              <button onClick={() => { exportPDF(); setShowDownloadModal(false); }} className="flex items-center gap-3 p-3 rounded-lg border border-neutral-700 hover:bg-[#2a2a2a] group">
-                <div className="w-8 h-8 rounded bg-red-500/10 flex items-center justify-center text-red-500"><IoDocumentTextOutline size={18} /></div>
-                <span className="text-sm font-bold text-white">PDF Document</span>
+        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm cursor-pointer" onClick={() => setShowDownloadModal(false)} />
+          <div className="relative bg-[#1c1c1c] border border-neutral-800 w-full max-w-[320px] rounded-xl p-6 shadow-2xl">
+            <div className="flex justify-between items-center mb-6 text-white font-one text-lg">
+              Download Batch 
+              <button onClick={() => setShowDownloadModal(false)} className="text-neutral-500 hover:text-white transition-colors cursor-pointer">
+                <IoCloseOutline size={22}/>
               </button>
-              <button onClick={() => { exportCSV(); setShowDownloadModal(false); }} className="flex items-center gap-3 p-3 rounded-lg border border-neutral-700 hover:bg-[#2a2a2a] group">
-                <div className="w-8 h-8 rounded bg-green-500/10 flex items-center justify-center text-green-500"><IoFileTrayFullOutline size={18} /></div>
-                <span className="text-sm font-bold text-white">CSV Spreadsheet</span>
+            </div>
+            <div className="flex flex-col gap-3">
+              <button className="flex items-center gap-3 p-3 rounded-lg border border-neutral-700 hover:bg-[#2a2a2a] text-white text-sm transition-colors cursor-pointer">
+                <IoDocumentTextOutline className="text-red-500" size={18}/>PDF Document
+              </button>
+              <button className="flex items-center gap-3 p-3 rounded-lg border border-neutral-700 hover:bg-[#2a2a2a] text-white text-sm transition-colors cursor-pointer">
+                <IoFileTrayFullOutline className="text-green-500" size={18}/>CSV Spreadsheet
               </button>
             </div>
           </div>

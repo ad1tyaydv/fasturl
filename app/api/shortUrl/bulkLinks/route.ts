@@ -133,7 +133,7 @@ export async function POST(req: NextRequest) {
         const bulkLinks = await prisma.bulkLinks.create({
             data: {
                 userId: decoded.userId,
-                name: "Fix the name",
+                name: "United bulk links",
                 password: hashedPassword,
                 expiresAt: expiresAt
             }
