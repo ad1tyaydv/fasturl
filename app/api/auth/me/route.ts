@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
                 email: true,
                 plan: true,
                 planExpiresAt: true,
-                planStatedAt: true
+                planStartedAt: true
             }
         })
 
