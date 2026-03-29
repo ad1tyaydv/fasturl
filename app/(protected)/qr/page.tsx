@@ -16,6 +16,7 @@ import PricingSection from "@/app/components/PricingSection";
 import FaqSection from "@/app/components/faqSection";
 import TotalData from "@/app/components/totalData";
 import Footer from "@/app/components/footer";
+import { Button } from "@/components/ui/button";
 
 
 export default function QRGenerator() {
@@ -267,13 +268,6 @@ export default function QRGenerator() {
               {showQr ? (
                 <>
                   <button
-                    className="flex-1 sm:flex-none px-4 sm:px-8 py-3 rounded-lg cursor-pointer flex items-center justify-center gap-2 transition font-medium bg-blue-600 text-white hover:bg-blue-700"
-                    onClick={downloadQr}
-                  >
-                    <IoDownloadOutline size={20} />
-                    Download
-                  </button>
-                  <button
                     className="px-4 sm:px-5 py-3 rounded-lg cursor-pointer flex items-center justify-center transition shrink-0 bg-[#2a2a2a] text-white hover:bg-[#333333]"
                     onClick={handleReset}
                     title="Generate another"
@@ -310,11 +304,18 @@ export default function QRGenerator() {
           )}
 
           {showQr && (
-            <div className="mt-8 flex flex-col items-center animate-in fade-in slide-in-from-top-4 duration-500">
-              <div className="bg-white p-6 rounded-2xl shadow-xl border border-neutral-200">
-                <img src={showQr} alt="Generated QR Code" className="w-48 h-48 object-contain" />
+            <div className="mt-10 flex flex-col items-center animate-in fade-in slide-in-from-top-4 duration-500">
+              <div className="bg-white p-6 rounded-3xl shadow-2xl border border-neutral-200 mb-6">
+                <img src={showQr} alt="Generated QR Code" className="w-52 h-52 object-contain" />
               </div>
-              <p className="mt-4 text-sm font-three font-semibold text-green-500">✓ Your QR code is ready for download!</p>
+              
+              <Button 
+                onClick={downloadQr}
+                className="bg-white text-black hover:bg-neutral-200 font-bold px-8 py-6 rounded-2xl text-lg shadow-lg shadow-white/5 transition-all active:scale-95 flex items-center gap-2 cursor-pointer"
+              >
+                <IoDownloadOutline size={24} />
+                Download QR Code
+              </Button>
             </div>
           )}
 
@@ -332,23 +333,6 @@ export default function QRGenerator() {
         </div>
       </section>
 
-      <section className="flex flex-col items-center justify-center px-4 sm:px-6 py-12 mt-12">
-        <div className="w-full max-w-3xl flex flex-col items-center text-center">
-          <h2 className="text-2xl font-three sm:text-3xl font-bold mb-3 text-white">Manage Your QR</h2>
-          <p className="mb-6 font-three text-sm sm:text-base px-2 text-neutral-400">
-            Access your library of generated QR codes and short links in one place.
-          </p>
-          <button
-            onClick={() => router.push('/urls')} 
-            className="w-full font-one sm:w-auto group flex justify-center items-center gap-2 border border-neutral-700 bg-transparent text-white px-6 sm:px-8 py-3 rounded-lg transition cursor-pointer font-semibold text-base sm:text-lg hover:bg-[#2a2a2a]"
-          >
-            See all your QRs
-            <IoArrowForwardOutline size={20} className="group-hover:translate-x-1 transition-transform" />
-          </button>
-          <div className="w-full border-t border-neutral-800 mt-8"></div>
-        </div>
-      </section>
-
       <div ref={pricingRef}>
         <PricingSection />
       </div>
@@ -362,7 +346,6 @@ export default function QRGenerator() {
       <div className="w-full h-px bg-neutral-800 my-6"></div>
 
       <FaqSection />
-      <div className="w-full h-px bg-neutral-800 my-6"></div>
       
       {isLoggedIn && <TotalData />}
 

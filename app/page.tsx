@@ -306,8 +306,6 @@ export default function Dashboard() {
         </div>
       )}
 
-      <div className="w-full h-px bg-neutral-800 my-6"></div>
-
       {isLoggedIn && (
         <TotalData />
       )}

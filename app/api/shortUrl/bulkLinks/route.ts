@@ -60,22 +60,36 @@ export async function POST(req: NextRequest) {
         const text = await file.text();
         let results: any[] = [];
 
-        if(text.startsWith("url")) {
+        const cleanedText = text.replace(/^\uFEFF/, "").trim();
+
+        if(cleanedText.startsWith("url")) {  // Removes hidden BOM chars
             await new Promise((resolve, reject) => {
                 stream
                     .pipe(csv())
                     .on("data", (data) => {
-                        results.push(data);
+                        const cleanedData: any = {};
+                        Object.keys(data).forEach(key => cleanedData[key.trim()] = data[key]);
+                        results.push(cleanedData);
+
                     })
                     .on("end", resolve)
                     .on("error", reject);
             })
 
         } else {
-            results = text.split("\n").map(line => ({
-                url: line.trim()
-            }));
+            results = text.split("\n")
+                .filter(line => line.trim() !== "")
+                .map(line => {
+                    const [url, customUrl] = line.split(",");
+                    return {
+                        url: url?.trim(),
+                        customUrl: customUrl?.trim() || null
+                    };
+                });
         }
+
+        console.log("TEXT:", text);
+        console.log("RESULTS:", results);
 
         const checkLimit = await prisma.user.findUnique({
             where: {
@@ -141,9 +155,35 @@ export async function POST(req: NextRequest) {
 
         for (let row of validLinks) {
             const url = row.url?.trim();
+            const custom = row.customUrl?.trim();
 
             try {
-                const shortUrl = shortUrlGenerator();
+                let shortUrl = custom || shortUrlGenerator();
+                console.log(shortUrl);
+
+                let checkShortUrl = await prisma.link.findUnique({
+                    where: {
+                        shorturl: shortUrl
+                    }
+                });
+
+                if (checkShortUrl) {
+                    let isUnique = false;
+
+                    while (!isUnique) {
+                        shortUrl = shortUrlGenerator();
+                        const collisionCheck = await prisma.link.findUnique({
+                            where: {
+                                shorturl: shortUrl
+                            }
+                        });
+
+                        if (!collisionCheck) {
+                            isUnique = true;
+                        }
+                    }
+
+                }
 
                 await prisma.link.create({
                     data: {
@@ -162,6 +202,8 @@ export async function POST(req: NextRequest) {
                     short: `${NEXT_PUBLIC_BASE_URL}/${shortUrl}`,
                 })
 
+                console.log(url);
+
             } catch (error) {
                 failed.push({
                     url,
@@ -169,6 +211,10 @@ export async function POST(req: NextRequest) {
                 });
             }
         }
+
+        console.log("success: ", success);
+        console.log("failed: ", failed);
+
 
         return NextResponse.json({
             success: success,

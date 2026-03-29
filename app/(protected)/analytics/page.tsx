@@ -7,11 +7,11 @@ import {
   IoGlobeOutline, IoPhonePortraitOutline, 
   IoHardwareChipOutline, IoShareSocialOutline, IoCompassOutline, 
   IoCloseOutline, IoArrowBackOutline, IoLockClosedOutline,
-  IoChevronForwardOutline, IoChevronBackOutline
+  IoChevronForwardOutline, IoChevronBackOutline, IoFileTrayFullOutline
 } from "react-icons/io5";
 
 import Navbar from "../../components/navbar"; 
-import { AnalyticsCardItem } from "../../components/analyticsCard";
+import { AnalyticsCardItem } from "../../components/linkAnalyticsCard";
 import { SkeletonLoader } from "@/app/loaders/links"; 
 
 import {
@@ -22,7 +22,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-
 
 const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN;
 
@@ -44,7 +43,6 @@ const getTimeAgo = (dateString: string) => {
   return `${diffInDays} days ago`;
 };
 
-
 export function SkeletonForm() {
   return (
     <div className="flex w-full flex-col gap-7 p-6 rounded-2xl border border-neutral-800 bg-[#1c1c1c]">
@@ -61,16 +59,18 @@ export function SkeletonForm() {
   );
 }
 
-
 export default function AnalyticsPage() {
   const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [tier, setTier] = useState("FREE");
+  const [view, setView] = useState<"links" | "bulk">("links");
   
   const [isPageLoading, setIsPageLoading] = useState(true); 
   
   const [selectedLink, setSelectedLink] = useState<any | null>(null);
   const [urls, setUrls] = useState<any[]>([]);
+  const [bulkLinks, setBulkLinks] = useState<any[]>([]);
+  
   const [analytics, setAnalytics] = useState<any>(null);
   const [isLoadingAnalytics, setIsLoadingAnalytics] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -79,7 +79,6 @@ export default function AnalyticsPage() {
   const [timeFilter, setTimeFilter] = useState<TimeFilter>("today");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-
 
   useEffect(() => {
     const checkAuthAndFetch = async () => {
@@ -90,22 +89,24 @@ export default function AnalyticsPage() {
         } else {
           setIsLoggedIn(true);
           setTier(res.data.plan || "FREE");
-          const urlRes = await axios.get("/api/fetchUrls");
+          
+          const [urlRes, bulkRes] = await Promise.all([
+            axios.get("/api/fetchUrls"),
+            axios.get("/api/shortUrl/bulkLinks/fetchBulkLinks")
+          ]);
+          
           setUrls(urlRes.data.urls.reverse());
+          setBulkLinks((bulkRes.data.bulkLinks || []).reverse());
         }
-
       } catch (error) {
         console.error("Auth check failed", error);
         router.push("/auth/signin");
-
       } finally {
         setIsPageLoading(false);
       }
     };
     checkAuthAndFetch();
-
   }, [router]);
-
 
   useEffect(() => {
     if (isModalOpen) {
@@ -116,65 +117,65 @@ export default function AnalyticsPage() {
     return () => {
       document.body.style.overflow = "";
     };
-
   }, [isModalOpen]);
 
+  const currentData = useMemo(() => {
+    return view === "links" ? urls : bulkLinks;
+  }, [view, urls, bulkLinks]);
 
-  const filteredUrls = useMemo(() => {
-    if (timeFilter === "lifetime") return urls;
+  const filteredData = useMemo(() => {
+    if (timeFilter === "lifetime") return currentData;
 
-    const now = new Date();
     const filterDate = new Date();
-
     if (timeFilter === "today") {
       filterDate.setHours(0, 0, 0, 0);
     } else if (timeFilter === "7days") {
-      filterDate.setDate(now.getDate() - 7);
+      filterDate.setDate(new Date().getDate() - 7);
     } else if (timeFilter === "30days") {
-      filterDate.setDate(now.getDate() - 30);
+      filterDate.setDate(new Date().getDate() - 30);
     }
 
-    return urls.filter(url => {
-      const created = new Date(url.createdAt); 
+    return currentData.filter(item => {
+      const created = new Date(item.createdAt); 
       return created >= filterDate;
     });
+  }, [currentData, timeFilter]);
 
-  }, [urls, timeFilter]);
-
-
-  const totalPages = Math.ceil(filteredUrls.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   
-
-  const paginatedUrls = useMemo(() => {
+  const paginatedData = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
-    return filteredUrls.slice(startIndex, startIndex + itemsPerPage);
-  }, [filteredUrls, currentPage]);
-
+    return filteredData.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredData, currentPage]);
 
   useEffect(() => {
     setCurrentPage(1);
+  }, [timeFilter, view]);
 
-  }, [timeFilter]);
-
-
-  const handleSelectLink = (url: any) => {
-    setSelectedLink(url);
-    handleLinkAnalytics(url.id);
+  const handleSelectLink = (item: any) => {
+    setSelectedLink(item);
+    handleLinkAnalytics(item.id);
   };
 
-  const handleLinkAnalytics = async (linkId: string) => {
+  const handleLinkAnalytics = async (id: string) => {
     setIsLoadingAnalytics(true);
     setAnalytics(null);
     try {
-      const res = await axios.get("/api/analytics/link", { params: { linkId } });
+      const endpoint = view === "links" 
+        ? "/api/analytics/link" 
+        : "/api/analytics/bulkLinks";
+
+      const res = await axios.get(endpoint, { 
+        params: view === "links" ? { linkId: id } : { batchId: id } 
+      });
+
       setAnalytics(res.data);
     } catch (error) {
-      console.error("Failed to fetch analytics:", error);
+      console.error(`Failed to fetch ${view} analytics:`, error);
     } finally {
       setIsLoadingAnalytics(false);
     }
   };
-
 
   const aggregatedCountries = useMemo(() => {
     if (!analytics?.countries) return [];
@@ -182,17 +183,13 @@ export default function AnalyticsPage() {
     analytics.countries.forEach((c: any) => {
       map.set(c.country, (map.get(c.country) || 0) + c.count);
     });
-
     return Array.from(map.entries()).map(([country, count]) => ({ country, count }));
-
   }, [analytics]);
-
 
   const openModal = (title: string, icon: React.ReactNode, data: any[], nameKey: string) => {
     setModalContent({ title, icon, data, nameKey });
     setIsModalOpen(true);
   };
-
 
   const premiumMetrics = [
     { title: "Top Referrers", icon: <IoShareSocialOutline size={25}/>, data: analytics?.referrers, key: "referrer", offset: 1 },
@@ -201,15 +198,13 @@ export default function AnalyticsPage() {
     { title: "Operating Systems", icon: <IoHardwareChipOutline size={25}/>, data: analytics?.os, key: "os", offset: 4 },
   ];
 
-
   const handleLinkClick = (e: React.MouseEvent, urlPath: string) => {
     e.stopPropagation();
     if (!urlPath) return;
     const finalUrl = urlPath.startsWith('http') ? urlPath : `https://${urlPath}`;
     window.open(finalUrl, '_blank', 'noopener,noreferrer');
   };
-  
-  
+
   return (
     <div className="min-h-screen bg-[#141414] text-white transition-colors duration-300">
       <Navbar />
@@ -225,57 +220,71 @@ export default function AnalyticsPage() {
               <div className="fade-in">
                 
                 <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-800 pb-6">
-                  <h1 className="text-2xl sm:text-3xl font-one tracking-tight text-white">
-                    Link Analytics
-                  </h1>
+                  <div className="flex items-center gap-2 text-2xl sm:text-3xl font-one tracking-tight">
+                    <button 
+                        onClick={() => setView("links")} 
+                        className={`cursor-pointer transition-colors ${view === "links" ? "text-white" : "text-neutral-600 hover:text-neutral-400"}`}
+                    >
+                        Link Analytics
+                    </button>
+                    <span className="text-neutral-700">/</span>
+                    <button 
+                        onClick={() => setView("bulk")} 
+                        className={`cursor-pointer transition-colors ${view === "bulk" ? "text-white" : "text-neutral-600 hover:text-neutral-400"}`}
+                    >
+                        Bulk link Analytics
+                    </button>
+                  </div>
 
                   <Select value={timeFilter} onValueChange={(value) => setTimeFilter(value as TimeFilter)}>
                     <SelectTrigger className="w-[180px] bg-[#1a1a1a] border-neutral-800 text-white font-three focus:ring-1 focus:ring-blue-500 rounded-lg">
                       <SelectValue placeholder="Select timeframe" />
                     </SelectTrigger>
                     <SelectContent className="bg-[#1a1a1a] border-neutral-800 text-white font-three rounded-lg">
-                      <SelectItem value="today" className="text-neutral-200 focus:bg-[#2a2a2a] focus:text-white data-[state=checked]:text-white cursor-pointer">Created Today</SelectItem>
-                      <SelectItem value="7days" className="text-neutral-200 focus:bg-[#2a2a2a] focus:text-white data-[state=checked]:text-white cursor-pointer">Last 7 Days</SelectItem>
-                      <SelectItem value="30days" className="text-neutral-200 focus:bg-[#2a2a2a] focus:text-white data-[state=checked]:text-white cursor-pointer">Last 30 Days</SelectItem>
-                      <SelectItem value="lifetime" className="text-neutral-200 focus:bg-[#2a2a2a] focus:text-white data-[state=checked]:text-white cursor-pointer">Lifetime</SelectItem>
+                      <SelectItem value="today" className="cursor-pointer">Created Today</SelectItem>
+                      <SelectItem value="7days" className="cursor-pointer">Last 7 Days</SelectItem>
+                      <SelectItem value="30days" className="cursor-pointer">Last 30 Days</SelectItem>
+                      <SelectItem value="lifetime" className="cursor-pointer">Lifetime</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
-                {filteredUrls.length > 0 ? (
+                {filteredData.length > 0 ? (
                   <div className="flex flex-col rounded-xl overflow-hidden">
-                    {paginatedUrls.map((url, index) => (
+                    {paginatedData.map((item, index) => (
                       <div
-                        key={url.id || index}
-                        onClick={() => handleSelectLink(url)}
+                        key={item.id || index}
+                        onClick={() => handleSelectLink(item)}
                         className="flex flex-col sm:flex-row items-start sm:items-center justify-between py-5 px-4 border-b border-neutral-800 last:border-0 hover:bg-[#1a1a1a] transition-colors cursor-pointer group gap-4 sm:gap-0"
                       >
                         <div className="flex items-center gap-4 w-full sm:w-[50%] overflow-hidden">
                           <div className="w-10 h-10 rounded-full bg-[#1c2a3a] text-blue-400 flex items-center justify-center shrink-0">
-                            <IoGlobeOutline size={20} />
+                            {view === "links" ? <IoGlobeOutline size={20} /> : <IoFileTrayFullOutline size={20} />}
                           </div>
                           <div className="flex flex-col overflow-hidden w-full">
                             <span className="font-bold text-white font-three text-base truncate">
-                              {url.title || url.name || "Untitled Link"}
+                              {view === "links" ? (item.title || item.name || "Untitled Link") : (item.name || "Untitled Batch")}
                             </span>
                             <span 
-                              onClick={(e) => handleLinkClick(e, url.original || `${NEXT_DOMAIN}/${url.shorturl}`)}
-                              className="text-sm text-neutral-400 font-three truncate mt-0.5 hover:text-blue-400 hover:underline transition-colors relative z-10 inline-block w-fit cursor-pointer"
+                              onClick={(e) => view === "links" && handleLinkClick(e, item.original || `${NEXT_DOMAIN}/${item.shorturl}`)}
+                              className={`text-sm text-neutral-400 font-three truncate mt-0.5 transition-colors relative z-10 inline-block w-fit ${view === "links" ? "hover:text-blue-400 hover:underline cursor-pointer" : ""}`}
                             >
-                              {url.original || `${NEXT_DOMAIN}/${url.shorturl}`}
+                              {view === "links" 
+                                ? (item.original || `${NEXT_DOMAIN}/${item.shorturl}`) 
+                                : `${item.links?.length || 0} links included`}
                             </span>
                           </div>
                         </div>
 
                         <div className="w-full sm:w-[20%] pl-14 sm:pl-0">
                           <span className="text-sm text-white font-three">
-                            {url.clicks === 1 ? "1 click" : `${url.clicks || 0} clicks`}
+                            {item.clicks === 1 ? "1 click" : `${item.clicks || 0} clicks`}
                           </span>
                         </div>
 
                         <div className="w-full sm:w-[20%] pl-14 sm:pl-0 sm:text-right">
                           <span className="text-sm text-neutral-400 font-three">
-                            {getTimeAgo(url.createdAt)}
+                            {getTimeAgo(item.createdAt)}
                           </span>
                         </div>
                       </div>
@@ -283,7 +292,7 @@ export default function AnalyticsPage() {
                   </div>
                 ) : (
                   <div className="py-12 text-center text-neutral-500 font-three border border-dashed border-neutral-800 rounded-lg mt-4">
-                    No links found for this timeframe.
+                    No records found for this timeframe.
                   </div>
                 )}
 
@@ -324,27 +333,27 @@ export default function AnalyticsPage() {
                   <div className="space-y-4">
                     <div className="pb-2">
                       <span className="text-2xl font-three text-blue-500 uppercase tracking-[0.2em]">
-                        Link Analytics
+                        {view === "links" ? "Link Analytics" : "Batch Analytics"}
                       </span>
                     </div>
                     
                     <div className="space-y-3">
                       <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-3">
-                        <span className="text-xs uppercase tracking-widest text-neutral-500 font-one w-24">Short Link:</span>
+                        <span className="text-xs uppercase tracking-widest text-neutral-500 font-one w-24">{view === "links" ? "Short Link:" : "Batch Name:"}</span>
                         <h2 
-                          onClick={(e) => handleLinkClick(e, `${NEXT_DOMAIN}/${selectedLink.shorturl}`)}
-                          className="text-xl font-three truncate max-w-[300px] md:max-w-md text-white hover:text-blue-400 hover:underline cursor-pointer transition-colors"
+                          onClick={(e) => view === "links" && handleLinkClick(e, `${NEXT_DOMAIN}/${selectedLink.shorturl}`)}
+                          className={`text-xl font-three truncate max-w-[300px] md:max-w-md text-white transition-colors ${view === "links" ? "hover:text-blue-400 hover:underline cursor-pointer" : ""}`}
                         >
-                          {NEXT_DOMAIN}/{selectedLink.shorturl}
+                          {view === "links" ? `${NEXT_DOMAIN}/${selectedLink.shorturl}` : (selectedLink.name || "Untitled Batch")}
                         </h2>
                       </div>
                       <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-3">
-                        <span className="text-xs uppercase tracking-widest text-neutral-500 font-one w-24">Original:</span>
+                        <span className="text-xs uppercase tracking-widest text-neutral-500 font-one w-24">{view === "links" ? "Original:" : "Items:"}</span>
                         <p 
-                          onClick={(e) => handleLinkClick(e, selectedLink.original)}
-                          className="text-neutral-400 text-xl font-three truncate max-w-sm italic hover:text-blue-400 hover:underline cursor-pointer transition-colors"
+                          onClick={(e) => view === "links" && handleLinkClick(e, selectedLink.original)}
+                          className={`text-neutral-400 text-xl font-three truncate max-w-sm italic transition-colors ${view === "links" ? "hover:text-blue-400 hover:underline cursor-pointer" : ""}`}
                         >
-                          {selectedLink.original}
+                          {view === "links" ? selectedLink.original : `${selectedLink.links?.length || 0} links included`}
                         </p>
                       </div>
                     </div>
@@ -362,6 +371,7 @@ export default function AnalyticsPage() {
 
                 {isLoadingAnalytics ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-24">
+                    <SkeletonForm />
                     <SkeletonForm />
                     <SkeletonForm />
                     <SkeletonForm />

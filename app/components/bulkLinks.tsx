@@ -16,7 +16,7 @@ import {
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
 import BulkPasswordModal from "../modals/bulkPasswordProtection";
-
+import BulkLinkDetails from "./bulkLinkDetails";
 
 const getRelativeTime = (dateString?: string) => {
   if (!dateString) return "Just now";
@@ -31,34 +31,36 @@ const getRelativeTime = (dateString?: string) => {
   return date.toLocaleDateString();
 };
 
-
 export default function BulkLinks({ 
   bulkLinks, 
   onRefresh, 
   searchQuery, 
   setSearchQuery, 
   statusFilter, 
-  setStatusFilter 
+  setStatusFilter,
+  domain
 }: any) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [tempName, setTempName] = useState("");
   const [showDownloadModal, setShowDownloadModal] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [selectedBatch, setSelectedBatch] = useState<any>(null);
+  const [selectedBatchDetails, setSelectedBatchDetails] = useState<any>(null); // New state for navigation
 
   const [displaySearch, setDisplaySearch] = useState(searchQuery);
+
 
   useEffect(() => {
     const handler = setTimeout(() => {
       setSearchQuery(displaySearch);
     }, 300);
-
     return () => clearTimeout(handler);
 
   }, [displaySearch, setSearchQuery]);
 
 
-  const saveName = async (id: string) => {
+  const saveName = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
     if (!tempName.trim()) { setEditingId(null); return; }
     try {
       await axios.post("/api/shortUrl/bulkLinks/updateName", { linkId: id, name: tempName.trim() });
@@ -71,7 +73,19 @@ export default function BulkLinks({
     setEditingId(null);
   };
 
-  
+
+
+  if (selectedBatchDetails) {
+    return (
+      <BulkLinkDetails 
+        batch={selectedBatchDetails} 
+        onBack={() => setSelectedBatchDetails(null)} 
+        domain={domain}
+      />
+    );
+  }
+
+
   return (
     <div className="flex flex-col gap-2 w-full">
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 mt-2">
@@ -99,22 +113,26 @@ export default function BulkLinks({
       <div className="flex flex-col w-full">
         {bulkLinks.length > 0 ? (
           bulkLinks.map((url: any) => (
-            <div key={url.id} className="flex items-center justify-between py-5 px-4 border-b border-neutral-800/60 hover:bg-[#1a1a1a] group transition-colors">
+            <div 
+              key={url.id} 
+              onClick={() => setSelectedBatchDetails(url)} // Handle opening details
+              className="flex items-center justify-between py-5 px-4 border-b border-neutral-800/60 hover:bg-[#1a1a1a] group transition-colors cursor-pointer"
+            >
               <div className="flex items-start gap-4 w-[40%] min-w-0 pr-4">
                 <div className="mt-1 w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500 shrink-0">
                   <IoFileTrayFullOutline size={18} />
                 </div>
                 <div className="flex flex-col min-w-0 w-full">
                   {editingId === url.id ? (
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
                       <input 
                         autoFocus 
                         className="bg-[#111111] border border-neutral-700 rounded px-2 py-1 text-white w-full outline-none" 
                         value={tempName} 
                         onChange={(e) => setTempName(e.target.value)} 
-                        onKeyDown={(e) => e.key === "Enter" && saveName(url.id)} 
+                        onKeyDown={(e) => e.key === "Enter" && saveName(e as any, url.id)} 
                       />
-                      <button onClick={() => saveName(url.id)} className="text-green-500 cursor-pointer"><IoCheckmarkOutline size={22} /></button>
+                      <button onClick={(e) => saveName(e, url.id)} className="text-green-500 cursor-pointer"><IoCheckmarkOutline size={22} /></button>
                     </div>
                   ) : (
                     <span className="text-white font-one text-xl truncate tracking-wide">
@@ -135,18 +153,19 @@ export default function BulkLinks({
 
               <div className="flex items-center justify-end gap-3 text-neutral-400 w-[30%] opacity-0 group-hover:opacity-100 transition-opacity">
                 <button 
-                  onClick={() => { setSelectedBatch(url); setIsPasswordModalOpen(true); }} 
+                  onClick={(e) => { e.stopPropagation(); setSelectedBatch(url); setIsPasswordModalOpen(true); }} 
                   className={`p-2 rounded-md transition-colors cursor-pointer ${url.password ? 'text-blue-500' : 'hover:text-white'}`}
                 >
                     {url.password ? <IoLockClosedOutline size={18} /> : <IoLockOpenOutline size={18} />}
                 </button>
-                <button onClick={() => { setEditingId(url.id); setTempName(url.name || ""); }} className="p-2 hover:text-white rounded-md transition-colors cursor-pointer">
+                <button onClick={(e) => { e.stopPropagation(); setEditingId(url.id); setTempName(url.name || ""); }} className="p-2 hover:text-white rounded-md transition-colors cursor-pointer">
                   <IoPencilOutline size={18} />
                 </button>
-                <button onClick={() => { setSelectedBatch(url); setShowDownloadModal(true); }} className="p-2 hover:text-white rounded-md transition-colors cursor-pointer">
+                <button onClick={(e) => { e.stopPropagation(); setSelectedBatch(url); setShowDownloadModal(true); }} className="p-2 hover:text-white rounded-md transition-colors cursor-pointer">
                   <IoDownloadOutline size={18} />
                 </button>
-                <button onClick={async () => { 
+                <button onClick={async (e) => { 
+                  e.stopPropagation();
                   if(confirm("Are you sure?")) {
                     await axios.post(`/api/shortUrl/bulkLinks/delete/${url.id}`); 
                     onRefresh();
@@ -169,8 +188,8 @@ export default function BulkLinks({
       <BulkPasswordModal 
         isOpen={isPasswordModalOpen} 
         onClose={() => setIsPasswordModalOpen(false)} 
-        selectedBatch={selectedBatch} 
-        onSuccess={onRefresh} 
+        selectedBatch={selectedBatch}
+        onSuccess={onRefresh}
       />
 
       {showDownloadModal && (
