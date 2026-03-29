@@ -23,7 +23,6 @@ const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN;
 
 export default function Dashboard() {
   const router = useRouter();
-  const { setUser } = useUser();
   const pricingRef = useRef<HTMLDivElement>(null);
 
   const [url, setUrl] = useState("");

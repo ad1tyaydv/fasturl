@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { prisma } from "@/lib/dbConfig";
-import { use } from "react";
 
 
 const JWT_SECRET = process.env.NEXTAUTH_SECRET!;
@@ -29,8 +28,8 @@ export async function GET(req: NextRequest) {
                 id: userId
             },
             select: {
-                links: true,
-                plan: true
+                plan: true,
+                planStartedAt: true
             }
         })
 
@@ -41,18 +40,24 @@ export async function GET(req: NextRequest) {
             )
         }
 
-        let linksCount = user?.links.length;
-        let linksLeft = 0;
+        const currentUsageCount = await prisma.link.count({
+            where: {
+                userId: userId,
+                createdAt: {
+                    gte: user.planStartedAt ? new Date(user.planStartedAt) : new Date(0)
+                }
+            }
+        })
 
-        if(user.plan === "FREE") {
-            linksLeft = 20 - linksCount;
+        const planLimits: Record<string, number> = {
+            "FREE": 20,
+            "ESSENTIAL": 20000,
+            "PRO": 40000,
+        };
+        
+        const limit = planLimits[user.plan] || 20;
 
-        } else if(user.plan === 'ESSENTIAL') {
-            linksLeft = 20000 - linksCount;
-
-        } else {
-            linksLeft = 40000 - linksCount;
-        }
+        let linksLeft = Math.max(0, limit - currentUsageCount);
 
         return NextResponse.json(
             {message: "Links left", linksLeft}

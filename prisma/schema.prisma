@@ -22,7 +22,7 @@ model User {
   ipAddress      String?
 
   plan           Plan      @default(FREE)
-  planStatedAt   DateTime?
+  planStartedAt  DateTime?
   planExpiresAt  DateTime?
 
   links          Link[]
@@ -44,7 +44,7 @@ model Link {
   bulkLinksId  String?
   bulk         BulkLinks?  @relation(fields: [bulkLinksId], references: [id])
 
-  checkBulk  Boolean     @default(false)
+  checkBulk    Boolean     @default(false)
 
   ipAddress    String?
 
