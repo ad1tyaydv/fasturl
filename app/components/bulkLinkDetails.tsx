@@ -11,7 +11,7 @@ import {
 } from "react-icons/io5";
 
 
-export default function BulkLinkDetails({ batch, onBack, domain, onRefresh }: any) {
+export default function BulkLinkDetails({ batch, onBack, domain }: any) {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 

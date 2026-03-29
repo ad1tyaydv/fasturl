@@ -80,7 +80,7 @@ export async function GET(req: NextRequest) {
             }
         })
         const osData = os.map((d) => ({
-            os: d.OS || "Unknown",
+            os: (d.OS || "Unknown").replace(/"/g, ""),
             count: d._count.OS,
         }))
 

@@ -16,19 +16,40 @@ export async function GET(req: NextRequest) {
             )
         }
 
-        const bulkLinkId = req.nextUrl.searchParams.get("bulkLinkId");
-        if (!bulkLinkId) {
+        const linkId = req.nextUrl.searchParams.get("linkId");
+
+        if (!linkId) {
             return NextResponse.json(
-                { message: "bulkLinkId is required" },
+                { message: "linkId is required" },
                 { status: 400 }
             );
         }
 
+        const bulk = await prisma.bulkLinks.findUnique({
+            where: { id: linkId },
+                include: {
+                    links: {
+                        select: {
+                            id: true
+                        }
+                    }
+                }
+            });
+
+        if (!bulk) {
+            return NextResponse.json(
+                { message: "Bulk not found" },
+                { status: 404 }
+            );
+        }
+
+        const linkIds = bulk.links.map(link => link.id);
+
         const clicks = await prisma.click.groupBy({
             by: ["country", "state"],
             where: {
-                link: {
-                    bulkLinksId: bulkLinkId,
+                linkId: {
+                    in: linkIds
                 }
             },
             _count: {
@@ -45,8 +66,8 @@ export async function GET(req: NextRequest) {
         const browsers = await prisma.click.groupBy({
             by: ["browser"],
             where: {
-                link: {
-                    bulkLinksId: bulkLinkId,
+                linkId: {
+                    in: linkIds
                 }
             },
             _count: {
@@ -62,8 +83,8 @@ export async function GET(req: NextRequest) {
         const devices = await prisma.click.groupBy({
             by: ["device"],
             where: {
-                link: {
-                    bulkLinksId: bulkLinkId,
+                linkId: {
+                    in: linkIds
                 }
             },
             _count: {
@@ -79,8 +100,8 @@ export async function GET(req: NextRequest) {
         const os = await prisma.click.groupBy({
             by: ["OS"],
             where: {
-                link: {
-                    bulkLinksId: bulkLinkId,
+                linkId: {
+                    in: linkIds
                 }
             },
             _count: {
@@ -88,7 +109,7 @@ export async function GET(req: NextRequest) {
             }
         })
         const osData = os.map((d) => ({
-            os: d.OS || "Unknown",
+            os: (d.OS || "Unknown").replace(/"/g, ""),
             count: d._count.OS,
         }))
 
@@ -96,8 +117,8 @@ export async function GET(req: NextRequest) {
         const referrers = await prisma.click.groupBy({
             by: ["referrer"],
             where: { 
-                link: {
-                    bulkLinksId: bulkLinkId,
+                linkId: {
+                    in: linkIds
                 }
              },
             _count: {
@@ -112,6 +133,7 @@ export async function GET(req: NextRequest) {
 
         return NextResponse.json({
             message: "Analytics fetched successfully",
+            clicks: clicks,
             countries: formatted,
             browsers: browserData,
             devices: deviceData,

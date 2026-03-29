@@ -44,7 +44,7 @@ export default function ShortlyFeatures({ isLoggedIn, userPlan }: ShortlyFeature
       title: "Bulk Short URLs",
       desc: "Shorten hundreds of links at once via CSV upload.",
       icon: <IoLayersOutline size={28} />,
-      path: "/bulkLinks",
+      path: "/bulklinks",
       color: "bg-purple-600 hover:bg-purple-700",
       border: "border-purple-900/30",
     },

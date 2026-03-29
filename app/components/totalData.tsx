@@ -4,7 +4,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 
 export default function TotalData() {
-  const [stats, setStats] = useState({ links: 0, clicks: 0, customers: 0 });
+  const [stats, setStats] = useState({ links: 0, qr: 0, clicks: 0, customers: 0 });
 
 
   useEffect(() => {
@@ -13,6 +13,7 @@ export default function TotalData() {
         const res = await axios.get("/api/totalData");
         setStats({
           links: res.data.totalLinks || 0,
+          qr: res.data.totalqrCodes || 0,
           clicks: res.data.totalClicks || 0,
           customers: res.data.totalUsers || 1300000 
         });
@@ -34,6 +35,11 @@ export default function TotalData() {
       bottomLabel: "Links",
     },
     {
+      topLabel: "Generated",
+      value: stats.qr,
+      bottomLabel: "QR Codes",
+    },
+    {
       topLabel: "Serving",
       value: stats.clicks,
       bottomLabel: "Clicks",
@@ -49,7 +55,7 @@ export default function TotalData() {
   return (
     <section className="w-full bg-[#141414] py-20 border-t border-neutral-800">
       <div className="max-w-7xl mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-4">
           {statItems.map((item, index) => (
             <div 
               key={index} 

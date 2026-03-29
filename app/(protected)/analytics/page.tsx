@@ -152,8 +152,20 @@ export default function AnalyticsPage() {
     setCurrentPage(1);
   }, [timeFilter, view]);
 
+  // Helper to calculate total clicks for a bulk batch
+  const getBulkTotalClicks = (item: any) => {
+    if (view === "links") return item.clicks || 0;
+    if (!item.links) return 0;
+    return item.links.reduce((acc: number, link: any) => acc + (link.clicks || 0), 0);
+  };
+
   const handleSelectLink = (item: any) => {
-    setSelectedLink(item);
+    // Add calculated total clicks to the selected object for the header display
+    const enrichedItem = {
+      ...item,
+      totalCalculatedClicks: getBulkTotalClicks(item)
+    };
+    setSelectedLink(enrichedItem);
     handleLinkAnalytics(item.id);
   };
 
@@ -166,10 +178,11 @@ export default function AnalyticsPage() {
         : "/api/analytics/bulkLinks";
 
       const res = await axios.get(endpoint, { 
-        params: view === "links" ? { linkId: id } : { batchId: id } 
+        params: { linkId: id }
       });
 
       setAnalytics(res.data);
+
     } catch (error) {
       console.error(`Failed to fetch ${view} analytics:`, error);
     } finally {
@@ -251,44 +264,47 @@ export default function AnalyticsPage() {
 
                 {filteredData.length > 0 ? (
                   <div className="flex flex-col rounded-xl overflow-hidden">
-                    {paginatedData.map((item, index) => (
-                      <div
-                        key={item.id || index}
-                        onClick={() => handleSelectLink(item)}
-                        className="flex flex-col sm:flex-row items-start sm:items-center justify-between py-5 px-4 border-b border-neutral-800 last:border-0 hover:bg-[#1a1a1a] transition-colors cursor-pointer group gap-4 sm:gap-0"
-                      >
-                        <div className="flex items-center gap-4 w-full sm:w-[50%] overflow-hidden">
-                          <div className="w-10 h-10 rounded-full bg-[#1c2a3a] text-blue-400 flex items-center justify-center shrink-0">
-                            {view === "links" ? <IoGlobeOutline size={20} /> : <IoFileTrayFullOutline size={20} />}
+                    {paginatedData.map((item, index) => {
+                      const totalClicks = getBulkTotalClicks(item);
+                      return (
+                        <div
+                          key={item.id || index}
+                          onClick={() => handleSelectLink(item)}
+                          className="flex flex-col sm:flex-row items-start sm:items-center justify-between py-5 px-4 border-b border-neutral-800 last:border-0 hover:bg-[#1a1a1a] transition-colors cursor-pointer group gap-4 sm:gap-0"
+                        >
+                          <div className="flex items-center gap-4 w-full sm:w-[50%] overflow-hidden">
+                            <div className="w-10 h-10 rounded-full bg-[#1c2a3a] text-blue-400 flex items-center justify-center shrink-0">
+                              {view === "links" ? <IoGlobeOutline size={20} /> : <IoFileTrayFullOutline size={20} />}
+                            </div>
+                            <div className="flex flex-col overflow-hidden w-full">
+                              <span className="font-bold text-white font-three text-base truncate">
+                                {view === "links" ? (item.title || item.name || "Untitled Link") : (item.name || "Untitled Batch")}
+                              </span>
+                              <span 
+                                onClick={(e) => view === "links" && handleLinkClick(e, item.original || `${NEXT_DOMAIN}/${item.shorturl}`)}
+                                className={`text-sm text-neutral-400 font-three truncate mt-0.5 transition-colors relative z-10 inline-block w-fit ${view === "links" ? "hover:text-blue-400 hover:underline cursor-pointer" : ""}`}
+                              >
+                                {view === "links" 
+                                  ? (item.original || `${NEXT_DOMAIN}/${item.shorturl}`) 
+                                  : `${item.links?.length || 0} links included`}
+                              </span>
+                            </div>
                           </div>
-                          <div className="flex flex-col overflow-hidden w-full">
-                            <span className="font-bold text-white font-three text-base truncate">
-                              {view === "links" ? (item.title || item.name || "Untitled Link") : (item.name || "Untitled Batch")}
+
+                          <div className="w-full sm:w-[20%] pl-14 sm:pl-0">
+                            <span className="text-sm text-white font-three">
+                              {totalClicks === 1 ? "1 click" : `${totalClicks} clicks`}
                             </span>
-                            <span 
-                              onClick={(e) => view === "links" && handleLinkClick(e, item.original || `${NEXT_DOMAIN}/${item.shorturl}`)}
-                              className={`text-sm text-neutral-400 font-three truncate mt-0.5 transition-colors relative z-10 inline-block w-fit ${view === "links" ? "hover:text-blue-400 hover:underline cursor-pointer" : ""}`}
-                            >
-                              {view === "links" 
-                                ? (item.original || `${NEXT_DOMAIN}/${item.shorturl}`) 
-                                : `${item.links?.length || 0} links included`}
+                          </div>
+
+                          <div className="w-full sm:w-[20%] pl-14 sm:pl-0 sm:text-right">
+                            <span className="text-sm text-neutral-400 font-three">
+                              {getTimeAgo(item.createdAt)}
                             </span>
                           </div>
                         </div>
-
-                        <div className="w-full sm:w-[20%] pl-14 sm:pl-0">
-                          <span className="text-sm text-white font-three">
-                            {item.clicks === 1 ? "1 click" : `${item.clicks || 0} clicks`}
-                          </span>
-                        </div>
-
-                        <div className="w-full sm:w-[20%] pl-14 sm:pl-0 sm:text-right">
-                          <span className="text-sm text-neutral-400 font-three">
-                            {getTimeAgo(item.createdAt)}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 ) : (
                   <div className="py-12 text-center text-neutral-500 font-three border border-dashed border-neutral-800 rounded-lg mt-4">
@@ -364,7 +380,7 @@ export default function AnalyticsPage() {
                       Total Clicks
                     </span>
                     <p className="text-3xl font-two text-white">
-                      {selectedLink.clicks || 0}
+                      {selectedLink.totalCalculatedClicks ?? selectedLink.clicks ?? 0}
                     </p>
                   </div>
                 </div>
