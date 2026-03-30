@@ -7,19 +7,13 @@ import toast from "react-hot-toast";
 import { 
   IoCopyOutline, IoPencilOutline, IoCheckmarkOutline, IoSearchOutline, 
   IoGlobeOutline, IoTrashOutline, IoLockOpenOutline, IoOpenOutline, 
-  IoQrCodeOutline, IoColorWandOutline, IoFilterOutline, IoLockClosedOutline
+  IoQrCodeOutline, IoColorWandOutline, IoLockClosedOutline
 } from "react-icons/io5";
 
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
-} from "@/components/ui/dropdown-menu";
 import QRCodeModal from "../modals/qrGenerate";
 import PasswordProtectionModal from "@/app/modals/linkPasswordProtection";
 import CustomUrlModal from "@/app/modals/customUrl";
-
+import { FilterDropDown, FilterType } from "../dropDown/urlsPageDropDown";
 
 const getRelativeTime = (dateString?: string) => {
   if (!dateString) return "Just now";
@@ -34,7 +28,6 @@ const getRelativeTime = (dateString?: string) => {
   return date.toLocaleDateString();
 };
 
-
 export default function SavedLinks({ 
   links, 
   onRefresh, 
@@ -44,7 +37,6 @@ export default function SavedLinks({
   statusFilter, 
   setStatusFilter 
 }: any) {
-  const router = useRouter();
   const [copiedUrlId, setCopiedUrlId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [tempName, setTempName] = useState("");
@@ -54,25 +46,23 @@ export default function SavedLinks({
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [isCustomModalOpen, setIsCustomModalOpen] = useState(false);
 
-
   const copyToClipboard = (url: string, id: string) => {
     navigator.clipboard.writeText(url);
     setCopiedUrlId(id);
     toast.success("Link copied!"); 
-    
     setTimeout(() => setCopiedUrlId(null), 2000);
   };
 
 
   const saveName = async (id: string) => {
     if (!tempName.trim()) { setEditingId(null); return; }
+
     try {
       await axios.post("/api/shortUrl/linkName", { linkId: id, name: tempName.trim() });
       toast.success("Name updated!");
       onRefresh();
 
     } catch { toast.error("Update failed"); }
-
     setEditingId(null);
   };
 
@@ -90,15 +80,11 @@ export default function SavedLinks({
             onChange={(e) => setSearchQuery(e.target.value)} 
           />
         </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger className="flex items-center gap-2 px-4 py-2 bg-[#111111] border border-neutral-800 rounded-lg text-sm text-neutral-400 outline-none hover:text-white transition-colors cursor-pointer">
-            <IoFilterOutline size={18} /> {statusFilter === "all" ? "All Links" : "Protected Only"}
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="bg-[#1c1c1c] border-neutral-800 text-white min-w-[160px]">
-            <DropdownMenuItem onClick={() => setStatusFilter("all")} className="cursor-pointer">All Links</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setStatusFilter("protected")} className="cursor-pointer">Protected Only</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+
+        <FilterDropDown 
+          value={statusFilter} 
+          onChange={(val: FilterType) => setStatusFilter(val)} 
+        />
       </div>
 
       <div className="flex flex-col w-full">
@@ -118,7 +104,7 @@ export default function SavedLinks({
                       onChange={(e) => setTempName(e.target.value)} 
                       onKeyDown={(e) => e.key === "Enter" && saveName(url.id)} 
                     />
-                    <button onClick={() => saveName(url.id)} className="text-green-500 cursor-pointer transition-transform active:scale-90">
+                    <button onClick={() => saveName(url.id)} className="text-green-500 cursor-pointer">
                       <IoCheckmarkOutline size={22} />
                     </button>
                   </div>
@@ -147,24 +133,24 @@ export default function SavedLinks({
                 >
                     {url.password ? <IoLockClosedOutline size={18} /> : <IoLockOpenOutline size={18} />}
                 </button>
-                <button onClick={() => { setSelectedLink(url); setIsCustomModalOpen(true); }} className="hover:text-white p-2 cursor-pointer transition-colors">
+                <button onClick={() => { setSelectedLink(url); setIsCustomModalOpen(true); }} className="hover:text-white p-2 cursor-pointer">
                   <IoColorWandOutline size={18} />
                 </button>
-                <button onClick={() => window.open(`${domain}/${url.shorturl}`, '_blank')} className="hover:text-white p-2 cursor-pointer transition-colors">
+                <button onClick={() => window.open(`${domain}/${url.shorturl}`, '_blank')} className="hover:text-white p-2 cursor-pointer">
                   <IoOpenOutline size={18} />
                 </button>
-                <button onClick={() => copyToClipboard(`${domain}/${url.shorturl}`, url.id)} className={`p-2 cursor-pointer transition-colors ${copiedUrlId === url.id ? "text-green-500" : "hover:text-white"}`}>
+                <button onClick={() => copyToClipboard(`${domain}/${url.shorturl}`, url.id)} className={`p-2 cursor-pointer ${copiedUrlId === url.id ? "text-green-500" : "hover:text-white"}`}>
                   {copiedUrlId === url.id ? <IoCheckmarkOutline size={18} /> : <IoCopyOutline size={18} />}
                 </button>
-                <button onClick={() => { setSelectedLink(url); setIsQrModalOpen(true); }} className="hover:text-white p-2 cursor-pointer transition-colors">
+                <button onClick={() => { setSelectedLink(url); setIsQrModalOpen(true); }} className="hover:text-white p-2 cursor-pointer">
                   <IoQrCodeOutline size={18} />
                 </button>
-                <button onClick={() => { setEditingId(url.id); setTempName(url.linkName || ""); }} className="hover:text-white p-2 cursor-pointer transition-colors">
+                <button onClick={() => { setEditingId(url.id); setTempName(url.linkName || ""); }} className="hover:text-white p-2 cursor-pointer">
                   <IoPencilOutline size={18} />
                 </button>
                 <button 
                   onClick={async () => { if(confirm("Delete link?")) { await axios.post(`/api/shortUrl/delete/${url.id}`); onRefresh(); } }} 
-                  className="hover:text-red-500 p-2 cursor-pointer transition-colors"
+                  className="hover:text-red-500 p-2 cursor-pointer"
                 >
                   <IoTrashOutline size={18} />
                 </button>
