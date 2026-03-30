@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "Shortly URL Shortener",
+  "version": "1.0",
+  "description": "Shorten current page URL instantly",
+  "permissions": ["activeTab", "storage", "tabs"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Shortly"
+  }
+}

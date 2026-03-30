@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import axios from "axios";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation"; // Added useSearchParams
 import { 
   IoGlobeOutline, IoPhonePortraitOutline, 
   IoHardwareChipOutline, IoShareSocialOutline, IoCompassOutline, 
@@ -15,7 +15,6 @@ import { AnalyticsCardItem } from "../../components/linkAnalyticsCard";
 import { SkeletonLoader } from "@/app/loaders/links"; 
 import { AnalyticsFilter, SortOrder } from "@/app/dropDown/filterDropDown";
 import { TimeFilterDropDown } from "@/app/dropDown/timeFilterDropDown";
-
 
 const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN;
 
@@ -36,12 +35,15 @@ const getTimeAgo = (dateString: string) => {
   return `${diffInDays} days ago`;
 };
 
-
 export default function AnalyticsPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const currentView = (searchParams.get("view") as "links" | "bulk") || "links";
+  
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [tier, setTier] = useState("FREE");
-  const [view, setView] = useState<"links" | "bulk">("links");
+  const [view, setView] = useState<"links" | "bulk">(currentView);
   const [isPageLoading, setIsPageLoading] = useState(true); 
   const [selectedLink, setSelectedLink] = useState<any | null>(null);
   const [urls, setUrls] = useState<any[]>([]);
@@ -55,6 +57,20 @@ export default function AnalyticsPage() {
   const [sortOrder, setSortOrder] = useState<SortOrder>("newest");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+
+
+  useEffect(() => {
+    setView(currentView);
+
+  }, [currentView]);
+
+
+  const handleViewChange = (newView: "links" | "bulk") => {
+    setView(newView);
+    setSelectedLink(null);
+
+    router.push(`?view=${newView}`, { scroll: false });
+  };
 
 
   useEffect(() => {
@@ -87,7 +103,7 @@ export default function AnalyticsPage() {
 
   }, [router]);
 
-
+  
   useEffect(() => {
     document.body.style.overflow = isModalOpen ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
@@ -101,7 +117,7 @@ export default function AnalyticsPage() {
     return item.links.reduce((acc: number, link: any) => acc + (link.clicks || 0), 0);
   };
 
-
+  
   const filteredData = useMemo(() => {
     let result = view === "links" ? [...urls] : [...bulkLinks];
 
@@ -121,8 +137,8 @@ export default function AnalyticsPage() {
 
       if (sortOrder === "most") return clicksB - clicksA;
       if (sortOrder === "least") return clicksA - clicksB;
-      if (sortOrder === "oldest") return timeA - timeB; // First created first
-      return timeB - timeA; // Recent first
+      if (sortOrder === "oldest") return timeA - timeB;
+      return timeB - timeA;
     });
 
     return result;
@@ -150,11 +166,12 @@ export default function AnalyticsPage() {
     setIsLoadingAnalytics(true);
     setAnalytics(null);
 
+
     try {
       const endpoint = view === "links" ? "/api/analytics/link" : "/api/analytics/bulkLinks";
       const res = await axios.get(endpoint, { params: { linkId: id } });
       setAnalytics(res.data);
-
+      
     } catch (error) { console.error(error); } finally { setIsLoadingAnalytics(false); }
   };
 
@@ -165,7 +182,6 @@ export default function AnalyticsPage() {
     analytics.countries.forEach((c: any) => map.set(c.country, (map.get(c.country) || 0) + c.count));
 
     return Array.from(map.entries()).map(([country, count]) => ({ country, count }));
-
   }, [analytics]);
 
 
@@ -193,9 +209,20 @@ export default function AnalyticsPage() {
               <div className="fade-in">
                 <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-800 pb-6">
                   <div className="flex items-center gap-2 text-2xl sm:text-3xl font-one tracking-tight">
-                    <button onClick={() => setView("links")} className={`cursor-pointer ${view === "links" ? "text-white" : "text-neutral-600"}`}>Link Analytics</button>
+                    {/* Updated onClick handlers */}
+                    <button 
+                      onClick={() => handleViewChange("links")} 
+                      className={`cursor-pointer transition-colors ${view === "links" ? "text-white" : "text-neutral-600 hover:text-neutral-400"}`}
+                    >
+                      Link Analytics
+                    </button>
                     <span className="text-neutral-700">/</span>
-                    <button onClick={() => setView("bulk")} className={`cursor-pointer ${view === "bulk" ? "text-white" : "text-neutral-600"}`}>Bulk link Analytics</button>
+                    <button 
+                      onClick={() => handleViewChange("bulk")} 
+                      className={`cursor-pointer transition-colors ${view === "bulk" ? "text-white" : "text-neutral-600 hover:text-neutral-400"}`}
+                    >
+                      Bulk link Analytics
+                    </button>
                   </div>
                   <div className="flex flex-wrap items-center gap-3">
                     <AnalyticsFilter sortOrder={sortOrder} setSortOrder={setSortOrder} />
@@ -268,6 +295,7 @@ export default function AnalyticsPage() {
         )}
       </main>
 
+      {/* Modal logic remains same */}
       {isModalOpen && modalContent && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80" onClick={() => setIsModalOpen(false)}>
           <div className="bg-[#1c1c1c] w-full max-w-lg border border-neutral-800 flex flex-col max-h-[85vh]" onClick={(e) => e.stopPropagation()}>

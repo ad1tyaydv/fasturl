@@ -47,12 +47,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const linksLeft = await prisma.link.count({
-      where: {
-        userId: user.id
-      }
-    })
-
     const token = jwt.sign(
       { userId: user.id, email: user.email },
       JWT_SECRET,

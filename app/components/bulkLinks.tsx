@@ -6,15 +6,11 @@ import toast from "react-hot-toast";
 import { 
   IoSearchOutline, IoTrashOutline, IoLockOpenOutline, IoPencilOutline,
   IoCheckmarkOutline, IoFileTrayFullOutline, IoDownloadOutline,
-  IoCloseOutline, IoDocumentTextOutline, IoLockClosedOutline, IoFilterOutline
+  IoCloseOutline, IoDocumentTextOutline, IoLockClosedOutline
 } from "react-icons/io5";
 
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
-} from "@/components/ui/dropdown-menu";
+// Import the FilterDropDown and Type
+import { FilterDropDown, FilterType } from "@/app/dropDown/urlsPageDropDown";
 import BulkPasswordModal from "../modals/bulkPasswordProtection";
 import BulkLinkDetails from "./bulkLinkDetails";
 
@@ -45,19 +41,16 @@ export default function BulkLinks({
   const [showDownloadModal, setShowDownloadModal] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [selectedBatch, setSelectedBatch] = useState<any>(null);
-  const [selectedBatchDetails, setSelectedBatchDetails] = useState<any>(null); // New state for navigation
+  const [selectedBatchDetails, setSelectedBatchDetails] = useState<any>(null);
 
   const [displaySearch, setDisplaySearch] = useState(searchQuery);
-
 
   useEffect(() => {
     const handler = setTimeout(() => {
       setSearchQuery(displaySearch);
     }, 300);
     return () => clearTimeout(handler);
-
   }, [displaySearch, setSearchQuery]);
-
 
   const saveName = async (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
@@ -66,14 +59,11 @@ export default function BulkLinks({
       await axios.post("/api/shortUrl/bulkLinks/updateName", { linkId: id, name: tempName.trim() });
       toast.success("Updated");
       onRefresh();
-
     } catch { 
       toast.error("Failed to update name"); 
     }
     setEditingId(null);
   };
-
-
 
   if (selectedBatchDetails) {
     return (
@@ -84,7 +74,6 @@ export default function BulkLinks({
       />
     );
   }
-
 
   return (
     <div className="flex flex-col gap-2 w-full">
@@ -99,15 +88,12 @@ export default function BulkLinks({
             onChange={(e) => setDisplaySearch(e.target.value)} 
           />
         </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger className="flex items-center gap-2 px-4 py-2 bg-[#111111] border border-neutral-800 rounded-lg text-sm text-neutral-400 outline-none hover:text-white transition-colors cursor-pointer">
-            <IoFilterOutline size={18} /> {statusFilter === "all" ? "All Batches" : "Protected Only"}
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="bg-[#1c1c1c] border-neutral-800 text-white min-w-[180px]">
-            <DropdownMenuItem onClick={() => setStatusFilter("all")} className="cursor-pointer">All Batches</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setStatusFilter("protected")} className="cursor-pointer">Protected Only</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+
+        {/* Replaced DropdownMenu with FilterDropDown for consistency */}
+        <FilterDropDown 
+          value={statusFilter} 
+          onChange={(val: FilterType) => setStatusFilter(val)} 
+        />
       </div>
 
       <div className="flex flex-col w-full">
@@ -115,7 +101,7 @@ export default function BulkLinks({
           bulkLinks.map((url: any) => (
             <div 
               key={url.id} 
-              onClick={() => setSelectedBatchDetails(url)} // Handle opening details
+              onClick={() => setSelectedBatchDetails(url)}
               className="flex items-center justify-between py-5 px-4 border-b border-neutral-800/60 hover:bg-[#1a1a1a] group transition-colors cursor-pointer"
             >
               <div className="flex items-start gap-4 w-[40%] min-w-0 pr-4">
@@ -132,7 +118,9 @@ export default function BulkLinks({
                         onChange={(e) => setTempName(e.target.value)} 
                         onKeyDown={(e) => e.key === "Enter" && saveName(e as any, url.id)} 
                       />
-                      <button onClick={(e) => saveName(e, url.id)} className="text-green-500 cursor-pointer"><IoCheckmarkOutline size={22} /></button>
+                      <button onClick={(e) => saveName(e, url.id)} className="text-green-500 cursor-pointer">
+                        <IoCheckmarkOutline size={22} />
+                      </button>
                     </div>
                   ) : (
                     <span className="text-white font-one text-xl truncate tracking-wide">

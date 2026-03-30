@@ -76,7 +76,7 @@ export default function SavedLinks({
             type="text" 
             placeholder="Search links..." 
             className="w-full pl-10 pr-4 py-2 bg-[#111111] border border-neutral-800 rounded-lg text-white text-sm outline-none focus:border-neutral-600 transition-all" 
-            value={searchQuery} 
+            value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)} 
           />
         </div>
