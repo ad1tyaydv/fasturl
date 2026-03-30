@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import axios from "axios";
+import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation"; // Added useSearchParams
 import { 
   IoGlobeOutline, IoPhonePortraitOutline, 
@@ -35,7 +36,7 @@ const getTimeAgo = (dateString: string) => {
   return `${diffInDays} days ago`;
 };
 
-export default function AnalyticsPage() {
+function AnalyticsPageClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -198,7 +199,7 @@ export default function AnalyticsPage() {
     { title: "Operating Systems", icon: <IoHardwareChipOutline size={25}/>, data: analytics?.os, key: "os", offset: 4 },
   ];
 
-  
+
   return (
     <div className="min-h-screen bg-[#141414] text-white">
       <Navbar />
@@ -315,5 +316,13 @@ export default function AnalyticsPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function AnalyticsPage() {
+  return (
+    <Suspense fallback={<div className="text-white p-10">Loading...</div>}>
+      <AnalyticsPageClient />
+    </Suspense>
   );
 }

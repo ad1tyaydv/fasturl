@@ -15,6 +15,6 @@ export const prisma =
     adapter,
   });
 
-if (process.env.NODE_ENV !== "npm") {
+if (process.env.NODE_ENV !== "production") {
   globalForPrisma.prisma = prisma;
 }
