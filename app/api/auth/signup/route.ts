@@ -38,7 +38,8 @@ export async function POST(req: NextRequest) {
                 userName: data.userName,
                 email: data.email,
                 password: hashedPassword,
-                plan: "FREE"
+                plan: "FREE",
+                totalLinks: 0
             }
         })
 

@@ -21,6 +21,8 @@ model User {
   userName       String?
   ipAddress      String?
 
+  totalLinks     Int         @default(0)
+
   plan           Plan      @default(FREE)
   planStartedAt  DateTime?
   planExpiresAt  DateTime?

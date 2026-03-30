@@ -189,7 +189,7 @@ export default function BulkCreateLinks() {
 
       setStatus({
         type: "success",
-        message: `Successfully created ${res.data.success.length} short links!`
+        message: `Successfully created ${res.data.count} short links!`
       });
 
       setCreatedLinks(res.data.success || []);
