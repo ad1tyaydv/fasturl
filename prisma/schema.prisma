@@ -31,6 +31,8 @@ model User {
   qr             Qr[]
   bulkLinks      BulkLinks[]
 
+  domain         CustomDomain[]
+
   createdAt      DateTime    @default(now())
 }
 
@@ -119,6 +121,18 @@ model BulkLinks {
   user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt  DateTime     @default(now())
+}
+
+model CustomDomain {
+  id         String       @id @default(uuid())
+  domain     String       @unique
+  token      String?
+  verified   Boolean      @default(false)
+  
+  userId    String
+  user      User          @relation(fields: [userId], references: [id])
+  
+  createdAt DateTime      @default(now())
 }
 
 model Count {

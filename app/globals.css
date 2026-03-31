@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+
 .font-one { font-family: "Boldonse", system-ui; font-weight: 400; }
 .font-two { font-family: "Alfa Slab One", serif; font-weight: 400; }
 .font-three { font-family: "Share Tech", sans-serif; font-weight: 400; }
@@ -8,6 +9,14 @@
 ::view-transition-new(root) {
   animation: none;
   mix-blend-mode: normal;
+}
+
+::-webkit-scrollbar {
+    display: none;
+}
+
+html {
+  scrollbar-gutter: stable;
 }
 
 ::view-transition-old(root) { z-index: 1; }
