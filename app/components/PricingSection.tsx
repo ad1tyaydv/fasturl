@@ -1,16 +1,20 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { IoCheckmarkOutline, IoCloseOutline } from "react-icons/io5";
+
+import { HugeiconsIcon } from '@hugeicons/react';
+import { 
+  Tick01Icon, Cancel01Icon, RupeeIcon }
+  from '@hugeicons/core-free-icons';
 
 export default function PricingSection() {
   const router = useRouter();
 
   const Check = () => (
-    <IoCheckmarkOutline className="text-green-500 font-bold ml-2 shrink-0" size={25} />
+    <HugeiconsIcon icon={Tick01Icon} className="text-green-500 font-bold ml-2 shrink-0" size={25} />
   );
   const Cross = () => (
-    <IoCloseOutline className="text-red-500 font-bold ml-2 shrink-0" size={25} />
+    <HugeiconsIcon icon={Cancel01Icon} className="text-red-500 font-bold ml-2 shrink-0" size={25} />
   );
 
   

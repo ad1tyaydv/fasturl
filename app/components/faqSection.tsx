@@ -1,7 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { IoChevronDownOutline } from "react-icons/io5";
+
+import { HugeiconsIcon } from '@hugeicons/react';
+import { 
+  ArrowDown01Icon }
+  from '@hugeicons/core-free-icons';
 
 interface FaqItem {
   question: string;
@@ -70,8 +74,7 @@ export default function FaqSection() {
                 <span className={`text-lg font-three font-bold transition-colors ${openIndex === index ? 'text-blue-500' : 'text-white group-hover:text-blue-500'}`}>
                   {faq.question}
                 </span>
-                <IoChevronDownOutline 
-                  size={20} 
+                <HugeiconsIcon icon={ArrowDown01Icon}
                   className={`text-neutral-400 transition-transform duration-300 ${openIndex === index ? 'rotate-180 text-blue-500' : ''}`} 
                 />
               </button>

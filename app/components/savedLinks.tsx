@@ -2,13 +2,15 @@
 
 import { useState } from "react";
 import axios from "axios";
-import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import { IoCheckmarkOutline } from "react-icons/io5";
+
+import { HugeiconsIcon } from '@hugeicons/react';
 import { 
-  IoCopyOutline, IoPencilOutline, IoCheckmarkOutline, IoSearchOutline, 
-  IoGlobeOutline, IoTrashOutline, IoLockOpenOutline, IoOpenOutline, 
-  IoQrCodeOutline, IoColorWandOutline, IoLockClosedOutline
-} from "react-icons/io5";
+  Globe02Icon, Share05Icon, Delete02Icon, QrCodeIcon, Edit03Icon, MagicWand01Icon,
+  CircleLock01Icon, Search02Icon, CircleUnlock01Icon, CopyCheckIcon,
+  CopyIcon }
+  from '@hugeicons/core-free-icons';
 
 import QRCodeModal from "../modals/qrGenerate";
 import PasswordProtectionModal from "@/app/modals/linkPasswordProtection";
@@ -70,12 +72,12 @@ export default function SavedLinks({
   return (
     <div className="flex flex-col gap-2 w-full">
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 mt-2">
-        <div className="relative w-full sm:w-[320px]">
-          <IoSearchOutline className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500" size={18} />
+        <div className="relative w-full sm:w-[400px]">
+          <HugeiconsIcon icon={Search02Icon} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500" />
           <input 
             type="text" 
-            placeholder="Search links..." 
-            className="w-full pl-10 pr-4 py-2 bg-[#111111] border border-neutral-800 rounded-lg text-white text-sm outline-none focus:border-neutral-600 transition-all" 
+            placeholder="Search links..."
+            className="w-full pl-10 pr-3 py-3 bg-[#111111] font-three border border-neutral-800 rounded-lg text-white text-sm outline-none focus:border-neutral-600 transition-all" 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)} 
           />
@@ -92,7 +94,7 @@ export default function SavedLinks({
           <div key={url.id} className="flex items-center justify-between py-5 px-4 border-b border-neutral-800/60 hover:bg-[#1a1a1a] group transition-colors">
             <div className="flex items-start gap-4 w-[40%] min-w-0 pr-4">
               <div className="mt-1 w-8 h-8 rounded-full bg-neutral-800 flex items-center justify-center text-neutral-400 shrink-0">
-                <IoGlobeOutline size={18} />
+                <HugeiconsIcon icon={Globe02Icon} />
               </div>
               <div className="flex flex-col min-w-0 w-full">
                 {editingId === url.id ? (
@@ -117,9 +119,9 @@ export default function SavedLinks({
 
             <div className="hidden md:flex w-[10%] shrink-0">
               {url.password && (
-                <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">
-                  <IoLockClosedOutline size={12} />
-                  <span className="text-[10px] uppercase tracking-widest font-bold">Protected</span>
+                <div className="flex items-center gap-1.5 px-1.5 py-1 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                  <HugeiconsIcon icon={CircleLock01Icon} size={15} />
+                  <span className="text-[10px] uppercase tracking-widest font-one">Protected</span>
                 </div>
               )}
             </div>
@@ -131,28 +133,28 @@ export default function SavedLinks({
                   onClick={() => { setSelectedLink(url); setIsPasswordModalOpen(true); }} 
                   className={`p-2 rounded-md cursor-pointer transition-colors ${url.password ? 'text-blue-500' : 'hover:text-white'}`}
                 >
-                    {url.password ? <IoLockClosedOutline size={18} /> : <IoLockOpenOutline size={18} />}
+                    {url.password ? <HugeiconsIcon icon={CircleLock01Icon} /> : <HugeiconsIcon icon={CircleUnlock01Icon} />}
                 </button>
                 <button onClick={() => { setSelectedLink(url); setIsCustomModalOpen(true); }} className="hover:text-white p-2 cursor-pointer">
-                  <IoColorWandOutline size={18} />
+                  <HugeiconsIcon icon={MagicWand01Icon} />
                 </button>
                 <button onClick={() => window.open(`${domain}/${url.shorturl}`, '_blank')} className="hover:text-white p-2 cursor-pointer">
-                  <IoOpenOutline size={18} />
+                  <HugeiconsIcon icon={Share05Icon} />
                 </button>
                 <button onClick={() => copyToClipboard(`${domain}/${url.shorturl}`, url.id)} className={`p-2 cursor-pointer ${copiedUrlId === url.id ? "text-green-500" : "hover:text-white"}`}>
-                  {copiedUrlId === url.id ? <IoCheckmarkOutline size={18} /> : <IoCopyOutline size={18} />}
+                  {copiedUrlId === url.id ? <HugeiconsIcon icon={CopyCheckIcon} /> : <HugeiconsIcon icon={CopyIcon} />}
                 </button>
                 <button onClick={() => { setSelectedLink(url); setIsQrModalOpen(true); }} className="hover:text-white p-2 cursor-pointer">
-                  <IoQrCodeOutline size={18} />
+                  <HugeiconsIcon icon={QrCodeIcon} />
                 </button>
                 <button onClick={() => { setEditingId(url.id); setTempName(url.linkName || ""); }} className="hover:text-white p-2 cursor-pointer">
-                  <IoPencilOutline size={18} />
+                  <HugeiconsIcon icon={Edit03Icon} />
                 </button>
                 <button 
                   onClick={async () => { if(confirm("Delete link?")) { await axios.post(`/api/shortUrl/delete/${url.id}`); onRefresh(); } }} 
                   className="hover:text-red-500 p-2 cursor-pointer"
                 >
-                  <IoTrashOutline size={18} />
+                  <HugeiconsIcon icon={Delete02Icon} />
                 </button>
             </div>
 

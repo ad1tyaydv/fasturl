@@ -1,13 +1,15 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { 
-  IoBarChartOutline, 
+import {
   IoLayersOutline, 
-  IoQrCodeOutline, 
   IoListOutline, 
-  IoArrowForwardOutline 
 } from "react-icons/io5";
+
+import { HugeiconsIcon } from '@hugeicons/react';
+import { 
+  Analytics01Icon, ArrowRightDoubleIcon, QrCodeIcon }
+  from '@hugeicons/core-free-icons';
 
 interface ShortlyFeaturesProps {
   isLoggedIn: boolean;
@@ -35,7 +37,7 @@ export default function ShortlyFeatures({ isLoggedIn, userPlan }: ShortlyFeature
     {
       title: "Detailed Link Analytics",
       desc: "Track every click with geographic data and device info.",
-      icon: <IoBarChartOutline size={28} />,
+      icon: <HugeiconsIcon icon={Analytics01Icon} size={28} />,
       path: "/analytics",
       color: "bg-blue-600 hover:bg-blue-700",
       border: "border-blue-900/30",
@@ -51,7 +53,7 @@ export default function ShortlyFeatures({ isLoggedIn, userPlan }: ShortlyFeature
     {
       title: "QR Code Generation",
       desc: "Create custom QR codes for every shortened link.",
-      icon: <IoQrCodeOutline size={28} />,
+      icon: <HugeiconsIcon icon={QrCodeIcon} size={28} />,
       path: "/qr",
       color: "bg-emerald-600 hover:bg-emerald-700",
       border: "border-emerald-900/30",
@@ -89,7 +91,7 @@ export default function ShortlyFeatures({ isLoggedIn, userPlan }: ShortlyFeature
                 onClick={() => handleAccess(f.path)}
                 className={`w-full py-4 text-white font-one flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-[0.97] rounded-none ${f.color}`}
               >
-                Access Feature <IoArrowForwardOutline size={18} />
+                Access Feature <HugeiconsIcon icon={ArrowRightDoubleIcon} />
               </button>
             </div>
           ))}

@@ -3,12 +3,12 @@
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
-import {
-  IoCopyOutline,
-  IoRefreshOutline,
-  IoQrCodeOutline,
-  IoCloseOutline,
-} from "react-icons/io5";
+import { IoCloseOutline } from "react-icons/io5";
+
+import { HugeiconsIcon } from '@hugeicons/react';
+import { 
+  QrCodeIcon, CopyIcon, Refresh04Icon, Download01Icon 
+} from '@hugeicons/core-free-icons';
 
 import Navbar from "./components/navbar";
 import PricingSection from "./components/PricingSection";
@@ -16,7 +16,6 @@ import TotalData from "./components/totalData";
 import ShortlyFeatures from "./components/features";
 import FaqSection from "./components/faqSection";
 import Footer from "./components/footer";
-import { useUser } from "./components/userContext";
 
 
 const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN;
@@ -55,20 +54,17 @@ export default function Dashboard() {
     if (pricingRef.current) {
       pricingRef.current.scrollIntoView({ behavior: "smooth" });
     }
-
     setUpgradeMsg(true);
     setTimeout(() => setUpgradeMsg(false), 3000);
   };
 
-  
+
   const handleShortUrl = async (originalUrl: string) => {
     if (!originalUrl) return;
-
     try {
       setLoading(true);
       const res = await axios.post("/api/shortUrl", { url: originalUrl });
       const generatedShortUrl = res.data.shortUrl;
-
       setShortUrl(generatedShortUrl);
       setUrl(`${NEXT_DOMAIN}/${generatedShortUrl}`);
 
@@ -105,10 +101,12 @@ export default function Dashboard() {
       return;
     }
 
+
     if (typeof showQr === "string") {
       setShowQr(false);
       return;
     }
+
 
     try {
       const res = await axios.post("/api/qrCode", {
@@ -123,15 +121,25 @@ export default function Dashboard() {
   };
 
 
+  const downloadQrCode = () => {
+    if (typeof showQr === "string") {
+      const link = document.createElement("a");
+      link.href = showQr;
+      link.download = `qrcode-${shortUrl || "link"}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
+
   useEffect(() => {
     const checkAuth = async () => {
       try {
         const res = await axios.get("/api/auth/me");
         const count = await axios.get("/api/shortUrl/linksLeft")
-
         const authenticated = !!res.data.authenticated;
         setIsLoggedIn(authenticated);
-
         setLinksLeft(count.data.linksLeft);
 
         if (authenticated) {
@@ -164,21 +172,11 @@ export default function Dashboard() {
     setShowQr(false);
   };
 
-  
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && url && !shortUrl && !loading) {
       handleShortUrl(url);
     }
-  };
-
-
-  const handleLogout = async () => {
-    await axios.post("/api/auth/logout");
-    setIsLoggedIn(false);
-    setShortUrl("");
-    setUrl("");
-    setUserPlan("FREE");
-    localStorage.removeItem("plan");
   };
 
   
@@ -231,13 +229,13 @@ export default function Dashboard() {
             {shortUrl ? (
               <div className="flex gap-2 w-full sm:w-auto">
                 <button onClick={handleGenerateQr} className={`px-4 sm:px-5 py-3 rounded-lg flex items-center justify-center cursor-pointer transition-colors ${showQr ? 'bg-blue-600 text-white' : 'bg-[#2a2a2a] text-white hover:bg-[#333333]'}`}>
-                  <IoQrCodeOutline size={22} />
+                  <HugeiconsIcon icon={QrCodeIcon} />
                 </button>
                 <button onClick={copyToClipboard} className="flex-1 sm:flex-none px-4 sm:px-8 py-3 rounded-lg bg-blue-600 text-white font-medium flex items-center justify-center gap-2 cursor-pointer hover:bg-blue-700 transition-colors">
-                  <IoCopyOutline size={20} /> Copy
+                  <HugeiconsIcon icon={CopyIcon} />
                 </button>
                 <button onClick={handleReset} className="px-4 sm:px-5 py-3 rounded-lg bg-[#2a2a2a] text-white flex items-center justify-center cursor-pointer hover:bg-[#333333] transition-colors">
-                  <IoRefreshOutline size={22} />
+                  <HugeiconsIcon icon={Refresh04Icon} />
                 </button>
               </div>
             ) : (
@@ -264,7 +262,15 @@ export default function Dashboard() {
               <div className="bg-white p-4 rounded-none shadow-lg border border-neutral-200">
                 <img src={showQr} alt="QR Code" className="w-40 h-40 object-contain" />
               </div>
-              <p className="mt-3 text-sm font-three text-green-500">Your QR code is ready!</p>
+              <div className="flex items-center gap-4 mt-4">
+                <button 
+                  onClick={downloadQrCode}
+                  className="flex items-center gap-2 px-4 py-2 bg-white text-black text-xs font-bold rounded hover:bg-gray-200 transition-all cursor-pointer"
+                >
+                  <HugeiconsIcon icon={Download01Icon} />
+                  DOWNLOAD
+                </button>
+              </div>
             </div>
           )}
 
@@ -282,15 +288,11 @@ export default function Dashboard() {
       </section>
 
       <ShortlyFeatures isLoggedIn={isLoggedIn} userPlan={userPlan} />
-
       <div className="w-full h-px bg-neutral-800 my-6"></div>
-
       <div ref={pricingRef}>
         <PricingSection />
       </div>
-
       <div className="w-full h-px bg-neutral-800 my-6"></div>
-
       <FaqSection />
 
       {copied && (
