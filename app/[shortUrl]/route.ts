@@ -10,6 +10,15 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ shor
     
     const { shortUrl } = await params;
 
+    const cachedUrl = await redis.get(`link:${shortUrl}`);
+    
+    if(cachedUrl) {
+        return NextResponse.redirect(cachedUrl as string);
+    }
+
+    const domain = req.headers.get("host");
+    console.log("Request from domain:", domain);
+
     const ip =
         req.headers.get("x-forwarded-for")?.split(",")[0] ||
         req.headers.get("x-real-ip") ||
@@ -62,9 +71,6 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ shor
         else referrer = domain;
         } catch {}
     }
-
-
-    const cachedUrl = await redis.get(`link:${shortUrl}`);
 
     const start = Date.now();
 

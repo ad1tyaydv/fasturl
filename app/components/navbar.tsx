@@ -18,8 +18,7 @@ export default function Navbar() {
     }
     return "FREE";
   });
-
-
+  
 
   const menuItems = [
     { name: 'Dashboard', path: '/' },
@@ -27,6 +26,7 @@ export default function Navbar() {
     { name: 'Bulk Links', path: '/bulklinks' },
     { name: 'QR Codes', path: '/qr' },
     { name: 'Analytics', path: '/analytics' },
+    { name: 'Domains', path: '/domain' },
     { name: 'Premium', path: '/premium' },
     { name: 'Settings', path: '/settings' },
   ];
@@ -57,11 +57,11 @@ export default function Navbar() {
     <nav className="flex items-center justify-between px-6 sm:px-10 py-6 border-b border-neutral-800 z-30 shrink-0 bg-[#141414] text-white sticky top-0 shadow-sm">
       
       <div className="flex items-center gap-10">
-        <h1 
+        <h1
           className="text-xl sm:text-2xl font-three font-bold cursor-pointer tracking-tighter" 
           onClick={() => router.push('/')}
         >
-          SHORTLY
+          FASTURL
         </h1>
 
         <div className="hidden lg:flex items-center gap-1">

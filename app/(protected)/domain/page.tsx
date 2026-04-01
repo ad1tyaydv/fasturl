@@ -4,10 +4,15 @@ import axios from "axios";
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { 
-  ChevronLeft, ChevronRight, Plus, Globe, Trash2, 
-  ShieldCheck, ShieldAlert, Search, 
-  Copy, Check, ChevronDown, Loader2 
+  ChevronLeft, ChevronRight, ShieldCheck, ShieldAlert, Loader2 
 } from "lucide-react";
+
+import { HugeiconsIcon } from '@hugeicons/react';
+import { 
+  PlusSignIcon, Search01Icon, Globe02Icon, ArrowDown01Icon, CopyIcon,
+  CopyCheckIcon, Delete02Icon 
+} from '@hugeicons/core-free-icons';
+
 import { Toaster, toast } from "react-hot-toast";
 
 import { Button } from "@/components/ui/button";
@@ -15,7 +20,6 @@ import { Input } from "@/components/ui/input";
 import Navbar from "../../components/navbar";
 import { SkeletonLoader } from "@/app/loaders/links";
 import ConnectDomainModal from "@/app/modals/addDomainModal";
-
 
 export default function DomainsPage() {
   const router = useRouter();
@@ -27,13 +31,11 @@ export default function DomainsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   
   const [verifyingId, setVerifyingId] = useState<string | null>(null);
-  
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
-
 
   const fetchDomains = useCallback(async () => {
     try {
@@ -43,7 +45,7 @@ export default function DomainsPage() {
 
     } catch (err) {
       toast.error("Failed to load domains");
-      
+
     } finally {
       setLoading(false);
     }
@@ -62,7 +64,7 @@ export default function DomainsPage() {
       }
 
     } catch (error: any) {
-      toast.error("DNS records not found yet. Try again later.");
+      toast.error("DNS records not found yet, Try again.");
 
     } finally {
       setVerifyingId(null);
@@ -74,7 +76,8 @@ export default function DomainsPage() {
     if (isLoggedIn) {
       fetchDomains();
     }
-  }, [isLoggedIn]);
+
+  }, [isLoggedIn, fetchDomains]);
 
 
   const handleAddDomain = async (domainName: string) => {
@@ -93,7 +96,20 @@ export default function DomainsPage() {
   };
 
 
+  const handleDeleteDomain = async (id: string) => {
+    try {
+      await axios.post(`/api/domain/deleteDomain/${id}`);
+      toast.success("Domain deleted successfully");
+      fetchDomains();
+
+    } catch (error) {
+      toast.error("Error while deleting domain");
+    }
+  };
+  
+
   const handleCopy = (text: string, field: string) => {
+    if (!text) return;
     navigator.clipboard.writeText(text);
     setCopiedField(field);
     toast.success(`${field} copied!`);
@@ -108,7 +124,9 @@ export default function DomainsPage() {
         if (res.data.authenticated) setIsLoggedIn(true);
         else router.push("/auth/signin");
 
-      } catch { router.push("/auth/signin"); }
+      } catch { 
+        router.push("/auth/signin"); 
+      }
     };
     initAuth();
 
@@ -119,14 +137,13 @@ export default function DomainsPage() {
     return domains.filter((d) =>
       d.domain?.toLowerCase().includes(searchQuery.toLowerCase())
     ).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-
   }, [domains, searchQuery]);
 
 
   const totalPages = Math.ceil(filteredDomains.length / itemsPerPage);
   const paginatedData = filteredDomains.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
-  
+
   return (
     <div className="min-h-screen bg-[#141414] text-white">
       <Toaster position="bottom-center" />
@@ -136,11 +153,11 @@ export default function DomainsPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 border-b border-neutral-800 pb-6">
           <div className="text-2xl sm:text-4xl font-one tracking-tight">Custom Domains</div>
           <div className="flex items-center gap-3">
-            <span className="hidden sm:block px-4 py-1.5 font-bold bg-[#1c1c1c] border border-neutral-700 rounded-lg text-xs">
+            <span className="hidden sm:block px-4 py-1.5 font-three bg-[#1c1c1c] border border-neutral-700 rounded-lg text-xs">
               TOTAL - {filteredDomains.length}
             </span>
-            <Button onClick={() => setIsModalOpen(true)} className="bg-white text-black hover:bg-neutral-200 font-bold px-6 py-2 rounded-lg">
-              <Plus className="w-4 h-4 mr-2" /> Connect Domain
+            <Button onClick={() => setIsModalOpen(true)} className="bg-white text-black hover:bg-neutral-200 font-three py-4 rounded-lg cursor-pointer">
+              <HugeiconsIcon icon={PlusSignIcon} /> Connect Domain
             </Button>
           </div>
         </div>
@@ -148,15 +165,15 @@ export default function DomainsPage() {
         <ConnectDomainModal 
           isOpen={isModalOpen} 
           onClose={() => setIsModalOpen(false)} 
-          onAdd={handleAddDomain} 
+          onAdd={handleAddDomain}
           isAdding={isAdding} 
         />
 
         <div className="relative mb-8 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500" />
+          <HugeiconsIcon icon={Search01Icon} className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-500" />
           <Input 
             placeholder="Search your domains..." 
-            className="bg-[#1c1c1c] border-neutral-800 pl-10 h-11"
+            className="bg-[#1c1c1c] font-one border-neutral-800 pl-10 h-11"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -170,66 +187,97 @@ export default function DomainsPage() {
 
               return (
                 <div key={index} className={`overflow-hidden rounded-2xl bg-[#1c1c1c] border transition-all duration-300 ${isExpanded ? 'border-neutral-500 shadow-lg' : 'border-neutral-800 hover:border-neutral-700'}`}>
-                  <div onClick={() => setExpandedId(isExpanded ? null : item.domain)} className="flex items-center justify-between p-5 cursor-pointer">
+                  
+                  <div onClick={() => setExpandedId(isExpanded ? null : item.domain)} className="flex items-center font-three justify-between p-5 cursor-pointer">
                     <div className="flex items-center gap-4">
                       <div className="p-3.5 rounded-xl bg-[#141414] border border-neutral-800 group-hover:border-neutral-700">
-                        <Globe className={`w-6 h-6 transition-colors ${isExpanded ? 'text-white' : 'text-neutral-400'}`} />
+                        <HugeiconsIcon icon={Globe02Icon} className={`w-6 h-6 transition-colors ${isExpanded ? 'text-white' : 'text-neutral-400'}`} />
                       </div>
                       <div>
                         <div className="flex items-center gap-3">
-                          <h3 className="font-bold text-lg">{item.domain}</h3>
-                          
-                          {item.verified ? (
+                          <h3 className="font-one text-lg">{item.domain}</h3>
+                          {item.isActive ? (
                             <span className="flex items-center gap-1 text-[10px] bg-emerald-500/10 text-emerald-500 px-2 py-0.5 rounded-full border border-emerald-500/20 font-bold uppercase">
                               <ShieldCheck className="w-3 h-3" /> Verified
                             </span>
                           ) : (
                             <div className="flex items-center gap-2">
-                              <span className="flex items-center gap-1 text-[10px] bg-amber-500/10 text-amber-500 px-2 py-0.5 rounded-full border border-amber-500/20 font-bold uppercase">
+                              <span className="flex items-center gap-1 text-[10px] bg-amber-500/10 text-amber-500 px-2 py-0.5 rounded-full border border-amber-500/20 font-three uppercase">
                                 <ShieldAlert className="w-3 h-3" /> Pending
                               </span>
-                              
-                              {/* Verify Button - Conditionally Rendered */}
                               <Button 
                                 size="sm" 
                                 disabled={isVerifying}
                                 onClick={(e) => handleVerify(e, item.domain)}
-                                className="h-7 px-3 text-[10px] bg-white text-black hover:bg-neutral-200 font-bold rounded-md"
+                                className="h-7 px-3 text-[12px] bg-white text-black hover:bg-neutral-200 font-three rounded-md cursor-pointer"
                               >
                                 {isVerifying ? <Loader2 className="w-3 h-3 animate-spin" /> : "Verify Now"}
                               </Button>
                             </div>
                           )}
                         </div>
-                        <p className="text-xs text-neutral-500 mt-1">Added {new Date(item.createdAt).toLocaleDateString()}</p>
+                        <p className="text-xs text-neutral-400 font-three mt-1">{new Date(item.createdAt).toLocaleDateString()}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <ChevronDown className={`w-5 h-5 text-neutral-500 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
-                      <Button variant="ghost" size="icon" className="text-neutral-500 hover:text-red-500 ml-2"><Trash2 className="w-4 h-4" /></Button>
+                      <HugeiconsIcon icon={ArrowDown01Icon} className={`text-neutral-500 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                      <Button 
+                        variant="ghost" size="icon" 
+                        className="text-neutral-500 hover:text-red-500 ml-2 cursor-pointer"
+                        onClick={(e) => { e.stopPropagation(); handleDeleteDomain(item.id) }}
+                      >
+                        <HugeiconsIcon icon={Delete02Icon} />
+                      </Button>
                     </div>
                   </div>
 
-                  <div className={`px-5 transition-all duration-300 ease-in-out ${isExpanded ? 'max-h-[500px] pb-6 opacity-100 border-t border-neutral-800/50 pt-6' : 'max-h-0 opacity-0 pointer-events-none'}`}>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className={`px-5 transition-all duration-300 ease-in-out ${isExpanded ? 'max-h-[800px] pb-6 opacity-100 border-t border-neutral-800/50 pt-6' : 'max-h-0 opacity-0 pointer-events-none'}`}>
+                    <div className="space-y-6">
+                      
                       <div className="space-y-2">
-                        <label className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">Type / Host</label>
-                        <div onClick={() => handleCopy("TXT / @", "Host")} className="flex items-center justify-between bg-[#141414] p-3 rounded-lg border border-neutral-800 cursor-pointer hover:bg-neutral-900 group/item">
-                          <span className="text-sm font-mono text-neutral-300">TXT / @</span>
-                          {copiedField === "Host" ? <Check size={14} className="text-emerald-500" /> : <Copy size={14} className="text-neutral-600 group-hover/item:text-neutral-400" />}
+                        <label className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">Verification (TXT Record)</label>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          <div onClick={() => handleCopy("TXT / @", "TXT Host")} className="flex items-center justify-between bg-[#141414] p-3 rounded-lg border border-neutral-800 cursor-pointer hover:bg-neutral-900 group/item">
+                            <div className="flex flex-col">
+                              <span className="text-[9px] text-neutral-500 uppercase font-bold">Type / Host</span>
+                              <span className="text-sm font-three text-neutral-300">TXT / @</span>
+                            </div>
+                            {copiedField === "TXT Host" ? <HugeiconsIcon icon={CopyCheckIcon} className="text-emerald-500 w-4 h-4" /> : <HugeiconsIcon icon={CopyIcon} className="w-4 h-4 text-neutral-600" />}
+                          </div>
+                          <div onClick={() => handleCopy(item.txtValue, "TXT Value")} className="flex items-center justify-between bg-[#141414] p-3 rounded-lg border border-neutral-800 cursor-pointer hover:bg-neutral-900 group/item">
+                            <div className="flex flex-col overflow-hidden">
+                              <span className="text-[9px] text-neutral-500 uppercase font-bold">Value</span>
+                              <span className="text-sm font-three text-neutral-300 truncate mr-4">{item.txtValue || "N/A"}</span>
+                            </div>
+                            {copiedField === "TXT Value" ? <HugeiconsIcon icon={CopyCheckIcon} className="text-emerald-500 w-4 h-4" /> : <HugeiconsIcon icon={CopyIcon} className="w-4 h-4 text-neutral-600" />}
+                          </div>
                         </div>
                       </div>
+
                       <div className="space-y-2">
-                        <label className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">TXT Value (Token)</label>
-                        <div onClick={() => handleCopy(item.token, "Token")} className="flex items-center justify-between bg-[#141414] p-3 rounded-lg border border-neutral-800 cursor-pointer hover:bg-neutral-900 group/item">
-                          <span className="text-sm font-mono text-neutral-300 truncate mr-4">{item.token || "N/A"}</span>
-                          {copiedField === "Token" ? <Check size={14} className="text-emerald-500" /> : <Copy size={14} className="text-neutral-600 group-hover/item:text-neutral-400" />}
+                        <label className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">Routing (CNAME Record)</label>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          <div onClick={() => handleCopy("CNAME / www", "CNAME Host")} className="flex items-center justify-between bg-[#141414] p-3 rounded-lg border border-neutral-800 cursor-pointer hover:bg-neutral-900 group/item">
+                            <div className="flex flex-col">
+                              <span className="text-[9px] text-neutral-500 uppercase font-bold">Type / Host</span>
+                              <span className="text-sm font-three text-neutral-300">CNAME / www</span>
+                            </div>
+                            {copiedField === "CNAME Host" ? <HugeiconsIcon icon={CopyCheckIcon} className="text-emerald-500 w-4 h-4" /> : <HugeiconsIcon icon={CopyIcon} className="w-4 h-4 text-neutral-600" />}
+                          </div>
+                          <div onClick={() => handleCopy(item.cnameTarget, "CNAME Target")} className="flex items-center justify-between bg-[#141414] p-3 rounded-lg border border-neutral-800 cursor-pointer hover:bg-neutral-900 group/item">
+                            <div className="flex flex-col overflow-hidden">
+                              <span className="text-[9px] text-neutral-500 uppercase font-bold">Value / Target</span>
+                              <span className="text-sm font-three text-neutral-300 truncate mr-4">{item.cnameTarget || "N/A"}</span>
+                            </div>
+                            {copiedField === "CNAME Target" ? <HugeiconsIcon icon={CopyCheckIcon} className="text-emerald-500 w-4 h-4" /> : <HugeiconsIcon icon={CopyIcon} className="w-4 h-4 text-neutral-600" />}
+                          </div>
                         </div>
                       </div>
+
+                      <p className="text-[11px] italic font-three text-neutral-500 mt-4 leading-relaxed bg-neutral-900/50 p-3 rounded-lg border border-neutral-800/50">
+                        <span className="text-neutral-300 font-bold not-italic">Pro Tip:</span> Add these records in your DNS settings. TXT is for ownership verification, and CNAME points your domain traffic to our servers.
+                      </p>
                     </div>
-                    <p className="text-xs italic text-neutral-500 mt-4 leading-relaxed">
-                      Paste these values in your domain provider (e.g., Cloudflare, Namecheap) DNS settings to verify.
-                    </p>
                   </div>
                 </div>
               );

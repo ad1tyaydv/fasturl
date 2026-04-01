@@ -18,7 +18,7 @@ import FaqSection from "./components/faqSection";
 import Footer from "./components/footer";
 import { DomainDropdown } from "./dropDown/domainDropDown";
 
-const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN || "shortly.link";
+const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN || "fasturl.in";
 
 export default function Dashboard() {
   const router = useRouter();
@@ -36,14 +36,12 @@ export default function Dashboard() {
   const [upgradeMsg, setUpgradeMsg] = useState(false);
   const [authLoading, setAuthLoading] = useState(true);
   
-  // Custom Domain Selection
   const [selectedDomain, setSelectedDomain] = useState(NEXT_DOMAIN);
 
   const [modalConfig, setModalConfig] = useState<{
     show: boolean; title: string; description: string; buttonText: string; action: () => void;
   }>({ show: false, title: "", description: "", buttonText: "", action: () => { } });
 
-  // Auth & Limits Check
   useEffect(() => {
     const checkAuth = async () => {
       try {
@@ -55,20 +53,23 @@ export default function Dashboard() {
         if (authenticated) {
           setUserPlan(res.data.plan || "FREE");
         }
+
       } catch (err) {
         setIsLoggedIn(false);
+
       } finally {
         setAuthLoading(false);
       }
     };
     checkAuth();
+
   }, []);
+
 
   const handleShortUrl = async (originalUrl: string) => {
     if (!originalUrl) return;
     try {
       setLoading(true);
-      // Construct payload with custom domain if selected
       const res = await axios.post("/api/shortUrl", { 
         url: originalUrl,
         customDomain: selectedDomain !== NEXT_DOMAIN ? selectedDomain : null
@@ -76,8 +77,8 @@ export default function Dashboard() {
       
       const generatedShortUrl = res.data.shortUrl;
       setShortUrl(generatedShortUrl);
-      // Display the final URL with the chosen domain
       setUrl(`${selectedDomain}/${generatedShortUrl}`);
+      
     } catch (error: any) {
       if (error.response?.status === 429) {
         if (!isLoggedIn) {
@@ -159,11 +160,17 @@ export default function Dashboard() {
         <div className="flex flex-col lg:flex-row items-start justify-between gap-12 lg:gap-20">
           
           <div className="flex-1 text-center lg:text-left lg:pt-12">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 text-white leading-tight font-one tracking-tight">
+            <h1 className="text-3xl sm:text-3xl md:text-5xl font-bold mb-6 text-white leading-tight font-one tracking-tight">
               Shorten Your <span className="text-red-500">Links</span> Instantly
             </h1>
+            <br />
+            <br />
             <p className="font-one text-lg text-neutral-400 max-w-lg mx-auto lg:mx-0">
-              Transform long URLs into brandable short links with analytics, custom domains, and QR codes.
+              Transform long URLs into brandable short links with analytics, custom domains, and QR codes. Transform long URLs into short, brandable links with analytics and QR codes.
+            </p>
+            <br />
+            <p className="font-one text-lg text-neutral-400 max-w-lg mx-auto lg:mx-0">
+              Share links, Generate QR Codes, view analytics and more than a just a url shortner.
             </p>
           </div>
 

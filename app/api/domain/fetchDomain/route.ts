@@ -27,9 +27,11 @@ export async function GET(req: NextRequest) {
                 userId: userId
             },
             select: {
+                id: true,
                 domain: true,
-                verified: true,
-                token: true,
+                isActive: true,
+                txtValue: true,
+                cnameTarget: true,
                 createdAt: true
             }
         })

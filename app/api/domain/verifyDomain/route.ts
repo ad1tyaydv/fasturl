@@ -18,50 +18,99 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        if (!domainData.token) {
+        if (!domainData.txtValue || !domainData.subDomain || !domainData.cnameTarget) {
             return NextResponse.json(
-                {message: "TXT token is not found"},
-                {status: 404}
+                { message: "TXT token, subdomain, or CNAME target missing" },
+                { status: 400 }
             );
         }
         console.log("Checking domain:", domain);
-        console.log("Looking for token:", domainData.token);
+        console.log("Looking for token:", domainData.txtValue);
 
 
         const resolver = new Resolver();
         resolver.setServers(["1.1.1.1", "8.8.8.8"]);
-        let isValid = false;
 
+        let isTxtValid = false;
         try {
-            const records = await resolver.resolveTxt(domain);
-            console.log("Actual DNS Records found:", JSON.stringify(records));
+            const txtRecords = await resolver.resolveTxt(domainData.domain);
+            console.log("Actual DNS Records found:", JSON.stringify(txtRecords));
 
-            const flatRecords = records.flat();
-            isValid = flatRecords.some(txt => txt.includes(domainData.token!));
-            console.log("Match found?", isValid);
+            const flatRecords = txtRecords.flat();
+            isTxtValid = flatRecords.some(txt => txt.includes(domainData.txtValue!));
+            console.log("Match found?", isTxtValid);
+
+            await prisma.customDomain.update({
+                where: {
+                    domain: domain
+                },
+                data: { 
+                    txtVerified: isTxtValid
+                }
+            });
+
+            console.log("TXT records:", flatRecords);
+            console.log("TXT match found?", isTxtValid);
 
         } catch (error) {
-            isValid = false;
+            isTxtValid = false;
         }
 
-        await prisma.customDomain.update({
-            where: {
-                domain: domain
-            },
-            data: { 
-                verified: isValid
-             }
-        });
 
-        if (isValid) {
+        let isCnameValid = false;
+        let cnameRecords: string[] = [];
+
+        try {
+            const fullSubDomain = `${domainData.subDomain}.${domainData.domain}`;
+            cnameRecords = await resolver.resolveCname(fullSubDomain);
+
+            isCnameValid = cnameRecords.some((record) =>
+                record.includes(domainData.cnameTarget!)
+            );
+
+            await prisma.customDomain.update({
+                where: {
+                    domain
+                },
+                data: {
+                    cnameVerfied: isCnameValid
+                },
+            });
+
+            console.log("CNAME records:", cnameRecords);
+            console.log("CNAME match found?", isCnameValid);
+
+
+        } catch (error) {
+            console.log("CNAME error:", error);
+            isCnameValid = false;
+        }
+
+
+        console.log("Expected CNAME:", domainData.cnameTarget);
+        console.log("CNAME Found:", cnameRecords);
+
+
+        if(isTxtValid && isCnameValid) {
+
+            await prisma.customDomain.update({
+                where: {
+                    domain: domain
+                },
+                data: {
+                    isActive: true
+                }
+            })
+
             return NextResponse.json(
                 {message: "Domain verified successfully", verified: true},
                 {status: 200}
             );
+
         } else {
             return NextResponse.json(
-                {message: "Verification failed. DNS records not found yet.", verified: false},
-                {status: 400}
+                {message: "Domain verified successfully", verified: false},
+                {status: 200}
             );
         }
 

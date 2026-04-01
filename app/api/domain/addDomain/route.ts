@@ -21,15 +21,32 @@ export async function POST(req: NextRequest) {
             userId: string;
         };
 
-        const { domain } = await req.json();
+        const { domain: fullDomain } = await req.json();
+
+        const parts = fullDomain.split(".");
+        if (parts.length < 2) {
+            return NextResponse.json(
+                { message: "Invalid domain format" },
+                { status: 400 }
+            );
+        }
+
+        const subDomain = parts.length > 2 ? parts.slice(0, parts.length - 2).join(".") : "";
+        const rootDomain = parts.slice(-2).join(".");
 
         const existing = await prisma.customDomain.findUnique({
-            where: { domain }
+            where: {
+                domain: fullDomain
+            }
         });
 
         if (existing) {
             return NextResponse.json({
-                verificationToken: existing.token
+                success: true,
+                verificationToken: existing.txtValue,
+                cnameTarget: existing.cnameTarget,
+                domain: existing.domain,
+                subDomain: existing.subDomain
             });
         }
 
@@ -37,17 +54,23 @@ export async function POST(req: NextRequest) {
 
         const newDomain = await prisma.customDomain.create({
             data: {
-                domain: domain,
-                token: verificationToken,
+                domain: rootDomain,
+                subDomain: subDomain,
+                txtValue: verificationToken,
+                txtVerified: false,
+                cnameTarget: "fasturl.in",
+                cnameVerfied: false,
+                isActive: false,
                 userId: decoded.userId,
-                verified: false,
             }
         })
 
         return NextResponse.json({
             success: true,
-            verificationToken,
-            domain: domain
+            verificationToken: newDomain.txtValue,
+            cnameTarget: newDomain.cnameTarget,
+            domain: newDomain.domain,
+            subDomain: newDomain.subDomain
         });
 
     } catch (error) {

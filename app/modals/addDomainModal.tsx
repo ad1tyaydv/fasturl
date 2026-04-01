@@ -1,12 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { 
-  Globe, 
-  X, 
-  Loader2, 
-  AlertCircle 
-} from "lucide-react";
+import { Loader2 } from "lucide-react";
+
+import { HugeiconsIcon } from '@hugeicons/react';
+import { Cancel01Icon, Globe02Icon, Alert02Icon } from '@hugeicons/core-free-icons';
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -62,7 +61,7 @@ export default function ConnectDomainModal({
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-neutral-900 rounded-md border border-neutral-800">
-              <Globe size={18} className="text-white" />
+              <HugeiconsIcon icon={Globe02Icon} />
             </div>
             <h3 className="text-white text-lg font-medium">Connect Domain</h3>
           </div>
@@ -70,7 +69,7 @@ export default function ConnectDomainModal({
             onClick={onClose} 
             className="text-neutral-500 hover:text-white transition-colors cursor-pointer"
           >
-            <X size={20} />
+            <HugeiconsIcon icon={Cancel01Icon} />
           </button>
         </div>
 
@@ -89,7 +88,7 @@ export default function ConnectDomainModal({
 
           <div className="bg-neutral-900/50 border border-neutral-800/50 rounded-md p-3">
             <h4 className="text-[11px] font-bold text-neutral-400 uppercase mb-2 flex items-center gap-2">
-              <AlertCircle size={12} /> Instructions
+              <HugeiconsIcon icon={Alert02Icon} /> Instructions
             </h4>
             <p className="text-xs text-neutral-500 leading-relaxed">
               Enter the domain or subdomain you want to use. After adding, you'll need to point your DNS <b>CNAME</b> record to our servers.
@@ -101,7 +100,7 @@ export default function ConnectDomainModal({
           <Button 
             onClick={handleSubmit}
             disabled={isAdding || !domain}
-            className="w-full bg-white text-black hover:bg-neutral-200 h-11 font-bold rounded-md transition-all flex items-center justify-center gap-2"
+            className="w-full bg-white text-black hover:bg-neutral-200 h-11 font-bold rounded-md transition-all flex items-center justify-center gap-2 cursor-pointer"
           >
             {isAdding ? (
               <Loader2 size={18} className="animate-spin" />

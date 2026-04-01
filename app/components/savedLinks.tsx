@@ -17,6 +17,7 @@ import PasswordProtectionModal from "@/app/modals/linkPasswordProtection";
 import CustomUrlModal from "@/app/modals/customUrl";
 import { FilterDropDown, FilterType } from "../dropDown/urlsPageDropDown";
 
+
 const getRelativeTime = (dateString?: string) => {
   if (!dateString) return "Just now";
   const date = new Date(dateString);
@@ -29,6 +30,7 @@ const getRelativeTime = (dateString?: string) => {
   if (diffInHours < 24) return `${diffInHours}h ago`;
   return date.toLocaleDateString();
 };
+
 
 export default function SavedLinks({ 
   links, 
@@ -67,6 +69,17 @@ export default function SavedLinks({
     } catch { toast.error("Update failed"); }
     setEditingId(null);
   };
+
+  
+  const handleLinkDelete = async (url: any) => {
+    try {
+      await axios.post(`/api/shortUrl/delete/${url.id}`);
+      onRefresh();
+      
+    } catch (error) {
+      console.log("Error while deleting the link")
+    }
+  }
 
 
   return (
@@ -128,7 +141,7 @@ export default function SavedLinks({
 
             <div className="w-[10%] text-neutral-400 font-medium">{url.clicks || 0} clicks</div>
 
-            <div className="flex items-center justify-end gap-3 text-neutral-400 w-[30%] opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="flex items-center justify-end gap-3 text-neutral-400 w-[30%] opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity">
                 <button 
                   onClick={() => { setSelectedLink(url); setIsPasswordModalOpen(true); }} 
                   className={`p-2 rounded-md cursor-pointer transition-colors ${url.password ? 'text-blue-500' : 'hover:text-white'}`}
@@ -151,7 +164,7 @@ export default function SavedLinks({
                   <HugeiconsIcon icon={Edit03Icon} />
                 </button>
                 <button 
-                  onClick={async () => { if(confirm("Delete link?")) { await axios.post(`/api/shortUrl/delete/${url.id}`); onRefresh(); } }} 
+                  onClick={() => handleLinkDelete(url)} 
                   className="hover:text-red-500 p-2 cursor-pointer"
                 >
                   <HugeiconsIcon icon={Delete02Icon} />
