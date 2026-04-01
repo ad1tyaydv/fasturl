@@ -11,13 +11,13 @@ import {
   Analytics01Icon, ArrowRightDoubleIcon, QrCodeIcon }
   from '@hugeicons/core-free-icons';
 
-interface ShortlyFeaturesProps {
+interface FasturlFeaturesProps {
   isLoggedIn: boolean;
   userPlan: string;
 }
 
 
-export default function ShortlyFeatures({ isLoggedIn, userPlan }: ShortlyFeaturesProps) {
+export default function FasturlFeatures({ isLoggedIn, userPlan }: FasturlFeaturesProps) {
   const router = useRouter();
 
   const handleAccess = (path: string) => {
@@ -73,7 +73,7 @@ export default function ShortlyFeatures({ isLoggedIn, userPlan }: ShortlyFeature
     <section className="py-20 px-4 bg-[#141414] border-t border-neutral-800 transition-colors duration-300">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-three font-bold mb-3 text-white">Shortly Plan Includes</h2>
+          <h2 className="text-4xl font-three font-bold mb-3 text-white">Fasturl Plan Includes</h2>
           <p className="text-neutral-400 font-one">Premium tools to help you manage and track your brand's reach.</p>
         </div>
 

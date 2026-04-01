@@ -4,6 +4,12 @@ import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useUser } from "./userContext";
 import axios from "axios";
+import { UserAccountNav } from "../dropDown/navbarDropDown";
+
+import { HugeiconsIcon } from '@hugeicons/react';
+import { 
+  UserCircle02Icon }
+  from '@hugeicons/core-free-icons';
 
 
 export default function Navbar() {
@@ -11,14 +17,15 @@ export default function Navbar() {
   const { user, setUser } = useUser();
   const pathname = usePathname();
   const loggedIn = !!user;
-  
+
+
   const [tier, setTier] = useState(() => {
-    if(typeof window !== "undefined") {
+    if (typeof window !== "undefined") {
       return localStorage.getItem("plan") || "FREE";
     }
     return "FREE";
   });
-  
+
 
   const menuItems = [
     { name: 'Dashboard', path: '/' },
@@ -28,12 +35,13 @@ export default function Navbar() {
     { name: 'Analytics', path: '/analytics' },
     { name: 'Domains', path: '/domain' },
     { name: 'Premium', path: '/premium' },
+    { name: 'Docs', path: '/docs' },
     { name: 'Settings', path: '/settings' },
   ];
 
 
   useEffect(() => {
-    if(user && user.plan) {
+    if (user && user.plan) {
       setTier(user.plan);
       localStorage.setItem("plan", user.plan);
     }
@@ -43,15 +51,20 @@ export default function Navbar() {
 
   const isPaid = tier !== "FREE" && tier !== "";
 
-  const handleLogout =  async () => {
-    await axios.post("api/auth/logout")
 
-    setUser(null);
-    localStorage.removeItem("user");
-    localStorage.removeItem("plan");
-    localStorage.removeItem("linksLeft_cache");
+  const handleLogout = async () => {
+    try {
+      await axios.post("api/auth/logout");
+      setUser(null);
+      localStorage.removeItem("user");
+      localStorage.removeItem("plan");
+      localStorage.removeItem("linksLeft_cache");
+      router.push("/auth/signin");
+
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
   };
-
 
   return (
     <nav className="flex items-center justify-between px-6 sm:px-10 py-6 border-b border-neutral-800 z-30 shrink-0 bg-[#141414] text-white sticky top-0 shadow-sm">
@@ -84,8 +97,8 @@ export default function Navbar() {
         </div>
       </div>
 
-      <div className="flex items-center gap-6">
-        {loggedIn && tier && (
+      <div className="flex items-center gap-6 sm:mr-12 lg:mr-16">
+        {loggedIn && (
           <div className="relative flex flex-col items-center">
             <button
               onClick={() => router.push('/premium')}
@@ -99,9 +112,7 @@ export default function Navbar() {
             </button>
 
             {tier.toUpperCase() === "FREE" && (
-              <div 
-                className="absolute font-one top-14 left-1/2 -translate-x-1/2 bg-yellow-100 text-yellow-800 text-[10px] font-black px-4 py-1.5 rounded-full border border-yellow-300 animate-bounce whitespace-nowrap shadow-md z-50"
-              >
+              <div className="absolute font-one top-14 left-1/2 -translate-x-1/2 bg-yellow-100 text-yellow-800 text-[10px] font-black px-4 py-1.5 rounded-full border border-yellow-300 animate-bounce whitespace-nowrap shadow-md z-50">
                 <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[4px] border-l-transparent border-r-[4px] border-r-transparent border-b-[4px] border-b-yellow-100"></div>
                 UPGRADE
               </div>
@@ -110,12 +121,7 @@ export default function Navbar() {
         )}
 
         {loggedIn ? (
-          <button
-            onClick={handleLogout}
-            className="border border-neutral-700 bg-transparent text-white hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/50 px-6 py-2.5 rounded-lg transition-all cursor-pointer font-three text-sm font-semibold"
-          >
-            Logout
-          </button>
+          <UserAccountNav user={user} onLogout={handleLogout} />
         ) : (
           <button
             onClick={() => router.push("/auth/signin")}

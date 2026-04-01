@@ -251,7 +251,7 @@ export default function BulkCreateLinks() {
 
   const exportPDF = () => {
     const doc = new jsPDF();
-    doc.text("Shortly - Shortened Links", 14, 15);
+    doc.text("Fasturl - Shortened Links", 14, 15);
     autoTable(doc, {
       head: [['#', 'Original URL', 'Short URL']],
       body: createdLinks.map((l, i) => [i + 1, l.original, `${NEXT_DOMAIN}/${l.short}`]),

@@ -96,10 +96,10 @@ export default function Footer() {
 
             <div className="text-center lg:text-right">
               <h2 className="text-4xl font-one font-black tracking-tighter mb-2 text-white">
-                SHORTLY
+                FASTURL
               </h2>
               <p className="text-xs text-neutral-500 font-two leading-relaxed">
-                © {currentYear} Shortly LLC <br />
+                © {currentYear} FASTURL LLC <br />
                 All Rights Reserved
               </p>
             </div>

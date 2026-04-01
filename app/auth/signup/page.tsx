@@ -86,7 +86,7 @@ export default function Signup() {
           <div className="w-10 h-10 bg-red-600 rounded-xl flex items-center justify-center text-white font-black text-2xl shadow-[0_0_20px_rgba(220,38,38,0.4)]">
             S
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-white">Shortly</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-white">Fasturl</h1>
         </div>
 
         <div className="relative z-10 flex flex-col justify-center px-20">
@@ -112,7 +112,7 @@ export default function Signup() {
             <div className="w-10 h-10 bg-red-600 rounded-xl flex items-center justify-center text-white font-black text-2xl shadow-[0_0_20px_rgba(220,38,38,0.3)]">
               S
             </div>
-            <h1 className="text-2xl font-bold tracking-tight">Shortly</h1>
+            <h1 className="text-2xl font-bold tracking-tight">Fasturl</h1>
           </div>
 
           <div className="mb-8">

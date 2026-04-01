@@ -14,16 +14,16 @@ interface FaqItem {
 
 const faqs: FaqItem[] = [
   {
-    question: "What is Shortly?",
-    answer: "Shortly is a powerful URL shortening service that allows you to transform long, complex links into short, memorable URLs. It helps you track analytics, manage links, and create QR codes all in one dashboard."
+    question: "What is Fasturl?",
+    answer: "Fasturl is a powerful URL shortening service that allows you to transform long, complex links into short, memorable URLs. It helps you track analytics, manage links, and create QR codes all in one dashboard."
   },
   {
-    question: "How does Shortly work?",
-    answer: "When you enter a long URL, Shortly generates a unique key for that link and stores it in our database. When someone clicks your short link, we instantly redirect them to the original destination while tracking the click data."
+    question: "How does Fasturl work?",
+    answer: "When you enter a long URL, Fasturl generates a unique key for that link and stores it in our database. When someone clicks your short link, we instantly redirect them to the original destination while tracking the click data."
   },
   {
-    question: "What are the benefits of using Shortly?",
-    answer: "Shortly provides detailed analytics (clicks, location, devices), custom aliases for branding, password protection for sensitive links, and bulk creation tools to save you time."
+    question: "What are the benefits of using Fasturl?",
+    answer: "Fasturl provides detailed analytics (clicks, location, devices), custom aliases for branding, password protection for sensitive links, and bulk creation tools to save you time."
   },
   {
     question: "What is a custom URL shortener?",
@@ -31,11 +31,11 @@ const faqs: FaqItem[] = [
   },
   {
     question: "How do I shorten a URL for free?",
-    answer: "You can use Shortly's homepage to shorten individual links for free. To manage multiple links or access premium features like Bulk Shortening, you can create a free account or upgrade to a premium plan."
+    answer: "You can use Fasturl's homepage to shorten individual links for free. To manage multiple links or access premium features like Bulk Shortening, you can create a free account or upgrade to a premium plan."
   },
   {
     question: "How do I know the service is reliable?",
-    answer: "Shortly is built on scalable cloud infrastructure with 99.9% uptime. We handle millions of redirects daily and use advanced encryption to ensure your data and your users' privacy are protected."
+    answer: "Fasturl is built on scalable cloud infrastructure with 99.9% uptime. We handle millions of redirects daily and use advanced encryption to ensure your data and your users' privacy are protected."
   }
 ];
 
@@ -57,7 +57,7 @@ export default function FaqSection() {
             Frequently Asked Questions
           </h2>
           <p className="mt-4 text-neutral-400 font-one text-lg">
-            Have questions about Shortly? We've got answers. If you can't find what you're looking for, feel free to contact our support team.
+            Have questions about Fasturl? We've got answers. If you can't find what you're looking for, feel free to contact our support team.
           </p>
         </div>
 
