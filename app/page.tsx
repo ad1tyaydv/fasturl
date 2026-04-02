@@ -292,7 +292,7 @@ export default function Dashboard() {
                 <div className="mt-4 font-one text-lg text-neutral-500 text-center">
                   <p>Guest limit: 1 link/day</p>
                   <button onClick={() => router.push("/auth/signin")} className="mt-1 underline cursor-pointer text-white hover:text-blue-400 transition-colors">
-                    Login for custom domains & more
+                    Login for custom domains & much more
                   </button>
                 </div>
               )}
