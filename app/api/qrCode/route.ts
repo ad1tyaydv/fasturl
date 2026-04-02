@@ -2,6 +2,7 @@ import { prisma } from "@/lib/dbConfig";
 import { NextRequest, NextResponse } from "next/server";
 import QRCode from "qrcode";
 import jwt from "jsonwebtoken";
+import { redis } from "@/lib/redis";
 
 
 const JWT_SECRET = process.env.NEXTAUTH_SECRET!;
@@ -144,7 +145,11 @@ export async function POST(req: NextRequest) {
             }
         })
 
-        console.log(saveQR.qrImage);
+        const cachedKey = `qrs-left:${userId}`;
+        const checkCacheExists = await redis.get(cachedKey);
+        if(checkCacheExists !== null && Number(checkCacheExists) > 0) {
+            await redis.decr(cachedKey);
+        }
 
         return NextResponse.json({
             message: "Short URL created!",

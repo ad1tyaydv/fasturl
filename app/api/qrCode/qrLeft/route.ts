@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { prisma } from "@/lib/dbConfig";
+import { redis } from "@/lib/redis";
 
 
 const JWT_SECRET = process.env.NEXTAUTH_SECRET!;
@@ -13,7 +14,7 @@ export async function GET(req: NextRequest) {
         if(!token) {
             return NextResponse.json(
                 {message: "User not found"},
-                {status: 500}
+                {status: 401}
             )
         }
 
@@ -23,20 +24,30 @@ export async function GET(req: NextRequest) {
 
         const userId = decoded.userId;
 
+        const cachedKey = `qrs-left:${userId}`;
+        const cached = await redis.get(cachedKey);
+        if(cached !== null) {
+            return NextResponse.json({
+                message: "qr left (cached)",
+                qrLeft: cached
+            });
+        }
+
         const user = await prisma.user.findUnique({
             where: {
                 id: userId
             },
             select: {
                 plan: true,
-                planStartedAt: true
+                planStartedAt: true,
+                planExpiresAt: true
             }
         })
 
         if(!user) {
             return NextResponse.json(
                 {message: "User not found"},
-                {status: 500}
+                {status: 404}
             )
         }
 
@@ -58,6 +69,14 @@ export async function GET(req: NextRequest) {
         const limit = planLimits[user.plan] || 20;
 
         let qrLeft = Math.max(0, limit - currentUsageCount);
+
+
+        const expiresAt = user.planExpiresAt 
+                         ? new Date(user.planExpiresAt).getTime()
+                         : Date.now() + 7 * 24 * 60 * 60 * 1000;
+
+        const seconds = Math.floor((expiresAt - Date.now()) / 1000);
+        await redis.set(cachedKey, qrLeft, {ex: seconds});
 
         return NextResponse.json(
             {message: "Links left", qrLeft}

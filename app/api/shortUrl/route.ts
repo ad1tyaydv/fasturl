@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { prisma } from "@/lib/dbConfig";
 import shortUrlGenerator from "@/app/helpers/shortUrlGenerator";
+import { redis } from "@/lib/redis";
 
 
 const JWT_SECRET = process.env.NEXTAUTH_SECRET!;
@@ -157,6 +158,12 @@ export async function POST(req: NextRequest) {
         },
       });
 
+      const cachedKey = `links-left:${userId}`;
+      const checkCacheExists = await redis.get(cachedKey);
+      if(checkCacheExists) {
+        await redis.decr(cachedKey);
+      }
+
     return NextResponse.json({
       message: "Short URL created!",
       shortUrl: urlShort.shorturl,
@@ -164,7 +171,6 @@ export async function POST(req: NextRequest) {
     });
 
   } catch (error) {
-    console.error(error);
     return NextResponse.json(
       { message: "Can't shorten URL right now, try again later" },
       { status: 500 }

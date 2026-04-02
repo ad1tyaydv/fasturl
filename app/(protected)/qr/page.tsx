@@ -4,8 +4,7 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import { 
-  IoRefreshOutline, 
-  IoArrowForwardOutline,
+  IoRefreshOutline,
   IoCloseOutline,
   IoCheckmarkCircle,
   IoDownloadOutline,
@@ -102,8 +101,8 @@ export default function QRGenerator() {
 
       setShowQr(res.data.qrImage);
 
-      const count = await axios.get("/api/shortUrl/linksLeft");
-      setQrsLeft(count.data.linksLeft);
+      const count = await axios.get("/api/qrCode/qrLeft");
+      setQrsLeft(count.data.qrLeft);
 
     } catch (error: any) {
       if (error.response?.status === 429) {
@@ -150,6 +149,8 @@ export default function QRGenerator() {
         const authenticated = !!res.data.authenticated;
         setIsLoggedIn(authenticated);
         setQrsLeft(count.data.qrLeft);
+        console.log(count.data)
+        console.log(count.data.qrLeft)
 
         if (authenticated) {
           setUserPlan(res.data.plan || "FREE");
@@ -245,7 +246,7 @@ export default function QRGenerator() {
           <h1 className="text-3xl font-one sm:text-4xl md:text-5xl font-bold mb-4 text-white">
             Generate <span className="text-red-500">QR Codes</span> Instantly
           </h1>
-          <p className="mb-8 font-two text-base sm:text-lg px-2 text-neutral-400">
+          <p className="mb-8 font-one sm:text-lg px-2 text-neutral-400">
             Transform any URL into a high-quality, shareable QR code instantly.
           </p>
 
