@@ -25,7 +25,6 @@ export default function Dashboard() {
   const router = useRouter();
   const pricingRef = useRef<HTMLDivElement>(null);
 
-  // Core States
   const [url, setUrl] = useState("");
   const [shortUrl, setShortUrl] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -45,14 +44,16 @@ export default function Dashboard() {
     show: boolean; title: string; description: string; buttonText: string; action: () => void;
   }>({ show: false, title: "", description: "", buttonText: "", action: () => { } });
 
+
   useEffect(() => {
     const checkAuth = async () => {
       try {
         const res = await axios.get("/api/auth/me");
-        const count = await axios.get("/api/shortUrl/linksLeft");
+        const links = await axios.get("/api/shortUrl/linksLeft");
         const authenticated = !!res.data.authenticated;
         setIsLoggedIn(authenticated);
-        setLinksLeft(count.data.linksLeft);
+        setLinksLeft(links.data.linksLeft);
+
         if (authenticated) {
           setUserPlan(res.data.plan || "FREE");
         }
@@ -98,10 +99,12 @@ export default function Dashboard() {
           setTimeout(() => setUpgradeMsg(false), 3000);
         }
       }
+
     } finally {
       setLoading(false);
     }
   };
+
 
   const handleGenerateQr = async () => {
     if (!isLoggedIn) {
@@ -120,16 +123,19 @@ export default function Dashboard() {
       return;
     }
 
-    setIsLoadingQr(true); // Start Loader
+    setIsLoadingQr(true);
     try {
       const res = await axios.post("/api/qrCode", { shortUrl: shortUrl, longUrl: url });
       setShowQr(res.data.qrImage);
+
     } catch (error: any) {
       if (error.response?.status === 429) setUpgradeMsg(true);
+
     } finally {
       setIsLoadingQr(false);
     }
   };
+
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(url);
@@ -138,12 +144,14 @@ export default function Dashboard() {
     setTimeout(() => setCopied(false), 1000);
   };
 
+
   const handleReset = () => {
     setShortUrl("");
     setUrl("");
     setShowQr(false);
   };
 
+  
   return (
     <div className="min-h-screen bg-[#141414] text-white relative transition-colors duration-300 overflow-x-hidden selection:bg-blue-500/30">
       <Navbar />
