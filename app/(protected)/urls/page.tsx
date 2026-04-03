@@ -186,7 +186,7 @@ function AllUrlsPageClient() {
 
     const now = new Date();
     if (statusFilter === "protected") {
-      result = result.filter((item) => !!item.isProtected);
+      result = result.filter((item) => !!item.password);
       
     } else if (statusFilter === "today") {
       result = result.filter(
@@ -299,7 +299,7 @@ function AllUrlsPageClient() {
                     </div>
 
                     <div className="hidden md:flex w-[10%] shrink-0">
-                      {url.isProtected && (
+                      {url.password && (
                         <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">
                           <HugeiconsIcon icon={CircleLock01Icon} size={15} />
                           <span className="text-[10px] uppercase tracking-widest font-one">Protected</span>
@@ -312,8 +312,8 @@ function AllUrlsPageClient() {
                     </div>
 
                     <div className="flex items-center justify-end gap-3 text-neutral-400 w-[30%] opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity">
-                      <button onClick={() => { setSelectedLink(url); setIsPasswordModalOpen(true); }} className={`p-2 rounded-md cursor-pointer transition-colors ${url.isProtected ? 'text-blue-500' : 'hover:text-white'}`}>
-                        {url.isProtected ? <HugeiconsIcon icon={CircleLock01Icon} /> : <HugeiconsIcon icon={CircleUnlock01Icon} />}
+                      <button onClick={() => { setSelectedLink(url); setIsPasswordModalOpen(true); }} className={`p-2 rounded-md cursor-pointer transition-colors ${url.password ? 'text-blue-500' : 'hover:text-white'}`}>
+                        {url.password ? <HugeiconsIcon icon={CircleLock01Icon} /> : <HugeiconsIcon icon={CircleUnlock01Icon} />}
                       </button>
                       <button onClick={() => { setSelectedLink(url); setIsCustomModalOpen(true); }} className="hover:text-white p-2 cursor-pointer">
                         <HugeiconsIcon icon={MagicWand01Icon} />

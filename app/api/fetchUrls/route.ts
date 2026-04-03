@@ -52,7 +52,7 @@ export async function GET(req: NextRequest) {
                         original: true,
                         linkName: true,
                         clicks: true,
-                        isProtected: true,
+                        password: true,
                         createdAt: true
                     },
                      orderBy: {
