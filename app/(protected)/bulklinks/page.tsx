@@ -4,26 +4,23 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { 
-  IoCloudUploadOutline, 
-  IoDocumentTextOutline, 
   IoCloseOutline, 
   IoCheckmarkCircleOutline, 
   IoAlertCircleOutline,
-  IoDownloadOutline,
   IoFileTrayFullOutline,
   IoRocketOutline,
   IoRefreshOutline,
-  IoEyeOutline,
-  IoEyeOffOutline,
   IoCalendarOutline,
-  IoGlobeOutline,
-  IoLockOpenOutline,
-  IoPencilOutline,
-  IoTrashOutline,
-  IoChevronBack,
-  IoChevronForward,
-  IoCheckmarkOutline
 } from "react-icons/io5";
+
+import { HugeiconsIcon } from '@hugeicons/react';
+import { 
+  CloudUploadIcon, Download02Icon, Cancel01Icon, File02Icon, 
+  Calendar03Icon, ArrowRight01Icon, Delete02Icon, CheckmarkCircle01Icon,
+  Edit03Icon, CircleLock01Icon, CircleUnlock01Icon, ViewIcon, ViewOffSlashIcon,
+  Pdf02Icon, Csv02Icon, 
+} from '@hugeicons/core-free-icons';
+
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import Navbar from "../../components/navbar";
@@ -57,7 +54,6 @@ export default function BulkCreateLinks() {
   const [status, setStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
   const [createdLinks, setCreatedLinks] = useState<any[]>([]);
-
   const [pastBulkLinks, setPastBulkLinks] = useState<any[]>([]);
 
   const [showDownloadModal, setShowDownloadModal] = useState(false);
@@ -76,9 +72,6 @@ export default function BulkCreateLinks() {
   
   const [editingId, setEditingId] = useState<string | null>(null);
   const [tempName, setTempName] = useState("");
-
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -138,7 +131,6 @@ export default function BulkCreateLinks() {
     setCreatedLinks([]);
     setPassword("");
     setExpiryDate("");
-    setCurrentPage(1);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
@@ -176,7 +168,6 @@ export default function BulkCreateLinks() {
     setLoading(true);
     setStatus(null);
 
-
     const formData = new FormData();
     formData.append("file", file);
     if (password) formData.append("password", password);
@@ -193,9 +184,7 @@ export default function BulkCreateLinks() {
       });
 
       setCreatedLinks(res.data.success || []);
-
       await fetchPastBulkLinks();
-      setCurrentPage(1);
       setFile(null);
 
     } catch (error: any) {
@@ -234,14 +223,7 @@ export default function BulkCreateLinks() {
   const handleDelete = async (id: string) => {
     try {
       await axios.delete(`/api/shortUrl/bulkLinks/delete/${id}`);
-
       setPastBulkLinks((prev) => prev.filter((link) => link.id !== id));
-      
-      const newTotalPages = Math.ceil((pastBulkLinks.length - 1) / itemsPerPage);
-
-      if (currentPage > newTotalPages && newTotalPages > 0) {
-        setCurrentPage(newTotalPages);
-      }
 
     } catch (error) {
       console.error("Failed to delete bulk job", error);
@@ -258,6 +240,7 @@ export default function BulkCreateLinks() {
       startY: 20,
     });
     doc.save("links.pdf");
+
   };
 
 
@@ -293,19 +276,18 @@ export default function BulkCreateLinks() {
         password: finalPassword,
         expiryDate: finalExpiry,
       });
+
       alert("Protection Updated successfully");
       await fetchPastBulkLinks();
       closeAllModals();
+
     } catch (error) {
       console.log("Update failed", error);
     }
   };
 
 
-  const totalPages = Math.ceil(pastBulkLinks.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentBulkLinks = pastBulkLinks.slice(startIndex, endIndex);
+  const topFiveLinks = pastBulkLinks.slice(0, 5);
 
 
   return (
@@ -335,7 +317,7 @@ export default function BulkCreateLinks() {
         ) : (
           <div className="flex flex-col lg:flex-row items-stretch gap-8 lg:h-[540px]">
             
-            <div className="w-full lg:w-[60%] xl:w-[65%] p-6 sm:p-8 bg-[#1c1c1c] border border-neutral-800 rounded-2xl shadow-sm relative text-white flex flex-col h-full">
+            <div className="w-full lg:w-[60%] xl:w-[65%] p-6 sm:p-8 border border-neutral-800 rounded-2xl shadow-sm relative text-white flex flex-col h-full">
               <div className="mb-6 shrink-0">
                 <h2 className="text-2xl font-bold mb-2 text-white">Bulk Shorten Links</h2>
                 <p className="text-neutral-400 text-sm">
@@ -355,7 +337,7 @@ export default function BulkCreateLinks() {
                     {file ? (
                       <div className="flex items-center justify-between w-full">
                         <div className="flex items-center gap-4">
-                          <IoDocumentTextOutline size={44} className="text-blue-500" />
+                          <HugeiconsIcon icon={File02Icon} size={30} className="text-blue-500" />
                           <div className="text-left">
                             <p className="font-semibold truncate max-w-[150px] sm:max-w-[200px] text-white text-lg">{file.name}</p>
                             <p className="text-sm text-neutral-400">{(file.size / 1024).toFixed(2)} KB</p>
@@ -363,7 +345,7 @@ export default function BulkCreateLinks() {
                         </div>
                         {!loading && (
                           <button onClick={(e) => { e.stopPropagation(); setFile(null); }} className="p-2 hover:bg-red-500/20 rounded-full text-red-500 cursor-pointer transition-colors">
-                            <IoCloseOutline size={32} />
+                            <HugeiconsIcon icon={Cancel01Icon} />
                           </button>
                         )}
                       </div>
@@ -374,7 +356,7 @@ export default function BulkCreateLinks() {
                       </div>
                     ) : (
                       <>
-                        <IoCloudUploadOutline size={48} className="text-neutral-500 mb-4" />
+                        <HugeiconsIcon icon={CloudUploadIcon} size={35} className="mb-4" />
                         <p className="text-center font-medium text-white">Click to upload your CSV</p>
                       </>
                     )}
@@ -385,8 +367,8 @@ export default function BulkCreateLinks() {
                   {file && !createdLinks.length && (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 animate-in fade-in duration-300 border-t border-neutral-800 pt-6">
                       <div className="space-y-2">
-                        <label className="text-sm font-medium flex items-center gap-1">
-                          Password <span className="text-neutral-500 font-normal">(Optional)</span>
+                        <label className="text-sm font-three flex items-center gap-1">
+                          Password <span className="text-neutral-500 font-three">(Optional)</span>
                         </label>
                         <div className="relative group">
                           <input
@@ -394,21 +376,21 @@ export default function BulkCreateLinks() {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="Enter password"
-                            className="w-full p-3 bg-[#111111] border border-neutral-700 rounded-lg outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all pr-12 text-white"
+                            className="w-full p-3 bg-[#111111] font-three border border-neutral-700 rounded-lg outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all pr-12 text-white"
                           />
                           <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
                             className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-white transition-colors cursor-pointer"
                           >
-                            {showPassword ? <IoEyeOffOutline size={20} /> : <IoEyeOutline size={20} />}
+                            {showPassword ? <HugeiconsIcon icon={ViewOffSlashIcon} /> : <HugeiconsIcon icon={ViewIcon} />}
                           </button>
                         </div>
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-sm font-medium flex items-center gap-1">
-                          Set Expiry Date <span className="text-neutral-500 font-normal">(Optional)</span>
+                        <label className="text-sm font-three flex items-center gap-1">
+                          Set Expiry Date <span className="text-neutral-500 font-three">(Optional)</span>
                         </label>
                         <div className="relative group">
                           <input
@@ -418,7 +400,7 @@ export default function BulkCreateLinks() {
                             className="w-full p-3 bg-[#111111] border border-neutral-700 rounded-lg outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all pr-12 text-white appearance-none cursor-pointer [color-scheme:dark]"
                           />
                           <div className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 pointer-events-none">
-                            <IoCalendarOutline size={20} />
+                            <HugeiconsIcon icon={Calendar03Icon} />
                           </div>
                         </div>
                       </div>
@@ -461,7 +443,7 @@ export default function BulkCreateLinks() {
                             <div className="w-5 h-5 border-2 border-current border-t-transparent animate-spin rounded-full" />
                             <span>Processing...</span>
                           </div>
-                          <span className="text-[10px] font-normal opacity-80 uppercase tracking-widest mt-1">This may take some time, Please wait</span>
+                          <span className="text-[10px] font-three opacity-80 uppercase tracking-widest mt-1">This may take some time, Please wait</span>
                         </>
                       ) : (
                         userPlan === "FREE" ? "Upgrade to Shorten Bulk" : "Shorten Links"
@@ -471,9 +453,9 @@ export default function BulkCreateLinks() {
                     <div className="flex flex-col sm:flex-row gap-3">
                       <button 
                         onClick={() => setShowDownloadModal(true)} 
-                        className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-blue-700 transition-all cursor-pointer"
+                        className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-three flex items-center justify-center gap-2 hover:bg-blue-700 transition-all cursor-pointer"
                       >
-                        <IoDownloadOutline size={20} /> Download Results
+                        <HugeiconsIcon icon={Download02Icon} /> Download Results
                       </button>
                     </div>
                   )}
@@ -481,33 +463,28 @@ export default function BulkCreateLinks() {
               </div>
             </div>
 
-            <div className="w-full lg:w-[40%] xl:w-[35%] p-6 sm:p-8 bg-[#1c1c1c] border border-neutral-800 rounded-2xl shadow-sm relative text-white flex flex-col h-full">
+            <div className="w-full lg:w-[40%] xl:w-[35%] p-6 sm:p-8 border border-neutral-800 rounded-2xl shadow-sm relative text-white flex flex-col h-full">
               <div className="mb-6 flex items-center justify-between shrink-0">
                 <div>
-                  <h2 className="text-2xl font-bold mb-2 text-white">Recent Bulk Links</h2>
-                  <p className="text-neutral-400 text-sm">
-                    Links generated from your past uploads.
+                  <h2 className="text-2xl font-one mb-2 text-white">Recent Bulk Links</h2>
+                  <p className="text-neutral-400 font-one text-sm">
+                    Top 5 links from your past uploads.
                   </p>
                 </div>
-                {pastBulkLinks.length > 0 && (
-                  <div className="px-3 py-1 bg-[#141414] border border-neutral-700 rounded-lg text-sm font-medium">
-                    Total: {pastBulkLinks.length}
-                  </div>
-                )}
               </div>
 
               <div className="flex-1 flex flex-col w-full min-h-0">
                 {pastBulkLinks.length > 0 ? (
                   <>
                     <div className="flex-1 overflow-y-auto pr-1 space-y-2 min-h-0">
-                      {currentBulkLinks.map((link) => (
+                      {topFiveLinks.map((link) => (
                         <div
                           key={link.id}
                           className="flex items-center justify-between py-3 px-4 border border-neutral-800/60 hover:bg-[#1a1a1a] transition-colors group w-full rounded-xl gap-2"
                         >
                           <div className="flex items-center gap-4 flex-1 min-w-0">
                             <div className="w-9 h-9 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 shrink-0">
-                              <IoFileTrayFullOutline size={18} />
+                              <HugeiconsIcon icon={File02Icon} />
                             </div>
                             <div className="flex flex-col min-w-0 w-full">
                               {editingId === link.id ? (
@@ -526,23 +503,22 @@ export default function BulkCreateLinks() {
                                     onClick={() => handleUpdateName(link.id, tempName)} 
                                     className="text-green-500 hover:text-green-400 shrink-0 p-1 cursor-pointer"
                                   >
-                                    <IoCheckmarkOutline size={18} />
+                                    <HugeiconsIcon icon={CheckmarkCircle01Icon} />
                                   </button>
                                 </div>
                               ) : (
-                                <span className="text-white font-bold text-base truncate tracking-wide">
+                                <span className="text-white font-three text-base truncate tracking-wide">
                                   {link.name || "Bulk Link"}
                                 </span>
                               )}
-                              <span className="text-neutral-500 text-xs mt-0.5">
+                              <span className="text-neutral-500 font-one text-xs mt-0.5">
                                 {getRelativeTime(link.createdAt)}
                               </span>
                             </div>
                           </div>
 
                           <div className="flex items-center justify-end gap-1 text-neutral-300 shrink-0 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-                            
-                            <button 
+                            <button
                               onClick={() => {
                                 if (userPlan !== "PRO" && userPlan !== "ULTRA") {
                                   router.push("/premium");
@@ -552,11 +528,15 @@ export default function BulkCreateLinks() {
                                   setIsEditingPassword(!link.password);
                                   setIsEditingExpiry(!link.expiresAt);
                                 }
-                              }} 
-                              className="hover:text-white hover:bg-neutral-800 p-1.5 rounded-md transition-colors cursor-pointer" 
+                              }}
+                              className={`p-1.5 rounded-md transition-colors cursor-pointer hover:text-white hover:bg-neutral-800`}
                               title="Password Protection"
                             >
-                              <IoLockOpenOutline size={16} />
+                              {link.password ? (
+                                <HugeiconsIcon icon={CircleUnlock01Icon} className="text-blue-500" />
+                              ) : (
+                                <HugeiconsIcon icon={CircleLock01Icon} />
+                              )}
                             </button>
 
                             <button 
@@ -567,18 +547,7 @@ export default function BulkCreateLinks() {
                               className="hover:text-white hover:bg-neutral-800 p-1.5 rounded-md transition-colors cursor-pointer" 
                               title="Edit Name"
                             >
-                              <IoPencilOutline size={16} />
-                            </button>
-
-                            <button 
-                              onClick={() => {
-                                setSelectedUrl(link);
-                                setShowDownloadModal(true);
-                              }} 
-                              className="hover:text-white hover:bg-neutral-800 p-1.5 rounded-md transition-colors cursor-pointer" 
-                              title="Download Results"
-                            >
-                              <IoDownloadOutline size={16} />
+                              <HugeiconsIcon icon={Edit03Icon} />
                             </button>
 
                             <button 
@@ -586,37 +555,22 @@ export default function BulkCreateLinks() {
                               className="hover:text-red-500 hover:bg-red-500/10 p-1.5 rounded-md transition-colors cursor-pointer" 
                               title="Delete Bulk Job"
                             >
-                              <IoTrashOutline size={16} />
+                              <HugeiconsIcon icon={Delete02Icon} />
                             </button>
-
                           </div>
                         </div>
                       ))}
                     </div>
 
-                    {totalPages > 1 && (
-                      <div className="flex items-center justify-center gap-6 mt-4 pt-4 border-t border-neutral-800 text-white shrink-0">
-                        <button
-                          disabled={currentPage === 1}
-                          onClick={() => setCurrentPage(prev => prev - 1)}
-                          className="p-2 rounded-lg border border-neutral-800 hover:bg-[#2a2a2a] disabled:opacity-30 disabled:cursor-not-allowed transition cursor-pointer"
-                        >
-                          <IoChevronBack size={18} />
-                        </button>
-
-                        <span className="font-bold text-sm tracking-widest text-neutral-400">
-                          {currentPage} / {totalPages}
-                        </span>
-
-                        <button
-                          disabled={currentPage === totalPages}
-                          onClick={() => setCurrentPage(prev => prev + 1)}
-                          className="p-2 rounded-lg border border-neutral-800 hover:bg-[#2a2a2a] disabled:opacity-30 disabled:cursor-not-allowed transition cursor-pointer"
-                        >
-                          <IoChevronForward size={18} />
-                        </button>
-                      </div>
-                    )}
+                    <div className="mt-4 pt-4 border-t border-neutral-800 shrink-0">
+                      <button
+                        onClick={() => router.push('/urls?types=bulk')}
+                        className="w-full flex items-center justify-between px-4 py-3 bg-[#1c1c1c] hover:bg-[#252525] border border-neutral-800 rounded-xl transition-all group cursor-pointer"
+                      >
+                        <span className="font-semibold text-sm text-neutral-300 group-hover:text-white">Manage all links</span>
+                        <HugeiconsIcon icon={ArrowRight01Icon} className="text-neutral-500 group-hover:text-white group-hover:translate-x-1 transition-all" />
+                      </button>
+                    </div>
                   </>
                 ) : (
                   <div className="flex flex-col items-center justify-center h-full flex-1 border-2 border-dashed border-neutral-800 rounded-xl py-20 text-neutral-500 bg-[#1a1a1a]/50">
@@ -644,11 +598,11 @@ export default function BulkCreateLinks() {
             </div>
             <div className="flex flex-col gap-2">
               <button onClick={() => { exportPDF(); setShowDownloadModal(false); }} className="flex items-center gap-3 p-3 rounded-lg border border-neutral-700 hover:bg-[#2a2a2a] transition-colors text-left cursor-pointer group">
-                <div className="w-8 h-8 rounded bg-red-500/10 flex items-center justify-center text-red-500 group-hover:scale-110 transition-transform"><IoDocumentTextOutline size={18} /></div>
+                <div className="w-8 h-8 rounded bg-red-500/10 flex items-center justify-center text-red-500 group-hover:scale-110 transition-transform"><HugeiconsIcon icon={Pdf02Icon} /></div>
                 <span className="text-sm font-medium text-white">PDF Document</span>
               </button>
               <button onClick={() => { exportCSV(); setShowDownloadModal(false); }} className="flex items-center gap-3 p-3 rounded-lg border border-neutral-700 hover:bg-[#2a2a2a] transition-colors text-left cursor-pointer group">
-                <div className="w-8 h-8 rounded bg-green-500/10 flex items-center justify-center text-green-500 group-hover:scale-110 transition-transform"><IoFileTrayFullOutline size={18} /></div>
+                <div className="w-8 h-8 rounded bg-green-500/10 flex items-center justify-center text-green-500 group-hover:scale-110 transition-transform"><HugeiconsIcon icon={Csv02Icon} /></div>
                 <span className="text-sm font-medium text-white">CSV Spreadsheet</span>
               </button>
             </div>
@@ -681,7 +635,7 @@ export default function BulkCreateLinks() {
                       className="text-blue-500 hover:text-blue-400 cursor-pointer transition-colors"
                       title="Edit Password"
                     >
-                      <IoPencilOutline size={18} />
+                      <HugeiconsIcon icon={Edit03Icon} />
                     </button>
                   )}
                 </div>
@@ -704,7 +658,7 @@ export default function BulkCreateLinks() {
                       onClick={() => setShowPassword(!showPassword)}
                       className="px-4 text-neutral-500 hover:text-white transition-colors cursor-pointer"
                     >
-                      {showPassword ? <IoEyeOffOutline size={20} /> : <IoEyeOutline size={20} />}
+                      {showPassword ? <HugeiconsIcon icon={ViewOffSlashIcon} /> : <HugeiconsIcon icon={ViewIcon} />}
                     </button>
                   </div>
                 )}
@@ -719,7 +673,7 @@ export default function BulkCreateLinks() {
                       className="text-blue-500 hover:text-blue-400 cursor-pointer transition-colors"
                       title="Edit Expiry"
                     >
-                      <IoPencilOutline size={18} />
+                      <HugeiconsIcon icon={Edit03Icon} />
                     </button>
                   )}
                 </div>

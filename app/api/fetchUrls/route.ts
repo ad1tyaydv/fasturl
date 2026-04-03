@@ -46,6 +46,12 @@ export async function GET(req: NextRequest) {
                     where: {
                         checkBulk: false
                     },
+                    select: {
+                        id: true,
+                        shorturl: true,
+                        original: true,
+                        createdAt: true
+                    },
                      orderBy: {
                         createdAt: "asc"
                     }

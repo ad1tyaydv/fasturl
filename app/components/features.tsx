@@ -7,7 +7,7 @@ import {
 } from "react-icons/io5";
 
 import { HugeiconsIcon } from '@hugeicons/react';
-import { 
+import {
   Analytics01Icon, ArrowRightDoubleIcon, QrCodeIcon }
   from '@hugeicons/core-free-icons';
 

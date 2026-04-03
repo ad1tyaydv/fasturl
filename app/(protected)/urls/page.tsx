@@ -2,7 +2,7 @@
 
 import axios from "axios";
 import { useEffect, useState, useCallback, useMemo } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Toaster } from "react-hot-toast";
 
@@ -16,8 +16,11 @@ const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN;
 
 export default function AllUrlsPage() {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
-  const [view, setView] = useState<"links" | "bulk">("links");
+  const initialView = searchParams.get("types") === "bulk" ? "bulk" : "links";
+  const [view, setView] = useState<"links" | "bulk">(initialView);
 
   const [data, setData] = useState<any[]>([]);
   const [tier, setTier] = useState("FREE");
@@ -32,6 +35,15 @@ export default function AllUrlsPage() {
 
   const handleViewChange = (newView: "links" | "bulk") => {
     setView(newView);
+    if(newView === "links") {
+      const newUrl = `${pathname}?types=link`;
+      router.push(newUrl);
+    }
+
+    if(newView === "bulk") {
+      const newUrl = `${pathname}?types=bulk`;
+      router.push(newUrl);
+    }
   };
 
 

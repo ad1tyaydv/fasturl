@@ -77,20 +77,31 @@ export async function POST(req: NextRequest) {
 
         const totalRequestedLinks = validLinks.length;
 
-        const result = await prisma.$transaction(async (tx) => {
-            const user = await tx.user.findUnique({
-                where: {
-                    id: decoded.userId
-                },
-                select: {
-                    totalLinks: true,
-                    plan: true
-                }
-            });
-
-            if(!user) {
-                throw new Error("User not found");
+        const user = await prisma.user.findUnique({
+            where: {
+                id: decoded.userId
+            },
+            select: {
+                totalLinks: true,
+                plan: true
             }
+        });
+
+        if(!user) {
+            return NextResponse.json(
+                {message: "User not found"},
+                {status: 404}
+            )
+        }
+
+        if((user.plan === "ESSENTIAL" || user.plan === "PRO") && totalRequestedLinks > 5000) {
+            return NextResponse.json(
+                {message: "You can generate only 5000 links at once"},
+                {status: 400}
+            )
+        }
+
+        const result = await prisma.$transaction(async (tx) => {
 
             if(user.totalLinks < totalRequestedLinks) {
                 throw new Error("Limit Exceeded");

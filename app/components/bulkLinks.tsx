@@ -3,11 +3,12 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { Loader2 } from "lucide-react";
 
 import { HugeiconsIcon } from '@hugeicons/react';
 import { 
   File02Icon, Download01Icon, Search02Icon, Delete02Icon, 
-  Edit03Icon, CircleLock01Icon, CircleUnlock01Icon, Tick02Icon 
+  Edit03Icon, CircleLock01Icon, CircleUnlock01Icon, Tick02Icon
 } from '@hugeicons/core-free-icons';
 
 import { FilterDropDown, FilterType } from "@/app/dropDown/urlsPageDropDown";
@@ -35,6 +36,7 @@ export default function BulkLinks({
 }: any) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [tempName, setTempName] = useState("");
+  const [savingId, setSavingId] = useState<string | null>(null); // New state for spinner
   const [showDownloadModal, setShowDownloadModal] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [selectedBatch, setSelectedBatch] = useState<any>(null);
@@ -45,19 +47,27 @@ export default function BulkLinks({
   useEffect(() => {
     const handler = setTimeout(() => setSearchQuery(displaySearch), 300);
     return () => clearTimeout(handler);
+
   }, [displaySearch, setSearchQuery]);
 
 
-  const saveName = async (e: React.MouseEvent, id: string) => {
+  const saveName = async (e: React.MouseEvent | React.KeyboardEvent, id: string) => {
     e.stopPropagation();
     if (!tempName.trim()) { setEditingId(null); return; }
+    
+    setSavingId(id);
     try {
       await axios.post("/api/shortUrl/bulkLinks/updateName", { linkId: id, name: tempName.trim() });
       toast.success("Updated");
       onRefresh();
+      setEditingId(null);
 
-    } catch { toast.error("Failed to update"); }
-    setEditingId(null);
+    } catch { 
+      toast.error("Failed to update");
+
+    } finally {
+      setSavingId(null);
+    }
   };
 
 
@@ -95,12 +105,22 @@ export default function BulkLinks({
                   {editingId === url.id ? (
                     <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
                       <input 
-                        autoFocus className="bg-[#111111] border border-neutral-700 rounded px-2 py-1 text-white w-full outline-none" 
+                        autoFocus 
+                        disabled={savingId === url.id}
+                        className="bg-[#111111] border border-neutral-700 rounded px-2 py-1 text-white w-full outline-none disabled:opacity-50" 
                         value={tempName} onChange={(e) => setTempName(e.target.value)} 
                         onKeyDown={(e) => e.key === "Enter" && saveName(e as any, url.id)} 
                       />
-                      <button onClick={(e) => saveName(e, url.id)} className="text-green-500 cursor-pointer">
-                        <HugeiconsIcon icon={Tick02Icon} />
+                      <button 
+                        onClick={(e) => saveName(e, url.id)} 
+                        disabled={savingId === url.id}
+                        className="text-green-500 cursor-pointer disabled:cursor-not-allowed"
+                      >
+                        {savingId === url.id ? (
+                          <Loader2 className="w-5 h-5 animate-spin text-blue-500" />
+                        ) : (
+                          <HugeiconsIcon icon={Tick02Icon} />
+                        )}
                       </button>
                     </div>
                   ) : (
@@ -168,7 +188,7 @@ export default function BulkLinks({
         onSuccess={onRefresh}
       />
 
-      <BulkDownloadModal 
+      <BulkDownloadModal
         isOpen={showDownloadModal} 
         onClose={() => setShowDownloadModal(false)} 
         batchName={selectedBatch?.name}

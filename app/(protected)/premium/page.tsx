@@ -11,11 +11,13 @@ export default function PremiumPage() {
   const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+
   useEffect(() => {
     const checkAuth = async () => {
       try {
         const res = await axios.get("/api/auth/me");
         setIsLoggedIn(!!res.data.authenticated);
+
       } catch {
         setIsLoggedIn(false);
       }
@@ -30,11 +32,13 @@ export default function PremiumPage() {
       await axios.post("/api/auth/logout");
       setIsLoggedIn(false);
       router.push("/auth/signin");
+
     } catch (error) {
       console.error("Logout failed", error);
     }
   };
 
+  
   return (
     <div className="min-h-screen bg-[#141414] text-white transition-colors duration-300">
       <Navbar />
