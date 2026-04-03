@@ -11,11 +11,12 @@ interface CustomUrlModalProps {
   onClose: () => void;
   selectedUrl: any;
   onSuccess: () => void;
-  domain: string;
 }
 
 
-export default function CustomUrlModal({ isOpen, onClose, selectedUrl, onSuccess, domain }: CustomUrlModalProps) {
+const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN;
+
+export default function CustomUrlModal({ isOpen, onClose, selectedUrl, onSuccess }: CustomUrlModalProps) {
   const [customUrl, setCustomUrl] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -88,7 +89,7 @@ export default function CustomUrlModal({ isOpen, onClose, selectedUrl, onSuccess
           <div className="space-y-2">
             <label className="text-xl font-one text-white">Current URL</label>
             <div className="w-full p-3 border border-dashed border-neutral-700 bg-[#1a1a1a] text-neutral-400 font-three rounded-lg text-sm truncate">
-              {domain}/{selectedUrl.shorturl}
+              {NEXT_DOMAIN}/{selectedUrl.shorturl}
             </div>
           </div>
 
@@ -100,7 +101,7 @@ export default function CustomUrlModal({ isOpen, onClose, selectedUrl, onSuccess
               } bg-[#111111] focus-within:border-blue-500 transition-colors rounded-lg overflow-hidden`}
             >
               <span className="pl-3 py-3 text-neutral-500 font-three bg-[#1a1a1a] border-r border-neutral-700 px-3 text-sm">
-                {domain}/
+                {NEXT_DOMAIN}/
               </span>
               <input
                 type="text"

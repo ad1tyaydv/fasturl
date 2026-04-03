@@ -53,6 +53,7 @@ model Link {
   ipAddress    String?
 
   password     String?
+  isProtected  Boolean     @default(false)
   expiresAt    DateTime?
   
   userId       String

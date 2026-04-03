@@ -50,6 +50,9 @@ export async function GET(req: NextRequest) {
                         id: true,
                         shorturl: true,
                         original: true,
+                        linkName: true,
+                        clicks: true,
+                        isProtected: true,
                         createdAt: true
                     },
                      orderBy: {
