@@ -9,14 +9,18 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { IoFilterOutline, IoChevronDown } from "react-icons/io5"
+
+import { HugeiconsIcon } from '@hugeicons/react';
+import {
+  FilterIcon, ArrowDown01Icon, QrCodeIcon }
+  from '@hugeicons/core-free-icons';
 
 interface AnalyticsFilterProps {
   days: number;
   setDays: (days: number) => void;
 }
 
-export function ClicksFilter({ days, setDays }: AnalyticsFilterProps) {
+export function AnalyticsDropDown({ days, setDays }: AnalyticsFilterProps) {
 
 
   return (
@@ -24,11 +28,11 @@ export function ClicksFilter({ days, setDays }: AnalyticsFilterProps) {
       <DropdownMenuTrigger asChild>
         <Button 
           variant="outline" 
-          className="bg-[#1a1a1a] border-neutral-800 text-white hover:bg-[#252525] hover:text-white rounded-lg flex items-center gap-2 h-9 outline-none focus:ring-1 focus:ring-neutral-700"
+          className="bg-[#1a1a1a] border-neutral-800 text-white hover:bg-[#252525] hover:text-white rounded-lg flex items-center gap-2 h-9 outline-none focus:ring-1 focus:ring-neutral-700 cursor-pointer"
         >
-          <IoFilterOutline size={16} className="text-blue-500" />
-          <span className="text-xs font-medium">Last {days} Days</span>
-          <IoChevronDown size={14} className="text-neutral-500" />
+          <HugeiconsIcon icon={FilterIcon} />
+          <span className="text-xs font-medium cusor-pointer">Last {days} Days</span>
+          <HugeiconsIcon icon={ArrowDown01Icon} />
         </Button>
       </DropdownMenuTrigger>
 

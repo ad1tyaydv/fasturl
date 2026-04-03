@@ -28,23 +28,43 @@ const getOSIcon = (os: string) => {
 };
 
 interface OSAnalyticsProps {
-  data?: { os?: string; operatingSystem?: string; count: number }[];
+  data?: any[];
+  days?: number;
 }
 
-export default function OSAnalytics({ data = [] }: OSAnalyticsProps) {
+export default function OSAnalytics({ data = [], days = 7 }: OSAnalyticsProps) {
   
   const sortedData = useMemo(() => {
-    return [...data]
+    if (!data || data.length === 0) return [];
+
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - days);
+    cutoffDate.setHours(0, 0, 0, 0);
+
+    const osCounts: Record<string, number> = {};
+
+    data.forEach((item: any) => {
+      if (item.createdAt) {
+        const itemDate = new Date(item.createdAt);
+        if (itemDate < cutoffDate) return;
+      }
+
+      const osName = item.os || item.operatingSystem || "Unknown";
+      const count = item.count !== undefined ? item.count : 1; 
+
+      osCounts[osName] = (osCounts[osName] || 0) + count;
+    });
+
+    return Object.entries(osCounts)
+      .map(([os, count]) => ({ os, count }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 5);
-  }, [data]);
-
+  }, [data, days]);
 
   const maxCount = useMemo(() => 
     sortedData.length > 0 ? Math.max(...sortedData.map(d => d.count)) : 0, 
     [sortedData]
   );
-
 
   return (
     <Card className="bg-transparent text-white w-full h-full flex flex-col border-none shadow-none">
@@ -60,7 +80,7 @@ export default function OSAnalytics({ data = [] }: OSAnalyticsProps) {
             {sortedData.length > 0 ? (
               sortedData.map((item, index) => {
                 const barWidth = maxCount > 0 ? (item.count / maxCount) * 100 : 0;
-                const osName = item.os || item.operatingSystem || "Unknown";
+                const osName = item.os || "Unknown";
 
                 return (
                   <div key={index} className="group flex flex-col gap-2">
@@ -89,7 +109,7 @@ export default function OSAnalytics({ data = [] }: OSAnalyticsProps) {
               })
             ) : (
               <div className="h-[200px] flex items-center justify-center text-sm text-neutral-600 italic">
-                No system data available
+                No active operating system data for this period
               </div>
             )}
           </div>

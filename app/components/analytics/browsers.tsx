@@ -28,17 +28,41 @@ const getBrowserIcon = (browser: string) => {
 
 
 interface BrowserAnalyticsProps {
-  data?: { browser: string; count: number }[];
+  data?: any[];
+  days?: number;
 }
 
-
-export default function BrowserAnalytics({ data = [] }: BrowserAnalyticsProps) {
+export default function BrowserAnalytics({ data = [], days = 7 }: BrowserAnalyticsProps) {
   
   const sortedData = useMemo(() => {
-    return [...data]
+    if (!data || data.length === 0) return [];
+
+    
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - days);
+    cutoffDate.setHours(0, 0, 0, 0);
+
+    const browserCounts: Record<string, number> = {};
+
+    data.forEach((item: any) => {
+      if (item.createdAt) {
+        const itemDate = new Date(item.createdAt);
+        if (itemDate < cutoffDate) return;
+      }
+
+      const browserName = item.browser || "Unknown";
+    
+      const count = item.count !== undefined ? item.count : 1; 
+
+      browserCounts[browserName] = (browserCounts[browserName] || 0) + count;
+    });
+
+
+    return Object.entries(browserCounts)
+      .map(([browser, count]) => ({ browser, count }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 5);
-  }, [data]);
+  }, [data, days]);
 
 
   const maxCount = useMemo(() => 
@@ -49,7 +73,6 @@ export default function BrowserAnalytics({ data = [] }: BrowserAnalyticsProps) {
 
   return (
     <Card className="bg-transparent text-white w-full h-full flex flex-col border-none shadow-none">
-      
       <CardContent className="px-6 flex-1 flex flex-col">
         <div className="flex flex-col gap-6">
           <div className="flex justify-between text-[15px] uppercase tracking-[0.15em] font-three">
@@ -61,7 +84,7 @@ export default function BrowserAnalytics({ data = [] }: BrowserAnalyticsProps) {
             {sortedData.length > 0 ? (
               sortedData.map((item, index) => {
                 const barWidth = maxCount > 0 ? (item.count / maxCount) * 100 : 0;
-                const browserName = item.browser || "Unknown";
+                const browserName = item.browser;
 
                 return (
                   <div key={index} className="group flex flex-col gap-2">
@@ -90,7 +113,7 @@ export default function BrowserAnalytics({ data = [] }: BrowserAnalyticsProps) {
               })
             ) : (
               <div className="h-[200px] flex items-center justify-center text-sm text-neutral-600 italic">
-                No active session data
+                No active session data for this period
               </div>
             )}
           </div>

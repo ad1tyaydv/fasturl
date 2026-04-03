@@ -12,7 +12,6 @@ import {
   ComputerVideoIcon, SmartPhone02Icon, Tablet02Icon }
   from '@hugeicons/core-free-icons';
 
-
 const getDeviceIcon = (device: string) => {
   const type = device?.toLowerCase() || "";
   if (type.includes("desktop") || type.includes("windows") || type.includes("mac")) 
@@ -27,17 +26,38 @@ const getDeviceIcon = (device: string) => {
 
 
 interface DeviceAnalyticsProps {
-  data?: { device?: string; devices?: string; count: number }[];
+  data?: any[];
+  days?: number;
 }
 
-
-export default function DeviceListAnalytics({ data = [] }: DeviceAnalyticsProps) {
+export default function DeviceListAnalytics({ data = [], days = 7 }: DeviceAnalyticsProps) {
 
   const sortedData = useMemo(() => {
-    return [...data]
+    if (!data || data.length === 0) return [];
+
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - days);
+    cutoffDate.setHours(0, 0, 0, 0);
+
+    const deviceCounts: Record<string, number> = {};
+
+    data.forEach((item: any) => {
+      if (item.createdAt) {
+        const itemDate = new Date(item.createdAt);
+        if (itemDate < cutoffDate) return;
+      }
+
+      const deviceName = item.device || item.devices || "Unknown";
+      const count = item.count !== undefined ? item.count : 1; 
+
+      deviceCounts[deviceName] = (deviceCounts[deviceName] || 0) + count;
+    });
+
+    return Object.entries(deviceCounts)
+      .map(([device, count]) => ({ device, count }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 5);
-  }, [data]);
+  }, [data, days]);
 
 
   const maxCount = useMemo(() => 
@@ -60,7 +80,7 @@ export default function DeviceListAnalytics({ data = [] }: DeviceAnalyticsProps)
             {sortedData.length > 0 ? (
               sortedData.map((item, index) => {
                 const barWidth = maxCount > 0 ? (item.count / maxCount) * 100 : 0;
-                const deviceName = item.device || item.devices || "Unknown";
+                const deviceName = item.device || "Unknown";
 
                 return (
                   <div key={index} className="group flex flex-col gap-2">
@@ -89,7 +109,7 @@ export default function DeviceListAnalytics({ data = [] }: DeviceAnalyticsProps)
               })
             ) : (
               <div className="h-[200px] flex items-center justify-center text-sm text-neutral-600 italic">
-                No device data found
+                No active device data for this period
               </div>
             )}
           </div>

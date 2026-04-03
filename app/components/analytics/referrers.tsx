@@ -30,30 +30,50 @@ const getReferrerIcon = (referrer: string) => {
     return <Linkedin className="w-4 h-4 text-blue-700" />;
   if (ref.includes("whatsapp") || ref.includes("t.me")) 
     return <MessageCircle className="w-4 h-4 text-green-500" />;
-  if (ref === "direct" || ref === "") 
+  if (ref === "direct" || ref === "direct / internal" || ref === "") 
     return <Globe className="w-4 h-4 text-neutral-400" />;
     
   return <Globe className="w-4 h-4 text-neutral-500" />;
 };
 
 interface ReferrerAnalyticsProps {
-  data?: { referrer: string; count: number }[];
+  data?: any[];
+  days?: number;
 }
 
-export default function ReferrerAnalytics({ data = [] }: ReferrerAnalyticsProps) {
+export default function ReferrerAnalytics({ data = [], days = 7 }: ReferrerAnalyticsProps) {
   
   const sortedData = useMemo(() => {
-    return [...data]
+    if (!data || data.length === 0) return [];
+
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - days);
+    cutoffDate.setHours(0, 0, 0, 0);
+
+    const referrerCounts: Record<string, number> = {};
+
+    data.forEach((item: any) => {
+      if (item.createdAt) {
+        const itemDate = new Date(item.createdAt);
+        if (itemDate < cutoffDate) return;
+      }
+
+      const referrerName = item.referrer ? item.referrer : "Direct / Internal";
+      const count = item.count !== undefined ? item.count : 1; 
+
+      referrerCounts[referrerName] = (referrerCounts[referrerName] || 0) + count;
+    });
+
+    return Object.entries(referrerCounts)
+      .map(([referrer, count]) => ({ referrer, count }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 5);
-  }, [data]);
-
+  }, [data, days]);
 
   const maxCount = useMemo(() => 
     sortedData.length > 0 ? Math.max(...sortedData.map(d => d.count)) : 0, 
     [sortedData]
   );
-
 
   return (
     <Card className="bg-transparent text-white w-full h-full flex flex-col border-none shadow-none">
@@ -69,6 +89,7 @@ export default function ReferrerAnalytics({ data = [] }: ReferrerAnalyticsProps)
             {sortedData.length > 0 ? (
               sortedData.map((item, index) => {
                 const barWidth = maxCount > 0 ? (item.count / maxCount) * 100 : 0;
+                
                 return (
                   <div key={index} className="group flex flex-col gap-2">
                     <div className="flex items-center justify-between transition-transform duration-200 group-hover:translate-x-1">
@@ -77,7 +98,7 @@ export default function ReferrerAnalytics({ data = [] }: ReferrerAnalyticsProps)
                           {getReferrerIcon(item.referrer)}
                         </div>
                         <span className="text-sm font-medium text-neutral-300 group-hover:text-white transition-colors capitalize">
-                          {item.referrer || "Direct / Internal"}
+                          {item.referrer}
                         </span>
                       </div>
                       <span className="text-sm font-bold tabular-nums text-white">
@@ -96,7 +117,7 @@ export default function ReferrerAnalytics({ data = [] }: ReferrerAnalyticsProps)
               })
             ) : (
               <div className="h-[200px] flex items-center justify-center text-sm text-neutral-600 italic">
-                No referral data recorded
+                No referral data for this period
               </div>
             )}
           </div>

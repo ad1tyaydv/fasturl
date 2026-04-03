@@ -16,7 +16,6 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart"
 
-
 const chartConfig = {
   total: { 
     label: "Clicks",
@@ -24,12 +23,10 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-
 interface ClicksAnalyticsProps {
   data?: any[];
   days?: number;
 }
-
 
 export default function ClicksAnalytics({ data = [], days = 7 }: ClicksAnalyticsProps) {
 
@@ -46,6 +43,7 @@ export default function ClicksAnalytics({ data = [], days = 7 }: ClicksAnalytics
     data.forEach((c: any) => {
       if (!c.createdAt) return;
       const dateStr = new Date(c.createdAt).toISOString().slice(0, 10)
+      
       if (dataMap[dateStr]) {
         dataMap[dateStr].total += 1
       }
@@ -54,7 +52,7 @@ export default function ClicksAnalytics({ data = [], days = 7 }: ClicksAnalytics
     return Object.values(dataMap).sort((a: any, b: any) => a.date.localeCompare(b.date))
   }, [data, days])
 
-
+  
   const totalClicksCount = useMemo(() => 
     chartData.reduce((acc, curr) => acc + curr.total, 0),
     [chartData]
@@ -70,7 +68,9 @@ export default function ClicksAnalytics({ data = [], days = 7 }: ClicksAnalytics
         
         <div className="flex border-t border-neutral-800 sm:border-t-0">
           <div className="relative z-30 flex flex-1 flex-col justify-center gap-1 px-6 py-4 text-left sm:px-8 sm:py-6">
-            <span className="text-xs text-neutral-500 font-three uppercase tracking-wider">Total</span>
+            <span className="text-xs text-neutral-500 font-three uppercase tracking-wider">
+              Total (Last {days} Days)
+            </span>
             <span className="text-lg font-bold sm:text-3xl font-two">
               {totalClicksCount.toLocaleString()}
             </span>

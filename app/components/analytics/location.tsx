@@ -36,19 +36,40 @@ const getCountryFlag = (country: string) => {
   return map[country?.toLowerCase()] || "🌍"
 }
 
-
 interface CountryAnalyticsProps {
-  data?: { country: string; count: number }[];
+  data?: any[];
+  days?: number;
 }
 
-
-export default function CountryAnalytics({ data = [] }: CountryAnalyticsProps) {
+export default function CountryAnalytics({ data = [], days = 7 }: CountryAnalyticsProps) {
   
   const sortedData = useMemo(() => {
-    return [...data]
+    if (!data || data.length === 0) return [];
+
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - days);
+    cutoffDate.setHours(0, 0, 0, 0);
+
+    const countryCounts: Record<string, number> = {};
+
+    data.forEach((item: any) => {
+      if (item.createdAt) {
+        const itemDate = new Date(item.createdAt);
+        if (itemDate < cutoffDate) return;
+      }
+
+      const countryName = item.country || "Unknown";
+      const count = item.count !== undefined ? item.count : 1; 
+
+      countryCounts[countryName] = (countryCounts[countryName] || 0) + count;
+    });
+
+  
+    return Object.entries(countryCounts)
+      .map(([country, count]) => ({ country, count }))
       .sort((a, b) => b.count - a.count)
-      .slice(0, 5)
-  }, [data])
+      .slice(0, 5);
+  }, [data, days]);
 
 
   const maxCount = useMemo(() => 
@@ -107,7 +128,7 @@ export default function CountryAnalytics({ data = [] }: CountryAnalyticsProps) {
               })
             ) : (
               <div className="h-[200px] flex items-center justify-center text-sm text-neutral-600 italic">
-                No location data available
+                No active location data for this period
               </div>
             )}
           </div>
