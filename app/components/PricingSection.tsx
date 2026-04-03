@@ -6,17 +6,34 @@ import { HugeiconsIcon } from '@hugeicons/react';
 import { 
   Tick01Icon, Cancel01Icon, RupeeIcon }
   from '@hugeicons/core-free-icons';
+import axios from "axios";
+import { useState } from "react";
 
 export default function PricingSection() {
   const router = useRouter();
 
+  const [tier, setTier] = useState("FREE");
+
+
+  const handlePayments = async () => {
+    try {
+      await axios.post("/api/payments", {
+        tier: tier
+      })
+
+    } catch (error) {
+      console.log("Error while handling payments")
+    }
+  }
+
+
+
   const Check = () => (
-    <HugeiconsIcon icon={Tick01Icon} className="text-green-500 font-bold ml-2 shrink-0" size={25} />
+  <HugeiconsIcon icon={Tick01Icon} className="text-green-500 font-bold ml-2 shrink-0" size={25} />
   );
   const Cross = () => (
     <HugeiconsIcon icon={Cancel01Icon} className="text-red-500 font-bold ml-2 shrink-0" size={25} />
   );
-
   
   return (
     <section className="px-4 sm:px-8 py-12 md:py-20 max-w-6xl mx-auto flex flex-col items-center">
