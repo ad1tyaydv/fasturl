@@ -159,18 +159,18 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ shor
 
         if (ref) {
             try {
-            const domain = new URL(ref).hostname.toLowerCase();
+                const domain = new URL(ref).hostname.toLowerCase();
 
-            if (domain.includes("twitter")) referrer = "Twitter";
-            else if (domain.includes("facebook"))
-                referrer = "Facebook";
-            else if (domain.includes("linkedin"))
-                referrer = "LinkedIn";
-            else if (domain.includes("instagram"))
-                referrer = "Instagram";
-            else if (domain.includes("google"))
-                referrer = "Google";
-            else referrer = domain;
+                if (domain.includes("twitter")) referrer = "Twitter";
+                else if (domain.includes("facebook"))
+                    referrer = "Facebook";
+                else if (domain.includes("linkedin"))
+                    referrer = "LinkedIn";
+                else if (domain.includes("instagram"))
+                    referrer = "Instagram";
+                else if (domain.includes("google"))
+                    referrer = "Google";
+                else referrer = domain;
 
             } catch {}
         }
