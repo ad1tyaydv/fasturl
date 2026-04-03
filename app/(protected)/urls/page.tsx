@@ -1,7 +1,7 @@
 "use client";
 
 import axios from "axios";
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useCallback, useMemo, Suspense } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Toaster } from "react-hot-toast";
@@ -14,7 +14,7 @@ import { FilterType } from "@/app/dropDown/urlsPageDropDown";
 
 const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN;
 
-export default function AllUrlsPage() {
+function AllUrlsPageClient() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -302,4 +302,13 @@ export default function AllUrlsPage() {
       </main>
     </div>
   );
+}
+
+
+export default function AllUrlsPage() {
+  return (
+    <Suspense fallback={<SkeletonLoader />}>
+      <AllUrlsPageClient />
+    </Suspense>
+  )
 }
