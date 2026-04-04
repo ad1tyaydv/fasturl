@@ -1,10 +1,47 @@
 import { prisma } from "@/lib/dbConfig";
+import { redis } from "@/lib/redis";
 import { NextRequest, NextResponse } from "next/server";
+import jwt from "jsonwebtoken";
 
+
+const JWT_SECRET = process.env.NEXTAUTH_SECRET!;
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string}> } ) {
 
+    const token = req.cookies.get("token")?.value;
+
+    if (!token) {
+        return NextResponse.json(
+            { message: "Unauthorized" },
+            { status: 401 }
+        );
+    }
+
+    const decoded = jwt.verify(token!, JWT_SECRET) as {
+        userId: string;
+    }
+    const userId = decoded.userId;
+
     const { id } = await params;
+
+    const find = await prisma.link.findUnique({
+        where: {
+            id: id
+        },
+        select: {
+            shorturl: true
+        }
+    })
+
+    if(!find) {
+        return NextResponse.json(
+            {message: "User does not exist"},
+            {status: 404}
+        )
+    }
+
+    await redis.del(`fetchLinks:${userId}`)
+    await redis.del(`analytics${find.shorturl}`)
 
     try {
 
@@ -26,6 +63,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         )
         
     } catch (error) {
+        console.log(error)
         return NextResponse.json(
             {message: "Error while deleting the url"},
             {status: 500}

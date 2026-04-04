@@ -164,11 +164,16 @@ export async function POST(req: NextRequest) {
         await redis.decr(cachedKey);
       }
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       message: "Short URL created!",
       shortUrl: urlShort.shorturl,
       original: urlShort.original,
     });
+
+    const userCachedkey = `fetchLinks:${userId}`;
+    await redis.del(userCachedkey);
+
+    return response;
 
   } catch (error) {
     return NextResponse.json(

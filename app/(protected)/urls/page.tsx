@@ -5,12 +5,11 @@ import { useEffect, useState, useCallback, useMemo, Suspense } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Toaster, toast } from "react-hot-toast";
-import { IoCheckmarkOutline } from "react-icons/io5";
 
 import { HugeiconsIcon } from '@hugeicons/react';
 import { 
   Globe02Icon, Share05Icon, Delete02Icon, QrCodeIcon, Edit03Icon, MagicWand01Icon,
-  CircleLock01Icon, Search02Icon, CircleUnlock01Icon, CopyCheckIcon,
+  CircleLock01Icon, Search02Icon, CircleUnlock01Icon, CopyCheckIcon, Tick02Icon,
   CopyIcon 
 } from '@hugeicons/core-free-icons';
 
@@ -61,7 +60,11 @@ function AllUrlsPageClient() {
   const itemsPerPage = 10;
 
   const [copiedUrlId, setCopiedUrlId] = useState<string | null>(null);
+
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const [isSavingName, setIsSavingName] = useState(false);
   const [tempName, setTempName] = useState("");
   const [selectedLink, setSelectedLink] = useState<any>(null);
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
@@ -143,6 +146,8 @@ function AllUrlsPageClient() {
       return;
     }
 
+    setIsSavingName(true);
+
     try {
       await axios.post("/api/shortUrl/linkName", {
         linkId: id,
@@ -150,23 +155,33 @@ function AllUrlsPageClient() {
       });
 
       toast.success("Name updated!");
-      fetchData();
+      await fetchData();
 
     } catch {
       toast.error("Update failed");
+      
+    } finally {
+      setIsSavingName(false);
+      setEditingId(null);
     }
-
-    setEditingId(null);
   };
 
 
   const handleLinkDelete = async (url: any) => {
+    setDeletingId(url.id);
+
     try {
       await axios.post(`/api/shortUrl/delete/${url.id}`);
-      fetchData();
+      await fetchData();
+
+      toast.success("Link deleted successfully")
 
     } catch (error) {
       console.log("Error while deleting the link");
+      toast.error("Failed to delete link");
+
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -285,10 +300,19 @@ function AllUrlsPageClient() {
                               className="bg-[#111111] border border-neutral-700 rounded px-2 py-1 text-white w-full outline-none" 
                               value={tempName} 
                               onChange={(e) => setTempName(e.target.value)} 
-                              onKeyDown={(e) => e.key === "Enter" && saveName(url.id)} 
+                              onKeyDown={(e) => e.key === "Enter" && !isSavingName && saveName(url.id)} 
+                              disabled={isSavingName}
                             />
-                            <button onClick={() => saveName(url.id)} className="text-green-500 cursor-pointer">
-                              <IoCheckmarkOutline size={22} />
+                            <button 
+                              onClick={() => saveName(url.id)} 
+                              disabled={isSavingName}
+                              className={`text-green-500 transition-opacity ${isSavingName ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'}`}
+                            >
+                              {isSavingName ? (
+                                <div className="w-[22px] h-[22px] border-2 border-t-transparent rounded-full animate-spin"></div>
+                              ) : (
+                                <HugeiconsIcon icon={Tick02Icon} />
+                              )}
                             </button>
                           </div>
                         ) : (
@@ -330,8 +354,20 @@ function AllUrlsPageClient() {
                       <button onClick={() => { setEditingId(url.id); setTempName(url.linkName || ""); }} className="hover:text-white p-2 cursor-pointer">
                         <HugeiconsIcon icon={Edit03Icon} />
                       </button>
-                      <button onClick={() => handleLinkDelete(url)} className="hover:text-red-500 p-2 cursor-pointer">
-                        <HugeiconsIcon icon={Delete02Icon} />
+                      <button 
+                        onClick={() => handleLinkDelete(url)} 
+                        disabled={deletingId === url.id}
+                        className={`p-2 transition-opacity ${
+                          deletingId === url.id 
+                            ? 'text-red-500 cursor-not-allowed opacity-70' 
+                            : 'hover:text-red-500 cursor-pointer'
+                        }`}
+                      >
+                        {deletingId === url.id ? (
+                          <div className="w-[20px] h-[20px] border-2 border-red-500 border-t-transparent rounded-full animate-spin"></div>
+                        ) : (
+                          <HugeiconsIcon icon={Delete02Icon} />
+                        )}
                       </button>
                     </div>
 
