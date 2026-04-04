@@ -18,8 +18,10 @@ import FaqSection from "./components/faqSection";
 import Footer from "./components/footer";
 import { DomainDropdown } from "./dropDown/domainDropDown";
 import { Button } from "@/components/ui/button";
+import { useUser } from "./components/userContext";
 
-const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN || "fasturl.in";
+
+const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN!;
 
 export default function Dashboard() {
   const router = useRouter();

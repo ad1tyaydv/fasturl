@@ -17,20 +17,23 @@ enum Plan {
 model User {
   id             String      @id @default(uuid())
   email          String      @unique
-  password       String
+  password       String?
   userName       String?
+
+  provider       String?
+  image          String?
+
   ipAddress      String?
 
   totalLinks     Int         @default(0)
 
-  plan           Plan      @default(FREE)
+  plan           Plan        @default(FREE)
   planStartedAt  DateTime?
   planExpiresAt  DateTime?
 
   links          Link[]
   qr             Qr[]
   bulkLinks      BulkLinks[]
-
   domain         CustomDomain[]
 
   createdAt      DateTime    @default(now())

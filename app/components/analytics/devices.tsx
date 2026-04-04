@@ -109,7 +109,7 @@ export default function DeviceListAnalytics({ data = [], days = 7 }: DeviceAnaly
               })
             ) : (
               <div className="h-[200px] flex items-center justify-center text-sm text-neutral-600 italic">
-                No active device data for this period
+                No data found
               </div>
             )}
           </div>

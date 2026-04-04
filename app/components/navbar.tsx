@@ -36,7 +36,7 @@ export default function Navbar() {
     { name: 'Domains', path: '/domain' },
     { name: 'Premium', path: '/premium' },
     { name: 'Docs', path: '/docs' },
-    { name: 'Settings', path: '/settings' },
+    { name: 'Settings', path: '/settings/profile' },
   ];
 
 
@@ -47,6 +47,22 @@ export default function Navbar() {
     }
 
   }, [user]);
+
+
+  useEffect(() => {
+    const fetchAgain = async () => {
+      try {
+      const res = await axios.get("/api/auth/me");
+      setTier(user.plan);
+      localStorage.setItem("plan", user.plan);
+
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    fetchAgain();
+
+  }, [])
 
 
   const isPaid = tier !== "FREE" && tier !== "";

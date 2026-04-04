@@ -251,19 +251,21 @@ function AllUrlsPageClient() {
           </span>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 mt-2">
-          <div className="relative w-full sm:w-[400px]">
-            <HugeiconsIcon icon={Search02Icon} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500" />
-            <input 
-              type="text" 
-              placeholder="Search links..."
-              className="w-full pl-10 pr-3 py-3 bg-[#111111] font-three border border-neutral-800 rounded-lg text-white text-sm outline-none focus:border-neutral-600 transition-all" 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)} 
-            />
+        {view === "links" && (
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 mt-2">
+            <div className="relative w-full sm:w-[400px]">
+              <HugeiconsIcon icon={Search02Icon} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500" />
+              <input 
+                type="text" 
+                placeholder="Search links..."
+                className="w-full pl-10 pr-3 py-3 bg-[#111111] font-three border border-neutral-800 rounded-lg text-white text-sm outline-none focus:border-neutral-600 transition-all" 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)} 
+              />
+            </div>
+            <FilterDropDown value={statusFilter} onChange={(val: FilterType) => setStatusFilter(val)} />
           </div>
-          <FilterDropDown value={statusFilter} onChange={(val: FilterType) => setStatusFilter(val)} />
-        </div>
+        )}
 
         {loading ? (
           <SkeletonLoader />

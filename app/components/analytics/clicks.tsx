@@ -68,9 +68,6 @@ export default function ClicksAnalytics({ data = [], days = 7 }: ClicksAnalytics
         
         <div className="flex border-t border-neutral-800 sm:border-t-0">
           <div className="relative z-30 flex flex-1 flex-col justify-center gap-1 px-6 py-4 text-left sm:px-8 sm:py-6">
-            <span className="text-xs text-neutral-500 font-three uppercase tracking-wider">
-              Total (Last {days} Days)
-            </span>
             <span className="text-lg font-bold sm:text-3xl font-two">
               {totalClicksCount.toLocaleString()}
             </span>

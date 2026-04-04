@@ -128,7 +128,7 @@ export default function CountryAnalytics({ data = [], days = 7 }: CountryAnalyti
               })
             ) : (
               <div className="h-[200px] flex items-center justify-center text-sm text-neutral-600 italic">
-                No active location data for this period
+                No data found
               </div>
             )}
           </div>

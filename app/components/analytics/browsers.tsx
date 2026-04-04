@@ -76,7 +76,7 @@ export default function BrowserAnalytics({ data = [], days = 7 }: BrowserAnalyti
       <CardContent className="px-6 flex-1 flex flex-col">
         <div className="flex flex-col gap-6">
           <div className="flex justify-between text-[15px] uppercase tracking-[0.15em] font-three">
-            <span>Source</span>
+            <span>Browsers</span>
             <span>Clicks</span>
           </div>
 
@@ -113,7 +113,7 @@ export default function BrowserAnalytics({ data = [], days = 7 }: BrowserAnalyti
               })
             ) : (
               <div className="h-[200px] flex items-center justify-center text-sm text-neutral-600 italic">
-                No active session data for this period
+                No data found
               </div>
             )}
           </div>

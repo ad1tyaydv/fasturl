@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
 import { useUser } from "@/app/components/userContext";
+import { signIn } from "next-auth/react"
 
 
 export default function Signup() {
@@ -207,6 +208,7 @@ export default function Signup() {
             <button
               type="button"
               className="w-full flex items-center justify-center gap-3 py-3.5 px-4 rounded-xl border border-white/10 bg-[#141414] hover:bg-[#1f1f1f] transition-all font-medium text-white shadow-sm cursor-pointer"
+              onClick={() => signIn("google")}
             >
               <FcGoogle size={20} />
               Sign up with Google

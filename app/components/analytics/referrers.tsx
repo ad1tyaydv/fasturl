@@ -81,7 +81,7 @@ export default function ReferrerAnalytics({ data = [], days = 7 }: ReferrerAnaly
       <CardContent className="px-6 flex-1 flex flex-col">
         <div className="flex flex-col gap-6">
           <div className="flex justify-between text-[15px] uppercase tracking-[0.15em] font-three">
-            <span>Source</span>
+            <span>Referrers</span>
             <span>Clicks</span>
           </div>
 
@@ -117,7 +117,7 @@ export default function ReferrerAnalytics({ data = [], days = 7 }: ReferrerAnaly
               })
             ) : (
               <div className="h-[200px] flex items-center justify-center text-sm text-neutral-600 italic">
-                No referral data for this period
+                No data found
               </div>
             )}
           </div>

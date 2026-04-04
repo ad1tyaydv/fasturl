@@ -30,7 +30,14 @@ export async function GET(req: NextRequest) {
                 email: true,
                 plan: true,
                 planExpiresAt: true,
-                planStartedAt: true
+                planStartedAt: true,
+                _count: {
+                    select: {
+                        links: true,
+                        bulkLinks: true,
+                        qr: true
+                    }
+                }
             }
         })
 
@@ -53,12 +60,26 @@ export async function GET(req: NextRequest) {
             daysLeft = Math.max(0, Math.ceil(diff / (24 * 60 * 60 * 1000)));
         }
 
-
+        const planStartedAt = new Date(checkPlan.planStartedAt!).toLocaleString("en-IN", {
+            dateStyle: "medium",
+            timeStyle: "short"
+        })
+        const planExpiresAt = new Date(checkPlan.planExpiresAt!).toLocaleString("en-IN", {
+            dateStyle: "medium",
+            timeStyle: "short"
+        })
+        
+        
         return NextResponse.json({
             userName: checkPlan.userName,
             email: checkPlan.email,
             authenticated: true,
             plan: currentPlan,
+            planStartedAt: planStartedAt,
+            planExpiresAt: planExpiresAt,
+            totalLinks: checkPlan._count.links,
+            bulkLinks: checkPlan._count.bulkLinks,
+            totalQrCodes: checkPlan._count.qr,
             isActive: isActive,
             daysLeft: daysLeft
         });

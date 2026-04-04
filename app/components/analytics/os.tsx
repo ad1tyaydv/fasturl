@@ -72,7 +72,7 @@ export default function OSAnalytics({ data = [], days = 7 }: OSAnalyticsProps) {
       <CardContent className="px-6 flex-1 flex flex-col">
         <div className="flex flex-col gap-6">
           <div className="flex justify-between text-[15px] uppercase tracking-[0.15em] font-three">
-            <span>OS Name</span>
+            <span>OS</span>
             <span>Clicks</span>
           </div>
 
@@ -109,7 +109,7 @@ export default function OSAnalytics({ data = [], days = 7 }: OSAnalyticsProps) {
               })
             ) : (
               <div className="h-[200px] flex items-center justify-center text-sm text-neutral-600 italic">
-                No active operating system data for this period
+                No data found
               </div>
             )}
           </div>
