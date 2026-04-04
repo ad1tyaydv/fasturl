@@ -14,6 +14,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ shor
     const cachedUrl = await redis.get(`link:${shortUrl}`);
     
     if(cachedUrl) {
+
+        await redis.del(`analytics:${shortUrl}`)
+
         const domain = req.headers.get("host");
         console.log("Request from domain:", domain);
 
