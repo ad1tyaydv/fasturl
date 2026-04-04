@@ -13,7 +13,6 @@ interface CustomUrlModalProps {
   onSuccess: () => void;
 }
 
-
 const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN;
 
 export default function CustomUrlModal({ isOpen, onClose, selectedUrl, onSuccess }: CustomUrlModalProps) {
@@ -21,10 +20,11 @@ export default function CustomUrlModal({ isOpen, onClose, selectedUrl, onSuccess
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-
+  
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
+      
     } else {
       document.body.style.overflow = "unset";
     }
@@ -34,13 +34,11 @@ export default function CustomUrlModal({ isOpen, onClose, selectedUrl, onSuccess
 
   }, [isOpen]);
 
-
   useEffect(() => {
     if (isOpen) {
       setCustomUrl("");
       setErrorMessage("");
     }
-
   }, [isOpen]);
 
   if (!isOpen || !selectedUrl) return null;
@@ -50,6 +48,7 @@ export default function CustomUrlModal({ isOpen, onClose, selectedUrl, onSuccess
     if (!customUrl) return setErrorMessage("Please enter an alias");
     setErrorMessage("");
     setIsLoading(true);
+
     try {
       await axios.post("/api/shortUrl/customUrl", {
         shortUrl: selectedUrl?.id,
@@ -62,6 +61,7 @@ export default function CustomUrlModal({ isOpen, onClose, selectedUrl, onSuccess
     } catch (error: any) {
       if (error.response?.status === 409) {
         setErrorMessage("This alias is already taken");
+
       } else {
         toast.error("Something went wrong");
       }
@@ -71,7 +71,7 @@ export default function CustomUrlModal({ isOpen, onClose, selectedUrl, onSuccess
     }
   };
 
-  
+
   return (
     <div
       className="fixed inset-0 z-[110] flex items-center justify-center bg-black/80 p-4 transition-opacity duration-150"
@@ -111,6 +111,11 @@ export default function CustomUrlModal({ isOpen, onClose, selectedUrl, onSuccess
                 onChange={(e) => {
                   setCustomUrl(e.target.value.replace(/[^a-zA-Z0-9-]/g, ""));
                   if (errorMessage) setErrorMessage("");
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !isLoading) {
+                    handleUpdate();
+                  }
                 }}
                 disabled={isLoading}
                 className="flex-1 p-3 bg-transparent text-white font-three focus:outline-none disabled:opacity-50"

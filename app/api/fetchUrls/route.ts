@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { prisma } from "@/lib/dbConfig";
+import { redis } from "@/lib/redis";
 
 
 const JWT_SECRET = process.env.NEXTAUTH_SECRET!;
@@ -20,23 +21,16 @@ export async function GET(req: NextRequest) {
         userId: string;
         email: string;
     }
-    
     const userId = decoded.userId;
 
     try {
-        const user = await prisma.user.findUnique({
-            where: {
-                id: userId
-            }
-        })
+    const cachedKey = `fetchLinks:${userId}`;
+    const cachedData = await redis.get(cachedKey);
 
-        if(!user) {
-            return NextResponse.json(
-                {message: "Can't find user"},
-                {status: 500}
-            )
-        }
+    if(cachedData) {
+        return NextResponse.json(typeof cachedData === "string" ? JSON.parse(cachedData) : cachedData);
 
+    } else {
         const urls = await prisma.user.findUnique({
             where: {
                 id: userId
@@ -62,13 +56,22 @@ export async function GET(req: NextRequest) {
             },
         })
 
-        return NextResponse.json(
-            {
-                message: "All urls found",
-                urls: urls?.links || []
-            },
-        )
+        if(!urls) {
+            return NextResponse.json(
+                {message: "Urls not found"},
+                {status: 404}
+            )
+        }
 
+        const responseData = {
+            message: "All urls found",
+            urls: urls?.links || []
+        }
+
+        await redis.set(cachedKey, JSON.stringify(responseData));
+
+        return NextResponse.json(responseData);
+    }
 
     } catch (error) {
         console.log(error);
