@@ -1,11 +1,22 @@
 import { prisma } from "@/lib/dbConfig";
 import { redis } from "@/lib/redis";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 
-export async function GET() {
+export async function GET(request: NextRequest) {
 
   try {
+    const authHeader = request.headers.get("Authorization");
+    const cronSecret = process.env.CRON_SECRET;
+
+    if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
+      console.warn("[CRON] Unauthorized access attempt");
+      return NextResponse.json(
+        {success: false, error: "Unauthorized"},
+        {status: 401}
+      );
+    }
+
     const nowUTC = new Date();
     const nowIST = new Date(nowUTC.getTime() + 5.5 * 60 * 60 * 1000);
     
@@ -38,8 +49,6 @@ export async function GET() {
         ])
       )
     );
-
-    console.log(`[CRON] Deleted ${deleted.count} expired links`);
 
     return NextResponse.json({
       success: true,
