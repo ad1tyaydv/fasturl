@@ -15,28 +15,31 @@ enum Plan {
 }
 
 model User {
-  id             String      @id @default(uuid())
-  email          String      @unique
-  password       String?
-  userName       String?
+  id                  String      @id @default(uuid())
+  email               String      @unique
+  password            String?
+  userName            String?
 
-  provider       String?
-  image          String?
+  twofactorEnabled    Boolean     @default(false)
+  twofactorSecret     String?
 
-  ipAddress      String?
+  provider            String?
+  image               String?
 
-  totalLinks     Int         @default(0)
+  ipAddress           String?
 
-  plan           Plan        @default(FREE)
-  planStartedAt  DateTime?
-  planExpiresAt  DateTime?
+  totalLinks          Int         @default(0)
 
-  links          Link[]
-  qr             Qr[]
-  bulkLinks      BulkLinks[]
-  domain         CustomDomain[]
+  plan                Plan        @default(FREE)
+  planStartedAt       DateTime?
+  planExpiresAt       DateTime?
 
-  createdAt      DateTime    @default(now())
+  links               Link[]
+  qr                  Qr[]
+  bulkLinks           BulkLinks[]
+  domain              CustomDomain[]
+
+  createdAt           DateTime    @default(now())
 }
 
 model Link {
