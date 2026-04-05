@@ -4,14 +4,15 @@ import { NextResponse } from "next/server";
 
 
 export async function GET() {
-    
-  try {
-    const now = new Date();
 
+  try {
+    const nowUTC = new Date();
+    const nowIST = new Date(nowUTC.getTime() + 5.5 * 60 * 60 * 1000);
+    
     const expiredLinks = await prisma.link.findMany({
       where: {
         expiresAt: {
-          lte: now
+          lte: nowIST
         }
       },
       select: {
@@ -23,7 +24,7 @@ export async function GET() {
     const deleted = await prisma.link.deleteMany({
       where: {
         expiresAt: {
-          lte: now
+          lte: nowIST
         }
       }
     });
