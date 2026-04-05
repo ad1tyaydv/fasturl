@@ -10,6 +10,11 @@ import {
   IoDownloadOutline,
 } from "react-icons/io5";
 
+import { HugeiconsIcon } from '@hugeicons/react';
+import {
+  Refresh04Icon, Download01Icon, QrCodeIcon }
+  from '@hugeicons/core-free-icons';
+
 import Navbar from "@/app/components/navbar";
 import PricingSection from "@/app/components/PricingSection";
 import FaqSection from "@/app/components/faqSection";
@@ -273,7 +278,7 @@ export default function QRGenerator() {
                     onClick={handleReset}
                     title="Generate another"
                   >
-                    <IoRefreshOutline size={22} />
+                    <HugeiconsIcon icon={Refresh04Icon} />
                   </button>
                 </>
               ) : (
@@ -310,11 +315,11 @@ export default function QRGenerator() {
                 <img src={showQr} alt="Generated QR Code" className="w-52 h-52 object-contain" />
               </div>
               
-              <Button 
+              <Button
                 onClick={downloadQr}
                 className="bg-white text-black hover:bg-neutral-200 font-bold px-8 py-6 rounded-2xl text-lg shadow-lg shadow-white/5 transition-all active:scale-95 flex items-center gap-2 cursor-pointer"
               >
-                <IoDownloadOutline size={24} />
+                <HugeiconsIcon icon={Download01Icon}/>
                 Download QR Code
               </Button>
             </div>

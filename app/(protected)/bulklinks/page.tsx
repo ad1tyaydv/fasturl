@@ -18,7 +18,7 @@ import {
   CloudUploadIcon, Download02Icon, Cancel01Icon, File02Icon, 
   Calendar03Icon, ArrowRight01Icon, Delete02Icon, CheckmarkCircle01Icon,
   Edit03Icon, CircleLock01Icon, CircleUnlock01Icon, ViewIcon, ViewOffSlashIcon,
-  Pdf02Icon, Csv02Icon, 
+  Pdf02Icon, Csv02Icon, Tick02Icon
 } from '@hugeicons/core-free-icons';
 
 import jsPDF from "jspdf";
@@ -503,7 +503,7 @@ export default function BulkCreateLinks() {
                                     onClick={() => handleUpdateName(link.id, tempName)} 
                                     className="text-green-500 hover:text-green-400 shrink-0 p-1 cursor-pointer"
                                   >
-                                    <HugeiconsIcon icon={CheckmarkCircle01Icon} />
+                                    <HugeiconsIcon icon={Tick02Icon} />
                                   </button>
                                 </div>
                               ) : (
@@ -533,9 +533,9 @@ export default function BulkCreateLinks() {
                               title="Password Protection"
                             >
                               {link.password ? (
-                                <HugeiconsIcon icon={CircleUnlock01Icon} className="text-blue-500" />
+                                <HugeiconsIcon icon={CircleLock01Icon} className="text-blue-500" />
                               ) : (
-                                <HugeiconsIcon icon={CircleLock01Icon} />
+                                <HugeiconsIcon icon={CircleUnlock01Icon } />
                               )}
                             </button>
 

@@ -31,6 +31,7 @@ export async function GET(req: NextRequest) {
                 plan: true,
                 planExpiresAt: true,
                 planStartedAt: true,
+                twofactorEnabled: true,
                 _count: {
                     select: {
                         links: true,
@@ -77,6 +78,7 @@ export async function GET(req: NextRequest) {
             plan: currentPlan,
             planStartedAt: planStartedAt,
             planExpiresAt: planExpiresAt,
+            twofactorEnabled: checkPlan.twofactorEnabled,
             totalLinks: checkPlan._count.links,
             bulkLinks: checkPlan._count.bulkLinks,
             totalQrCodes: checkPlan._count.qr,

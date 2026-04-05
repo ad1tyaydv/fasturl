@@ -25,7 +25,7 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
           <h1 className="text-3xl sm:text-4xl font-bold text-white">Settings</h1>
         </div>
 
-        <div className="flex flex-col md:flex-row gap-8 lg:gap-12">
+        <div className="flex flex-col md:flex-row gap-8">
           <aside className="w-full md:w-64 shrink-0">
             <nav className="flex flex-col gap-2">
               {tabs.map((tab) => (

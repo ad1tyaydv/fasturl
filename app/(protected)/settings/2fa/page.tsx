@@ -5,8 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import axios from "axios";
 
 export default function TwoFactorPage() {
+  
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [qrCode, setQrCode] = useState<string | null>(null);
   const [otp, setOtp] = useState("");
@@ -15,6 +17,7 @@ export default function TwoFactorPage() {
   const [isDisabling, setIsDisabling] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isEnabled, setIsEnabled] = useState(false);
+  const [loading, setloading] = useState(false);
 
 
   useEffect(() => {
@@ -29,23 +32,34 @@ export default function TwoFactorPage() {
   }, [isModalOpen]);
 
 
+  useEffect(() => {
+    const check2fa = async () => {
+      setloading(true);
+
+      try {
+        const res = await axios.get("/api/auth/me");
+        
+        setIsEnabled(res.data.twofactorEnabled);
+
+      } catch (error) {
+        console.log("Error while 2fa check")
+
+      } finally {
+        setloading(false);
+      }
+    }
+    check2fa();
+
+  }, [])
+
+
   const fetchQrCode = async () => {
     try {
       setIsLoading(true);
       setError(null);
-      const response = await fetch("/api/auth/2fa");
+      const res = await axios.get("/api/auth/2fa");
 
-      const contentType = response.headers.get("content-type") || "";
-      if (!contentType.includes("application/json")) {
-        throw new Error(`Expected JSON but got ${contentType || "unknown content type"} — check the API route.`);
-      }
-
-      if (!response.ok) {
-        const err = await response.json();
-        throw new Error(err.message || "Failed to fetch QR code");
-      }
-
-      const data = await response.json();
+      const data = res.data;
       setQrCode(data.qrCode || data.url || null);
 
     } catch (err) {
@@ -63,21 +77,9 @@ export default function TwoFactorPage() {
       setIsVerifying(true);
       setError(null);
 
-      const response = await fetch("/api/auth/2fa/verify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ otp }),
+      const res = await axios.post("/api/auth/2fa/verify", {
+        otp: otp
       });
-
-      const contentType = response.headers.get("content-type") || "";
-      if (!contentType.includes("application/json")) {
-        throw new Error("Unexpected response from server");
-      }
-
-      if (!response.ok) {
-        const errData = await response.json();
-        throw new Error(errData.message || "OTP verification failed");
-      }
 
       setIsEnabled(true);
       setIsModalOpen(false);
@@ -98,20 +100,7 @@ export default function TwoFactorPage() {
     try {
       setIsDisabling(true);
 
-      const response = await fetch("/api/auth/2fa/disable", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-      });
-
-      const contentType = response.headers.get("content-type") || "";
-      if (!contentType.includes("application/json")) {
-        throw new Error("Unexpected response from server");
-      }
-
-      if (!response.ok) {
-        const errData = await response.json();
-        throw new Error(errData.message || "Failed to disable 2FA");
-      }
+      await axios.post("/api/auth/2fa/disable")
 
       setIsEnabled(false);
       toast.success("Two-factor authentication disabled.");
@@ -136,23 +125,30 @@ export default function TwoFactorPage() {
         code from your mobile phone in order to sign in.
       </p>
 
-      {isEnabled ? (
-        <Button
-          onClick={handleDisable}
-          disabled={isDisabling}
-          className="bg-red-600 hover:bg-red-700 text-white font-bold px-8 py-2.5 w-full sm:w-fit cursor-pointer rounded-none gap-2"
-        >
-          {isDisabling && <Loader2 className="w-4 h-4 animate-spin" />}
-          {isDisabling ? "Disabling..." : "Disable"}
-        </Button>
-      ) : (
-        <Button
-          onClick={() => setIsModalOpen(true)}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-2.5 w-full sm:w-fit cursor-pointer rounded-none"
-        >
-          Enable
-        </Button>
-      )}
+      <div className="min-h-[44px] flex items-center">
+        {loading ? (
+          <div className="flex items-center gap-3 text-gray-400">
+            <Loader2 className="w-5 h-5 animate-spin text-blue-500" />
+            <span className="text-sm font-medium">Checking security status...</span>
+          </div>
+        ) : isEnabled ? (
+          <Button
+            onClick={handleDisable}
+            disabled={isDisabling}
+            className="bg-red-600 hover:bg-red-700 text-white font-bold px-8 py-2.5 w-full sm:w-fit cursor-pointer rounded-none gap-2 transition-all"
+          >
+            {isDisabling && <Loader2 className="w-4 h-4 animate-spin" />}
+            {isDisabling ? "Disabling..." : "Disable"}
+          </Button>
+        ) : (
+          <Button
+            onClick={() => setIsModalOpen(true)}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-2.5 w-full sm:w-fit cursor-pointer rounded-none transition-all"
+          >
+            Enable
+          </Button>
+        )}
+      </div>
 
       {isModalOpen && (
         <div

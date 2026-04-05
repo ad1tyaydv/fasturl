@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { FcGoogle } from "react-icons/fc";
@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
 import { useUser } from "@/app/components/userContext";
+import { Loader2, ArrowLeft } from "lucide-react";
+
 
 export default function Login() {
   const router = useRouter();
@@ -19,6 +21,11 @@ export default function Login() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [show2FA, setShow2FA] = useState(false);
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+  const [verifying2FA, setVerifying2FA] = useState(false);
+  const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -33,26 +40,208 @@ export default function Login() {
     try {
       const res = await axios.post("/api/auth/signin", {
         email: formData.email,
-        password: formData.password
+        password: formData.password,
       });
-      
+
       const loggedInUser = res.data.user;
 
-      if(loggedInUser) {
+      if (loggedInUser) {
         localStorage.setItem("user", loggedInUser.plan);
       }
-      
+
       setUser(loggedInUser);
       toast.success("Welcome back!", { id: loginToast });
-      router.push("/");
+
+      if (loggedInUser.twofactorEnabled) {
+        setShow2FA(true);
+
+      } else {
+        router.push("/");
+      }
 
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Login failed!", { id: loginToast });
+      toast.error(error.response?.data?.message || "Login failed!", {
+        id: loginToast,
+      });
 
     } finally {
       setLoading(false);
     }
   };
+
+
+  const handleOtpChange = (index: number, value: string) => {
+    if (!/^\d*$/.test(value)) return;
+    if (value.length > 1) return;
+
+    const newOtp = [...otp];
+    newOtp[index] = value;
+    setOtp(newOtp);
+
+    if (value && index < 5) {
+      otpRefs.current[index + 1]?.focus();
+    }
+  };
+
+
+  const handleOtpBackspace = (index: number) => {
+    const newOtp = [...otp];
+    if (!otp[index] && index > 0) {
+      otpRefs.current[index - 1]?.focus();
+
+    } else {
+      newOtp[index] = "";
+      setOtp(newOtp);
+    }
+  };
+
+
+  const handleVerify2FA = async () => {
+    const otpCode = otp.join("");
+
+    if (otpCode.length !== 6) {
+      toast.error("Please enter all 6 digits");
+      return;
+    }
+
+    setVerifying2FA(true);
+    const verifyToast = toast.loading("Verifying OTP...");
+
+    try {
+      const res = await axios.post("/api/auth/signin/2faVerify", {
+        email: formData.email,
+        otp: otpCode,
+      });
+
+      if (res.status === 200 && res.data.success) {
+        toast.success("OTP verified successfully!", { id: verifyToast });
+        
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        router.push("/");
+        return;
+      }
+
+    } catch (error: any) {
+      console.error("2FA Error:", error);
+      toast.error(error.response?.data?.message || "Invalid OTP", {
+        id: verifyToast,
+      });
+
+      setOtp(["", "", "", "", "", ""]);
+      otpRefs.current[0]?.focus();
+
+    } finally {
+      setVerifying2FA(false);
+    }
+  };
+
+
+  const handleBackTo2FA = () => {
+    setShow2FA(false);
+    setOtp(["", "", "", "", "", ""]);
+  };
+
+
+  if (show2FA) {
+    return (
+      <div className="min-h-screen flex w-full bg-[#0a0a0a] text-white selection:bg-red-500/30 overflow-hidden">
+        <Toaster position="top-center" />
+
+        <div className="hidden lg:flex lg:w-[60%] relative bg-[#0f0f0f] border-r border-white/5">
+          <img
+            src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop"
+            alt="Abstract Dark Background"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#0a0a0a]/20 to-[#0a0a0a]"></div>
+
+          <div className="absolute top-12 left-12 flex items-center gap-3 z-20">
+            <div className="w-10 h-10 bg-red-600 rounded-xl flex items-center justify-center text-white font-black text-2xl shadow-[0_0_20px_rgba(220,38,38,0.4)]">
+              S
+            </div>
+            <h1 className="text-2xl font-bold tracking-tight text-white">Fasturl</h1>
+          </div>
+
+          <div className="relative z-10 flex flex-col justify-center px-20">
+            <h2 className="text-6xl font-bold leading-tight max-w-xl">
+              Shorten Your <span className="text-red-500 text-glow">Links</span>{" "}
+              <br />
+              <span className="text-white/90">Instantly.</span>
+            </h2>
+            <div className="h-1 w-24 bg-red-600 my-8 rounded-full shadow-[0_0_10px_#dc2626]"></div>
+            <p className="text-gray-300 text-xl max-w-md font-light leading-relaxed">
+              Join thousands of users transforming long, messy URLs into powerful
+              marketing assets.
+            </p>
+          </div>
+
+          <div className="absolute bottom-12 left-12 text-white/20 text-sm font-mono tracking-tighter">
+            PRO_VERSION // 2026_BUILD
+          </div>
+        </div>
+
+        <div className="w-full lg:w-[40%] flex flex-col justify-center p-8 sm:p-12 lg:p-16 bg-[#0a0a0a] relative">
+          <button
+            onClick={handleBackTo2FA}
+            className="absolute top-8 left-8 flex items-center gap-2 text-gray-400 hover:text-red-500 transition-colors cursor-pointer group"
+          >
+            <ArrowLeft className="w-5 h-5 group-hover:scale-110 transition-transform" />
+            <span className="text-sm font-medium">Back</span>
+          </button>
+
+          <div className="w-full max-w-md mx-auto">
+            <div className="mb-8">
+              <h1 className="text-4xl font-bold mb-2">Verify Identity</h1>
+              <p className="text-gray-400">
+                Enter the OTP sent to your authenticator app
+              </p>
+            </div>
+
+            <div className="space-y-8">
+              <div className="flex gap-3 justify-center">
+                {otp.map((digit, index) => (
+                  <input
+                    key={index}
+                    ref={(el) => {
+                      otpRefs.current[index] = el;
+                    }}
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={1}
+                    value={digit}
+                    onChange={(e) => handleOtpChange(index, e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Backspace") {
+                        handleOtpBackspace(index);
+                      }
+                    }}
+                    className="w-14 h-14 rounded-xl bg-[#141414] border border-white/10 focus:border-red-500 focus:ring-2 focus:ring-red-500 outline-none text-white font-bold text-2xl text-center transition-all"
+                    placeholder="•"
+                  />
+                ))}
+              </div>
+
+              <Button
+                onClick={handleVerify2FA}
+                disabled={verifying2FA || otp.join("").length !== 6}
+                className="w-full py-7 bg-red-600 hover:bg-red-700 disabled:bg-red-400/50 text-white font-bold rounded-xl transition-all active:scale-[0.98] shadow-[0_10px_20px_rgba(220,38,38,0.2)] border-none text-lg cursor-pointer flex items-center justify-center gap-2"
+              >
+                {verifying2FA ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Verifying...
+                  </>
+                ) : (
+                  "Verify OTP"
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
 
   return (
@@ -61,13 +250,13 @@ export default function Login() {
 
       <div className="hidden lg:flex lg:w-[60%] relative bg-[#0f0f0f] border-r border-white/5">
         <img
-          src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop" 
+          src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop"
           alt="Abstract Dark Background"
           className="absolute inset-0 w-full h-full object-cover"
         />
-        
+
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#0a0a0a]/20 to-[#0a0a0a]"></div>
-        
+
         <div className="absolute top-12 left-12 flex items-center gap-3 z-20">
           <div className="w-10 h-10 bg-red-600 rounded-xl flex items-center justify-center text-white font-black text-2xl shadow-[0_0_20px_rgba(220,38,38,0.4)]">
             S
@@ -76,24 +265,25 @@ export default function Login() {
         </div>
 
         <div className="relative z-10 flex flex-col justify-center px-20">
-            <h2 className="text-6xl font-bold leading-tight max-w-xl">
-                Shorten Your <span className="text-red-500 text-glow">Links</span> <br /> 
-                <span className="text-white/90">Instantly.</span>
-            </h2>
-            <div className="h-1 w-24 bg-red-600 my-8 rounded-full shadow-[0_0_10px_#dc2626]"></div>
-            <p className="text-gray-300 text-xl max-w-md font-light leading-relaxed">
-                Join thousands of users transforming long, messy URLs into powerful marketing assets.
-            </p>
+          <h2 className="text-6xl font-bold leading-tight max-w-xl">
+            Shorten Your <span className="text-red-500 text-glow">Links</span>{" "}
+            <br />
+            <span className="text-white/90">Instantly.</span>
+          </h2>
+          <div className="h-1 w-24 bg-red-600 my-8 rounded-full shadow-[0_0_10px_#dc2626]"></div>
+          <p className="text-gray-300 text-xl max-w-md font-light leading-relaxed">
+            Join thousands of users transforming long, messy URLs into powerful
+            marketing assets.
+          </p>
         </div>
 
         <div className="absolute bottom-12 left-12 text-white/20 text-sm font-mono tracking-tighter">
-            PRO_VERSION // 2026_BUILD
+          PRO_VERSION // 2026_BUILD
         </div>
       </div>
 
       <div className="w-full lg:w-[40%] flex flex-col justify-center p-8 sm:p-12 lg:p-16 bg-[#0a0a0a]">
         <div className="w-full max-w-md mx-auto">
-          
           <div className="flex lg:hidden items-center gap-3 mb-12">
             <div className="w-10 h-10 bg-red-600 rounded-xl flex items-center justify-center text-white font-black text-2xl shadow-[0_0_20px_rgba(220,38,38,0.3)]">
               S
@@ -105,7 +295,7 @@ export default function Login() {
             <h1 className="text-4xl font-bold mb-2">Welcome Back</h1>
             <p className="text-gray-400">
               New here?{" "}
-              <button 
+              <button
                 onClick={() => router.push("/auth/signup")}
                 className="text-red-500 hover:text-red-400 font-medium cursor-pointer transition-colors"
               >
@@ -116,7 +306,9 @@ export default function Login() {
 
           <form className="space-y-5" onSubmit={handleLogin}>
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-400 ml-1">Email Address</label>
+              <label className="text-sm font-medium text-gray-400 ml-1">
+                Email Address
+              </label>
               <input
                 name="email"
                 type="email"
@@ -129,7 +321,9 @@ export default function Login() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-400 ml-1">Password</label>
+              <label className="text-sm font-medium text-gray-400 ml-1">
+                Password
+              </label>
               <div className="relative">
                 <input
                   name="password"
@@ -145,7 +339,11 @@ export default function Login() {
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-red-500 cursor-pointer"
                   onClick={() => setShowPassword(!showPassword)}
                 >
-                  {showPassword ? <AiOutlineEyeInvisible size={22} /> : <AiOutlineEye size={22} />}
+                  {showPassword ? (
+                    <AiOutlineEyeInvisible size={22} />
+                  ) : (
+                    <AiOutlineEye size={22} />
+                  )}
                 </button>
               </div>
             </div>
@@ -162,7 +360,9 @@ export default function Login() {
           <div className="mt-10">
             <div className="relative flex items-center justify-center mb-6">
               <div className="w-full border-t border-white/5"></div>
-              <span className="absolute bg-[#0a0a0a] px-4 text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold">OR</span>
+              <span className="absolute bg-[#0a0a0a] px-4 text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold">
+                OR
+              </span>
             </div>
 
             <button

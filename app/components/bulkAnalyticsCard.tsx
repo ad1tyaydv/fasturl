@@ -4,7 +4,6 @@ import React from "react";
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from "recharts";
 import { IoArrowForwardOutline } from "react-icons/io5";
 
-// Matches your existing site color palette
 const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899", "#14b8a6"];
 
 const CustomTooltip = ({ active, payload }: any) => {
@@ -40,9 +39,9 @@ export const BulkAnalyticsCardItem = ({
   colorOffset = 0,
   onExpand,
 }: BulkAnalyticsCardItemProps) => {
+  
   return (
     <div className="bg-[#1a1a1a] border border-neutral-800 rounded-none shadow-sm flex flex-col h-full hover:border-neutral-700 transition-all group">
-      {/* Header */}
       <div className="p-6 pb-2 flex flex-row items-center justify-between">
         <h3 className="text-sm font-bold flex items-center gap-3 text-white font-one uppercase tracking-widest">
           <span className="text-blue-500">{icon}</span> {title}
@@ -55,12 +54,10 @@ export const BulkAnalyticsCardItem = ({
         </button>
       </div>
       
-      {/* Content */}
       <div className="p-6 pt-0 flex-1">
         <div className="flex flex-col sm:flex-row items-center h-[220px] mt-2 gap-4">
           {data && data.length > 0 ? (
             <>
-              {/* Chart Container */}
               <div className="w-full h-full min-h-[150px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
@@ -88,7 +85,6 @@ export const BulkAnalyticsCardItem = ({
                 </ResponsiveContainer>
               </div>
 
-              {/* Legend / Mini List */}
               <div className="w-full space-y-3 px-2 overflow-hidden">
                 {data.slice(0, 4).map((item: any, index: number) => (
                   <div

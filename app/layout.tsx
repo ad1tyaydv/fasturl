@@ -32,7 +32,7 @@ export default function RootLayout({
       >
         <UserProvider>
           {children}
-          <Toaster theme="dark" />
+          <Toaster theme="light" />
         </UserProvider>
         <Analytics/>
       </body>
