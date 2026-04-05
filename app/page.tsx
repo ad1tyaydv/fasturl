@@ -19,6 +19,7 @@ import Footer from "./components/footer";
 import { DomainDropdown } from "./dropDown/domainDropDown";
 import { Button } from "@/components/ui/button";
 import { useUser } from "./components/userContext";
+import { toast } from "sonner";
 
 
 const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN!;
@@ -86,23 +87,25 @@ export default function Dashboard() {
       setUrl(`${selectedDomain}/${generatedShortUrl}`);
       
     } catch (error: any) {
-      if (error.response?.status === 429) {
-        if (!isLoggedIn) {
-          setModalConfig({
-            show: true,
-            title: "Limit Reached",
-            description: "Login to generate more links and access custom domains.",
-            buttonText: "Login Now",
-            action: () => router.push("/auth/signin"),
-          });
-        } else {
-          setUpgradeMsg(true);
-          pricingRef.current?.scrollIntoView({ behavior: "smooth" });
-          setTimeout(() => setUpgradeMsg(false), 3000);
+        if (error.response?.status === 401) {
+          if (!isLoggedIn) {
+            setModalConfig({
+              show: true,
+              title: "Limit Reached",
+              description: "Login to generate more links and access custom domains.",
+              buttonText: "Login Now",
+              action: () => router.push("/auth/signin"),
+            });
+          } else {
+            setUpgradeMsg(true);
+            pricingRef.current?.scrollIntoView({ behavior: "smooth" });
+            setTimeout(() => setUpgradeMsg(false), 3000);
+          }
+        } else if (error.response?.status === 430) {
+          toast.error("Too many requests under 1 minute, Please try again later");
         }
-      }
 
-    } finally {
+      } finally {
       setLoading(false);
     }
   };

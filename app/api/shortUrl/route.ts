@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import { prisma } from "@/lib/dbConfig";
 import shortUrlGenerator from "@/app/helpers/shortUrlGenerator";
 import { redis } from "@/lib/redis";
+import { nonVerifiedRateLimit, verifiedRateLimit } from "@/lib/rateLimit";
 
 
 const JWT_SECRET = process.env.NEXTAUTH_SECRET!;
@@ -15,6 +16,7 @@ export async function POST(req: NextRequest) {
     const ip = req.headers.get("x-forwarded-for")?.split(",")[0] ||
       req.headers.get("x-real-ip") ||
       "127.0.0.1";
+
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
@@ -27,6 +29,14 @@ export async function POST(req: NextRequest) {
 
     if (!token) {
       userId = ANON_USER_ID;
+
+      const { success } = await nonVerifiedRateLimit.limit(ip);
+      if(!success) {
+        return NextResponse.json(
+          {message: "Too many links created, Please try after some time"},
+          {status: 430}
+        )
+      }
 
       count = await prisma.link.count({
         where: {
@@ -41,7 +51,7 @@ export async function POST(req: NextRequest) {
       if (count >= 1) {
         return NextResponse.json(
           { message: "Anonymous users can only create 1 link every day" },
-          { status: 429 }
+          { status: 401 }
         );
       }
 
@@ -51,6 +61,14 @@ export async function POST(req: NextRequest) {
         email: string;
       };
       userId = decoded.userId;
+
+      const { success } = await verifiedRateLimit.limit(userId);
+      if(!success) {
+        return NextResponse.json(
+          {message: "Too many links created, Please try after some time"},
+          {status: 430}
+        )
+      }
 
       const user = await prisma.user.findUnique({
         where: {
@@ -71,10 +89,9 @@ export async function POST(req: NextRequest) {
 
     const user = await prisma.user.findUnique({
       where: {
-        id: decoded?.userId
+        id: userId
       }
     })
-
 
     if (token && user) {
       if (user.plan === "FREE") {
@@ -140,8 +157,9 @@ export async function POST(req: NextRequest) {
 
     let originalLink = ""
     let link = data.url;
-    if(link.startsWith("https://") && link.startsWith("http://")) {
+    if(!link.startsWith("https://") && !link.startsWith("http://")) {
       originalLink = "https://" + link;
+
     } else {
       originalLink = link;
     }
@@ -176,6 +194,7 @@ export async function POST(req: NextRequest) {
     return response;
 
   } catch (error) {
+    console.log(error);
     return NextResponse.json(
       { message: "Can't shorten URL right now, try again later" },
       { status: 500 }
