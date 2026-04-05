@@ -83,14 +83,13 @@ export default function BrowserAnalytics({ data = [], days = 7 }: BrowserAnalyti
           <div className="flex flex-col gap-5">
             {sortedData.length > 0 ? (
               sortedData.map((item, index) => {
-                const barWidth = maxCount > 0 ? (item.count / maxCount) * 100 : 0;
                 const browserName = item.browser;
 
                 return (
                   <div key={index} className="group flex flex-col gap-2">
-                    <div className="flex items-center justify-between transition-transform duration-200 group-hover:translate-x-1">
+                    <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 bg-neutral-900 rounded-lg group-hover:bg-neutral-800 transition-colors">
+                        <div className="p-2 bg-neutral-900 rounded-lg">
                           {getBrowserIcon(browserName)}
                         </div>
                         <span className="text-sm font-medium text-neutral-300 group-hover:text-white transition-colors">
@@ -100,13 +99,6 @@ export default function BrowserAnalytics({ data = [], days = 7 }: BrowserAnalyti
                       <span className="text-sm font-bold tabular-nums text-white">
                         {item.count.toLocaleString()}
                       </span>
-                    </div>
-                    
-                    <div className="h-[3px] w-full bg-neutral-900 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-blue-500/80 transition-all duration-1000 ease-out rounded-full"
-                        style={{ width: `${barWidth}%` }}
-                      />
                     </div>
                   </div>
                 );

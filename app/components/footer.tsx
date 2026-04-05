@@ -12,34 +12,34 @@ import {
 export default function Footer() {
   const currentYear = new Date().getFullYear();
 
-  const footerLinks = [
+  const footerLinks: Array<{ title: string; links: Array<{ name: string; href: string; external?: boolean }> }> = [
     {
       title: "Features",
       links: [
-        { name: "Link Editor", href: "/features" },
+        { name: "Link Editor", href: "/" },
         { name: "Link Management", href: "/urls" },
-        { name: "Branded Links", href: "/premium" },
+        { name: "Branded Links", href: "/urls" },
         { name: "Short URL Tracking", href: "/analytics" },
-        { name: "QR Code Generator", href: "/qr-generator" },
-        { name: "Short URL API", href: "/api-docs" },
+        { name: "QR Code Generator", href: "/qr" },
+        { name: "Short URL API", href: "/shortapi" },
       ],
     },
     {
       title: "Resources",
       links: [
-        { name: "Blog", href: "#" },
-        { name: "For Developers", href: "#" },
-        { name: "Our Proven Process", href: "#" },
-        { name: "About Us", href: "#" },
+        { name: "Blog", href: "/docs" },
+        { name: "For Developers", href: "/docs" },
+        { name: "Our Proven Process", href: "/docs" },
+        { name: "About Us", href: "/docs" },
       ],
     },
     {
       title: "Contact Us",
       links: [
-        { name: "Help Desk", href: "#" },
-        { name: "Contact Sales", href: "#" },
-        { name: "Contact Support", href: "#" },
-        { name: "Report Abuse", href: "#" },
+        { name: "Help Desk", href: "https://mail.google.com/mail/?view=cm&fs=1&to=fasturl@tutamail.com", external: true },
+        { name: "Contact Sales", href: "https://mail.google.com/mail/?view=cm&fs=1&to=fasturl@tutamail.com", external: true },
+        { name: "Contact Support", href: "https://mail.google.com/mail/?view=cm&fs=1&to=fasturl@tutamail.com", external: true },
+        { name: "Report Abuse", href: "https://mail.google.com/mail/?view=cm&fs=1&to=fasturl@tutamail.com", external: true },
       ],
     },
     {
@@ -54,7 +54,7 @@ export default function Footer() {
     },
   ];
 
-  
+
   return (
     <footer className="bg-[#141414] text-white border-t border-neutral-800 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-6 py-16">
@@ -62,13 +62,14 @@ export default function Footer() {
           
           {footerLinks.map((section, idx) => (
             <div key={idx} className="flex flex-col gap-4">
-              <h4 className="font-one font-bold text-lg text-white">{section.title}</h4>
+              <h4 className="font-one font-three text-lg text-white">{section.title}</h4>
               <ul className="flex flex-col gap-2">
                 {section.links.map((link, lIdx) => (
                   <li key={lIdx}>
-                    <Link 
+                    <Link
                       href={link.href} 
-                      className="text-neutral-400 hover:text-blue-500 transition-colors text-sm font-two"
+                      {...(link.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                      className="text-neutral-400 hover:text-blue-500 transition-colors text-sm font-one"
                     >
                       {link.name}
                     </Link>
@@ -95,10 +96,10 @@ export default function Footer() {
             </div>
 
             <div className="text-center lg:text-right">
-              <h2 className="text-4xl font-one font-black tracking-tighter mb-2 text-white">
+              <h2 className="text-4xl font-three font-black tracking-tighter mb-2 text-white">
                 FASTURL
               </h2>
-              <p className="text-xs text-neutral-500 font-two leading-relaxed">
+              <p className="text-xs text-neutral-500 font-one leading-relaxed">
                 © {currentYear} FASTURL LLC <br />
                 All Rights Reserved
               </p>

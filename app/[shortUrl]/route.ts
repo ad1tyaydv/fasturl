@@ -93,7 +93,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ shor
             );
         }
 
-        await prisma.link.update({
+        const update = await prisma.link.update({
             where: {
                 shorturl: shortUrl,
             },
@@ -103,6 +103,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ shor
                 },
             },
         });
+
+        await redis.del(`fetchLinks:${update.userId}`)
 
         await prisma.click.create({
             data: {

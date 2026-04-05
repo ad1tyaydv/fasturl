@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
-import { Loader2, BarChart3, Search, Lock } from "lucide-react";
+import { Loader2, Lock } from "lucide-react";
 
 import { HugeiconsIcon } from '@hugeicons/react';
 import {

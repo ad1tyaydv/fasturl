@@ -2,7 +2,7 @@ import { useRouter } from "next/navigation";
 
 import { HugeiconsIcon } from '@hugeicons/react';
 import { 
-  Tick01Icon, Cancel01Icon, Call02Icon }
+  Tick01Icon, Cancel01Icon, Mail01Icon }
   from '@hugeicons/core-free-icons';
 
 import axios from "axios";
@@ -189,8 +189,18 @@ export default function PricingSection() {
 
       <div className="mt-16 text-center max-w-2xl">
         <p className="text-neutral-500 text-sm flex items-center justify-center gap-2">
-          <HugeiconsIcon icon={Call02Icon} className="text-blue-400" />
-          <span>Need help choosing? <span className="text-blue-400 cursor-pointer hover:underline">Contact our team</span></span>
+          <HugeiconsIcon icon={Mail01Icon} />
+          <span>
+            Need help choosing?{" "}
+            <a 
+              href="https://mail.google.com/mail/?view=cm&fs=1&to=fasturl@tutamail.com" 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-400 hover:underline"
+            >
+              Contact our team
+            </a>
+          </span>
         </p>
       </div>
     </section>

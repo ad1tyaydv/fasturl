@@ -113,7 +113,7 @@ export async function POST(req: NextRequest) {
                 })),
 
                 os: osData.map(o => ({
-                    os: o.OS || "Unknown",
+                    os: (o.OS || "Unknown").replace(/["']/g, "").trim(),
                     count: o._count.OS
                 })),
                 

@@ -7,8 +7,10 @@ export async function proxy(request: NextRequest) {
 
     const token = request.cookies.get("token")?.value;
     const pathName = request.nextUrl.pathname;
-    
 
+    if(pathName.startsWith('/api/cronJobs')) {
+        return NextResponse.next();
+    }
     const protectedRoutes = ['/urls', '/qr', '/analytics']
 
     const isProtectedRoute = protectedRoutes.some(route => pathName.startsWith(route))
@@ -27,6 +29,5 @@ export const config = {
         '/urls/:path*',
         '/qr/:path*',
         '/analytics/:path*',
-        '/',
     ]
 }
