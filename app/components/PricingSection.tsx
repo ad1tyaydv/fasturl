@@ -41,11 +41,8 @@ export default function PricingSection() {
         <h2 className="text-3xl font-one sm:text-5xl font-extrabold mb-4 leading-tight text-white">
           Unlock the Full Potential of Your Links
         </h2>
-        <p className="text-neutral-400 font-two text-base sm:text-lg mb-2">
+        <p className="text-neutral-400 font-one text-base sm:text-lg mb-2">
           Stop guessing and start tracking. Deliver the insights you need to grow.
-        </p>
-        <p className="text-neutral-500 font-two text-sm">
-          Choose the plan that fits your needs. All plans include core tracking features.
         </p>
       </div>
 

@@ -1,10 +1,7 @@
 import { prisma } from "@/lib/dbConfig";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 
   const { id } = await params;
 
@@ -22,7 +19,7 @@ export async function POST(
     );
 
   } catch (error) {
-
+    console.log(error);
     return NextResponse.json(
       { message: "Error while deleting link" },
       { status: 500 }

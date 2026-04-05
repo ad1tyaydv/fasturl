@@ -18,7 +18,6 @@ import FaqSection from "./components/faqSection";
 import Footer from "./components/footer";
 import { DomainDropdown } from "./dropDown/domainDropDown";
 import { Button } from "@/components/ui/button";
-import { useUser } from "./components/userContext";
 import { toast } from "sonner";
 
 
@@ -32,6 +31,7 @@ export default function Dashboard() {
   const [shortUrl, setShortUrl] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userPlan, setUserPlan] = useState("FREE");
+  const [links, setLinks] = useState<[]>([]);
   const [linksLeft, setLinksLeft] = useState(0);
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -39,7 +39,7 @@ export default function Dashboard() {
   const [upgradeMsg, setUpgradeMsg] = useState(false);
 
   const [authLoading, setAuthLoading] = useState(true);
-  const [isLoadingQr, setIsLoadingQr] = useState(false); // Add this state
+  const [isLoadingQr, setIsLoadingQr] = useState(false);
   
   const [selectedDomain, setSelectedDomain] = useState(NEXT_DOMAIN);
 
@@ -52,10 +52,13 @@ export default function Dashboard() {
     const checkAuth = async () => {
       try {
         const res = await axios.get("/api/auth/me");
-        const links = await axios.get("/api/shortUrl/linksLeft");
+        const linksLeft = await axios.get("/api/shortUrl/linksLeft");
+        const links = await axios.get("/api/fetchUrls");
+
         const authenticated = !!res.data.authenticated;
         setIsLoggedIn(authenticated);
-        setLinksLeft(links.data.linksLeft);
+        setLinksLeft(linksLeft.data.linksLeft);
+        setLinks(links.data.urls);
 
         if (authenticated) {
           setUserPlan(res.data.plan || "FREE");
@@ -178,10 +181,10 @@ export default function Dashboard() {
         </div>
       )}
 
-        <section className="max-w-7xl mx-auto px-6 pt-16 pb-20"> {/* Reduced pt-24 to pt-16 */}
+        <section className="max-w-7xl mx-auto px-6 pt-16 pb-20">
           <div className="flex flex-col lg:flex-row items-start justify-between gap-12 lg:gap-20">
             
-            <div className="flex-1 text-center lg:text-left lg:pt-6"> {/* Reduced lg:pt-12 to lg:pt-6 */}
+            <div className="flex-1 text-center lg:text-left lg:pt-6">
               <h1 className="text-3xl sm:text-3xl md:text-5xl font-bold mb-6 text-white leading-tight font-one tracking-tight">
                 Shorten Your <span className="text-red-500">Links</span> Instantly
               </h1>
@@ -202,6 +205,7 @@ export default function Dashboard() {
                   View Plans
                   <span className="group-hover:translate-x-1 transition-transform"><HugeiconsIcon icon={ArrowRightDoubleIcon} /></span>
                 </Button>
+                
               </div>
             </div>
 
@@ -313,6 +317,7 @@ export default function Dashboard() {
           </div>
         </div>
       </section>
+      
 
       <FasturlFeatures isLoggedIn={isLoggedIn} userPlan={userPlan} />
       <div className="w-full h-px bg-neutral-800/50 my-12 shadow-sm"></div>

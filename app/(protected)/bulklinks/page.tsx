@@ -16,7 +16,7 @@ import {
 import { HugeiconsIcon } from '@hugeicons/react';
 import { 
   CloudUploadIcon, Download02Icon, Cancel01Icon, File02Icon, 
-  Calendar03Icon, ArrowRight01Icon, Delete02Icon, CheckmarkCircle01Icon,
+  Calendar03Icon, ArrowRight01Icon, Delete02Icon, 
   Edit03Icon, CircleLock01Icon, CircleUnlock01Icon, ViewIcon, ViewOffSlashIcon,
   Pdf02Icon, Csv02Icon, Tick02Icon
 } from '@hugeicons/core-free-icons';
@@ -25,6 +25,8 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import Navbar from "../../components/navbar";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 
 const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN;
@@ -51,6 +53,7 @@ export default function BulkCreateLinks() {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [authLoading, setAuthLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [status, setStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
   const [createdLinks, setCreatedLinks] = useState<any[]>([]);
@@ -112,19 +115,6 @@ export default function BulkCreateLinks() {
   }, [router]);
 
 
-  const handleLogout = async () => {
-    try {
-      await axios.post("/api/auth/logout");
-      localStorage.removeItem("plan");
-      setIsLoggedIn(false);
-      router.push("/auth/signin");
-
-    } catch (error) {
-      console.error("Logout failed", error);
-    }
-  };
-
-
   const handleGenerateMore = () => {
     setFile(null);
     setStatus(null);
@@ -137,10 +127,12 @@ export default function BulkCreateLinks() {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
+
     if (selectedFile && selectedFile.type === "text/csv") {
       setFile(selectedFile);
       setStatus(null);
       setCreatedLinks([]);
+
     } else {
       alert("Please upload a valid CSV file.");
     }
@@ -152,13 +144,13 @@ export default function BulkCreateLinks() {
       router.push("/premium");
       return;
     }
-
     if (!file) return;
 
     if (expiryDate) {
       const selected = new Date(expiryDate);
       const today = new Date();
       today.setHours(0, 0, 0, 0);
+
       if (selected < today) {
         setStatus({ type: "error", message: "Invalid Date: Expiry cannot be in the past." });
         return;
@@ -221,12 +213,16 @@ export default function BulkCreateLinks() {
 
 
   const handleDelete = async (id: string) => {
+    setDeletingId(id);
     try {
-      await axios.delete(`/api/shortUrl/bulkLinks/delete/${id}`);
+      await axios.post(`/api/shortUrl/bulkLinks/delete/${id}`);
       setPastBulkLinks((prev) => prev.filter((link) => link.id !== id));
 
     } catch (error) {
-      console.error("Failed to delete bulk job", error);
+      console.error("Failed to delete bulk links", error);
+
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -240,7 +236,6 @@ export default function BulkCreateLinks() {
       startY: 20,
     });
     doc.save("links.pdf");
-
   };
 
 
@@ -271,25 +266,25 @@ export default function BulkCreateLinks() {
     try {
       const finalPassword = isEditingPassword ? password : selectedUrl?.password;
       const finalExpiry = isEditingExpiry ? expiryDate : selectedUrl?.expiresAt;
-      await axios.post("/api/shortUrl/passwordProtection", {
-        shortUrlId: selectedUrl?.id,
+      await axios.post("/api/shortUrl/bulkLinks/passwordProtection", {
+        bulkLinkId: selectedUrl?.id,
         password: finalPassword,
         expiryDate: finalExpiry,
       });
 
-      alert("Protection Updated successfully");
+      toast.success("Protection Updated successfully");
       await fetchPastBulkLinks();
       closeAllModals();
 
     } catch (error) {
-      console.log("Update failed", error);
+      console.log("Update failed");
     }
   };
 
 
   const topFiveLinks = pastBulkLinks.slice(0, 5);
 
-
+  
   return (
     <div className="min-h-screen bg-[#141414] text-white transition-colors duration-300">
       <Navbar />
@@ -358,6 +353,7 @@ export default function BulkCreateLinks() {
                       <>
                         <HugeiconsIcon icon={CloudUploadIcon} size={35} className="mb-4" />
                         <p className="text-center font-medium text-white">Click to upload your CSV</p>
+                        <p className="text-center text-xs text-neutral-500 mt-1">Make sure it contains a column for URLs</p>
                       </>
                     )}
                   </div>
@@ -418,18 +414,6 @@ export default function BulkCreateLinks() {
                     </div>
                   )}
 
-                  {createdLinks.length > 0 && (
-                    <div className="flex justify-center">
-                      <button 
-                        onClick={handleGenerateMore}
-                        className="flex items-center gap-2 px-7 py-4 text-sm font-bold text-blue-500 hover:bg-blue-500/10 rounded-lg transition-all border border-blue-500/20 cursor-pointer"
-                      >
-                        <IoRefreshOutline size={18} />
-                        Generate More Links
-                      </button>
-                    </div>
-                  )}
-
                   {createdLinks.length === 0 ? (
                     <button
                       onClick={handleUpload}
@@ -440,7 +424,7 @@ export default function BulkCreateLinks() {
                       {loading ? (
                         <>
                           <div className="flex items-center gap-2">
-                            <div className="w-5 h-5 border-2 border-current border-t-transparent animate-spin rounded-full" />
+                            <Loader2 className="w-5 h-5 animate-spin" />
                             <span>Processing...</span>
                           </div>
                           <span className="text-[10px] font-three opacity-80 uppercase tracking-widest mt-1">This may take some time, Please wait</span>
@@ -450,12 +434,20 @@ export default function BulkCreateLinks() {
                       )}
                     </button>
                   ) : (
-                    <div className="flex flex-col sm:flex-row gap-3">
+                    <div className="flex flex-col gap-3">
                       <button 
                         onClick={() => setShowDownloadModal(true)} 
-                        className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-three flex items-center justify-center gap-2 hover:bg-blue-700 transition-all cursor-pointer"
+                        className="w-full py-4 bg-blue-600 text-white rounded-xl font-three flex items-center justify-center gap-2 hover:bg-blue-700 transition-all cursor-pointer shadow-lg shadow-blue-600/20"
                       >
                         <HugeiconsIcon icon={Download02Icon} /> Download Results
+                      </button>
+                      
+                      <button 
+                        onClick={handleGenerateMore}
+                        className="w-full flex items-center justify-center gap-2 py-3 text-sm font-bold text-neutral-400 hover:text-white hover:bg-neutral-800/50 rounded-xl transition-all border border-neutral-800 cursor-pointer"
+                      >
+                        <IoRefreshOutline size={18} />
+                        Generate more links
                       </button>
                     </div>
                   )}
@@ -552,10 +544,15 @@ export default function BulkCreateLinks() {
 
                             <button 
                               onClick={() => handleDelete(link.id)}
-                              className="hover:text-red-500 hover:bg-red-500/10 p-1.5 rounded-md transition-colors cursor-pointer" 
+                              disabled={deletingId === link.id}
+                              className="hover:text-red-500 hover:bg-red-500/10 p-1.5 rounded-md transition-colors cursor-pointer flex items-center justify-center min-w-[32px]" 
                               title="Delete Bulk Job"
                             >
-                              <HugeiconsIcon icon={Delete02Icon} />
+                              {deletingId === link.id ? (
+                                <Loader2 className="w-4 h-4 animate-spin text-red-500" />
+                              ) : (
+                                <HugeiconsIcon icon={Delete02Icon} />
+                              )}
                             </button>
                           </div>
                         </div>
@@ -568,7 +565,10 @@ export default function BulkCreateLinks() {
                         className="w-full flex items-center justify-between px-4 py-3 bg-[#1c1c1c] hover:bg-[#252525] border border-neutral-800 rounded-xl transition-all group cursor-pointer"
                       >
                         <span className="font-semibold text-sm text-neutral-300 group-hover:text-white">Manage all links</span>
-                        <HugeiconsIcon icon={ArrowRight01Icon} className="text-neutral-500 group-hover:text-white group-hover:translate-x-1 transition-all" />
+                        <HugeiconsIcon 
+                            icon={ArrowRight01Icon} 
+                            className="text-neutral-500 group-hover:text-white group-hover:translate-x-1 transition-all"
+                        />
                       </button>
                     </div>
                   </>
@@ -589,10 +589,10 @@ export default function BulkCreateLinks() {
       {showDownloadModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center">
           <div className="absolute inset-0 bg-black/80 cursor-pointer" onClick={() => setShowDownloadModal(false)} />
-          <div className="relative bg-[#1c1c1c] border border-neutral-800 w-full max-w-[320px] rounded-xl p-5 shadow-2xl transition-none">
+          <div className="relative bg-[#1c1c1c] border border-neutral-800 w-full max-w-[320px] rounded-xl p-5 shadow-2xl">
             <div className="flex justify-between items-center mb-4">
               <h3 className="font-bold text-base text-white">Download As</h3>
-              <button onClick={() => setShowDownloadModal(false)} className="text-neutral-400 hover:text-white cursor-pointer transition-colors">
+              <button onClick={() => setShowDownloadModal(false)} className="text-neutral-400 hover:text-white cursor-pointer">
                 <IoCloseOutline size={22} />
               </button>
             </div>
@@ -612,11 +612,11 @@ export default function BulkCreateLinks() {
 
       {isPasswordModalOpen && selectedUrl && (
         <div
-          className="fixed inset-0 z-[110] flex items-center justify-center bg-black/80 p-4 transition-opacity duration-150"
+          className="fixed inset-0 z-[110] flex items-center justify-center bg-black/80 p-4"
           onClick={closeAllModals}
         >
           <div
-            className="bg-[#1c1c1c] shadow-2xl w-full max-w-lg p-6 sm:p-10 cursor-default border border-neutral-800 rounded-xl"
+            className="bg-[#1c1c1c] shadow-2xl w-full max-w-lg p-6 sm:p-10 border border-neutral-800 rounded-xl"
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="text-xl sm:text-2xl font-three mb-8 text-center text-white">
@@ -632,8 +632,7 @@ export default function BulkCreateLinks() {
                   {!isEditingPassword && selectedUrl.password && (
                     <button
                       onClick={() => { setIsEditingPassword(true); setPassword(""); }}
-                      className="text-blue-500 hover:text-blue-400 cursor-pointer transition-colors"
-                      title="Edit Password"
+                      className="text-blue-500 hover:text-blue-400 cursor-pointer"
                     >
                       <HugeiconsIcon icon={Edit03Icon} />
                     </button>
@@ -641,7 +640,7 @@ export default function BulkCreateLinks() {
                 </div>
 
                 {!isEditingPassword && selectedUrl.password ? (
-                  <div className="w-full p-3 border border-dashed border-neutral-700 bg-[#1a1a1a] text-neutral-400 font-three italic rounded-lg">
+                  <div className="w-full p-3 border border-dashed border-neutral-700 bg-[#1a1a1a] text-neutral-400 font-three italic rounded-lg text-sm">
                     Password is already configured
                   </div>
                 ) : (
@@ -656,7 +655,7 @@ export default function BulkCreateLinks() {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="px-4 text-neutral-500 hover:text-white transition-colors cursor-pointer"
+                      className="px-4 text-neutral-500 hover:text-white cursor-pointer"
                     >
                       {showPassword ? <HugeiconsIcon icon={ViewOffSlashIcon} /> : <HugeiconsIcon icon={ViewIcon} />}
                     </button>
@@ -670,8 +669,7 @@ export default function BulkCreateLinks() {
                   {!isEditingExpiry && selectedUrl.expiresAt && (
                     <button
                       onClick={() => { setIsEditingExpiry(true); setExpiryDate(""); }}
-                      className="text-blue-500 hover:text-blue-400 cursor-pointer transition-colors"
-                      title="Edit Expiry"
+                      className="text-blue-500 hover:text-blue-400 cursor-pointer"
                     >
                       <HugeiconsIcon icon={Edit03Icon} />
                     </button>
@@ -679,7 +677,7 @@ export default function BulkCreateLinks() {
                 </div>
 
                 {!isEditingExpiry && selectedUrl.expiresAt ? (
-                  <div className="w-full p-3 border border-dashed border-neutral-700 bg-[#1a1a1a] text-neutral-400 font-three rounded-lg">
+                  <div className="w-full p-3 border border-dashed border-neutral-700 bg-[#1a1a1a] text-neutral-400 font-three rounded-lg text-sm">
                     Expires on {new Date(selectedUrl.expiresAt).toLocaleDateString()}
                   </div>
                 ) : (
@@ -701,13 +699,13 @@ export default function BulkCreateLinks() {
             <div className="flex justify-end gap-3">
               <button
                 onClick={closeAllModals}
-                className="cursor-pointer px-6 py-2.5 font-three text-sm bg-transparent text-white border border-neutral-700 hover:bg-[#2a2a2a] transition-colors rounded-lg"
+                className="cursor-pointer px-6 py-2.5 font-three text-sm bg-transparent text-white border border-neutral-700 hover:bg-[#2a2a2a] rounded-lg"
               >
                 Cancel
               </button>
               <button
                 onClick={handleAddPassword}
-                className="bg-white text-black px-6 py-2.5 font-three text-sm hover:bg-gray-200 transition-colors rounded-lg cursor-pointer active:scale-95 font-bold"
+                className="bg-white text-black px-6 py-2.5 font-three text-sm hover:bg-gray-200 rounded-lg cursor-pointer active:scale-95 font-bold"
               >
                 Update
               </button>
@@ -719,7 +717,7 @@ export default function BulkCreateLinks() {
       {showLimitModal && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/80 cursor-pointer" onClick={() => setShowLimitModal(false)} />
-          <div className="relative bg-[#1c1c1c] border border-neutral-800 w-full max-w-[450px] rounded-2xl p-8 shadow-2xl flex flex-col items-center text-center animate-none transition-colors">
+          <div className="relative bg-[#1c1c1c] border border-neutral-800 w-full max-w-[450px] rounded-2xl p-8 shadow-2xl flex flex-col items-center text-center">
             <div className="w-16 h-16 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mb-4">
               <IoAlertCircleOutline size={40} />
             </div>
@@ -731,14 +729,14 @@ export default function BulkCreateLinks() {
             <div className="flex flex-col w-full gap-3">
               <button 
                 onClick={() => router.push('/premium')}
-                className="w-full py-4 bg-blue-600 text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-blue-700 transition-all cursor-pointer"
+                className="w-full py-4 bg-blue-600 text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-blue-700 cursor-pointer"
               >
                 <IoRocketOutline size={20} />
                 Upgrade Now
               </button>
               <button 
                 onClick={() => setShowLimitModal(false)}
-                className="w-full py-3 bg-[#2a2a2a] text-white rounded-xl font-bold cursor-pointer transition-colors hover:bg-[#333333]"
+                className="w-full py-3 bg-[#2a2a2a] text-white rounded-xl font-bold cursor-pointer hover:bg-[#333333]"
               >
                 Maybe Later
               </button>
