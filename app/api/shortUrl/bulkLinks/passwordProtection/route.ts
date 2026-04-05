@@ -34,6 +34,16 @@ export async function POST(req: NextRequest) {
             }
         })
 
+        await prisma.bulkLinks.update({
+            where: {
+                id: data.bulkLinkId,
+            },
+            data: {
+                password: hashedPassword,
+                expiresAt: expiresAt
+            }
+        })
+
         return NextResponse.json(
             {message: "Password Protection added"},
             {status: 200}

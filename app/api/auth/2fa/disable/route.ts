@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import speakeasy from "speakeasy";
 import jwt from "jsonwebtoken";
 import { prisma } from "@/lib/dbConfig";
 

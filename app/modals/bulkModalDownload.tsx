@@ -16,29 +16,38 @@ interface BulkDownloadModalProps {
   isOpen: boolean;
   onClose: () => void;
   batchName: string;
-  links: any[]; // We need the actual data to download it
+  links: any[];
 }
+
+const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN;
 
 export default function BulkDownloadModal({ isOpen, onClose, batchName, links }: BulkDownloadModalProps) {    
   
+
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
+
     } else {
       document.body.style.overflow = "unset";
     }
     return () => { document.body.style.overflow = "unset"; };
+    
   }, [isOpen]);
 
 
   const downloadCSV = () => {
-    const data = links.map(link => ({
-      Name: link.name || "Unnamed",
-      Original_URL: link.url,
-      Short_URL: `${window.location.origin}/${link.shorturl}`,
-      Clicks: link.clicks || 0,
-      Created: new Date(link.createdAt).toLocaleDateString()
-    }));
+    const data = links.map(link => {
+      const fullShortUrl = `${window.location.origin}/${link.shorturl}`;
+      
+      return {
+        Name: link.name || "Unnamed",
+        Original_URL: link.url,
+        Short_URL: `=HYPERLINK("${fullShortUrl}","${fullShortUrl}")`,
+        Clicks: link.clicks || 0,
+        Created: new Date(link.createdAt).toLocaleDateString()
+      };
+    });
 
     const csv = Papa.unparse(data);
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
@@ -58,9 +67,9 @@ export default function BulkDownloadModal({ isOpen, onClose, batchName, links }:
     
     const tableColumn = ["Name", "Original URL", "Short URL", "Clicks"];
     const tableRows = links.map(link => [
-      link.name || "N/A",
-      link.url,
-      link.shorturl,
+      link.linkName || "N/A",
+      link.original,
+      `${NEXT_DOMAIN}/${link.shorturl}`,
       link.clicks || 0
     ]);
 
@@ -68,6 +77,15 @@ export default function BulkDownloadModal({ isOpen, onClose, batchName, links }:
       head: [tableColumn],
       body: tableRows,
       startY: 20,
+      didDrawCell: (data) => {
+        if (data.section === 'body' && data.column.index === 2) {
+          const url = data.cell.raw;
+          if (url && url !== "N/A") {
+            doc.link(data.cell.x, data.cell.y, data.cell.width, data.cell.height, { url: url });
+            doc.setTextColor(0, 0, 255); 
+          }
+        }
+      },
     });
 
     doc.save(`${batchName || "batch"}.pdf`);

@@ -57,7 +57,11 @@ export default function BulkLinks({
     
     setSavingId(id);
     try {
-      await axios.post("/api/shortUrl/bulkLinks/updateName", { linkId: id, name: tempName.trim() });
+      await axios.post("/api/shortUrl/bulkLinks/updateName", {
+        linkId: id,
+        name: tempName.trim() 
+      });
+
       toast.success("Updated");
       onRefresh();
       setEditingId(null);
@@ -67,6 +71,22 @@ export default function BulkLinks({
 
     } finally {
       setSavingId(null);
+    }
+  };
+
+  const handleDeleteBatch = async (urlId: string) => {
+
+    const loadingToast = toast.loading("Deleting batch...");
+
+    try {
+      await axios.post(`/api/shortUrl/bulkLinks/delete/${urlId}`);
+      
+      toast.success("Batch deleted successfully!", { id: loadingToast });
+      onRefresh();
+
+    } catch (error) {
+      console.error("Delete failed:", error);
+      toast.error("Failed to delete the batch. Please try again.", { id: loadingToast });
     }
   };
 
@@ -132,9 +152,10 @@ export default function BulkLinks({
 
               <div className="hidden md:flex w-[15%] shrink-0">
                 {url.password && (
-                  <span className="text-[10px] uppercase tracking-widest font-bold px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
-                    Protected
-                  </span>
+                  <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                    <HugeiconsIcon icon={CircleLock01Icon} size={15} />
+                    <span className="text-[10px] uppercase tracking-widest font-one">Protected</span>
+                  </div>
                 )}
               </div>
 
@@ -158,14 +179,12 @@ export default function BulkLinks({
                   <HugeiconsIcon icon={Download01Icon} />
                 </button>
                 <button 
-                  onClick={async (e) => { 
-                    e.stopPropagation();
-                    if(confirm("Permanently delete this batch?")) {
-                      await axios.post(`/api/shortUrl/bulkLinks/delete/${url.id}`); 
-                      onRefresh();
-                    }
+                  onClick={(e) => { 
+                    e.stopPropagation(); 
+                    handleDeleteBatch(url.id); 
                   }} 
                   className="p-2 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors cursor-pointer"
+                  title="Delete Batch"
                 >
                   <HugeiconsIcon icon={Delete02Icon} />
                 </button>
