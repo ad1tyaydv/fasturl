@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
@@ -22,7 +23,7 @@ import { AnalyticsDropDown } from "@/app/dropDown/analyticsDropDown";
 
 const DOMAIN = process.env.NEXT_PUBLIC_DOMAIN!;
 
-function PremiumBlock({ children, isFree }: { children: React.ReactNode, isFree: boolean }) {
+function PremiumBlock({ children, isFree }: { children: React.ReactNode; isFree: boolean }) {
   return (
     <div className="relative flex w-full bg-black border border-neutral-800 rounded-xl p-4 min-h-[400px] overflow-hidden">
       {isFree && (
@@ -41,7 +42,7 @@ function PremiumBlock({ children, isFree }: { children: React.ReactNode, isFree:
           </Link>
         </div>
       )}
-      <div className={`w-full h-full transition-all duration-300 ${isFree ? 'opacity-30 blur-[4px] pointer-events-none select-none' : ''}`}>
+      <div className={`w-full h-full transition-all duration-300 ${isFree ? "opacity-30 blur-[4px] pointer-events-none select-none" : ""}`}>
         {children}
       </div>
     </div>
@@ -56,45 +57,75 @@ export default function AnalyticsPage() {
   const [selectedLink, setSelectedLink] = useState<string | null>(null);
   const [analyticsData, setAnalyticsData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  
   const [fetchingStats, setFetchingStats] = useState(false);
-  
-
   const [days, setDays] = useState<number>(7);
+
+
+  const fetchAnalytics = async (linkId: string) => {
+    setFetchingStats(true);
+    try {
+      const res = await fetch("/api/analytics/link", {
+        method: "POST",
+        body: JSON.stringify({ linkId }),
+      });
+      const data = await res.json();
+      setAnalyticsData(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setFetchingStats(false);
+    }
+  };
+
 
   useEffect(() => {
     async function init() {
       try {
-
         const [authRes, urlsRes] = await Promise.all([
           fetch("/api/auth/me").catch(() => null),
-          fetch("/api/fetchUrls").catch(() => null)
-        
+          fetch("/api/fetchUrls").catch(() => null),
         ]);
-
 
         if (authRes && authRes.ok) {
           const authData = await authRes.json();
           setTier(authData.plan || "FREE");
-        
         }
-
 
         if (urlsRes && urlsRes.ok) {
           const data = await urlsRes.json();
-          setUrls(data.urls || []);
-        }
+          const fetchedUrls: any[] = data.urls || [];
+          setUrls(fetchedUrls);
 
+          // Deep-link: read ?link=<shorturl> from current URL on mount
+          const params = new URLSearchParams(window.location.search);
+          const slug = params.get("link");
+          if (slug) {
+            const match = fetchedUrls.find((u: any) => u.shorturl === slug);
+            if (match) {
+              setSelectedLink(match.id);
+              fetchAnalytics(match.id);
+            }
+          }
+        }
       } catch (e) {
         console.error("Initialization error:", e);
-
       } finally {
         setLoading(false);
       }
     }
     init();
-
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+
+  const handleLinkClick = async (url: any) => {
+    setSelectedLink(url.id);
+
+    // Update browser URL to /analytics?link=<shorturl> without navigation/redirect
+    window.history.replaceState(null, "", `/analytics?link=${url.shorturl}`);
+
+    fetchAnalytics(url.id);
+  };
 
 
   const filteredUrls = useMemo(() => {
@@ -106,34 +137,12 @@ export default function AnalyticsPage() {
       );
     });
 
-
     return filtered.sort((a, b) => {
       const dateA = new Date(a.createdAt || 0).getTime();
       const dateB = new Date(b.createdAt || 0).getTime();
       return dateB - dateA;
     });
-
   }, [urls, searchQuery]);
-
-
-  const handleLinkClick = async (linkId: string) => {
-    setFetchingStats(true);
-    setSelectedLink(linkId);
-    try {
-      const res = await fetch("/api/analytics/link", {
-        method: "POST",
-        body: JSON.stringify({ linkId }),
-      });
-      const data = await res.json();
-      setAnalyticsData(data);
-
-    } catch (err) {
-      console.error(err);
-
-    } finally {
-      setFetchingStats(false);
-    }
-  };
 
 
   const isFree = tier === "FREE";
@@ -142,7 +151,7 @@ export default function AnalyticsPage() {
   return (
     <div className="flex flex-col h-screen bg-black text-white font-sans selection:bg-blue-500/30">
       <Navbar />
-      
+
       <div className="flex flex-1 overflow-hidden">
         {loading ? (
           <div className="flex flex-1 items-center justify-center bg-black">
@@ -161,7 +170,7 @@ export default function AnalyticsPage() {
 
                 <div className="relative group">
                   <HugeiconsIcon icon={Search01Icon} className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500 group-focus-within:text-blue-500 transition-colors" />
-                  <input 
+                  <input
                     type="text"
                     placeholder="Search by name, url, slug"
                     value={searchQuery}
@@ -170,16 +179,16 @@ export default function AnalyticsPage() {
                   />
                 </div>
               </div>
-              
+
               <div className="flex-1 overflow-y-auto px-3 space-y-1 custom-scrollbar cursor-pointer">
                 {filteredUrls.map((url) => (
                   <button
                     key={url.id}
-                    onClick={() => handleLinkClick(url.id)}
+                    onClick={() => handleLinkClick(url)}
                     className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-200 group ${
-                      selectedLink === url.id 
-                      ? "bg-blue-600 text-white"
-                      : "hover:bg-neutral-900 hover:text-neutral-200"
+                      selectedLink === url.id
+                        ? "bg-blue-600 text-white"
+                        : "hover:bg-neutral-900 hover:text-neutral-200"
                     }`}
                   >
                     <div className="flex items-center gap-3">
@@ -196,35 +205,34 @@ export default function AnalyticsPage() {
             <main className="flex-1 overflow-y-auto bg-[#050505]">
               {!selectedLink ? (
                 <div className="h-full flex flex-col items-center justify-center text-neutral-600">
-                  <HugeiconsIcon icon={AnalyticsUpIcon} size={40}/>
+                  <HugeiconsIcon icon={AnalyticsUpIcon} size={40} />
                   <p className="text-sm mt-4">Click a link on the left to see performance</p>
                 </div>
               ) : (
                 <div className="p-10 max-w-[1400px] mx-auto space-y-10">
-                  
                   <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <h1 className="text-4xl font-three tracking-tight cursor-pointer">Link Analytics Dashboard</h1>
                     <AnalyticsDropDown days={days} setDays={setDays} />
                   </header>
 
                   <section className="relative rounded-xl border border-neutral-800 bg-[#0a0a0a] overflow-hidden">
-                     {fetchingStats && (
-                       <div className="absolute inset-0 z-50 bg-black/40 backdrop-blur-[2px] flex items-center justify-center">
-                          <Loader2 className="animate-spin text-blue-500" />
-                       </div>
-                     )}
-                     <ClicksAnalytics data={analyticsData?.clicks} days={days} />
+                    {fetchingStats && (
+                      <div className="absolute inset-0 z-50 bg-black/40 backdrop-blur-[2px] flex items-center justify-center">
+                        <Loader2 className="animate-spin text-blue-500" />
+                      </div>
+                    )}
+                    <ClicksAnalytics data={analyticsData?.clicks} days={days} />
                   </section>
 
                   <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <PremiumBlock isFree={isFree}>
                       <CountryAnalytics data={analyticsData?.countries} days={days} />
                     </PremiumBlock>
-                    
+
                     <PremiumBlock isFree={isFree}>
                       <BrowserAnalytics data={analyticsData?.browsers} days={days} />
                     </PremiumBlock>
-                    
+
                     <PremiumBlock isFree={isFree}>
                       <DeviceListAnalytics data={analyticsData?.devices} days={days} />
                     </PremiumBlock>
@@ -234,7 +242,7 @@ export default function AnalyticsPage() {
                     <PremiumBlock isFree={isFree}>
                       <OSAnalytics data={analyticsData?.os} days={days} />
                     </PremiumBlock>
-                    
+
                     <PremiumBlock isFree={isFree}>
                       <ReferrerAnalytics data={analyticsData?.referrers} days={days} />
                     </PremiumBlock>

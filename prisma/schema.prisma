@@ -130,24 +130,28 @@ model BulkLinks {
   createdAt  DateTime     @default(now())
 }
 
-  model CustomDomain {
-    id            String       @id @default(uuid())
-    domain        String       @unique
-    subDomain     String?
+model CustomDomain {
+  id           String   @id @default(uuid())
+  domain       String
+  subDomain    String?
 
-    txtValue      String?
-    txtVerified   Boolean      @default(false)
+  txtValue     String?
+  txtName      String?
+  txtVerified  Boolean  @default(false)
 
-    cnameTarget   String?
-    cnameVerfied  Boolean      @default(false)
+  cnameTarget  String?
+  cnameVerfied Boolean  @default(false)
 
-    isActive      Boolean      @default(false)
-    
-    userId        String
-    user          User          @relation(fields: [userId], references: [id])
-    
-    createdAt     DateTime      @default(now())
-  }
+  isActive     Boolean  @default(false)
+  
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+
+  createdAt    DateTime @default(now())
+
+  @@unique([domain, subDomain])
+}
+
 
 model Count {
   countId     String      @id @default(uuid())

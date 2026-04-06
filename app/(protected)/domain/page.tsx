@@ -37,6 +37,7 @@ export default function DomainsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
 
+  
   const fetchDomains = useCallback(async () => {
     try {
       setLoading(true);
@@ -54,6 +55,8 @@ export default function DomainsPage() {
 
   const handleVerify = async (e: React.MouseEvent, domainName: string) => {
     e.stopPropagation();
+    console.log("Sending domain:", domainName); // add this
+
     try {
       setVerifyingId(domainName);
       const res = await axios.post("/api/domain/verifyDomain", { domain: domainName });
@@ -182,13 +185,13 @@ export default function DomainsPage() {
         {loading ? <SkeletonLoader /> : (
           <div className="space-y-4">
             {paginatedData.map((item, index) => {
-              const isExpanded = expandedId === item.domain;
+              const isExpanded = expandedId === item.id;
               const isVerifying = verifyingId === item.domain;
 
               return (
                 <div key={index} className={`overflow-hidden rounded-2xl bg-[#1c1c1c] border transition-all duration-300 ${isExpanded ? 'border-neutral-500 shadow-lg' : 'border-neutral-800 hover:border-neutral-700'}`}>
                   
-                  <div onClick={() => setExpandedId(isExpanded ? null : item.domain)} className="flex items-center font-three justify-between p-5 cursor-pointer">
+                  <div onClick={() => setExpandedId(isExpanded ? null : item.id)} className="flex items-center font-three justify-between p-5 cursor-pointer">
                     <div className="flex items-center gap-4">
                       <div className="p-3.5 rounded-xl bg-[#141414] border border-neutral-800 group-hover:border-neutral-700">
                         <HugeiconsIcon icon={Globe02Icon} className={`w-6 h-6 transition-colors ${isExpanded ? 'text-white' : 'text-neutral-400'}`} />
@@ -208,7 +211,7 @@ export default function DomainsPage() {
                               <Button 
                                 size="sm" 
                                 disabled={isVerifying}
-                                onClick={(e) => handleVerify(e, item.domain)}
+                                onClick={(e) => handleVerify(e, item.subDomain ? `${item.subDomain}.${item.domain}` : item.domain)}
                                 className="h-7 px-3 text-[12px] bg-white text-black hover:bg-neutral-200 font-three rounded-md cursor-pointer"
                               >
                                 {isVerifying ? <Loader2 className="w-3 h-3 animate-spin" /> : "Verify Now"}
@@ -237,10 +240,12 @@ export default function DomainsPage() {
                       <div className="space-y-2">
                         <label className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">Verification (TXT Record)</label>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                          <div onClick={() => handleCopy("TXT / @", "TXT Host")} className="flex items-center justify-between bg-[#141414] p-3 rounded-lg border border-neutral-800 cursor-pointer hover:bg-neutral-900 group/item">
+                          <div onClick={() => handleCopy(item.txtName, "TXT Host")} className="flex items-center justify-between bg-[#141414] p-3 rounded-lg border border-neutral-800 cursor-pointer hover:bg-neutral-900 group/item">
                             <div className="flex flex-col">
                               <span className="text-[9px] text-neutral-500 uppercase font-bold">Type / Host</span>
-                              <span className="text-sm font-three text-neutral-300">TXT / @</span>
+                              <span className="text-sm font-three text-neutral-300">
+                                TXT / {item.txtName || "N/A"}
+                              </span>
                             </div>
                             {copiedField === "TXT Host" ? <HugeiconsIcon icon={CopyCheckIcon} className="text-emerald-500 w-4 h-4" /> : <HugeiconsIcon icon={CopyIcon} className="w-4 h-4 text-neutral-600" />}
                           </div>

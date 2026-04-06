@@ -20,6 +20,27 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ shor
         const domain = req.headers.get("host");
         console.log("Request from domain:", domain);
 
+        if (domain && !domain.includes("fasturl.in") && !domain.includes("localhost")) {
+            const parts = domain.split(".");
+            const subDomain = parts.length > 2 ? parts.slice(0, -2).join(".") : null;
+            const rootDomain = parts.slice(-2).join(".");
+
+            const domainExists = await prisma.customDomain.findFirst({
+                where: {
+                    domain: rootDomain,
+                    subDomain: subDomain,
+                    isActive: true
+                }
+            });
+
+            if (!domainExists) {
+                return NextResponse.json(
+                    { message: "Domain not configured" },
+                    { status: 404 }
+                );
+            }
+        }
+
         const ip =
             req.headers.get("x-forwarded-for")?.split(",")[0] ||
             req.headers.get("x-real-ip") ||
@@ -127,6 +148,28 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ shor
     if (!cachedUrl) {
         const domain = req.headers.get("host");
         console.log("Request from domain:", domain);
+
+
+        if (domain && !domain.includes("fasturl.in") && !domain.includes("localhost")) {
+            const parts = domain.split(".");
+            const subDomain = parts.length > 2 ? parts.slice(0, -2).join(".") : null;
+            const rootDomain = parts.slice(-2).join(".");
+
+            const domainExists = await prisma.customDomain.findFirst({
+                where: {
+                    domain: rootDomain,
+                    subDomain: subDomain,
+                    isActive: true
+                }
+            });
+
+            if (!domainExists) {
+                return NextResponse.json(
+                    { message: "Domain not configured" },
+                    { status: 404 }
+                );
+            }
+        }
 
         const ip =
             req.headers.get("x-forwarded-for")?.split(",")[0] ||

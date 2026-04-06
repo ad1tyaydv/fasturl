@@ -82,6 +82,7 @@ export default function Navbar() {
     }
   };
 
+  
   return (
     <nav className="flex items-center justify-between px-6 sm:px-10 py-6 border-b border-neutral-800 z-30 shrink-0 bg-[#141414] text-white sticky top-0 shadow-sm">
       

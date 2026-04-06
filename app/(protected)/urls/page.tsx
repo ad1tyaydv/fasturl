@@ -40,14 +40,16 @@ const getRelativeTime = (dateString?: string) => {
   return date.toLocaleDateString();
 };
 
+type ViewType = "links" | "bulk" | "qr";
 
 function AllUrlsPageClient() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const initialView = searchParams.get("types") === "bulk" ? "bulk" : "links";
-  const [view, setView] = useState<"links" | "bulk">(initialView);
+  const initialParam = searchParams.get("types") as ViewType;
+  const initialView = ["links", "bulk", "qr"].includes(initialParam) ? initialParam : "links";
+  const [view, setView] = useState<ViewType>(initialView);
 
   const [data, setData] = useState<any[]>([]);
   const [tier, setTier] = useState("FREE");
@@ -72,15 +74,19 @@ function AllUrlsPageClient() {
   const [isCustomModalOpen, setIsCustomModalOpen] = useState(false);
 
 
-  const handleViewChange = (newView: "links" | "bulk") => {
+  const handleViewChange = (newView: ViewType) => {
     setView(newView);
-    const newUrl = `${pathname}?types=${newView === "links" ? "link" : "bulk"}`;
-
-    router.push(newUrl);
+    router.push(`${pathname}?types=${newView}`);
   };
 
 
   const fetchData = useCallback(async () => {
+    if (view === "qr") {
+      setData([]);
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       const endpoint = view === "links" ? "/api/fetchUrls" : "/api/shortUrl/bulkLinks/fetchBulkLinks";
@@ -95,7 +101,6 @@ function AllUrlsPageClient() {
     } finally {
       setLoading(false);
     }
-
   }, [view]);
 
 
@@ -198,7 +203,6 @@ function AllUrlsPageClient() {
       );
     }
 
-
     const now = new Date();
     if (statusFilter === "protected") {
       result = result.filter((item) => !!item.password);
@@ -240,178 +244,200 @@ function AllUrlsPageClient() {
 
 
   return (
-    <div className="min-h-screen bg-[#141414] text-white">
+    <div className="h-screen bg-[#141414] text-white flex flex-col overflow-hidden">
       <Toaster position="bottom-center" />
       <Navbar />
 
-      <main className="w-full max-w-6xl mx-auto px-6 py-10">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 border-b border-neutral-800 pb-4">
-          <div className="flex items-center gap-2 text-2xl sm:text-4xl font-one tracking-tight">
+      <div className="flex flex-col sm:flex-row flex-1 w-full max-w-[1600px] mx-auto overflow-hidden">
+        
+      <aside className="w-full sm:w-64 p-4 sm:p-8 sm:border-r border-neutral-800 flex flex-row sm:flex-col gap-2 overflow-x-auto sm:overflow-hidden border-b sm:border-b-0 shrink-0">
+          {["links", "bulk", "qr"].map((item) => (
             <button
-              onClick={() => handleViewChange("links")}
-              className={`cursor-pointer transition-colors ${view === "links" ? "text-white" : "text-neutral-600 hover:text-neutral-400"}`}
+              key={item}
+              onClick={() => handleViewChange(item as ViewType)}
+              className={`
+                text-left px-4 py-2.5 rounded-lg font-three transition-colors whitespace-nowrap 
+                cursor-pointer text-lg sm:text-xl
+                ${
+                  view === item
+                    ? "bg-neutral-800 text-white"
+                    : "text-neutral-500 hover:text-white hover:bg-neutral-800/50"
+                }
+              `}
             >
-              Saved URLs
+              {item === "links" && "Links"}
+              {item === "bulk" && "Bulk Links"}
+              {item === "qr" && "QR Code"}
             </button>
-            <span className="text-neutral-700">/</span>
-            <button
-              onClick={() => handleViewChange("bulk")}
-              className={`cursor-pointer transition-colors ${view === "bulk" ? "text-white" : "text-neutral-600 hover:text-neutral-400"}`}
-            >
-              Bulk Links
-            </button>
-          </div>
-          <span className="px-4 py-1.5 font-bold bg-[#1c1c1c] border border-neutral-700 rounded-lg text-sm">
-            Total - {filteredData.length}
-          </span>
-        </div>
+          ))}
+        </aside>
 
-        {view === "links" && (
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 mt-2">
-            <div className="relative w-full sm:w-[400px]">
-              <HugeiconsIcon icon={Search02Icon} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500" />
-              <input 
-                type="text" 
-                placeholder="Search links..."
-                className="w-full pl-10 pr-3 py-3 bg-[#111111] font-three border border-neutral-800 rounded-lg text-white text-sm outline-none focus:border-neutral-600 transition-all" 
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)} 
-              />
+        <main className="flex-1 w-full px-6 py-8 sm:px-10 sm:py-10 min-w-0 overflow-y-auto">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 border-b border-neutral-800 pb-4">
+            <div className="flex items-center gap-2 text-2xl sm:text-4xl font-one tracking-tight">
+              <span className="text-white">
+                {view === "links" && "Saved URLs"}
+                {view === "bulk" && "Bulk Links"}
+                {view === "qr" && "QR Codes"}
+              </span>
             </div>
-            <FilterDropDown value={statusFilter} onChange={(val: FilterType) => setStatusFilter(val)} />
+            <span className="px-4 py-1.5 font-bold bg-[#1c1c1c] border border-neutral-700 rounded-lg text-sm">
+              Total - {filteredData.length}
+            </span>
           </div>
-        )}
 
-        {loading ? (
-          <SkeletonLoader />
-        ) : (
-          <div className="fade-in">
-            {view === "links" ? (
-              <div className="flex flex-col w-full">
-                {paginatedData.map((url: any) => (
-                  <div key={url.id} className="flex items-center justify-between py-5 px-4 border-b border-neutral-800/60 hover:bg-[#1a1a1a] group transition-colors">
-                    <div className="flex items-start gap-4 w-[40%] min-w-0 pr-4">
-                      <div className="mt-1 w-8 h-8 rounded-full bg-neutral-800 flex items-center justify-center text-neutral-400 shrink-0">
-                        <HugeiconsIcon icon={Globe02Icon} />
-                      </div>
-                      <div className="flex flex-col min-w-0 w-full">
-                        {editingId === url.id ? (
-                          <div className="flex items-center gap-2">
-                            <input 
-                              autoFocus 
-                              className="bg-[#111111] border border-neutral-700 rounded px-2 py-1 text-white w-full outline-none" 
-                              value={tempName} 
-                              onChange={(e) => setTempName(e.target.value)} 
-                              onKeyDown={(e) => e.key === "Enter" && !isSavingName && saveName(url.id)} 
-                              disabled={isSavingName}
-                            />
-                            <button 
-                              onClick={() => saveName(url.id)} 
-                              disabled={isSavingName}
-                              className={`text-green-500 transition-opacity ${isSavingName ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'}`}
-                            >
-                              {isSavingName ? (
-                                <div className="w-[22px] h-[22px] border-2 border-t-transparent rounded-full animate-spin"></div>
-                              ) : (
-                                <HugeiconsIcon icon={Tick02Icon} />
-                              )}
-                            </button>
-                          </div>
-                        ) : (
-                          <span className="text-white font-one text-xl truncate tracking-wide">{url.linkName || "Untitled Link"}</span>
-                        )}
-                        <span className="text-neutral-500 font-three text-base truncate">{NEXT_DOMAIN}/{url.shorturl}</span>
-                      </div>
-                    </div>
+          {view === "links" && (
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 mt-2">
+              <div className="relative w-full sm:w-[400px]">
+                <HugeiconsIcon icon={Search02Icon} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500" />
+                <input 
+                  type="text" 
+                  placeholder="Search links..."
+                  className="w-full pl-10 pr-3 py-3 bg-[#111111] font-three border border-neutral-800 rounded-lg text-white text-sm outline-none focus:border-neutral-600 transition-all" 
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)} 
+                />
+              </div>
+              <FilterDropDown value={statusFilter} onChange={(val: FilterType) => setStatusFilter(val)} />
+            </div>
+          )}
 
-                    <div className="hidden md:flex w-[10%] shrink-0">
-                      {url.password && (
-                        <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">
-                          <HugeiconsIcon icon={CircleLock01Icon} size={15} />
-                          <span className="text-[10px] uppercase tracking-widest font-one">Protected</span>
+          {loading ? (
+            <SkeletonLoader />
+          ) : view === "qr" ? (
+            <div className="flex flex-col items-center justify-center py-32 text-neutral-500 fade-in">
+              <HugeiconsIcon icon={QrCodeIcon} size={64} className="mb-4 text-neutral-700" />
+              <p className="font-three text-lg">Your generated QR codes will appear here.</p>
+            </div>
+          ) : (
+            <div className="fade-in">
+              {view === "links" ? (
+                <div className="flex flex-col w-full">
+                  {paginatedData.map((url: any) => (
+                    <div key={url.id} className="flex items-center justify-between py-5 px-4 border-b border-neutral-800/60 hover:bg-[#1a1a1a] group transition-colors">
+                      <div className="flex items-start gap-4 w-[40%] min-w-0 pr-4">
+                        <div className="mt-1 w-8 h-8 rounded-full bg-neutral-800 flex items-center justify-center text-neutral-400 shrink-0">
+                          <HugeiconsIcon icon={Globe02Icon} />
                         </div>
-                      )}
-                    </div>
+                        <div className="flex flex-col min-w-0 w-full">
+                          {editingId === url.id ? (
+                            <div className="flex items-center gap-2">
+                              <input 
+                                autoFocus 
+                                className="bg-[#111111] border border-neutral-700 rounded px-2 py-1 text-white w-full outline-none" 
+                                value={tempName} 
+                                onChange={(e) => setTempName(e.target.value)} 
+                                onKeyDown={(e) => e.key === "Enter" && !isSavingName && saveName(url.id)} 
+                                disabled={isSavingName}
+                              />
+                              <button 
+                                onClick={() => saveName(url.id)} 
+                                disabled={isSavingName}
+                                className={`text-green-500 transition-opacity ${isSavingName ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'}`}
+                              >
+                                {isSavingName ? (
+                                  <div className="w-[22px] h-[22px] border-2 border-t-transparent rounded-full animate-spin"></div>
+                                ) : (
+                                  <HugeiconsIcon icon={Tick02Icon} />
+                                )}
+                              </button>
+                            </div>
+                          ) : (
+                            <span className="text-white font-one text-xl truncate tracking-wide">{url.linkName || "Untitled Link"}</span>
+                          )}
+                          <span className="text-neutral-500 font-three text-base truncate">{NEXT_DOMAIN}/{url.shorturl}</span>
+                        </div>
+                      </div>
 
-                    <div className="w-[10%] flex flex-col">
-                      <span className="text-white font-semibold">{url.clicks || 0} clicks</span>
-                    </div>
-
-                    <div className="flex items-center justify-end gap-3 text-neutral-400 w-[30%] opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity">
-                      <button onClick={() => { setSelectedLink(url); setIsPasswordModalOpen(true); }} className={`p-2 rounded-md cursor-pointer transition-colors ${url.password ? 'text-blue-500' : 'hover:text-white'}`}>
-                        {url.password ? <HugeiconsIcon icon={CircleLock01Icon} /> : <HugeiconsIcon icon={CircleUnlock01Icon} />}
-                      </button>
-                      <button onClick={() => { setSelectedLink(url); setIsCustomModalOpen(true); }} className="hover:text-white p-2 cursor-pointer">
-                        <HugeiconsIcon icon={MagicWand01Icon} />
-                      </button>
-                      <button onClick={() => window.open(`${NEXT_DOMAIN}/${url.shorturl}`, '_blank')} className="hover:text-white p-2 cursor-pointer">
-                        <HugeiconsIcon icon={Share05Icon} />
-                      </button>
-                      <button onClick={() => copyToClipboard(`${NEXT_DOMAIN}/${url.shorturl}`, url.id)} className={`p-2 cursor-pointer ${copiedUrlId === url.id ? "text-green-500" : "hover:text-white"}`}>
-                        {copiedUrlId === url.id ? <HugeiconsIcon icon={CopyCheckIcon} /> : <HugeiconsIcon icon={CopyIcon} />}
-                      </button>
-                      <button onClick={() => { setSelectedLink(url); setIsQrModalOpen(true); }} className="hover:text-white p-2 cursor-pointer">
-                        <HugeiconsIcon icon={QrCodeIcon} />
-                      </button>
-                      <button onClick={() => { setEditingId(url.id); setTempName(url.linkName || ""); }} className="hover:text-white p-2 cursor-pointer">
-                        <HugeiconsIcon icon={Edit03Icon} />
-                      </button>
-                      <button 
-                        onClick={() => handleLinkDelete(url)} 
-                        disabled={deletingId === url.id}
-                        className={`p-2 transition-opacity ${
-                          deletingId === url.id 
-                            ? 'text-red-500 cursor-not-allowed opacity-70' 
-                            : 'hover:text-red-500 cursor-pointer'
-                        }`}
-                      >
-                        {deletingId === url.id ? (
-                          <div className="w-[20px] h-[20px] border-2 border-red-500 border-t-transparent rounded-full animate-spin"></div>
-                        ) : (
-                          <HugeiconsIcon icon={Delete02Icon} />
+                      <div className="hidden md:flex w-[10%] shrink-0">
+                        {url.password && (
+                          <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                            <HugeiconsIcon icon={CircleLock01Icon} size={15} />
+                            <span className="text-[10px] uppercase tracking-widest font-one">Protected</span>
+                          </div>
                         )}
-                      </button>
+                      </div>
+
+                      <div className="w-[10%] flex flex-col">
+                        <span className="text-white font-semibold">{url.clicks || 0} clicks</span>
+                      </div>
+
+                      <div className="flex items-center justify-end gap-3 text-neutral-400 w-[30%] opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity">
+                        <button onClick={() => { setSelectedLink(url); setIsPasswordModalOpen(true); }} className={`p-2 rounded-md cursor-pointer transition-colors ${url.password ? 'text-blue-500' : 'hover:text-white'}`}>
+                          {url.password ? <HugeiconsIcon icon={CircleLock01Icon} /> : <HugeiconsIcon icon={CircleUnlock01Icon} />}
+                        </button>
+                        <button onClick={() => { setSelectedLink(url); setIsCustomModalOpen(true); }} className="hover:text-white p-2 cursor-pointer">
+                          <HugeiconsIcon icon={MagicWand01Icon} />
+                        </button>
+                        <button onClick={() => window.open(`${NEXT_DOMAIN}/${url.shorturl}`, '_blank')} className="hover:text-white p-2 cursor-pointer">
+                          <HugeiconsIcon icon={Share05Icon} />
+                        </button>
+                        <button onClick={() => copyToClipboard(`${NEXT_DOMAIN}/${url.shorturl}`, url.id)} className={`p-2 cursor-pointer ${copiedUrlId === url.id ? "text-green-500" : "hover:text-white"}`}>
+                          {copiedUrlId === url.id ? <HugeiconsIcon icon={CopyCheckIcon} /> : <HugeiconsIcon icon={CopyIcon} />}
+                        </button>
+                        <button onClick={() => { setSelectedLink(url); setIsQrModalOpen(true); }} className="hover:text-white p-2 cursor-pointer">
+                          <HugeiconsIcon icon={QrCodeIcon} />
+                        </button>
+                        <button onClick={() => { setEditingId(url.id); setTempName(url.linkName || ""); }} className="hover:text-white p-2 cursor-pointer">
+                          <HugeiconsIcon icon={Edit03Icon} />
+                        </button>
+                        <button 
+                          onClick={() => handleLinkDelete(url)} 
+                          disabled={deletingId === url.id}
+                          className={`p-2 transition-opacity ${
+                            deletingId === url.id 
+                              ? 'text-red-500 cursor-not-allowed opacity-70' 
+                              : 'hover:text-red-500 cursor-pointer'
+                          }`}
+                        >
+                          {deletingId === url.id ? (
+                            <div className="w-[20px] h-[20px] border-2 border-red-500 border-t-transparent rounded-full animate-spin"></div>
+                          ) : (
+                            <HugeiconsIcon icon={Delete02Icon} />
+                          )}
+                        </button>
+                      </div>
+
+                      <div className="w-[10%] text-right text-neutral-500 text-sm font-medium">{getRelativeTime(url.createdAt)}</div>
                     </div>
+                  ))}
+                </div>
+              ) : (
+                <BulkLinks
+                  bulkLinks={paginatedData}
+                  onRefresh={fetchData}
+                  domain={NEXT_DOMAIN!}
+                  userPlan={tier}
+                  searchQuery={searchQuery}
+                  setSearchQuery={setSearchQuery}
+                  statusFilter={statusFilter}
+                  setStatusFilter={setStatusFilter}
+                />
+              )}
 
-                    <div className="w-[10%] text-right text-neutral-500 text-sm font-medium">{getRelativeTime(url.createdAt)}</div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <BulkLinks
-                bulkLinks={paginatedData}
-                onRefresh={fetchData}
-                domain={NEXT_DOMAIN!}
-                userPlan={tier}
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
-                statusFilter={statusFilter}
-                setStatusFilter={setStatusFilter}
-              />
-            )}
-
-            {totalPages > 1 && (
-              <div className="flex justify-center items-center gap-4 mt-8">
-                <button
-                  disabled={currentPage === 1}
-                  onClick={() => setCurrentPage((prev) => prev - 1)}
-                  className="p-2 rounded-lg bg-neutral-800 disabled:opacity-40"
-                >
-                  <ChevronLeft size={18} />
-                </button>
-                <span>{currentPage} / {totalPages}</span>
-                <button
-                  disabled={currentPage === totalPages}
-                  onClick={() => setCurrentPage((prev) => prev + 1)}
-                  className="p-2 rounded-lg bg-neutral-800 disabled:opacity-40"
-                >
-                  <ChevronRight size={18} />
-                </button>
-              </div>
-            )}
-          </div>
-        )}
-      </main>
+              {totalPages > 1 && (
+                <div className="flex justify-center items-center gap-4 mt-8 pb-10">
+                  <button
+                    disabled={currentPage === 1}
+                    onClick={() => setCurrentPage((prev) => prev - 1)}
+                    className="p-2 rounded-lg bg-neutral-800 disabled:opacity-40"
+                  >
+                    <ChevronLeft size={18} />
+                  </button>
+                  <span>{currentPage} / {totalPages}</span>
+                  <button
+                    disabled={currentPage === totalPages}
+                    onClick={() => setCurrentPage((prev) => prev + 1)}
+                    className="p-2 rounded-lg bg-neutral-800 disabled:opacity-40"
+                  >
+                    <ChevronRight size={18} />
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </main>
+      </div>
 
       <QRCodeModal isOpen={isQrModalOpen} onClose={() => setIsQrModalOpen(false)} selectedUrl={selectedLink} />
       <PasswordProtectionModal isOpen={isPasswordModalOpen} onClose={() => setIsPasswordModalOpen(false)} selectedUrl={selectedLink} onSuccess={fetchData} />

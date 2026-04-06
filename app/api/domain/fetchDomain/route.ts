@@ -29,7 +29,9 @@ export async function GET(req: NextRequest) {
             select: {
                 id: true,
                 domain: true,
+                subDomain: true,
                 isActive: true,
+                txtName: true,
                 txtValue: true,
                 cnameTarget: true,
                 createdAt: true

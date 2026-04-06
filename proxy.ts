@@ -3,10 +3,18 @@ import { NextRequest, NextResponse } from "next/server";
 
 const NEXTAUTH_SECRET = process.env.NEXTAUTH_SECRET!;
 
-export async function proxy(request: NextRequest) {
+export async function proxy(req: NextRequest) {
 
-    const token = request.cookies.get("token")?.value;
-    const pathName = request.nextUrl.pathname;
+    const host = req.headers.get("host") || "";
+    const isCustomDomain = !host.includes("fasturl.in") && !host.includes("localhost");
+    if (isCustomDomain) {
+        const url = req.nextUrl.clone();
+        return NextResponse.next();
+    }
+
+
+    const token = req.cookies.get("token")?.value;
+    const pathName = req.nextUrl.pathname;
 
     if(pathName.startsWith('/api/cronJobs')) {
         return NextResponse.next();
@@ -16,7 +24,7 @@ export async function proxy(request: NextRequest) {
     const isProtectedRoute = protectedRoutes.some(route => pathName.startsWith(route))
 
     if(isProtectedRoute && !token) {
-        const loginUrl = new URL('/auth/signin', request.url)
+        const loginUrl = new URL('/auth/signin', req.url)
         return NextResponse.redirect(loginUrl)
     }
 
@@ -26,6 +34,7 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
     matcher: [
+        '/((?!api|_next|favicon.ico).*)',
         '/urls/:path*',
         '/qr/:path*',
         '/analytics/:path*',
