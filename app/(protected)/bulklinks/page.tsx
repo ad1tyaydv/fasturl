@@ -459,9 +459,6 @@ export default function BulkCreateLinks() {
               <div className="mb-6 flex items-center justify-between shrink-0">
                 <div>
                   <h2 className="text-2xl font-one mb-2 text-white">Recent Bulk Links</h2>
-                  <p className="text-neutral-400 font-one text-sm">
-                    Top 5 links from your past uploads.
-                  </p>
                 </div>
               </div>
 

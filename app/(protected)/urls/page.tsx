@@ -8,7 +8,7 @@ import { Toaster, toast } from "react-hot-toast";
 
 import { HugeiconsIcon } from '@hugeicons/react';
 import { 
-  Globe02Icon, Share05Icon, Delete02Icon, QrCodeIcon, Edit03Icon, MagicWand01Icon,
+  Link04Icon, Share05Icon, Delete02Icon, QrCodeIcon, Edit03Icon, MagicWand01Icon,
   CircleLock01Icon, Search02Icon, CircleUnlock01Icon, CopyCheckIcon, Tick02Icon,
   CopyIcon 
 } from '@hugeicons/core-free-icons';
@@ -40,7 +40,7 @@ const getRelativeTime = (dateString?: string) => {
   return date.toLocaleDateString();
 };
 
-type ViewType = "links" | "bulk" | "qr";
+type ViewType = "links" | "bulk";
 
 function AllUrlsPageClient() {
   const router = useRouter();
@@ -48,7 +48,7 @@ function AllUrlsPageClient() {
   const searchParams = useSearchParams();
 
   const initialParam = searchParams.get("types") as ViewType;
-  const initialView = ["links", "bulk", "qr"].includes(initialParam) ? initialParam : "links";
+  const initialView = ["links", "bulk"].includes(initialParam) ? initialParam : "links";
   const [view, setView] = useState<ViewType>(initialView);
 
   const [data, setData] = useState<any[]>([]);
@@ -81,11 +81,6 @@ function AllUrlsPageClient() {
 
 
   const fetchData = useCallback(async () => {
-    if (view === "qr") {
-      setData([]);
-      setLoading(false);
-      return;
-    }
 
     try {
       setLoading(true);
@@ -251,7 +246,7 @@ function AllUrlsPageClient() {
       <div className="flex flex-col sm:flex-row flex-1 w-full max-w-[1600px] mx-auto overflow-hidden">
         
       <aside className="w-full sm:w-64 p-4 sm:p-8 sm:border-r border-neutral-800 flex flex-row sm:flex-col gap-2 overflow-x-auto sm:overflow-hidden border-b sm:border-b-0 shrink-0">
-          {["links", "bulk", "qr"].map((item) => (
+          {["links", "bulk"].map((item) => (
             <button
               key={item}
               onClick={() => handleViewChange(item as ViewType)}
@@ -267,7 +262,6 @@ function AllUrlsPageClient() {
             >
               {item === "links" && "Links"}
               {item === "bulk" && "Bulk Links"}
-              {item === "qr" && "QR Code"}
             </button>
           ))}
         </aside>
@@ -278,7 +272,6 @@ function AllUrlsPageClient() {
               <span className="text-white">
                 {view === "links" && "Saved URLs"}
                 {view === "bulk" && "Bulk Links"}
-                {view === "qr" && "QR Codes"}
               </span>
             </div>
             <span className="px-4 py-1.5 font-bold bg-[#1c1c1c] border border-neutral-700 rounded-lg text-sm">
@@ -304,11 +297,6 @@ function AllUrlsPageClient() {
 
           {loading ? (
             <SkeletonLoader />
-          ) : view === "qr" ? (
-            <div className="flex flex-col items-center justify-center py-32 text-neutral-500 fade-in">
-              <HugeiconsIcon icon={QrCodeIcon} size={64} className="mb-4 text-neutral-700" />
-              <p className="font-three text-lg">Your generated QR codes will appear here.</p>
-            </div>
           ) : (
             <div className="fade-in">
               {view === "links" ? (
@@ -317,7 +305,7 @@ function AllUrlsPageClient() {
                     <div key={url.id} className="flex items-center justify-between py-5 px-4 border-b border-neutral-800/60 hover:bg-[#1a1a1a] group transition-colors">
                       <div className="flex items-start gap-4 w-[40%] min-w-0 pr-4">
                         <div className="mt-1 w-8 h-8 rounded-full bg-neutral-800 flex items-center justify-center text-neutral-400 shrink-0">
-                          <HugeiconsIcon icon={Globe02Icon} />
+                          <HugeiconsIcon icon={Link04Icon} />
                         </div>
                         <div className="flex flex-col min-w-0 w-full">
                           {editingId === url.id ? (

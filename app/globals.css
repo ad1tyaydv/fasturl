@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+@plugin "daisyui";
 
 .font-one { font-family: "Boldonse", system-ui; font-weight: 400; }
 .font-two { font-family: "Alfa Slab One", serif; font-weight: 400; }

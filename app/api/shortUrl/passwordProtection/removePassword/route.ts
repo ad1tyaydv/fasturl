@@ -58,8 +58,8 @@ export async function POST(req: NextRequest) {
             hashedPassword = await bcrypt.hash(data.password, 10);
         }
 
-        const expiresAt = new Date(data.expiryDate);
-
+        const expiresAt = data.expiryDate ? new Date(data.expiryDate) : null;
+        
         await prisma.link.update({
             where: {
                 id: data.shortUrlId
@@ -76,6 +76,7 @@ export async function POST(req: NextRequest) {
         )
         
     } catch (error) {
+        console.log(error);
         return NextResponse.json(
             {message: "Error while adding password protection"},
             {status: 500}

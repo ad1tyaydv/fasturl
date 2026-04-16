@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
             hashedPassword = await bcrypt.hash(data.password, 10);
         }
 
-        const expiresAt = new Date(data.expiryDate);
+        const expiresAt = data.expiryDate ? new Date(data.expiryDate) : null;
 
         await prisma.link.update({
             where: {

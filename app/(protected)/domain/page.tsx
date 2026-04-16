@@ -55,7 +55,7 @@ export default function DomainsPage() {
 
   const handleVerify = async (e: React.MouseEvent, domainName: string) => {
     e.stopPropagation();
-    console.log("Sending domain:", domainName); // add this
+    console.log("Sending domain:", domainName);
 
     try {
       setVerifyingId(domainName);

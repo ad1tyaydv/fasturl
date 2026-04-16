@@ -57,7 +57,7 @@ export function DomainDropdown({ selectedDomain, onSelect, defaultDomain }: Doma
   };
 
 
-  const displayDomain = selectedDomain.replace(/^https?:\/\//, "");
+  const displayDomain = (selectedDomain ?? "").replace(/^https?:\/\//, "");
   const itemClasses = "flex items-center justify-between text-white focus:text-white cursor-pointer transition-colors duration-200";
 
   
