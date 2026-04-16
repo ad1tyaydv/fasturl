@@ -154,19 +154,13 @@ export default function AnalyticsPage() {
 
       <div className="flex flex-1 overflow-hidden">
         {loading ? (
-          <div className="flex flex-1 items-center justify-center bg-black">
+          <div className="flex flex-1 items-center justify-center bg-[#141414]">
             <Loader2 className="animate-spin text-blue-500 w-8 h-8" />
           </div>
         ) : (
           <>
-            <aside className="w-80 border-r border-neutral-900 flex flex-col bg-black shrink-0">
+            <aside className="w-80 border-r border-neutral-900 flex flex-col bg-[#141414] shrink-0">
               <div className="p-6 space-y-4">
-                <div>
-                  <h2 className="text-xl font-semibold tracking-tight">Your Links</h2>
-                  <p className="text-[11px] text-neutral-500 uppercase tracking-widest mt-1">
-                    {filteredUrls.length} links found
-                  </p>
-                </div>
 
                 <div className="relative group">
                   <HugeiconsIcon icon={Search01Icon} className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500 group-focus-within:text-blue-500 transition-colors" />
@@ -202,7 +196,7 @@ export default function AnalyticsPage() {
               </div>
             </aside>
 
-            <main className="flex-1 overflow-y-auto bg-[#050505]">
+            <main className="flex-1 overflow-y-auto bg-[#141414]">
               {!selectedLink ? (
                 <div className="h-full flex flex-col items-center justify-center text-neutral-600">
                   <HugeiconsIcon icon={AnalyticsUpIcon} size={40} />

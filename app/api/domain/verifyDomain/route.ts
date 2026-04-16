@@ -47,9 +47,12 @@ export async function POST(req: NextRequest) {
         try {
 
             console.log("Checking TXT for:", domainData.domain);
-            
-            const records = await resolver.resolveTxt(domainData.domain);
 
+            const txtHost = `${domainData.txtName}.${domainData.domain}`;
+
+            console.log("Checking TXT for:", txtHost);
+
+            const records = await resolver.resolveTxt(txtHost);
             console.log("Actual DNS Records found:", JSON.stringify(records));
 
             txtRecords = records.flat();
@@ -92,8 +95,81 @@ export async function POST(req: NextRequest) {
 
         }
 
-        // If TXT verified → Activate Domain
-        if (isTxtValid) {
+
+        let isCnameValid = false;
+        let cnameRecords: string[] = [];
+
+        try {
+
+            const cnameHost = subDomain ? `${subDomain}.${rootDomain}` : rootDomain;
+
+            console.log("Checking CNAME for:", cnameHost);
+
+            const records = await resolver.resolveCname(cnameHost);
+
+            console.log("CNAME Records:", records);
+
+            cnameRecords = records;
+
+            isCnameValid = cnameRecords.includes(domainData.cnameTarget!);
+
+            console.log("CNAME match found?", isCnameValid);
+
+            await prisma.customDomain.update({
+                where: {
+                    domain_subDomain: {
+                        domain: rootDomain,
+                        subDomain: subDomain
+                    }
+                },
+                data: {
+                    cnameVerfied: isCnameValid
+                }
+            });
+
+        } catch (error) {
+
+            console.log("CNAME lookup error:", error);
+
+            await prisma.customDomain.update({
+                where: {
+                    domain_subDomain: {
+                        domain: rootDomain,
+                        subDomain: subDomain
+                    }
+                },
+                data: {
+                    cnameVerfied: false
+                }
+            });
+
+        }
+
+        if (isTxtValid && isCnameValid) {
+
+            try {
+
+                const response = await fetch(
+                    `https://api.vercel.com/v10/projects/${process.env.VERCEL_PROJECT_ID}/domains`,
+                    {
+                        method: "POST",
+                        headers: {
+                            Authorization: `Bearer ${process.env.VERCEL_TOKEN}`,
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            name: fullDomain
+                        }),
+                    }
+                );
+
+                const data = await response.json();
+
+                console.log("Vercel domain response:", data);
+
+            } catch (error) {
+                console.log("Error adding domain to Vercel:", error);
+            }
 
             await prisma.customDomain.update({
                 where: {

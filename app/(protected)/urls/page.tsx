@@ -7,10 +7,10 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Toaster, toast } from "react-hot-toast";
 
 import { HugeiconsIcon } from '@hugeicons/react';
-import { 
-  Link04Icon, Share05Icon, Delete02Icon, QrCodeIcon, Edit03Icon, MagicWand01Icon,
+import {
+  Share05Icon, Delete02Icon, QrCodeIcon, Edit03Icon, MagicWand01Icon,
   CircleLock01Icon, Search02Icon, CircleUnlock01Icon, CopyCheckIcon, Tick02Icon,
-  CopyIcon 
+  CopyIcon, ArrowLeft01Icon, ArrowRight01Icon, Link04Icon
 } from '@hugeicons/core-free-icons';
 
 import Navbar from "../../components/navbar";
@@ -159,7 +159,7 @@ function AllUrlsPageClient() {
 
     } catch {
       toast.error("Update failed");
-      
+
     } finally {
       setIsSavingName(false);
       setEditingId(null);
@@ -191,17 +191,25 @@ function AllUrlsPageClient() {
 
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
-      result = result.filter((item) =>
-        view === "links"
-          ? item.linkName?.toLowerCase().includes(q) || item.shorturl?.toLowerCase().includes(q)
-          : (item.name || "Bulk link").toLowerCase().includes(q)
-      );
+      result = result.filter((item) => {
+        const query = q;
+
+        if (view === "links") {
+          return (
+            item.linkName?.toLowerCase().includes(query) ||
+            item.shorturl?.toLowerCase().includes(query) ||
+            item.original?.toLowerCase().includes(query)
+          );
+        }
+
+        return (item.name || "Bulk link").toLowerCase().includes(query);
+      });
     }
 
     const now = new Date();
     if (statusFilter === "protected") {
       result = result.filter((item) => !!item.password);
-      
+
     } else if (statusFilter === "today") {
       result = result.filter(
         (item) => new Date(item.createdAt).toDateString() === now.toDateString()
@@ -244,8 +252,8 @@ function AllUrlsPageClient() {
       <Navbar />
 
       <div className="flex flex-col sm:flex-row flex-1 w-full max-w-[1600px] mx-auto overflow-hidden">
-        
-      <aside className="w-full sm:w-64 p-4 sm:p-8 sm:border-r border-neutral-800 flex flex-row sm:flex-col gap-2 overflow-x-auto sm:overflow-hidden border-b sm:border-b-0 shrink-0">
+
+        <aside className="w-full sm:w-64 p-4 sm:p-8 sm:border-r border-neutral-800 flex flex-row sm:flex-col gap-2 overflow-x-auto sm:overflow-hidden border-b sm:border-b-0 shrink-0">
           {["links", "bulk"].map((item) => (
             <button
               key={item}
@@ -253,10 +261,9 @@ function AllUrlsPageClient() {
               className={`
                 text-left px-4 py-2.5 rounded-lg font-three transition-colors whitespace-nowrap 
                 cursor-pointer text-lg sm:text-xl
-                ${
-                  view === item
-                    ? "bg-neutral-800 text-white"
-                    : "text-neutral-500 hover:text-white hover:bg-neutral-800/50"
+                ${view === item
+                  ? "bg-neutral-800 text-white"
+                  : "text-neutral-500 hover:text-white hover:bg-neutral-800/50"
                 }
               `}
             >
@@ -283,12 +290,12 @@ function AllUrlsPageClient() {
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 mt-2">
               <div className="relative w-full sm:w-[400px]">
                 <HugeiconsIcon icon={Search02Icon} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500" />
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   placeholder="Search links..."
-                  className="w-full pl-10 pr-3 py-3 bg-[#111111] font-three border border-neutral-800 rounded-lg text-white text-sm outline-none focus:border-neutral-600 transition-all" 
+                  className="w-full pl-10 pr-3 py-3 bg-[#111111] font-three border border-neutral-800 rounded-lg text-white text-sm outline-none focus:border-neutral-600 transition-all"
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)} 
+                  onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
               <FilterDropDown value={statusFilter} onChange={(val: FilterType) => setStatusFilter(val)} />
@@ -304,22 +311,22 @@ function AllUrlsPageClient() {
                   {paginatedData.map((url: any) => (
                     <div key={url.id} className="flex items-center justify-between py-5 px-4 border-b border-neutral-800/60 hover:bg-[#1a1a1a] group transition-colors">
                       <div className="flex items-start gap-4 w-[40%] min-w-0 pr-4">
-                        <div className="mt-1 w-8 h-8 rounded-full bg-neutral-800 flex items-center justify-center text-neutral-400 shrink-0">
+                        <div className="mt-1 w-8 h-8 rounded-full bg-neutral-800 flex items-center justify-center text-neutral-400 shrink-0" >
                           <HugeiconsIcon icon={Link04Icon} />
                         </div>
                         <div className="flex flex-col min-w-0 w-full">
                           {editingId === url.id ? (
                             <div className="flex items-center gap-2">
-                              <input 
-                                autoFocus 
-                                className="bg-[#111111] border border-neutral-700 rounded px-2 py-1 text-white w-full outline-none" 
-                                value={tempName} 
-                                onChange={(e) => setTempName(e.target.value)} 
-                                onKeyDown={(e) => e.key === "Enter" && !isSavingName && saveName(url.id)} 
+                              <input
+                                autoFocus
+                                className="bg-[#111111] border border-neutral-700 rounded px-2 py-1 text-white w-full outline-none"
+                                value={tempName}
+                                onChange={(e) => setTempName(e.target.value)}
+                                onKeyDown={(e) => e.key === "Enter" && !isSavingName && saveName(url.id)}
                                 disabled={isSavingName}
                               />
-                              <button 
-                                onClick={() => saveName(url.id)} 
+                              <button
+                                onClick={() => saveName(url.id)}
                                 disabled={isSavingName}
                                 className={`text-green-500 transition-opacity ${isSavingName ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'}`}
                               >
@@ -369,14 +376,13 @@ function AllUrlsPageClient() {
                         <button onClick={() => { setEditingId(url.id); setTempName(url.linkName || ""); }} className="hover:text-white p-2 cursor-pointer">
                           <HugeiconsIcon icon={Edit03Icon} />
                         </button>
-                        <button 
-                          onClick={() => handleLinkDelete(url)} 
+                        <button
+                          onClick={() => handleLinkDelete(url)}
                           disabled={deletingId === url.id}
-                          className={`p-2 transition-opacity ${
-                            deletingId === url.id 
-                              ? 'text-red-500 cursor-not-allowed opacity-70' 
-                              : 'hover:text-red-500 cursor-pointer'
-                          }`}
+                          className={`p-2 transition-opacity ${deletingId === url.id
+                            ? 'text-red-500 cursor-not-allowed opacity-70'
+                            : 'hover:text-red-500 cursor-pointer'
+                            }`}
                         >
                           {deletingId === url.id ? (
                             <div className="w-[20px] h-[20px] border-2 border-red-500 border-t-transparent rounded-full animate-spin"></div>
@@ -404,22 +410,65 @@ function AllUrlsPageClient() {
               )}
 
               {totalPages > 1 && (
-                <div className="flex justify-center items-center gap-4 mt-8 pb-10">
+                <div className="flex justify-center items-center gap-2 mt-8 pb-10 flex-wrap">
+
                   <button
                     disabled={currentPage === 1}
                     onClick={() => setCurrentPage((prev) => prev - 1)}
-                    className="p-2 rounded-lg bg-neutral-800 disabled:opacity-40"
+                    className="join-item btn btn-outline bg-neutral-900 border-neutral-700 text-white hover:bg-neutral-800 disabled:opacity-40"
                   >
-                    <ChevronLeft size={18} />
+                    <HugeiconsIcon icon={ArrowLeft01Icon} /> Prev
                   </button>
-                  <span>{currentPage} / {totalPages}</span>
+
+                  {(() => {
+                    const pages = [];
+
+                    for (let i = 1; i <= totalPages; i++) {
+                      if (
+                        i === 1 ||
+                        i === totalPages ||
+                        (i >= currentPage - 2 && i <= currentPage + 2)
+                      ) {
+                        pages.push(i);
+                      } else if (
+                        i === currentPage - 3 ||
+                        i === currentPage + 3
+                      ) {
+                        pages.push("...");
+                      }
+                    }
+
+                    return pages.map((page, index) =>
+                      page === "..." ? (
+                        <span
+                          key={index}
+                          className="px-2 text-neutral-500"
+                        >
+                          ...
+                        </span>
+                      ) : (
+                        <button
+                          key={page}
+                          onClick={() => setCurrentPage(Number(page))}
+                          className={`btn btn-square ${currentPage === page
+                            ? "bg-white text-black"
+                            : "bg-neutral-900 border-neutral-700 text-white hover:bg-neutral-800"
+                            }`}
+                        >
+                          {page}
+                        </button>
+                      )
+                    );
+                  })()}
+
                   <button
                     disabled={currentPage === totalPages}
                     onClick={() => setCurrentPage((prev) => prev + 1)}
-                    className="p-2 rounded-lg bg-neutral-800 disabled:opacity-40"
+                    className="join-item btn btn-outline bg-neutral-900 border-neutral-700 text-white hover:bg-neutral-800 disabled:opacity-40"
                   >
-                    <ChevronRight size={18} />
+                    Next <HugeiconsIcon icon={ArrowRight01Icon} />
                   </button>
+
                 </div>
               )}
             </div>
@@ -429,7 +478,7 @@ function AllUrlsPageClient() {
 
       <QRCodeModal isOpen={isQrModalOpen} onClose={() => setIsQrModalOpen(false)} selectedUrl={selectedLink} />
       <PasswordProtectionModal isOpen={isPasswordModalOpen} onClose={() => setIsPasswordModalOpen(false)} selectedUrl={selectedLink} onSuccess={fetchData} />
-      <CustomUrlModal isOpen={isCustomModalOpen} onClose={() => setIsCustomModalOpen(false)} selectedUrl={selectedLink} onSuccess={fetchData}/>
+      <CustomUrlModal isOpen={isCustomModalOpen} onClose={() => setIsCustomModalOpen(false)} selectedUrl={selectedLink} onSuccess={fetchData} />
     </div>
   );
 }

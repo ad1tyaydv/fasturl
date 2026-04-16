@@ -9,7 +9,7 @@ import axios from "axios";
 import { useState } from "react";
 
 
-export default function PricingSection() {
+export default function Premium() {
   const router = useRouter();
 
   const [tier, setTier] = useState("FREE");

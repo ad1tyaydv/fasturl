@@ -86,7 +86,10 @@ export default function DomainsPage() {
   const handleAddDomain = async (domainName: string) => {
     try {
       setIsAdding(true);
-      await axios.post("/api/domain/addDomain", { domain: domainName });
+      await axios.post("/api/domain/addDomain", {
+        domain: domainName
+      });
+
       toast.success("Domain added successfully");
       await fetchDomains();
 
@@ -198,7 +201,7 @@ export default function DomainsPage() {
                       </div>
                       <div>
                         <div className="flex items-center gap-3">
-                          <h3 className="font-one text-lg">{item.domain}</h3>
+                          <h3 className="font-one text-lg">{item.subDomain}.{item.domain}</h3>
                           {item.isActive ? (
                             <span className="flex items-center gap-1 text-[10px] bg-emerald-500/10 text-emerald-500 px-2 py-0.5 rounded-full border border-emerald-500/20 font-bold uppercase">
                               <ShieldCheck className="w-3 h-3" /> Verified
@@ -262,10 +265,10 @@ export default function DomainsPage() {
                       <div className="space-y-2">
                         <label className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">Routing (CNAME Record)</label>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                          <div onClick={() => handleCopy("CNAME / www", "CNAME Host")} className="flex items-center justify-between bg-[#141414] p-3 rounded-lg border border-neutral-800 cursor-pointer hover:bg-neutral-900 group/item">
+                          <div onClick={() => handleCopy(item.subdomain, "CNAME Host")} className="flex items-center justify-between bg-[#141414] p-3 rounded-lg border border-neutral-800 cursor-pointer hover:bg-neutral-900 group/item">
                             <div className="flex flex-col">
                               <span className="text-[9px] text-neutral-500 uppercase font-bold">Type / Host</span>
-                              <span className="text-sm font-three text-neutral-300">CNAME / www</span>
+                              <span className="text-sm font-three text-neutral-300">CNAME / {item.subDomain}</span>
                             </div>
                             {copiedField === "CNAME Host" ? <HugeiconsIcon icon={CopyCheckIcon} className="text-emerald-500 w-4 h-4" /> : <HugeiconsIcon icon={CopyIcon} className="w-4 h-4 text-neutral-600" />}
                           </div>

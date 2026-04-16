@@ -76,7 +76,7 @@ export default function ConnectDomainModal({
         <div className="space-y-4">
           <div>
             <label className="text-[11px] font-bold text-neutral-500 uppercase tracking-widest mb-2 block">
-              Domain Name
+              SubDomain Name
             </label>
             <Input
               placeholder="e.g. links.mybrand.com"
@@ -91,7 +91,7 @@ export default function ConnectDomainModal({
               <HugeiconsIcon icon={Alert02Icon} /> Instructions
             </h4>
             <p className="text-xs text-neutral-500 leading-relaxed">
-              Enter the domain or subdomain you want to use. After adding, you'll need to point your DNS <b>CNAME</b> record to our servers.
+              Enter the subdomain you want to use. After adding, you'll need to point your DNS <b>TXT</b> and <b>CNAME</b> record to our servers.
             </p>
           </div>
         </div>

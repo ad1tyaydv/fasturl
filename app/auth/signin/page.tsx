@@ -45,17 +45,18 @@ export default function Login() {
 
       const loggedInUser = res.data.user;
 
-      if (loggedInUser) {
-        localStorage.setItem("user", loggedInUser.plan);
-      }
-
-      setUser(loggedInUser);
-      toast.success("Welcome back!", { id: loginToast });
-
       if (loggedInUser.twofactorEnabled) {
         setShow2FA(true);
+        toast.success("Enter OTP to continue", { id: loginToast });
 
       } else {
+        setUser(loggedInUser);
+
+        if (loggedInUser) {
+          localStorage.setItem("user", loggedInUser.plan);
+        }
+
+        toast.success("Welcome back!", { id: loginToast });
         router.push("/");
       }
 
@@ -114,15 +115,21 @@ export default function Login() {
       });
 
       if (res.status === 200 && res.data.success) {
+
+        const loggedInUser = res.data.user;
+
+        setUser(loggedInUser);
+
+        if (loggedInUser) {
+          localStorage.setItem("user", loggedInUser.plan);
+        }
+
         toast.success("OTP verified successfully!", { id: verifyToast });
-        
-        await new Promise(resolve => setTimeout(resolve, 1000));
+
         router.push("/");
-        return;
       }
 
     } catch (error: any) {
-      console.error("2FA Error:", error);
       toast.error(error.response?.data?.message || "Invalid OTP", {
         id: verifyToast,
       });

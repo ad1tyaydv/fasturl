@@ -6,7 +6,7 @@ import { useEffect, useState, useRef } from "react";
 import { IoCloseOutline } from "react-icons/io5";
 
 import { HugeiconsIcon } from '@hugeicons/react';
-import { 
+import {
   QrCodeIcon, CopyIcon, Refresh04Icon, Download01Icon, CopyCheckIcon, ArrowRightDoubleIcon
 } from '@hugeicons/core-free-icons';
 
@@ -40,7 +40,7 @@ export default function Dashboard() {
 
   const [authLoading, setAuthLoading] = useState(true);
   const [isLoadingQr, setIsLoadingQr] = useState(false);
-  
+
   const [selectedDomain, setSelectedDomain] = useState(NEXT_DOMAIN);
 
   const [modalConfig, setModalConfig] = useState<{
@@ -80,35 +80,35 @@ export default function Dashboard() {
     if (!originalUrl) return;
     try {
       setLoading(true);
-      const res = await axios.post("/api/shortUrl", { 
+      const res = await axios.post("/api/shortUrl", {
         url: originalUrl,
         customDomain: selectedDomain !== NEXT_DOMAIN ? selectedDomain : null
       });
-      
+
       const generatedShortUrl = res.data.shortUrl;
       setShortUrl(generatedShortUrl);
       setUrl(`${selectedDomain}/${generatedShortUrl}`);
-      
-    } catch (error: any) {
-        if (error.response?.status === 401) {
-          if (!isLoggedIn) {
-            setModalConfig({
-              show: true,
-              title: "Limit Reached",
-              description: "Login to generate more links and access custom domains.",
-              buttonText: "Login Now",
-              action: () => router.push("/auth/signin"),
-            });
-          } else {
-            setUpgradeMsg(true);
-            pricingRef.current?.scrollIntoView({ behavior: "smooth" });
-            setTimeout(() => setUpgradeMsg(false), 3000);
-          }
-        } else if (error.response?.status === 430) {
-          toast.error("Too many requests under 1 minute, Please try again later");
-        }
 
-      } finally {
+    } catch (error: any) {
+      if (error.response?.status === 401) {
+        if (!isLoggedIn) {
+          setModalConfig({
+            show: true,
+            title: "Limit Reached",
+            description: "Login to generate more links and access custom domains.",
+            buttonText: "Login Now",
+            action: () => router.push("/auth/signin"),
+          });
+        } else {
+          setUpgradeMsg(true);
+          pricingRef.current?.scrollIntoView({ behavior: "smooth" });
+          setTimeout(() => setUpgradeMsg(false), 3000);
+        }
+      } else if (error.response?.status === 430) {
+        toast.error("Too many requests under 1 minute, Please try again later");
+      }
+
+    } finally {
       setLoading(false);
     }
   };
@@ -148,7 +148,7 @@ export default function Dashboard() {
   const copyToClipboard = () => {
     navigator.clipboard.writeText(url);
     setCopied(true);
-    
+
     setTimeout(() => setCopied(false), 1000);
   };
 
@@ -159,7 +159,7 @@ export default function Dashboard() {
     setShowQr(false);
   };
 
-  
+
   return (
     <div className="min-h-screen bg-[#141414] text-white relative transition-colors duration-300 overflow-x-hidden selection:bg-blue-500/30">
       <Navbar />
@@ -181,39 +181,39 @@ export default function Dashboard() {
         </div>
       )}
 
-        <section className="max-w-7xl mx-auto px-6 pt-16 pb-20">
-          <div className="flex flex-col lg:flex-row items-start justify-between gap-12 lg:gap-20">
-            
-            <div className="flex-1 text-center lg:text-left lg:pt-6">
-              <h1 className="text-3xl sm:text-3xl md:text-5xl font-bold mb-6 text-white leading-tight font-one tracking-tight">
-                Shorten Your <span className="text-red-500">Links</span> Instantly
-              </h1>
-              
-              <p className="font-one text-lg text-neutral-400 max-w-lg mx-auto lg:mx-0 mb-4">
-                Transform long URLs into brandable short links with analytics, custom domains, and QR codes. 
-              </p>
-              
-              <p className="font-one text-lg text-neutral-400 max-w-lg mx-auto lg:mx-0 mb-8">
-                Share links, Generate QR Codes, view analytics and more than just a URL shortener.
-              </p>
+      <section className="max-w-7xl mx-auto px-6 pt-16 pb-20">
+        <div className="flex flex-col lg:flex-row items-start justify-between gap-12 lg:gap-20">
 
-              <div className="flex justify-center lg:justify-start">
-                <Button
-                  onClick={() => router.push("/premium")}
-                  className="px-5 py-5 font-bold bg-white text-black transition-all duration-300 flex items-center gap-2 group cursor-pointer"
-                >
-                  View Plans
-                  <span className="group-hover:translate-x-1 transition-transform"><HugeiconsIcon icon={ArrowRightDoubleIcon} /></span>
-                </Button>
-                
-              </div>
+          <div className="flex-1 text-center lg:text-left lg:pt-6">
+            <h1 className="text-3xl sm:text-3xl md:text-5xl font-bold mb-6 text-white leading-tight font-one tracking-tight">
+              Shorten Your <span className="text-red-500">Links</span> Instantly
+            </h1>
+
+            <p className="font-one text-lg text-neutral-400 max-w-lg mx-auto lg:mx-0 mb-4">
+              Transform long URLs into brandable short links with analytics, custom domains, and QR codes.
+            </p>
+
+            <p className="font-one text-lg text-neutral-400 max-w-lg mx-auto lg:mx-0 mb-8">
+              Share links, Generate QR Codes, view analytics and more than just a URL shortener.
+            </p>
+
+            <div className="flex justify-center lg:justify-start">
+              <Button
+                onClick={() => router.push("/premium")}
+                className="px-5 py-5 font-bold bg-white text-black transition-all duration-300 flex items-center gap-2 group cursor-pointer"
+              >
+                View Plans
+                <span className="group-hover:translate-x-1 transition-transform"><HugeiconsIcon icon={ArrowRightDoubleIcon} /></span>
+              </Button>
+
             </div>
+          </div>
 
           <div className="flex-1 w-full max-w-xl">
             <div className="flex justify-start mb-4">
-              <DomainDropdown 
-                selectedDomain={selectedDomain} 
-                onSelect={setSelectedDomain} 
+              <DomainDropdown
+                selectedDomain={selectedDomain}
+                onSelect={setSelectedDomain}
                 defaultDomain={NEXT_DOMAIN}
               />
             </div>
@@ -232,11 +232,10 @@ export default function Dashboard() {
                   <button onClick={handleGenerateQr} className={`px-4 sm:px-5 py-3 bg-[#2a2a2a] rounded-xl flex items-center justify-center cursor-pointer transition-colors ${showQr ? 'text-white shadow-lg' : 'bg-[#2a2a2a] text-white hover:bg-[#333333]'}`}>
                     <HugeiconsIcon icon={QrCodeIcon} />
                   </button>
-                  <button 
-                    onClick={copyToClipboard} 
-                    className={`flex-1 sm:flex-none px-4 sm:px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 cursor-pointer transition-all duration-300 ${
-                      copied ? "bg-green-600 text-white" : "bg-[#2a2a2a] text-white hover:bg-[#333333]"
-                    }`}
+                  <button
+                    onClick={copyToClipboard}
+                    className={`flex-1 sm:flex-none px-4 sm:px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 cursor-pointer transition-all duration-300 ${copied ? "bg-green-600 text-white" : "bg-[#2a2a2a] text-white hover:bg-[#333333]"
+                      }`}
                   >
                     {copied ? (
                       <>
@@ -253,9 +252,9 @@ export default function Dashboard() {
                   </button>
                 </div>
               ) : (
-                <button 
-                  onClick={() => handleShortUrl(url)} 
-                  disabled={loading || !url} 
+                <button
+                  onClick={() => handleShortUrl(url)}
+                  disabled={loading || !url}
                   className="w-full sm:w-auto px-6 sm:px-10 py-3 bg-white text-black disabled:opacity-50 font-bold text-lg cursor-pointer hover:bg-gray-200 transition-all rounded-xl shadow-lg shadow-white/5"
                 >
                   {loading ? <div className="w-6 h-6 border-2 border-black border-t-transparent rounded-full animate-spin mx-auto"></div> : "Shorten"}
@@ -280,25 +279,34 @@ export default function Dashboard() {
                 {isLoadingQr ? (
                   <div className="flex flex-col items-center justify-center h-[200px]">
                     <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                    <p className="mt-4 text-sm font-medium text-neutral-400 animate-pulse font-one">Generating your QR...</p>
+                    <p className="mt-4 text-sm font-medium text-neutral-400 animate-pulse font-one">
+                      Generating your QR...
+                    </p>
                   </div>
                 ) : showQr && typeof showQr === "string" ? (
                   <div className="flex flex-col items-center animate-in fade-in zoom-in duration-500">
-                    <div className="bg-white p-4 rounded-2xl shadow-2xl border border-neutral-200">
-                      <img src={showQr} alt="QR Code" className="w-44 h-44 object-contain" />
+
+                    <div className="bg-white p-1 rounded-md">
+                      <img
+                        src={showQr}
+                        alt="QR Code"
+                        className="w-44 h-44 object-contain"
+                      />
                     </div>
-                    <button 
+
+                    <button
                       onClick={() => {
                         const link = document.createElement("a");
                         link.href = showQr;
                         link.download = `qrcode-${shortUrl}.png`;
                         link.click();
                       }}
-                      className="mt-6 flex items-center gap-2 px-6 py-2.5 bg-white rounded text-black text-xs font-bold hover:bg-gray-200 transition-all font-one"
+                      className="mt-6 flex items-center gap-2 px-6 py-2.5 bg-white rounded-md text-black text-xs font-bold hover:bg-gray-200 transition-all font-one"
                     >
                       <HugeiconsIcon icon={Download01Icon} size={16} />
                       DOWNLOAD QR
                     </button>
+
                   </div>
                 ) : (
                   <div className="h-[200px] w-full hidden lg:block"></div>
@@ -317,7 +325,7 @@ export default function Dashboard() {
           </div>
         </div>
       </section>
-      
+
 
       <FasturlFeatures isLoggedIn={isLoggedIn} userPlan={userPlan} />
       <div className="w-full h-px bg-neutral-800/50 my-12 shadow-sm"></div>
@@ -326,8 +334,13 @@ export default function Dashboard() {
       <FaqSection />
 
       {copied && (
-        <div className="fixed font-one top-24 left-1/2 -translate-x-1/2 px-6 py-3 shadow-2xl z-[100] bg-green-600 text-white font-bold rounded-full animate-in fade-in slide-in-from-top-6 duration-300">
-          ✓ URL Copied to Clipboard
+        <div className="fixed font-one top-24 left-1/2 -translate-x-1/2 px-6 py-3 shadow-2xl z-[100] text-white font-bold rounded-full animate-in fade-in slide-in-from-top-6 duration-300">
+          <div role="alert" className="alert alert-success">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 shrink-0 stroke-current" fill="none" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>Link copied successfully!</span>
+          </div>
         </div>
       )}
 
