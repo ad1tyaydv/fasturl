@@ -27,6 +27,7 @@ export async function GET(req: NextRequest) {
             },
             select: {
                 userName: true,
+                image: true,
                 email: true,
                 plan: true,
                 planExpiresAt: true,
@@ -80,6 +81,7 @@ export async function GET(req: NextRequest) {
             planExpiresAt: planExpiresAt,
             twofactorEnabled: checkPlan.twofactorEnabled,
             totalLinks: checkPlan._count.links,
+            image: checkPlan.image,
             bulkLinks: checkPlan._count.bulkLinks,
             totalQrCodes: checkPlan._count.qr,
             isActive: isActive,

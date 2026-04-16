@@ -1,17 +1,13 @@
 "use client";
 import { useRouter, usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
 import { useUser } from "./userContext";
-import axios from "axios";
 import { UserAccountNav } from "../dropDown/navbarDropDown";
+import axios from "axios";
 
 export default function Navbar() {
   const router = useRouter();
   const { user, setUser } = useUser();
   const pathname = usePathname();
-
-  const [tier, setTier] = useState<string>("FREE");
-  const [authenticated, setAuthenticated] = useState(false);
 
   const menuItems = [
     { name: "Dashboard", path: "/" },
@@ -25,49 +21,41 @@ export default function Navbar() {
     { name: "Settings", path: "/settings/profile" },
   ];
 
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const res = await axios.get("/api/auth/me");
-
-        if (res.data?.authenticated) {
-          setAuthenticated(true);
-          setUser(res.data.user);
-
-          if (res.data?.plan) {
-            setTier(res.data.plan);
-          }
-        } else {
-          setAuthenticated(false);
-        }
-
-      } catch {
-        setAuthenticated(false);
-      }
-    };
-    fetchUser();
-
-  }, [setUser]);
-
-
+  const tier = user?.plan ?? "FREE";
   const isPaid = tier !== "FREE" && tier !== "";
+  const avatarUrl = user?.image ?? null;
 
-
+  
   const handleLogout = async () => {
     try {
       await axios.post("/api/auth/logout");
       setUser(null);
-      setAuthenticated(false);
-
       localStorage.removeItem("user");
       localStorage.removeItem("plan");
+      localStorage.removeItem("avatar");
       localStorage.removeItem("linksLeft_cache");
 
     } catch (error) {
       console.error("Logout failed", error);
     }
   };
+
+
+  const avatarTrigger = (
+    <div className="w-9 h-9 rounded-full overflow-hidden bg-[#1e1e1e] border border-white/10 flex items-center justify-center shrink-0 cursor-pointer hover:ring-2 hover:ring-white/20 transition-all">
+      {avatarUrl ? (
+        <img
+          src={avatarUrl}
+          alt="Avatar"
+          className="w-full h-full object-cover cursor-pointer"
+        />
+      ) : (
+        <span className="text-white/40 text-xs font-bold">
+          {user?.userName?.[0]?.toUpperCase() ?? "?"}
+        </span>
+      )}
+    </div>
+  );
 
 
   return (
@@ -83,7 +71,6 @@ export default function Navbar() {
         <div className="hidden lg:flex items-center gap-1">
           {menuItems.map((item) => {
             const isActive = pathname === item.path;
-
             return (
               <button
                 key={item.path}
@@ -102,7 +89,7 @@ export default function Navbar() {
       </div>
 
       <div className="flex items-center gap-6 sm:mr-12 lg:mr-16">
-        {authenticated && (
+        {user && (
           <>
             <div className="relative flex flex-col items-center">
               <button
@@ -118,11 +105,15 @@ export default function Navbar() {
               </button>
             </div>
 
-            <UserAccountNav user={user} onLogout={handleLogout} />
+            <UserAccountNav
+              user={user}
+              onLogout={handleLogout}
+              trigger={avatarTrigger}
+            />
           </>
         )}
 
-        {!authenticated && (
+        {!user && (
           <button
             onClick={() => router.push("/auth/signin")}
             className="bg-white text-black hover:bg-gray-200 px-8 py-2.5 rounded-lg transition-all cursor-pointer font-three text-sm font-semibold shadow-sm"

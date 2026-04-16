@@ -10,12 +10,12 @@ export default function TotalData() {
   useEffect(() => {
     const fetchUserStats = async () => {
       try {
-        const res = await axios.get("/api/totalData");
+        const res = await axios.post("/api/totalData");
         setStats({
           links: res.data.totalLinks || 0,
           qr: res.data.totalqrCodes || 0,
           clicks: res.data.totalClicks || 0,
-          customers: res.data.totalUsers || 1300000 
+          customers: res.data.totalUsers || 0 
         });
         
       } catch (e) {

@@ -197,16 +197,18 @@ export default function Dashboard() {
               Share links, Generate QR Codes, view analytics and more than just a URL shortener.
             </p>
 
-            <div className="flex justify-center lg:justify-start">
-              <Button
-                onClick={() => router.push("/premium")}
-                className="px-5 py-5 font-bold bg-white text-black transition-all duration-300 flex items-center gap-2 group cursor-pointer"
-              >
-                View Plans
-                <span className="group-hover:translate-x-1 transition-transform"><HugeiconsIcon icon={ArrowRightDoubleIcon} /></span>
-              </Button>
+            {userPlan === "FREE" && (
+              <div className="flex justify-center lg:justify-start">
+                <Button
+                  onClick={() => router.push("/premium")}
+                  className="px-5 py-5 font-bold bg-white text-black transition-all duration-300 flex items-center gap-2 group cursor-pointer"
+                >
+                  View Plans
+                  <span className="group-hover:translate-x-1 transition-transform"><HugeiconsIcon icon={ArrowRightDoubleIcon} /></span>
+                </Button>
+              </div>
+            )}
 
-            </div>
           </div>
 
           <div className="flex-1 w-full max-w-xl">
