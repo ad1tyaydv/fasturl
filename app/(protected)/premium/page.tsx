@@ -1,6 +1,6 @@
 "use client";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Navbar from "../../components/navbar";
 import Premium from "@/app/components/premium";
@@ -28,14 +28,14 @@ const TIER_META: Record<
   },
 };
 
-export default function PremiumPage() {
+function PremiumPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const tabFromUrl = (searchParams.get("tab") as SidebarTab) ?? "Subscription";
   const [activeTab, setActiveTab] = useState<SidebarTab>(tabFromUrl);
 
-  const [userTier, setUserTier] = useState<UserTier>("free"); 
+  const [userTier, setUserTier] = useState<UserTier>("free");
 
   const [timeLeft, setTimeLeft] = useState({
     days: 15,
@@ -44,13 +44,11 @@ export default function PremiumPage() {
     seconds: 59,
   });
 
-  // Sync tab from URL on param change
   useEffect(() => {
     const t = searchParams.get("tab") as SidebarTab;
     if (t) setActiveTab(t);
   }, [searchParams]);
 
-  // Countdown timer — only runs when on Expires tab
   useEffect(() => {
     if (activeTab !== "Expires") return;
     const interval = setInterval(() => {
@@ -90,13 +88,9 @@ export default function PremiumPage() {
           {/* ── Sidebar ───────────────────────────────────────────── */}
           <aside className="w-52 shrink-0 self-stretch border-r border-white/10">
             <div className="sticky top-24 pt-2 flex flex-col gap-0">
-
-              {/* Section label */}
               <p className="px-6 pb-3 text-[11px] font-semibold uppercase tracking-widest text-white/30">
                 Account
               </p>
-
-              {/* Nav items */}
               {navItems.map((item) => {
                 const isActive = activeTab === item.id;
                 return (
@@ -106,7 +100,6 @@ export default function PremiumPage() {
                     className={`relative flex items-center px-6 py-2.5 text-sm font-medium transition-colors duration-150 text-left w-full
                       ${isActive ? "text-white" : "text-white/45 hover:text-white/80"}`}
                   >
-                    {/* Left accent bar */}
                     {isActive && (
                       <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-white" />
                     )}
@@ -117,19 +110,15 @@ export default function PremiumPage() {
             </div>
           </aside>
 
-          {/* ── Main content ──────────────────────────────────────── */}
           <section className="flex-1 min-w-0 px-8 py-2">
 
-            {/* SUBSCRIPTION */}
             {activeTab === "Subscription" && (
               <>
                 {tierMeta ? (
-                  /* ── User is on a paid tier ── */
                   <div className="max-w-2xl">
                     <h2 className="text-xl font-semibold mb-1">Your Subscription</h2>
                     <p className="text-white/40 text-sm mb-8">You're currently on an active plan.</p>
 
-                    {/* Current plan card */}
                     <div className={`rounded-2xl border p-6 mb-6 ${tierMeta.bg}`}>
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-3">
@@ -144,8 +133,6 @@ export default function PremiumPage() {
                           <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.745 3.745 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.745 3.745 0 013.296-1.043A3.745 3.745 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.745 3.745 0 013.296 1.043 3.745 3.745 0 011.043 3.296A3.745 3.745 0 0121 12z" />
                         </svg>
                       </div>
-
-                      {/* Features */}
                       <ul className="grid grid-cols-2 gap-y-2 gap-x-4 mt-2">
                         {tierMeta.features.map((f) => (
                           <li key={f} className="flex items-center gap-2 text-sm text-white/70">
@@ -158,7 +145,6 @@ export default function PremiumPage() {
                       </ul>
                     </div>
 
-                    {/* Actions */}
                     <div className="flex gap-3">
                       <button
                         onClick={() => handleTabChange("Expires")}
@@ -172,7 +158,6 @@ export default function PremiumPage() {
                     </div>
                   </div>
                 ) : (
-                  /* ── Free user — show full upgrade UI ── */
                   <div className="w-full">
                     <Premium />
                   </div>
@@ -180,13 +165,11 @@ export default function PremiumPage() {
               </>
             )}
 
-            {/* BILLING */}
             {activeTab === "Billing" && (
               <div className="max-w-2xl">
                 <h2 className="text-xl font-semibold mb-1">Billing</h2>
                 <p className="text-white/40 text-sm mb-8">Manage your payment methods and invoices.</p>
 
-                {/* Payment method */}
                 <div className="rounded-xl border border-white/10 bg-[#1e1e1e] p-5 flex items-center justify-between mb-3">
                   <div className="flex items-center gap-4">
                     <div className="w-10 h-7 rounded bg-white/10 flex items-center justify-center">
@@ -209,7 +192,6 @@ export default function PremiumPage() {
                   Add payment method
                 </button>
 
-                {/* Invoices */}
                 <h3 className="text-sm font-semibold text-white/50 mb-3 uppercase tracking-wider text-xs">Recent Invoices</h3>
                 <div className="flex flex-col gap-2">
                   {[
@@ -227,7 +209,6 @@ export default function PremiumPage() {
               </div>
             )}
 
-            {/* EXPIRES IN */}
             {activeTab === "Expires" && (
               <div className="max-w-2xl">
                 <h2 className="text-xl font-semibold mb-1">Expires In</h2>
@@ -266,5 +247,13 @@ export default function PremiumPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function PremiumPage() {
+  return (
+    <Suspense fallback={null}>
+      <PremiumPageContent />
+    </Suspense>
   );
 }
