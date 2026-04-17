@@ -56,7 +56,7 @@ export default function PricingSection() {
           </div>
           <div className="flex-1 space-y-3 text-base sm:text-lg font-medium">
             <p className="flex items-center text-neutral-200"><span>100 links/month</span> <Check /></p>
-            <p className="flex items-center text-neutral-200"><span>30 QR Code/day</span> <Check /></p>
+            <p className="flex items-center text-neutral-200"><span>30 QR Code/month</span> <Check /></p>
 
             <div className="pt-4 border-t border-neutral-800/80">
               <p className="mb-3 font-bold text-sm uppercase text-neutral-400 tracking-wider">What you'll track:</p>

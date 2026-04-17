@@ -29,6 +29,7 @@ model User {
   ipAddress           String?
 
   totalLinks          Int         @default(0)
+  totalQr             Int         @default(0)
 
   plan                Plan        @default(FREE)
   planStartedAt       DateTime?
@@ -153,6 +154,22 @@ model CustomDomain {
   createdAt    DateTime @default(now())
 
   @@unique([domain, subDomain])
+}
+
+model OTP {
+  id          String      @id @default(uuid())
+  userId      String
+  email       String?
+
+  otp         String
+
+  reason      String?
+
+  isUsed      Boolean      @default(false)
+
+  expiresAt   DateTime
+  
+  createdAt   DateTime    @default(now())
 }
 
 
