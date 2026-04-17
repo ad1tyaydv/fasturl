@@ -14,7 +14,7 @@ export async function POST() {
         const totalClicks = await prisma.click.count();
         const totalUsers = await prisma.user.count();
 
-        const currentData = await prisma.count.findUnique({
+        const currentData = await prisma.count.findFirst({
             where: {
                 countId: COUNTID
             }
