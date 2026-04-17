@@ -10,13 +10,20 @@ export async function GET(req: NextRequest) {
     try {
         const token = req.cookies.get("token")?.value;
 
-        if(!token) {
+        if (!token) {
             return NextResponse.json(
                 { authenticated: false }
             );
         }
 
-        const decoded: any = jwt.verify(token, JWT_SECRET);
+        let decoded: any;
+
+        try {
+            decoded = jwt.verify(token, JWT_SECRET);
+
+        } catch {
+            return NextResponse.json({ authenticated: false });
+        }
 
         let currentPlan = "FREE";
         let isActive = false;
@@ -43,7 +50,7 @@ export async function GET(req: NextRequest) {
             }
         })
 
-        if(!checkPlan) {
+        if (!checkPlan) {
             return NextResponse.json({
                 authenticated: false
             })
@@ -51,27 +58,32 @@ export async function GET(req: NextRequest) {
 
         const expiresAt = checkPlan.planExpiresAt;
 
-        if(checkPlan.plan !== "FREE" && expiresAt && new Date(expiresAt) > new Date() ) {
+        if (checkPlan.plan !== "FREE" && expiresAt && new Date(expiresAt) > new Date()) {
             currentPlan = checkPlan.plan;
             isActive = true;
         }
 
         let daysLeft = 0;
-        if(expiresAt) {
+        if (expiresAt) {
             const diff = new Date(expiresAt).getTime() - new Date().getTime();
             daysLeft = Math.max(0, Math.ceil(diff / (24 * 60 * 60 * 1000)));
         }
 
-        const planStartedAt = new Date(checkPlan.planStartedAt!).toLocaleString("en-IN", {
-            dateStyle: "medium",
-            timeStyle: "short"
-        })
-        const planExpiresAt = new Date(checkPlan.planExpiresAt!).toLocaleString("en-IN", {
-            dateStyle: "medium",
-            timeStyle: "short"
-        })
-        
-        
+        const planStartedAt = checkPlan.planStartedAt
+            ? new Date(checkPlan.planStartedAt).toLocaleString("en-IN", {
+                dateStyle: "medium",
+                timeStyle: "short",
+            })
+            : null;
+
+        const planExpiresAt = checkPlan.planExpiresAt
+            ? new Date(checkPlan.planExpiresAt).toLocaleString("en-IN", {
+                dateStyle: "medium",
+                timeStyle: "short",
+            })
+            : null;
+
+
         return NextResponse.json({
             userName: checkPlan.userName,
             email: checkPlan.email,

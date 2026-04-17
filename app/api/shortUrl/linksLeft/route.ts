@@ -61,8 +61,8 @@ export async function GET(req: NextRequest) {
         })
 
         const planLimits: Record<string, number> = {
-            "FREE": 20,
-            "ESSENTIAL": 20000,
+            "FREE": 100,
+            "ESSENTIAL": 10000,
             "PRO": 40000,
         };
         

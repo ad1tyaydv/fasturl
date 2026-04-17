@@ -3,14 +3,14 @@
 import axios from "axios";
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { 
-  ChevronLeft, ChevronRight, ShieldCheck, ShieldAlert, Loader2 
+import {
+  ChevronLeft, ChevronRight, ShieldCheck, ShieldAlert, Loader2
 } from "lucide-react";
 
 import { HugeiconsIcon } from '@hugeicons/react';
-import { 
+import {
   PlusSignIcon, Search01Icon, Globe02Icon, ArrowDown01Icon, CopyIcon,
-  CopyCheckIcon, Delete02Icon 
+  CopyCheckIcon, Delete02Icon
 } from '@hugeicons/core-free-icons';
 
 import { Toaster, toast } from "react-hot-toast";
@@ -20,6 +20,8 @@ import { Input } from "@/components/ui/input";
 import Navbar from "../../components/navbar";
 import { SkeletonLoader } from "@/app/loaders/links";
 import ConnectDomainModal from "@/app/modals/addDomainModal";
+import { FilterDomainDropDown, DomainFilterType } from "@/app/dropDown/filterDomainDropDown";
+
 
 export default function DomainsPage() {
   const router = useRouter();
@@ -29,15 +31,16 @@ export default function DomainsPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
+
   const [verifyingId, setVerifyingId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [copiedField, setCopiedField] = useState<string | null>(null);
+  const [domainFilter, setDomainFilter] = useState<DomainFilterType>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
 
-  
+
   const fetchDomains = useCallback(async () => {
     try {
       setLoading(true);
@@ -60,7 +63,7 @@ export default function DomainsPage() {
     try {
       setVerifyingId(domainName);
       const res = await axios.post("/api/domain/verifyDomain", { domain: domainName });
-      
+
       if (res.status === 200) {
         toast.success("Domain verified successfully!");
         await fetchDomains();
@@ -112,7 +115,7 @@ export default function DomainsPage() {
       toast.error("Error while deleting domain");
     }
   };
-  
+
 
   const handleCopy = (text: string, field: string) => {
     if (!text) return;
@@ -130,8 +133,8 @@ export default function DomainsPage() {
         if (res.data.authenticated) setIsLoggedIn(true);
         else router.push("/auth/signin");
 
-      } catch { 
-        router.push("/auth/signin"); 
+      } catch {
+        router.push("/auth/signin");
       }
     };
     initAuth();
@@ -140,10 +143,23 @@ export default function DomainsPage() {
 
 
   const filteredDomains = useMemo(() => {
-    return domains.filter((d) =>
-      d.domain?.toLowerCase().includes(searchQuery.toLowerCase())
-    ).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-  }, [domains, searchQuery]);
+    const q = searchQuery.toLowerCase();
+    return domains
+      .filter((d) => {
+        const full = `${d.subDomain ? d.subDomain + '.' : ''}${d.domain}`.toLowerCase();
+        const matchesSearch =
+          d.domain?.toLowerCase().includes(q) ||
+          d.subDomain?.toLowerCase().includes(q) ||
+          full.includes(q);
+        const matchesFilter =
+          domainFilter === "all" ||
+          (domainFilter === "verified" && d.isActive) ||
+          (domainFilter === "unverified" && !d.isActive);
+        return matchesSearch && matchesFilter;
+      })
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }, [domains, searchQuery, domainFilter]);
+
 
 
   const totalPages = Math.ceil(filteredDomains.length / itemsPerPage);
@@ -168,22 +184,26 @@ export default function DomainsPage() {
           </div>
         </div>
 
-        <ConnectDomainModal 
-          isOpen={isModalOpen} 
-          onClose={() => setIsModalOpen(false)} 
+        <ConnectDomainModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
           onAdd={handleAddDomain}
-          isAdding={isAdding} 
+          isAdding={isAdding}
         />
 
-        <div className="relative mb-8 max-w-md">
-          <HugeiconsIcon icon={Search01Icon} className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-500" />
-          <Input 
-            placeholder="Search your domains..." 
-            className="bg-[#1c1c1c] font-one border-neutral-800 pl-10 h-11"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
+        <div className="flex items-center justify-between mb-8">
+          <div className="relative w-[400px]">
+            <HugeiconsIcon icon={Search01Icon} className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-500" />
+            <Input
+              placeholder="Search by domain or subdomain..."
+              className="bg-[#1c1c1c] font-one border-neutral-800 pl-10 h-11"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          <FilterDomainDropDown value={domainFilter} onChange={setDomainFilter} />
         </div>
+
 
         {loading ? <SkeletonLoader /> : (
           <div className="space-y-4">
@@ -193,7 +213,7 @@ export default function DomainsPage() {
 
               return (
                 <div key={index} className={`overflow-hidden rounded-2xl bg-[#1c1c1c] border transition-all duration-300 ${isExpanded ? 'border-neutral-500 shadow-lg' : 'border-neutral-800 hover:border-neutral-700'}`}>
-                  
+
                   <div onClick={() => setExpandedId(isExpanded ? null : item.id)} className="flex items-center font-three justify-between p-5 cursor-pointer">
                     <div className="flex items-center gap-4">
                       <div className="p-3.5 rounded-xl bg-[#141414] border border-neutral-800 group-hover:border-neutral-700">
@@ -211,8 +231,8 @@ export default function DomainsPage() {
                               <span className="flex items-center gap-1 text-[10px] bg-amber-500/10 text-amber-500 px-2 py-0.5 rounded-full border border-amber-500/20 font-three uppercase">
                                 <ShieldAlert className="w-3 h-3" /> Pending
                               </span>
-                              <Button 
-                                size="sm" 
+                              <Button
+                                size="sm"
                                 disabled={isVerifying}
                                 onClick={(e) => handleVerify(e, item.subDomain ? `${item.subDomain}.${item.domain}` : item.domain)}
                                 className="h-7 px-3 text-[12px] bg-white text-black hover:bg-neutral-200 font-three rounded-md cursor-pointer"
@@ -227,8 +247,8 @@ export default function DomainsPage() {
                     </div>
                     <div className="flex items-center gap-2">
                       <HugeiconsIcon icon={ArrowDown01Icon} className={`text-neutral-500 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
-                      <Button 
-                        variant="ghost" size="icon" 
+                      <Button
+                        variant="ghost" size="icon"
                         className="text-neutral-500 hover:text-red-500 ml-2 cursor-pointer"
                         onClick={(e) => { e.stopPropagation(); handleDeleteDomain(item.id) }}
                       >
@@ -239,7 +259,7 @@ export default function DomainsPage() {
 
                   <div className={`px-5 transition-all duration-300 ease-in-out ${isExpanded ? 'max-h-[800px] pb-6 opacity-100 border-t border-neutral-800/50 pt-6' : 'max-h-0 opacity-0 pointer-events-none'}`}>
                     <div className="space-y-6">
-                      
+
                       <div className="space-y-2">
                         <label className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">Verification (TXT Record)</label>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">

@@ -9,6 +9,7 @@ const NEXTAUTH_SECRET = process.env.NEXTAUTH_SECRET!;
 export async function POST(req: NextRequest) {
 
     try {
+        const now = new Date();
 
         const data = await req.json();
 
@@ -39,7 +40,9 @@ export async function POST(req: NextRequest) {
                 email: data.email,
                 password: hashedPassword,
                 plan: "FREE",
-                totalLinks: 0
+                totalLinks: 100,
+                cycleStart: now,
+                cycleEnd: new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)
             }
         })
 

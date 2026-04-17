@@ -8,75 +8,64 @@ import { nonVerifiedRateLimit, verifiedRateLimit } from "@/lib/rateLimit";
 
 const JWT_SECRET = process.env.NEXTAUTH_SECRET!;
 const ANON_USER_ID = process.env.ANONYMOUS_USER_ID!;
-const ANON_USER_CLICK = process.env.ANONYMOUS_USER_CLICK!;
+
+function add30Days(date: Date) {
+  const d = new Date(date);
+  d.setDate(d.getDate() + 30);
+  return d;
+}
 
 export async function POST(req: NextRequest) {
-
   try {
-    const ip = req.headers.get("x-forwarded-for")?.split(",")[0] ||
+    const ip =
+      req.headers.get("x-forwarded-for")?.split(",")[0] ||
       req.headers.get("x-real-ip") ||
       "127.0.0.1";
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
 
     const data = await req.json();
     const token = req.cookies.get("token")?.value;
 
-    let userId: string;
-    let count: number = 0;
-    let decoded;
+    let userId = ANON_USER_ID;
+    let user: any = null;
 
     if (!token) {
-      userId = ANON_USER_ID;
-
       const { success } = await nonVerifiedRateLimit.limit(ip);
-      if(!success) {
+
+      if (!success) {
         return NextResponse.json(
-          {message: "Too many links created, Please try after some time"},
-          {status: 430}
-        )
+          { message: "Too many requests. Try later." },
+          { status: 429 }
+        );
       }
 
-      count = await prisma.link.count({
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const count = await prisma.link.count({
         where: {
           ipAddress: ip,
           userId: ANON_USER_ID,
-          createdAt: {
-            gte: today
-          }
-        }
+          createdAt: { gte: today },
+        },
       });
 
       if (count >= 1) {
         return NextResponse.json(
-          { message: "Anonymous users can only create 1 link every day" },
-          { status: 401 }
+          { message: "Anonymous users can only create 1 link/day" },
+          { status: 403 }
         );
       }
+    }
 
-    } else {
-      decoded = jwt.verify(token, JWT_SECRET) as {
+    if (token) {
+      const decoded = jwt.verify(token, JWT_SECRET) as {
         userId: string;
-        email: string;
       };
+
       userId = decoded.userId;
 
-      const { success } = await verifiedRateLimit.limit(userId);
-      if(!success) {
-        return NextResponse.json(
-          {message: "Too many links created, Please try after some time"},
-          {status: 430}
-        )
-      }
-
-      const user = await prisma.user.findUnique({
-        where: {
-          id: userId
-        },
-        select: {
-          email: true
-        },
+      user = await prisma.user.findUnique({
+        where: { id: userId },
       });
 
       if (!user) {
@@ -85,118 +74,100 @@ export async function POST(req: NextRequest) {
           { status: 404 }
         );
       }
-    }
 
-    const user = await prisma.user.findUnique({
-      where: {
-        id: userId
+      const { success } = await verifiedRateLimit.limit(userId);
+
+      if (!success) {
+        return NextResponse.json(
+          { message: "Too many requests. Try later." },
+          { status: 429 }
+        );
       }
-    })
 
-    if (token && user) {
-      if (user.plan === "FREE") {
-        count = await prisma.link.count({
+      const now = new Date();
+
+      let cycleStart = user.cycleStart;
+      let cycleEnd = user.cycleEnd;
+
+      if (!cycleStart || !cycleEnd) {
+        cycleStart = user.plan === "FREE" ? user.createdAt : user.planStartedAt || new Date();
+
+        cycleEnd = add30Days(cycleStart);
+
+        await prisma.user.update({
           where: {
-            userId: userId,
-            createdAt: {
-              gte: today
-            }
-          }
+            id: userId
+          },
+          data: {
+            cycleStart: cycleStart,
+            cycleEnd: cycleEnd
+          },
         });
-
-        if (count >= 20) {
-          return NextResponse.json(
-            { message: "Upgrade to generate up to 40,000 URLs every month" },
-            { status: 429 }
-          );
-        }
-
-      } else if (user.plan === "ESSENTIAL") {
-        if (user.planExpiresAt && user.planExpiresAt < today) {
-          return NextResponse.json(
-            { message: "Your ESSENTIAL plan has expired. Upgrade to continue" },
-            { status: 403 }
-          );
-        }
-
-        count = await prisma.link.count({
-          where: {
-            userId: userId,
-            createdAt: {
-              gte: today
-            }
-          }
-        });
-
-        if (count >= 20000) {
-          return NextResponse.json(
-            { message: "Upgrade to generate up to 40,000 URLs every month" },
-            { status: 429 }
-          );
-        }
-
-      } else {
-        count = await prisma.link.count({
-          where: {
-            userId: userId,
-            createdAt: {
-              gte: today
-            }
-          }
-        });
-
-        if (count >= 40000) {
-          return NextResponse.json(
-            { message: "Upgrade again to generate up to 40,000 URLs every month" },
-            { status: 429 }
-          );
-        }
       }
-    }
 
+      if (cycleEnd && now > new Date(cycleEnd)) {
+        cycleStart = now;
+        cycleEnd = add30Days(now);
 
-    let originalLink = ""
-    let link = data.url;
-    if(!link.startsWith("https://") && !link.startsWith("http://")) {
-      originalLink = "https://" + link;
+        await prisma.user.update({
+          where: { id: userId },
+          data: {
+            cycleStart: cycleStart,
+            cycleEnd: cycleEnd
+          },
+        });
+      }
 
-    } else {
-      originalLink = link;
-    }
+      let limit = 100;
+      if (user.plan === "ESSENTIAL") limit = 10000;
+      if (user.plan === "PRO") limit = 40000;
 
-
-    const shortUrl = shortUrlGenerator();
-
-      const urlShort = await prisma.link.create({
-        data: {
-          userId: userId,
-          original: originalLink,
-          shorturl: shortUrl,
-          ipAddress: ip,
+      const count = await prisma.link.count({
+        where: {
+          userId,
+          createdAt: {
+            gte: cycleStart,
+            lt: cycleEnd,
+          },
         },
       });
 
-      const cachedKey = `links-left:${userId}`;
-      const checkCacheExists = await redis.get(cachedKey);
-      if(checkCacheExists) {
-        await redis.decr(cachedKey);
+      if (count >= limit) {
+        return NextResponse.json(
+          { message: user.plan === "FREE" ? "Upgrade to continue" : "Plan limit reached" },
+          { status: 429 }
+        );
       }
+    }
 
-    const response = NextResponse.json({
+    let originalLink = data.url;
+
+    if (!originalLink.startsWith("http://") && !originalLink.startsWith("https://")) {
+      originalLink = "https://" + originalLink;
+    }
+
+    const shortUrl = shortUrlGenerator();
+
+    const urlShort = await prisma.link.create({
+      data: {
+        userId,
+        original: originalLink,
+        shorturl: shortUrl,
+        ipAddress: ip,
+      },
+    });
+
+    await redis.del(`fetchLinks:${userId}`);
+
+    return NextResponse.json({
       message: "Short URL created!",
       shortUrl: urlShort.shorturl,
       original: urlShort.original,
     });
 
-    const userCachedkey = `fetchLinks:${userId}`;
-    await redis.del(userCachedkey);
-
-    return response;
-
   } catch (error) {
-    console.log(error);
     return NextResponse.json(
-      { message: "Can't shorten URL right now, try again later" },
+      { message: "Server error, try again later" },
       { status: 500 }
     );
   }

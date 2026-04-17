@@ -1,109 +1,139 @@
 "use client";
 
 import { getUser } from "@/lib/getUser";
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+  useRef,
+} from "react";
 
 type UserContextType = {
-    user: any | null;
-    setUser: (u: any) => void;
-    refreshUser: () => Promise<void>;
-}
+  user: any | null;
+  setUser: (u: any | null) => void;
+  refreshUser: () => Promise<void>;
+  logout: () => void;
+};
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
-    const [user, setUser] = useState<any | null>(null);
-    const [isHydrated, setIsHydrated] = useState(false);
+  const [user, setUser] = useState<any | null>(null);
+  const [isHydrated, setIsHydrated] = useState(false);
 
-    const refreshUser = async () => {
-        try {
-            const data = await getUser();
-            if (data) {
-                setUser(data);
-                localStorage.setItem("user", JSON.stringify(data));
+  const isLoggingOut = useRef(false);
 
-            } else {
-                setUser(null);
-                localStorage.removeItem("user");
-            }
+  const refreshUser = async () => {
+    if (isLoggingOut.current) return;
 
-        } catch (error) {
-            console.log("Error refreshing user:", error);
+    try {
+      const data = await getUser();
+
+      if (data) {
+        setUser(data);
+      } else {
+        setUser(null);
+      }
+
+    } catch (error) {
+      console.log("Error refreshing user:");
+      setUser(null);
+    }
+  };
+
+
+  useEffect(() => {
+    async function fetchUser() {
+      try {
+        const data = await getUser();
+
+        if (data) {
+          setUser(data);
+        } else {
+          setUser(null);
         }
+
+      } catch (error) {
+        console.log("Error fetching user:", error);
+        setUser(null);
+
+      } finally {
+        setIsHydrated(true);
+      }
+    }
+    fetchUser();
+
+  }, []);
+
+
+  useEffect(() => {
+    if (!isHydrated) return;
+
+    const interval = setInterval(() => {
+      refreshUser();
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [isHydrated]);
+
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        refreshUser();
+      }
     };
 
-    useEffect(() => {
-        async function fetchUser() {
-            try {
-            
-                const stored = localStorage.getItem("user");
-                if (stored) {
-                    try {
-                        const parsedUser = JSON.parse(stored);
-                        setUser(parsedUser);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
-                    } catch (parseError) {
-                        console.log("Error parsing stored user:", parseError);
-                        localStorage.removeItem("user");
-                    }
-                }
-            
-                const data = await getUser();
-                if (data) {
-                    setUser(data);
-                    localStorage.setItem("user", JSON.stringify(data));
-
-                } else {
-                    setUser(null);
-                    localStorage.removeItem("user");
-                }
-
-            } catch (error) {
-                console.log("Error fetching user:", error);
-
-            } finally {
-                setIsHydrated(true);
-            }
-        }
-
-        fetchUser();
-    }, []);
+    return () =>
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, []);
 
 
-    useEffect(() => {
-        if (!isHydrated) return;
+  const logout = async () => {
+    try {
+      isLoggingOut.current = true;
 
-        const interval = setInterval(() => {
-            refreshUser();
-        }, 30000);
+      await fetch("/api/auth/logout", {
+        method: "POST",
+      });
 
-        return () => clearInterval(interval);
-    }, [isHydrated]);
+      setUser(null);
 
+      localStorage.removeItem("user");
 
-    useEffect(() => {
-        const handleVisibilityChange = () => {
-            if (document.visibilityState === "visible") {
-                refreshUser();
-            }
-        };
+      setTimeout(() => {
+        isLoggingOut.current = false;
+      }, 1000);
+      
+    } catch (error) {
+      console.log("Logout error:", error);
+    }
+  };
 
-        document.addEventListener("visibilitychange", handleVisibilityChange);
-        return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
-        
-    }, []);
-
-    return (
-        <UserContext.Provider value={{ user, setUser, refreshUser }}>
-            {children}
-        </UserContext.Provider>
-    );
+  return (
+    <UserContext.Provider
+      value={{
+        user,
+        setUser,
+        refreshUser,
+        logout,
+      }}
+    >
+      {children}
+    </UserContext.Provider>
+  );
 };
 
 export const useUser = () => {
-    const context = useContext(UserContext);
-    if (!context) {
-        throw new Error("useUser must be used inside UserProvider");
-    }
-    return context;
+  const context = useContext(UserContext);
+
+  if (!context) {
+    throw new Error("useUser must be used inside UserProvider");
+  }
+
+  return context;
 };

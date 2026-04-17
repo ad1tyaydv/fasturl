@@ -6,7 +6,7 @@ import axios from "axios";
 
 export default function Navbar() {
   const router = useRouter();
-  const { user, setUser } = useUser();
+  const { user, setUser, logout } = useUser();
   const pathname = usePathname();
 
   const menuItems = [
@@ -25,18 +25,13 @@ export default function Navbar() {
   const isPaid = tier !== "FREE" && tier !== "";
   const avatarUrl = user?.image ?? null;
 
-  
+
   const handleLogout = async () => {
     try {
-      await axios.post("/api/auth/logout");
-      setUser(null);
-      localStorage.removeItem("user");
-      localStorage.removeItem("plan");
-      localStorage.removeItem("avatar");
-      localStorage.removeItem("linksLeft_cache");
+      await logout();
 
     } catch (error) {
-      console.error("Logout failed", error);
+      console.error("Logout failed");
     }
   };
 
@@ -70,20 +65,18 @@ export default function Navbar() {
 
         <div className="hidden lg:flex items-center gap-1">
           {menuItems.map((item) => {
-            const isActive = pathname === item.path;
-            return (
-              <button
-                key={item.path}
-                onClick={() => router.push(item.path)}
-                className={`px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 shrink-0 cursor-pointer ${
-                  isActive
-                    ? "bg-[#1D9BF0] text-white shadow-sm"
-                    : "text-neutral-400 hover:bg-[#222222] hover:text-white"
-                }`}
-              >
-                {item.name}
-              </button>
-            );
+            const isActive = item.path === "/" ? pathname === "/" : pathname.startsWith(item.path); return (
+                  <button
+                    key={item.path}
+                    onClick={() => router.push(item.path)}
+                    className={`px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 shrink-0 cursor-pointer ${isActive
+                        ? "bg-[#1D9BF0] text-white shadow-sm"
+                        : "text-neutral-400 hover:bg-[#222222] hover:text-white"
+                      }`}
+                  >
+                    {item.name}
+                  </button>
+                );
           })}
         </div>
       </div>
@@ -95,10 +88,9 @@ export default function Navbar() {
               <button
                 onClick={() => router.push("/premium")}
                 className={`border font-three px-5 py-2 rounded-lg font-bold text-xs uppercase transition-all duration-500 cursor-pointer shadow-sm
-                  ${
-                    isPaid
-                      ? "bg-linear-to-r from-amber-400 via-yellow-200 to-amber-500 text-black border-amber-500 shadow-[0_0_15px_rgba(251,191,36,0.3)]"
-                      : "bg-[#222222] text-white border-neutral-700 hover:bg-[#333333]"
+                  ${isPaid
+                    ? "bg-linear-to-r from-amber-400 via-yellow-200 to-amber-500 text-black border-amber-500 shadow-[0_0_15px_rgba(251,191,36,0.3)]"
+                    : "bg-[#222222] text-white border-neutral-700 hover:bg-[#333333]"
                   }`}
               >
                 {tier}

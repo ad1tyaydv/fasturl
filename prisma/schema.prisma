@@ -34,6 +34,9 @@ model User {
   planStartedAt       DateTime?
   planExpiresAt       DateTime?
 
+  cycleStart          DateTime?
+  cycleEnd            DateTime?
+
   links               Link[]
   qr                  Qr[]
   bulkLinks           BulkLinks[]

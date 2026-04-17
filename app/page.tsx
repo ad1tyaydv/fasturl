@@ -269,7 +269,7 @@ export default function Dashboard() {
                 <div className="mb-4">
                   <span className="px-3 py-1.5 bg-[#1c1c1c] border border-neutral-800 text-sm font-medium text-neutral-400 inline-block rounded-lg shadow-sm">
                     {userPlan === "FREE" ? (
-                      <>You have <strong className="text-white">{linksLeft}</strong> links left for today</>
+                      <>You have <strong className="text-white">{linksLeft}</strong> links left this month</>
                     ) : (
                       <>You have <strong className="text-white">{linksLeft}</strong> links left this month</>
                     )}

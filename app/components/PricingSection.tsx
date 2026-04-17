@@ -55,8 +55,8 @@ export default function PricingSection() {
             <p className="text-xs text-neutral-400 mt-2">Perfect to get started</p>
           </div>
           <div className="flex-1 space-y-3 text-base sm:text-lg font-medium">
-            <p className="flex items-center text-neutral-200"><span>20 links/day</span> <Check /></p>
-            <p className="flex items-center text-neutral-200"><span>2 QR Code/day</span> <Check /></p>
+            <p className="flex items-center text-neutral-200"><span>100 links/month</span> <Check /></p>
+            <p className="flex items-center text-neutral-200"><span>30 QR Code/day</span> <Check /></p>
 
             <div className="pt-4 border-t border-neutral-800/80">
               <p className="mb-3 font-bold text-sm uppercase text-neutral-400 tracking-wider">What you'll track:</p>
@@ -72,12 +72,13 @@ export default function PricingSection() {
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
                   <span className="flex items-center whitespace-nowrap text-neutral-500">Devices <Cross /></span>
                   <span className="flex items-center whitespace-nowrap text-neutral-500">Top Referrers <Cross /></span>
-                  <span className="flex items-center whitespace-nowrap text-neutral-500">⭐Bulk Create <Cross /></span>
+                  <span className="flex items-center whitespace-nowrap text-neutral-500">⭐ Bulk Create <Cross /></span>
                 </div>
                 <div className="pt-2 space-y-2 border-t border-neutral-800/80">
-                  <p className="flex items-center justify-between text-neutral-500">⭐Custom URLs <Cross /></p>
-                  <p className="flex items-center justify-between text-neutral-500">⭐Custom Domains <Cross /></p>
-                  <p className="flex items-center justify-between text-neutral-500">⭐Security Options <Cross /></p>
+                  <p className="flex items-center justify-between text-neutral-500">⭐ Custom Domains <Cross /></p>
+                  <p className="flex items-center justify-between text-neutral-500">⭐ Custom URLs <Cross /></p>
+                  <p className="flex items-center justify-between text-neutral-500">⭐ API Access <Cross /></p>
+                  <p className="flex items-center justify-between text-neutral-500">⭐ Security Options <Cross /></p>
                 </div>
               </div>
             </div>
@@ -88,7 +89,6 @@ export default function PricingSection() {
           >
             Start Free
           </button>
-          <p className="text-xs text-neutral-500 text-center mt-3">No credit card required</p>
         </div>
         
 
@@ -106,8 +106,8 @@ export default function PricingSection() {
               </div>
             </div>
             <div className="flex-1 space-y-3 text-base sm:text-lg font-medium">
-              <p className="flex items-center text-neutral-200"><span>20,000 links/month</span> <Check /></p>
-              <p className="flex items-center text-neutral-200"><span>200 QR Codes/month</span> <Check /></p>
+              <p className="flex items-center text-neutral-200"><span>10,000 links/month</span> <Check /></p>
+              <p className="flex items-center text-neutral-200"><span>300 QR Codes/month</span> <Check /></p>
 
               <div className="pt-4 border-t border-neutral-800/80">
                 <p className="mb-3 font-bold text-sm uppercase text-neutral-400 tracking-wider">Advanced tracking:</p>
@@ -123,12 +123,13 @@ export default function PricingSection() {
                   <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
                     <span className="flex items-center whitespace-nowrap text-neutral-300">Devices <Check /></span>
                     <span className="flex items-center whitespace-nowrap text-neutral-300">Top Referrers <Check /></span>
-                    <span className="flex items-center whitespace-nowrap text-neutral-300">⭐Bulk Create <Check /></span>
+                    <span className="flex items-center whitespace-nowrap text-neutral-300">⭐ Bulk Create <Check /></span>
                   </div>
                   <div className="pt-2 space-y-2 border-t border-neutral-800/80">
-                    <p className="flex items-center justify-between text-neutral-500">⭐Custom URLs <Cross /></p>
-                    <p className="flex items-center justify-between text-neutral-500">⭐Custom Domains <Cross /></p>
-                    <p className="flex items-center justify-between text-neutral-500">⭐Security Options <Cross /></p>
+                    <p className="flex items-center justify-between text-neutral-300">⭐ 4 Custom Domains <Check /></p>
+                    <p className="flex items-center justify-between text-neutral-500">⭐ Custom URLs <Cross /></p>
+                    <p className="flex items-center justify-between text-neutral-500">⭐ API Access <Cross /></p>
+                    <p className="flex items-center justify-between text-neutral-500">⭐ Security Options <Cross /></p>
                   </div>
                 </div>
               </div>
@@ -136,7 +137,6 @@ export default function PricingSection() {
             <button className="mt-8 w-full px-6 bg-blue-600 text-white py-2.5 rounded-lg text-base font-three transition hover:bg-blue-700 cursor-pointer shadow-sm font-medium">
               Upgrade Now
             </button>
-            <p className="text-xs text-neutral-500 text-center mt-3">Switch anytime. Cancel without hassle.</p>
           </div>
         </div>
 
@@ -167,12 +167,13 @@ export default function PricingSection() {
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
                   <span className="flex items-center whitespace-nowrap text-neutral-300">Devices <Check /></span>
                   <span className="flex items-center whitespace-nowrap text-neutral-300">Top Referrers <Check /></span>
-                  <span className="flex items-center whitespace-nowrap text-neutral-300">⭐Bulk Create <Check /></span>
+                  <span className="flex items-center whitespace-nowrap text-neutral-300">⭐ Bulk Create <Check /></span>
                 </div>
                 <div className="pt-2 space-y-2 border-t border-neutral-800/80">
-                  <p className="flex items-center justify-between text-neutral-300">⭐Custom URLs <Check /></p>
-                  <p className="flex items-center justify-between text-neutral-300">⭐Custom Domains <Check /></p>
-                  <p className="flex items-center justify-between text-neutral-300">⭐Security Options <Check /></p>
+                  <p className="flex items-center justify-between text-neutral-300">⭐ 10 Custom Domains <Check /></p>
+                  <p className="flex items-center justify-between text-neutral-300">⭐ Custom URLs <Check /></p>
+                  <p className="flex items-center justify-between text-neutral-300">⭐ API Access <Check /></p>
+                  <p className="flex items-center justify-between text-neutral-300">⭐ Security Options <Check /></p>
                 </div>
               </div>
             </div>
@@ -180,7 +181,6 @@ export default function PricingSection() {
           <button className="mt-8 w-full px-6 bg-white text-black py-2.5 rounded-lg text-base font-three transition hover:bg-gray-200 cursor-pointer font-bold">
             Upgrade Now
           </button>
-          <p className="text-xs text-neutral-500 text-center mt-3">Full power unlocked</p>
         </div>
         
       </div>
