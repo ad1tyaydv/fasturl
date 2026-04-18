@@ -7,17 +7,21 @@ import { Loader2 } from "lucide-react";
 import AllKeysTab from "./api/page";
 import RequestsTab from "./requests/page";
 import DocsTab from "./docs/page";
+import LogsTab from "./apiLogs/page";
 
 const tabs = [
-  { id: "allkeys", label: "All Keys" },
+  { id: "allkeys",  label: "All Keys" },
   { id: "requests", label: "Requests" },
-  { id: "docs", label: "Docs" },
+  { id: "logs",     label: "API Logs" },
+  { id: "docs",     label: "Docs" },
 ];
+
 
 function ApiKeysSidebar() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const activeTab = searchParams.get("type") ?? "allkeys";
+
 
   return (
     <aside className="hidden md:flex fixed top-[64px] left-0 h-[calc(100vh-64px)] w-64 flex-col bg-[#141414] border-r border-neutral-800 px-4 py-6 z-10">
@@ -40,11 +44,11 @@ function ApiKeysSidebar() {
   );
 }
 
+
 function MobileSidebar() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const activeTab = searchParams.get("type") ?? "allkeys";
-
 
   return (
     <div className="flex md:hidden gap-2 mb-6 overflow-x-auto pb-1">
@@ -65,23 +69,23 @@ function MobileSidebar() {
   );
 }
 
+
 function ApiKeysContent() {
   const searchParams = useSearchParams();
   const activeTab = searchParams.get("type") ?? "allkeys";
 
-
   return (
     <div className="flex-1 min-w-0">
-      {activeTab === "allkeys" && <AllKeysTab />}
+      {activeTab === "allkeys"  && <AllKeysTab />}
       {activeTab === "requests" && <RequestsTab />}
-      {activeTab === "docs" && <DocsTab />}
+      {activeTab === "logs"     && <LogsTab />}
+      {activeTab === "docs"     && <DocsTab />}
     </div>
   );
 }
 
 
 export default function ApiKeysPage() {
-  
   return (
     <div className="min-h-screen bg-[#141414] text-white transition-colors duration-300">
       <Navbar />
@@ -91,7 +95,7 @@ export default function ApiKeysPage() {
       </Suspense>
 
       <div className="md:pl-64">
-        <main className="max-w-5xl mx-auto pt-6 pb-12 px-4 sm:px-8">
+        <main className="pt-6 pb-12 px-4 sm:px-8">
           <div className="mb-6">
             <h1 className="text-3xl sm:text-4xl font-bold text-white">API Keys</h1>
           </div>

@@ -170,15 +170,44 @@ model Api_key {
   usageLimit    Int       @default(1000)
   usageCount    Int       @default(0)
 
+  success       Int       @default(0)
+  failed        Int       @default(0)
+
   isActive      Boolean   @default(true)
 
   userId        String
   user          User      @relation(fields: [userId], references: [id])
 
   apiLinks      Link[]
+  apiLogs       ApiLog[]
 
   createdAt     DateTime  @default(now())
+
+  @@index([userId])
 }
+
+
+model ApiLog {
+  id         String   @id @default(uuid())
+  endpoint   String
+  method     String
+
+  status     Int
+  success    Boolean
+  error      String?
+  
+  ipAddress  String?
+  device     String?
+
+  apiKeyId   String
+  apiKey     Api_key  @relation(fields: [apiKeyId], references: [id])
+
+  createdAt  DateTime @default(now())
+
+  @@index([apiKeyId])
+  @@index([createdAt])
+}
+
 
 model OTP {
   id          String      @id @default(uuid())

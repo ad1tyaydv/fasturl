@@ -38,7 +38,8 @@ export async function GET(req: NextRequest) {
             select: {
                 links: {
                     where: {
-                        checkBulk: false
+                        checkBulk: false,
+                        api_link: false,
                     },
                     select: {
                         id: true,

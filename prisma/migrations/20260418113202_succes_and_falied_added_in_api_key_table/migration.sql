@@ -1,0 +1,6 @@
+-- AlterTable
+ALTER TABLE "Api_key" ADD COLUMN     "failed" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "success" INTEGER NOT NULL DEFAULT 0;
+
+-- AlterTable
+ALTER TABLE "Link" ADD COLUMN     "success" BOOLEAN NOT NULL DEFAULT false;
