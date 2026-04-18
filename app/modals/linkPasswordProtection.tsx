@@ -104,11 +104,11 @@ export default function LinkPasswordModal({ isOpen, onClose, selectedUrl, onSucc
 
   return (
   <div
-    className="fixed inset-0 z-[110] flex items-center justify-center bg-black/80 p-4 transition-opacity"
+    className="fixed inset-0 z-[110] flex items-center justify-center bg-black/50 p-4 transition-opacity"
     onClick={() => !(isUpdating || isRemoving) && onClose()}
   >
     <div
-      className="bg-[#1c1c1c] shadow-2xl w-full max-w-lg p-6 sm:p-10 border border-neutral-800 rounded-xl"
+      className="bg-[#1c1c1c] shadow-2xl w-full max-w-lg p-6 sm:p-10 rounded"
       onClick={(e) => e.stopPropagation()}
     >
       <h3 className="text-xl sm:text-2xl font-three mb-8 text-center text-white">
@@ -144,7 +144,7 @@ export default function LinkPasswordModal({ isOpen, onClose, selectedUrl, onSucc
               Password configured
             </div>
           ) : (
-            <div className="relative flex items-center border border-neutral-700 bg-[#111111] focus-within:border-blue-500 rounded-lg overflow-hidden">
+            <div className="relative flex items-center border border-neutral-700 bg-[#111111] rounded-lg overflow-hidden">
               <input
                 type={showPassword ? "text" : "password"}
                 placeholder="Enter password"
@@ -222,7 +222,7 @@ export default function LinkPasswordModal({ isOpen, onClose, selectedUrl, onSucc
             variant="outline"
             onClick={onClose}
             disabled={isUpdating || isRemoving}
-            className="bg-transparent h-10 px-6 text-white border-neutral-700 hover:bg-[#2a2a2a] cursor-pointer"
+            className="font-three text-sm bg-transparent h-10 w-22 text-white border-neutral-700 hover:bg-[#2a2a2a] hover:text-white transition-colors cursor-pointer"
           >
             Cancel
           </Button>

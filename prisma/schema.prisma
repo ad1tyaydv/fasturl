@@ -42,6 +42,7 @@ model User {
   qr                  Qr[]
   bulkLinks           BulkLinks[]
   domain              CustomDomain[]
+  api_key              Api_key[]
 
   createdAt           DateTime    @default(now())
 }
@@ -58,7 +59,11 @@ model Link {
   bulkLinksId  String?
   bulk         BulkLinks?  @relation(fields: [bulkLinksId], references: [id])
 
+  apiLinkId   String?
+  apiLink     Api_key?     @relation(fields: [apiLinkId], references: [id])
+
   checkBulk    Boolean     @default(false)
+  api_link     Boolean     @default(false)
 
   ipAddress    String?
 
@@ -154,6 +159,25 @@ model CustomDomain {
   createdAt    DateTime @default(now())
 
   @@unique([domain, subDomain])
+}
+
+
+model Api_key {
+  id            String    @id @default(uuid())
+  key           String    @unique
+  name          String?
+
+  usageLimit    Int       @default(1000)
+  usageCount    Int       @default(0)
+
+  isActive      Boolean   @default(true)
+
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+
+  apiLinks      Link[]
+
+  createdAt     DateTime  @default(now())
 }
 
 model OTP {

@@ -74,11 +74,11 @@ export default function CustomUrlModal({ isOpen, onClose, selectedUrl, onSuccess
 
   return (
     <div
-      className="fixed inset-0 z-[110] flex items-center justify-center bg-black/80 p-4 transition-opacity duration-150"
+      className="fixed inset-0 z-[110] flex items-center justify-center bg-black/50 p-4 transition-opacity duration-150"
       onClick={() => !isLoading && onClose()}
     >
       <div
-        className="bg-[#1c1c1c] shadow-2xl w-full max-w-lg p-6 sm:p-10 cursor-default border border-neutral-800 rounded-xl"
+        className="bg-[#1c1c1c] shadow-2xl w-full max-w-lg p-6 sm:p-10 cursor-default rounded"
         onClick={(e) => e.stopPropagation()}
       >
         <h3 className="text-xl sm:text-2xl font-three mb-8 text-center text-white">
@@ -88,7 +88,7 @@ export default function CustomUrlModal({ isOpen, onClose, selectedUrl, onSuccess
         <div className="space-y-6 mb-8">
           <div className="space-y-2">
             <label className="text-xl font-one text-white">Current URL</label>
-            <div className="w-full p-3 border border-dashed border-neutral-700 bg-[#1a1a1a] text-neutral-400 font-three rounded-lg text-sm truncate">
+            <div className="w-full p-3 border border-neutral-700 bg-[#1a1a1a] text-neutral-400 font-three rounded-lg text-sm truncate">
               {NEXT_DOMAIN}/{selectedUrl.shorturl}
             </div>
           </div>
@@ -98,7 +98,7 @@ export default function CustomUrlModal({ isOpen, onClose, selectedUrl, onSuccess
             <div
               className={`flex items-center border ${
                 errorMessage ? "border-red-500" : "border-neutral-700"
-              } bg-[#111111] focus-within:border-blue-500 transition-colors rounded-lg overflow-hidden`}
+              } bg-[#111111] transition-colors rounded-lg overflow-hidden`}
             >
               <span className="pl-3 py-3 text-neutral-500 font-three bg-[#1a1a1a] border-r border-neutral-700 px-3 text-sm">
                 {NEXT_DOMAIN}/

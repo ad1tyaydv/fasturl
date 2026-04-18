@@ -3,14 +3,13 @@
 import axios from "axios";
 import { useEffect, useState, useCallback, useMemo, Suspense } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Toaster, toast } from "react-hot-toast";
 
 import { HugeiconsIcon } from '@hugeicons/react';
 import {
   Share05Icon, Delete02Icon, QrCodeIcon, Edit03Icon, MagicWand01Icon,
   CircleLock01Icon, Search02Icon, CircleUnlock01Icon, CopyCheckIcon, Tick02Icon,
-  CopyIcon, ArrowLeft01Icon, ArrowRight01Icon, Link04Icon
+  CopyIcon, ArrowLeft01Icon, ArrowRight01Icon, Link04Icon, Analytics01Icon
 } from '@hugeicons/core-free-icons';
 
 import Navbar from "../../components/navbar";
@@ -77,6 +76,21 @@ function AllUrlsPageClient() {
   const handleViewChange = (newView: ViewType) => {
     setView(newView);
     router.push(`${pathname}?types=${newView}`);
+  };
+
+
+  const getDomain = (url: string) => {
+    try {
+      return new URL(url).hostname.replace("www.", "");
+
+    } catch {
+      return "";
+    }
+  };
+
+  const getLogo = (url: string) => {
+    const domain = getDomain(url);
+    return `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
   };
 
 
@@ -311,8 +325,19 @@ function AllUrlsPageClient() {
                   {paginatedData.map((url: any) => (
                     <div key={url.id} className="flex items-center justify-between py-5 px-4 border-b border-neutral-800/60 hover:bg-[#1a1a1a] group transition-colors">
                       <div className="flex items-start gap-4 w-[40%] min-w-0 pr-4">
-                        <div className="mt-1 w-8 h-8 rounded-full bg-neutral-800 flex items-center justify-center text-neutral-400 shrink-0" >
-                          <HugeiconsIcon icon={Link04Icon} />
+                        <div className="mt-1 w-8 h-8 rounded-full bg-neutral-800 flex items-center justify-center overflow-hidden shrink-0">
+                          {url.original ? (
+                            <img
+                              src={getLogo(url.original)}
+                              alt="logo"
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).style.display = "none";
+                              }}
+                            />
+                          ) : (
+                            <HugeiconsIcon icon={Link04Icon} />
+                          )}
                         </div>
                         <div className="flex flex-col min-w-0 w-full">
                           {editingId === url.id ? (
@@ -372,6 +397,9 @@ function AllUrlsPageClient() {
                         </button>
                         <button onClick={() => { setSelectedLink(url); setIsQrModalOpen(true); }} className="hover:text-white p-2 cursor-pointer">
                           <HugeiconsIcon icon={QrCodeIcon} />
+                        </button>
+                        <button onClick={() => router.push(`/analytics?link=${url.shorturl}`)} className="hover:text-white p-2 cursor-pointer">
+                          <HugeiconsIcon icon={Analytics01Icon} />
                         </button>
                         <button onClick={() => { setEditingId(url.id); setTempName(url.linkName || ""); }} className="hover:text-white p-2 cursor-pointer">
                           <HugeiconsIcon icon={Edit03Icon} />

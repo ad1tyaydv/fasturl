@@ -13,6 +13,7 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
     { id: "/settings/authentication", label: "authentication" },
     { id: "/settings/2fa", label: "2fa" },
     { id: "/settings/subscription", label: "Subscription & Usage" },
+    { id: "/settings/api", label: "API" },
   ];
 
 

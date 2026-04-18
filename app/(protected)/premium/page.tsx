@@ -1,259 +1,320 @@
 "use client";
-import axios from "axios";
-import { Suspense, useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import Navbar from "../../components/navbar";
-import Premium from "@/app/components/premium";
 
-type SidebarTab = "Subscription" | "Billing" | "Expires";
-type UserTier = "free" | "essential" | "pro";
+import { useState } from "react";
 
-const TIER_META: Record<
-  Exclude<UserTier, "free">,
-  { label: string; color: string; bg: string; badge: string; features: string[] }
-> = {
-  essential: {
-    label: "Essential",
-    color: "text-blue-400",
-    bg: "bg-blue-500/10 border-blue-500/20",
-    badge: "bg-blue-500/20 text-blue-300",
-    features: ["Up to 500 links", "Basic analytics", "Custom slugs", "Email support"],
+
+type CellValue = true | false | string;
+
+interface ComparisonRow {
+  label: string;
+  free: CellValue;
+  essential: CellValue;
+  pro: CellValue;
+}
+
+interface ComparisonSection {
+  title: string;
+  rows: ComparisonRow[];
+}
+
+
+const COMPARISON_SECTIONS: ComparisonSection[] = [
+  {
+    title: "Links & QR Codes",
+    rows: [
+      { label: "Links per month",    free: "100",    essential: "10,000",  pro: "40,000"  },
+      { label: "QR Codes per month", free: "30",     essential: "300",     pro: "2,000"   },
+    ],
   },
-  pro: {
-    label: "Pro",
-    color: "text-yellow-400",
-    bg: "bg-yellow-500/10 border-yellow-500/20",
-    badge: "bg-yellow-500/20 text-yellow-300",
-    features: ["Unlimited links", "Advanced analytics", "Custom domains", "Priority support", "API access", "Bulk operations"],
+  {
+    title: "Analytics & Tracking",
+    rows: [
+      { label: "Click tracking",  free: true,  essential: true,  pro: true  },
+      { label: "Location",        free: true,  essential: true,  pro: true  },
+      { label: "Browsers",        free: false, essential: true,  pro: true  },
+      { label: "OS details",      free: false, essential: true,  pro: true  },
+      { label: "Devices",         free: false, essential: true,  pro: true  },
+      { label: "Top referrers",   free: false, essential: true,  pro: true  },
+    ],
   },
-};
+  {
+    title: "Advanced Features",
+    rows: [
+      { label: "Bulk create",       free: false, essential: true,         pro: true          },
+      { label: "Custom domains",    free: false, essential: "4 domains",  pro: "10 domains"  },
+      { label: "Custom URLs",       free: false, essential: false,        pro: true          },
+      { label: "API access",        free: false, essential: false,        pro: true          },
+      { label: "Security options",  free: false, essential: false,        pro: true          },
+    ],
+  },
+  {
+    title: "Pricing",
+    rows: [
+      { label: "Price per month",    free: "₹0",    essential: "₹300",   pro: "₹1,200"  },
+      { label: "Original price",     free: "—",     essential: "₹1,200", pro: "₹5,600"  },
+    ],
+  },
+];
 
-function PremiumPageContent() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
 
-  const tabFromUrl = (searchParams.get("tab") as SidebarTab) ?? "Subscription";
-  const [activeTab, setActiveTab] = useState<SidebarTab>(tabFromUrl);
 
-  const [userTier, setUserTier] = useState<UserTier>("free");
+function CheckIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+    </svg>
+  );
+}
 
-  const [timeLeft, setTimeLeft] = useState({
-    days: 15,
-    hours: 10,
-    minutes: 24,
-    seconds: 59,
-  });
+function ChevronIcon({ open }: { open: boolean }) {
+  return (
+    <svg
+      className={`w-4 h-4 text-white/30 ml-auto transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+      fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+    </svg>
+  );
+}
 
-  useEffect(() => {
-    const t = searchParams.get("tab") as SidebarTab;
-    if (t) setActiveTab(t);
-  }, [searchParams]);
 
-  useEffect(() => {
-    if (activeTab !== "Expires") return;
-    const interval = setInterval(() => {
-      setTimeLeft((prev) => {
-        let { days, hours, minutes, seconds } = prev;
-        seconds--;
-        if (seconds < 0) { seconds = 59; minutes--; }
-        if (minutes < 0) { minutes = 59; hours--; }
-        if (hours < 0)   { hours = 23; days--; }
-        if (days < 0)    { days = 0; hours = 0; minutes = 0; seconds = 0; }
-        return { days, hours, minutes, seconds };
-      });
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [activeTab]);
 
-  const handleTabChange = (tab: SidebarTab) => {
-    setActiveTab(tab);
-    router.push(`/premium?tab=${tab}`, { scroll: false });
-  };
+function Cell({ value, tier }: { value: CellValue; tier: "free" | "essential" | "pro" }) {
+  const colBg =
+    tier === "essential" ? "bg-blue-500/5" :
+    tier === "pro"       ? "bg-yellow-500/5" : "";
 
-  const navItems: { id: SidebarTab; label: string }[] = [
-    { id: "Subscription", label: "Subscription" },
-    { id: "Billing",      label: "Billing" },
-    { id: "Expires",      label: "Expires In" },
-  ];
+  const checkColor =
+    tier === "essential" ? "text-blue-400" :
+    tier === "pro"       ? "text-yellow-400" : "text-white/30";
 
-  const tierMeta = userTier !== "free" ? TIER_META[userTier] : null;
+  if (value === true) {
+    return (
+      <div className={`px-3 py-3.5 flex items-center justify-center ${colBg}`}>
+        <CheckIcon className={`w-4 h-4 ${checkColor}`} />
+      </div>
+    );
+  }
+
+  if (value === false) {
+    return (
+      <div className={`px-3 py-3.5 flex items-center justify-center text-white/20 text-lg ${colBg}`}>
+        —
+      </div>
+    );
+  }
+
+  
+  if (value === "—") {
+    return (
+      <div className={`px-3 py-3.5 flex items-center justify-center text-white/20 text-lg ${colBg}`}>
+        —
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-[#141414] text-white transition-colors duration-300">
-      <Navbar />
-
-      <main className="max-w-7xl mx-auto px-4 py-10">
-        <div className="flex gap-0 items-stretch min-h-[calc(100vh-10rem)]">
-
-          {/* ── Sidebar ───────────────────────────────────────────── */}
-          <aside className="w-52 shrink-0 self-stretch border-r border-white/10">
-            <div className="sticky top-24 pt-2 flex flex-col gap-0">
-              <p className="px-6 pb-3 text-[11px] font-semibold uppercase tracking-widest text-white/30">
-                Account
-              </p>
-              {navItems.map((item) => {
-                const isActive = activeTab === item.id;
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => handleTabChange(item.id)}
-                    className={`relative flex items-center px-6 py-2.5 text-sm font-medium transition-colors duration-150 text-left w-full
-                      ${isActive ? "text-white" : "text-white/45 hover:text-white/80"}`}
-                  >
-                    {isActive && (
-                      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-white" />
-                    )}
-                    {item.label}
-                  </button>
-                );
-              })}
-            </div>
-          </aside>
-
-          <section className="flex-1 min-w-0 px-8 py-2">
-
-            {activeTab === "Subscription" && (
-              <>
-                {tierMeta ? (
-                  <div className="max-w-2xl">
-                    <h2 className="text-xl font-semibold mb-1">Your Subscription</h2>
-                    <p className="text-white/40 text-sm mb-8">You're currently on an active plan.</p>
-
-                    <div className={`rounded-2xl border p-6 mb-6 ${tierMeta.bg}`}>
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-3">
-                          <span className={`text-2xl font-bold ${tierMeta.color}`}>
-                            {tierMeta.label}
-                          </span>
-                          <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${tierMeta.badge}`}>
-                            Active
-                          </span>
-                        </div>
-                        <svg xmlns="http://www.w3.org/2000/svg" className={`w-8 h-8 ${tierMeta.color} opacity-60`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.745 3.745 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.745 3.745 0 013.296-1.043A3.745 3.745 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.745 3.745 0 013.296 1.043 3.745 3.745 0 011.043 3.296A3.745 3.745 0 0121 12z" />
-                        </svg>
-                      </div>
-                      <ul className="grid grid-cols-2 gap-y-2 gap-x-4 mt-2">
-                        {tierMeta.features.map((f) => (
-                          <li key={f} className="flex items-center gap-2 text-sm text-white/70">
-                            <svg xmlns="http://www.w3.org/2000/svg" className={`w-4 h-4 shrink-0 ${tierMeta.color}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                            </svg>
-                            {f}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    <div className="flex gap-3">
-                      <button
-                        onClick={() => handleTabChange("Expires")}
-                        className="px-4 py-2 text-sm rounded-xl border border-white/10 text-white/60 hover:text-white hover:border-white/20 transition-colors"
-                      >
-                        View expiry
-                      </button>
-                      <button className="px-4 py-2 text-sm rounded-xl bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10 transition-colors">
-                        Cancel plan
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="w-full">
-                    <Premium />
-                  </div>
-                )}
-              </>
-            )}
-
-            {activeTab === "Billing" && (
-              <div className="max-w-2xl">
-                <h2 className="text-xl font-semibold mb-1">Billing</h2>
-                <p className="text-white/40 text-sm mb-8">Manage your payment methods and invoices.</p>
-
-                <div className="rounded-xl border border-white/10 bg-[#1e1e1e] p-5 flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-7 rounded bg-white/10 flex items-center justify-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-white/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />
-                      </svg>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium">•••• •••• •••• 4242</p>
-                      <p className="text-xs text-white/40">Expires 12/27</p>
-                    </div>
-                  </div>
-                  <span className="text-xs px-2.5 py-1 rounded-full bg-white/10 text-white/60">Default</span>
-                </div>
-
-                <button className="text-sm text-white/40 hover:text-white transition-colors flex items-center gap-2 mb-10">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                  </svg>
-                  Add payment method
-                </button>
-
-                <h3 className="text-sm font-semibold text-white/50 mb-3 uppercase tracking-wider text-xs">Recent Invoices</h3>
-                <div className="flex flex-col gap-2">
-                  {[
-                    { date: "Mar 1, 2026", amount: "$9.99", status: "Paid" },
-                    { date: "Feb 1, 2026", amount: "$9.99", status: "Paid" },
-                    { date: "Jan 1, 2026", amount: "$9.99", status: "Paid" },
-                  ].map((inv, i) => (
-                    <div key={i} className="flex items-center justify-between px-4 py-3 rounded-xl bg-[#1e1e1e] border border-white/10 text-sm">
-                      <span className="text-white/50">{inv.date}</span>
-                      <span className="font-medium">{inv.amount}</span>
-                      <span className="text-xs px-2.5 py-1 rounded-full bg-green-500/10 text-green-400">{inv.status}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {activeTab === "Expires" && (
-              <div className="max-w-2xl">
-                <h2 className="text-xl font-semibold mb-1">Expires In</h2>
-                <p className="text-white/40 text-sm mb-10">Make sure to renew before time runs out.</p>
-
-                <div className="flex gap-6">
-                  {[
-                    { value: timeLeft.days,    label: "days"  },
-                    { value: timeLeft.hours,   label: "hours" },
-                    { value: timeLeft.minutes, label: "min"   },
-                    { value: timeLeft.seconds, label: "sec"   },
-                  ].map(({ value, label }) => (
-                    <div key={label} className="flex flex-col items-center gap-2">
-                      <div className="w-20 h-20 rounded-2xl bg-[#1e1e1e] border border-white/10 flex items-center justify-center">
-                        <span
-                          className="countdown font-mono text-3xl font-semibold"
-                          style={{ "--value": value } as React.CSSProperties}
-                          aria-live="polite"
-                          aria-label={String(value)}
-                        >
-                          {value}
-                        </span>
-                      </div>
-                      <span className="text-xs text-white/40 uppercase tracking-widest">{label}</span>
-                    </div>
-                  ))}
-                </div>
-
-                <button className="mt-10 px-6 py-2.5 rounded-xl bg-white text-black text-sm font-semibold hover:bg-white/90 transition-colors">
-                  Renew Plan
-                </button>
-              </div>
-            )}
-
-          </section>
-        </div>
-      </main>
+    <div className={`px-3 py-3.5 flex items-center justify-center text-sm ${tier === "free" ? "text-white/50" : "text-white"} ${colBg}`}>
+      {value}
     </div>
   );
 }
 
-export default function PremiumPage() {
+
+
+function Section({ section }: { section: ComparisonSection }) {
+  const [open, setOpen] = useState(true);
+
   return (
-    <Suspense fallback={null}>
-      <PremiumPageContent />
-    </Suspense>
+    <div>
+      <button
+        onClick={() => setOpen((o) => !o)}
+        className="w-full border-t border-white/10 bg-white/[0.03] hover:bg-white/[0.05] transition-colors"
+      >
+        <div className="px-5 py-3 flex items-center">
+          <span className="text-sm font-semibold text-white/80">{section.title}</span>
+          <ChevronIcon open={open} />
+        </div>
+      </button>
+
+      {open && section.rows.map((row, i) => (
+        <div
+          key={row.label}
+          className={`grid grid-cols-[2fr_1fr_1fr_1fr] border-t border-white/5 hover:bg-white/[0.04] transition-colors ${i % 2 !== 0 ? "bg-white/[0.015]" : ""}`}
+        >
+          <div className="px-5 py-3.5 text-sm text-white/60">{row.label}</div>
+          <Cell value={row.free}      tier="free"      />
+          <Cell value={row.essential} tier="essential" />
+          <Cell value={row.pro}       tier="pro"       />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+
+
+export default function Premium() {
+  return (
+    <div className="min-h-screen bg-[#141414] text-white">
+      <main className="max-w-6xl mx-auto px-4 py-12">
+
+        <div className="text-center mb-12">
+          <h1 className="text-3xl font-bold mb-2">Unlock the Full Potential of Your Links</h1>
+          <p className="text-white/40 text-sm">Stop guessing and start tracking. Deliver the insights you need to grow.</p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-16">
+
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-6 flex flex-col">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-xl font-bold text-white/70">Free</span>
+              <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-white/10 text-white/50">Current</span>
+            </div>
+            <div className="text-3xl font-bold mb-1">₹0</div>
+            <div className="text-xs text-white/30 mb-5">Perfect to get started</div>
+            <ul className="flex flex-col gap-2 mb-6 flex-1">
+              {[
+                "100 links/month",
+                "30 QR Codes/month",
+                "Click tracking",
+                "Location tracking",
+              ].map((f) => (
+                <li key={f} className="flex items-center gap-2 text-sm text-white/50">
+                  <CheckIcon className="w-4 h-4 shrink-0 text-white/30" />
+                  {f}
+                </li>
+              ))}
+            </ul>
+            <button className="w-full py-2.5 rounded-xl border border-white/10 text-sm text-white/40 font-medium cursor-default">
+              Start Free
+            </button>
+          </div>
+
+          <div className="rounded-2xl border border-blue-500/30 bg-blue-500/10 p-6 flex flex-col relative">
+            <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-600 text-white px-4 py-1 rounded-full text-[11px] font-semibold shadow-md whitespace-nowrap">
+              ⭐ Recommended
+            </div>
+            <div className="flex items-center justify-between mb-4 pt-2">
+              <span className="text-xl font-bold text-blue-400">Essentials</span>
+              <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-blue-500/20 text-blue-300">Popular</span>
+            </div>
+            <div className="flex items-baseline gap-2 mb-0.5">
+              <span className="text-sm line-through text-white/25">₹1,200</span>
+              <span className="text-3xl font-bold">₹300<span className="text-base font-normal text-white/40">/mo</span></span>
+            </div>
+            <div className="text-xs text-white/30 mb-5">Most popular choice</div>
+            <ul className="flex flex-col gap-2 mb-6 flex-1">
+              {[
+                "10,000 links/month",
+                "300 QR Codes/month",
+                "Full click analytics",
+                "Browsers, OS & devices",
+                "Top referrers",
+                "Bulk link creation",
+                "Custom URLs",
+                "4 custom domains",
+                "Security options",
+              ].map((f) => (
+                <li key={f} className="flex items-center gap-2 text-sm text-white/70">
+                  <CheckIcon className="w-4 h-4 shrink-0 text-blue-400" />
+                  {f}
+                </li>
+              ))}
+            </ul>
+            <button className="w-full py-2.5 rounded-xl bg-blue-500 hover:bg-blue-400 text-white text-sm font-semibold transition-colors cursor-pointer">
+              Upgrade to Essentials
+            </button>
+          </div>
+
+          <div className="rounded-2xl border border-yellow-500/30 bg-yellow-500/10 p-6 flex flex-col">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-xl font-bold text-yellow-400">Pro</span>
+              <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-yellow-500/20 text-yellow-300">Best value</span>
+            </div>
+            <div className="flex items-baseline gap-2 mb-0.5">
+              <span className="text-sm line-through text-white/25">₹5,600</span>
+              <span className="text-3xl font-bold">₹1,200<span className="text-base font-normal text-white/40">/mo</span></span>
+            </div>
+            <div className="text-xs text-white/30 mb-5">For power users</div>
+            <ul className="flex flex-col gap-2 mb-6 flex-1">
+              {[
+                "40,000 links/month",
+                "2,000 QR Codes/month",
+                "Full click analytics",
+                "Browsers, OS & devices",
+                "Top referrers",
+                "Bulk link creation",
+                "10 custom domains",
+                "Custom URLs",
+                "API access",
+                "Security options",
+              ].map((f) => (
+                <li key={f} className="flex items-center gap-2 text-sm text-white/70">
+                  <CheckIcon className="w-4 h-4 shrink-0 text-yellow-400" />
+                  {f}
+                </li>
+              ))}
+            </ul>
+            <button className="w-full py-2.5 rounded-xl bg-yellow-500 hover:bg-yellow-400 text-black text-sm font-semibold transition-colors cursor-pointer">
+              Upgrade to Pro
+            </button>
+          </div>
+
+        </div>
+
+        <div className="mb-4">
+          <h2 className="text-lg font-semibold mb-1">Compare plans</h2>
+          <p className="text-white/30 text-sm mb-6">Full breakdown of what's included in each plan.</p>
+        </div>
+
+        <div className="rounded-2xl border border-white/10 overflow-hidden">
+
+          <div className="grid grid-cols-[2fr_1fr_1fr_1fr] border-b border-white/10 bg-[#1a1a1a]">
+            <div className="px-5 py-4 text-xs font-semibold uppercase tracking-widest text-white/30">Feature</div>
+            <div className="px-3 py-4 text-center text-sm font-semibold text-white/50">Free</div>
+            <div className="px-3 py-4 text-center text-sm font-semibold text-blue-400 bg-blue-500/5">Essentials</div>
+            <div className="px-3 py-4 text-center text-sm font-semibold text-yellow-400 bg-yellow-500/5">Pro</div>
+          </div>
+
+          {COMPARISON_SECTIONS.map((section) => (
+            <Section key={section.title} section={section} />
+          ))}
+
+          <div className="grid grid-cols-[2fr_1fr_1fr_1fr] border-t border-white/10 bg-[#1a1a1a]">
+            <div className="px-5 py-4" />
+            <div className="px-3 py-4 flex items-center justify-center">
+              <button className="px-4 py-2 text-xs rounded-xl border border-white/10 text-white/40 hover:text-white hover:border-white/20 transition-colors font-medium cursor-pointer">
+                Start Free
+              </button>
+            </div>
+            <div className="px-3 py-4 flex items-center justify-center bg-blue-500/5">
+              <button className="px-4 py-2 text-xs rounded-xl bg-blue-500 hover:bg-blue-400 text-white transition-colors font-semibold">
+                Get Essentials
+              </button>
+            </div>
+            <div className="px-3 py-4 flex items-center justify-center bg-yellow-500/5">
+              <button className="px-4 py-2 text-xs rounded-xl bg-yellow-500 hover:bg-yellow-400 text-black transition-colors font-semibold">
+                Get Pro
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <p className="mt-8 text-center text-white/30 text-sm">
+          Need help choosing?{" "}
+          <a
+            href="https://mail.google.com/mail/?view=cm&fs=1&to=fasturl@tutamail.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-400 hover:underline"
+          >
+            Contact our team
+          </a>
+        </p>
+
+      </main>
+    </div>
   );
 }
