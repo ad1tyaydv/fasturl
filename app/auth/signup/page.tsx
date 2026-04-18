@@ -1,17 +1,22 @@
 "use client";
 
-import { useState } from "react";
-import axios from "axios";
-import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+import React, { useState } from "react";
+import { 
+  Check,
+  Command,
+} from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
-import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
+import axios from "axios";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 import toast, { Toaster } from "react-hot-toast";
 import { useUser } from "@/app/components/userContext";
-import { signIn } from "next-auth/react"
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ViewIcon, ViewOffSlashIcon, ArrowRight01Icon, Tick02Icon } from "@hugeicons/core-free-icons";
 
 
-export default function Signup() {
+export default function SignupPage() {
   const router = useRouter();
   const { setUser } = useUser();
 
@@ -32,7 +37,9 @@ export default function Signup() {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!agreed) return toast.error("Please agree to the terms & conditions");
+    if (!agreed) {
+      return toast.error("Please agree to the terms and privacy policy");
+    }
 
     setLoading(true);
     const signupToast = toast.loading("Creating your account...");
@@ -44,25 +51,16 @@ export default function Signup() {
         password: formData.password
       });
       
-      const newUser = {
-        userName: formData.userName,
-        email: formData.email,
-        plan: "FREE"
-      }
-
+      const newUser = { userName: formData.userName, email: formData.email, plan: "FREE" };
       localStorage.setItem("user", JSON.stringify(newUser));
       localStorage.setItem("plan", "FREE");
-
       setUser(newUser);
 
-      toast.success("Account created successfully!", { 
-          id: signupToast
-        });
-
-      router.push("/");
+      toast.success("Welcome to Fasturl!", { id: signupToast });
+      setTimeout(() => router.push("/"), 1000);
 
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Signup failed!", { id: signupToast });
+      toast.error(error.response?.data?.message || "Signup failed.", { id: signupToast });
 
     } finally {
       setLoading(false);
@@ -71,150 +69,169 @@ export default function Signup() {
 
 
   return (
-    <div className="min-h-screen flex w-full bg-[#0a0a0a] text-white selection:bg-red-500/30 overflow-hidden">
-      <Toaster position="top-center" />
+    <div className="min-h-screen w-full bg-white text-black font-sans selection:bg-black selection:text-white flex overflow-hidden">
+      <Toaster position="bottom-right" reverseOrder={false} />
 
-      <div className="hidden lg:flex lg:w-[60%] relative bg-[#0f0f0f] border-r border-white/5">
-        <img
-          src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop" 
-          alt="Abstract Dark Background"
-          className="absolute inset-0 w-full h-full object-cover"
-        />
-        
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#0a0a0a]/20 to-[#0a0a0a]"></div>
-        
-        <div className="absolute top-12 left-12 flex items-center gap-3 z-20">
-          <div className="w-10 h-10 bg-red-600 rounded-xl flex items-center justify-center text-white font-black text-2xl shadow-[0_0_20px_rgba(220,38,38,0.4)]">
-            S
+      <div className="hidden lg:flex lg:w-[55%] relative flex-col justify-between p-16 bg-[#0a0a0a] text-white">
+        <div className="absolute inset-0 opacity-20 pointer-events-none">
+            <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_20%_30%,#333_0%,transparent_50%)]" />
+        </div>
+
+        <div className="relative z-10 flex items-center gap-3 cursor-pointer" onClick={() => router.push("/")}>
+          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(255,255,255,0.1)]">
+            <Command className="text-black" size={22} />
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-white">Fasturl</h1>
+          <span className="text-sm font-bold tracking-[0.3em] uppercase">Fasturl</span>
         </div>
 
-        <div className="relative z-10 flex flex-col justify-center px-20">
-            <h2 className="text-6xl font-bold leading-tight max-w-xl">
-                Start Your <span className="text-red-500 text-glow">Journey</span> <br /> 
-                <span className="text-white/90">With Us.</span>
-            </h2>
-            <div className="h-1 w-24 bg-red-600 my-8 rounded-full shadow-[0_0_10px_#dc2626]"></div>
-            <p className="text-gray-300 text-xl max-w-md font-light leading-relaxed">
-                Create an account to track your links, analyze your audience, and build your brand.
-            </p>
+        <div className="relative z-10 max-w-2xl">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <h1 className="text-7xl font-light leading-[1.05] tracking-tight mb-10">
+              The internet <br />
+              <span className="italic font-serif opacity-90">is noisy enough.</span> <br />
+              Keep your links clean. <br />
+            </h1>
+            
+            <div className="space-y-6 mt-16 border-l border-white/10 pl-8">
+              <p className="text-sm text-white/40 max-w-xs leading-relaxed italic">
+                "We built Fasturl because we were tired of cluttered dashboards. We wanted something that felt calm, intentional, and human."
+              </p>
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-px bg-white/20" />
+                <span className="text-[10px] uppercase tracking-[0.4em] text-white/30 font-bold">fasturl</span>
+              </div>
+            </div>
+          </motion.div>
         </div>
 
-        <div className="absolute bottom-12 left-12 text-white/20 text-sm font-mono tracking-tighter">
-            PRO_VERSION // 2026_BUILD
+        <div className="relative z-10 flex items-center gap-10 opacity-30">
         </div>
       </div>
 
-      <div className="w-full lg:w-[40%] flex flex-col justify-center p-8 sm:p-12 lg:p-16 bg-[#0a0a0a]">
-        <div className="w-full max-w-md mx-auto">
-          
-          <div className="flex lg:hidden items-center gap-3 mb-12">
-            <div className="w-10 h-10 bg-red-600 rounded-xl flex items-center justify-center text-white font-black text-2xl shadow-[0_0_20px_rgba(220,38,38,0.3)]">
-              S
+      <div className="w-full lg:w-[45%] flex items-center justify-center bg-white overflow-y-auto p-8">
+        <motion.div 
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="w-full max-w-[400px]" 
+        >
+          <div className="lg:hidden flex items-center gap-3 mb-10">
+            <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
+                <Command className="text-white" size={16} />
             </div>
-            <h1 className="text-2xl font-bold tracking-tight">Fasturl</h1>
+            <span className="font-bold tracking-[0.2em] text-[10px] uppercase">Fasturl</span>
           </div>
 
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold mb-2 text-white">Create an account</h1>
-            <p className="text-gray-400">
-              Already have an account?{" "}
+          <div className="mb-10 text-center lg:text-left">
+            <h2 className="text-4xl font-bold tracking-tighter mb-3">Create account</h2>
+            <p className="text-slate-400 text-base font-medium">
+              Already a member?{" "}
               <button 
                 onClick={() => router.push("/auth/signin")}
-                className="text-red-500 hover:text-red-400 font-medium cursor-pointer transition-colors"
+                className="text-black font-bold hover:underline underline-offset-4 transition-all cursor-pointer"
               >
                 Log in
               </button>
             </p>
           </div>
 
-          <form className="space-y-4" onSubmit={handleSignup}>
-            <div className="space-y-1">
-              <label className="text-sm font-medium text-gray-400 ml-1">Username</label>
+          <form onSubmit={handleSignup} className="space-y-6">
+            <div className="space-y-2.5">
+              <label className="text-[12px] font-bold uppercase tracking-[0.2em] text-black ml-0.5">Username</label>
               <input
                 name="userName"
+                type="text"
                 placeholder="Username"
                 value={formData.userName}
                 onChange={handleChange}
-                className="w-full px-4 py-3.5 rounded-xl bg-[#141414] border border-white/10 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none transition-all placeholder:text-gray-600 text-white"
+                className="w-full px-5 py-4 rounded-2xl border border-slate-200 text-base focus:border-black focus:ring-4 focus:ring-black/5 outline-none transition-all placeholder:text-slate-300 bg-slate-50/30"
                 required
               />
             </div>
 
-            <div className="space-y-1">
-              <label className="text-sm font-medium text-gray-400 ml-1">Email</label>
+            <div className="space-y-2.5">
+              <label className="text-[12px] font-bold uppercase tracking-[0.2em] text-black ml-0.5">Email Address</label>
               <input
-                name="email"
                 type="email"
-                placeholder="Email"
+                name="email"
+                placeholder="you@domain.com"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full px-4 py-3.5 rounded-xl bg-[#141414] border border-white/10 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none transition-all placeholder:text-gray-600 text-white"
+                className="w-full px-5 py-4 rounded-2xl border border-slate-200 text-base focus:border-black focus:ring-4 focus:ring-black/5 outline-none transition-all placeholder:text-slate-300 bg-slate-50/30"
                 required
               />
             </div>
 
-            <div className="space-y-1">
-              <label className="text-sm font-medium text-gray-400 ml-1">Password</label>
-              <div className="relative">
+            <div className="space-y-2.5">
+              <label className="text-[12px] font-bold uppercase tracking-[0.2em] text-black ml-0.5">Secure Password</label>
+              <div className="relative group">
                 <input
-                  name="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="Enter your password"
+                  name="password"
+                  placeholder="••••••••"
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full px-4 py-3.5 rounded-xl bg-[#141414] border border-white/10 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none transition-all pr-12 placeholder:text-gray-600 text-white"
+                  className="w-full px-5 py-4 rounded-2xl border border-slate-200 text-base focus:border-black focus:ring-4 focus:ring-black/5 outline-none transition-all placeholder:text-slate-300 bg-slate-50/30"
                   required
                 />
                 <button
                   type="button"
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-red-500 cursor-pointer"
                   onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 hover:text-black transition-colors cursor-pointer"
                 >
-                  {showPassword ? <AiOutlineEyeInvisible size={22} /> : <AiOutlineEye size={22} />}
+                  {showPassword ? <HugeiconsIcon icon={ViewOffSlashIcon} /> : <HugeiconsIcon icon={ViewIcon} />}
                 </button>
               </div>
             </div>
 
-            <div className="flex items-center gap-2 py-2">
-              <input 
-                type="checkbox" 
-                id="terms"
-                checked={agreed}
-                onChange={(e) => setAgreed(e.target.checked)}
-                className="w-4 h-4 rounded border-white/20 bg-[#141414] text-red-600 focus:ring-red-500 cursor-pointer"
-              />
-              <label htmlFor="terms" className="text-sm text-gray-400 cursor-pointer select-none">
-                I agree to the <span className="text-red-500 underline decoration-red-500/30">terms & conditions</span>
-              </label>
-            </div>
-
-            <Button
-              type="submit"
-              disabled={loading}
-              className="w-full py-7 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl transition-all active:scale-[0.98] mt-2 shadow-[0_10px_20px_rgba(220,38,38,0.2)] border-none text-lg cursor-pointer"
+            <div 
+              className="flex items-center gap-4 cursor-pointer group py-1"
+              onClick={() => setAgreed(!agreed)}
             >
-              {loading ? "Creating account..." : "Create account"}
-            </Button>
-          </form>
-
-          <div className="mt-8">
-            <div className="relative flex items-center justify-center mb-6">
-              <div className="w-full border-t border-white/5"></div>
-              <span className="absolute bg-[#0a0a0a] px-4 text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold">OR</span>
+              <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-all shrink-0 ${
+                agreed ? 'bg-black border-black shadow-sm' : 'border-slate-200 group-hover:border-slate-300'
+              }`}>
+                {agreed && <HugeiconsIcon icon={Tick02Icon} className="text-white stroke-[4px]" />}
+              </div>
+              <span className="text-xs text-slate-400 font-medium select-none">
+                I agree to the <span className="text-black font-bold">Terms</span> and <span className="text-black font-bold">Privacy Policy</span>.
+              </span>
             </div>
 
             <button
-              type="button"
-              className="w-full flex items-center justify-center gap-3 py-3.5 px-4 rounded-xl border border-white/10 bg-[#141414] hover:bg-[#1f1f1f] transition-all font-medium text-white shadow-sm cursor-pointer"
-              onClick={() => signIn("google")}
+              type="submit"
+              disabled={loading}
+              className="w-full py-4.5 rounded-2xl bg-black text-white font-bold text-sm transition-all hover:bg-zinc-800 active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3 shadow-xl mt-2 cursor-pointer"
             >
-              <FcGoogle size={20} />
-              Sign up with Google
+              {loading ? (
+                <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+              ) : (
+                <>
+                  Create an account
+                  <HugeiconsIcon icon={ArrowRight01Icon} />
+                </>
+              )}
             </button>
+          </form>
+
+          <div className="relative flex items-center justify-center my-10">
+            <div className="w-full border-t border-slate-100"></div>
+            <span className="absolute bg-white px-5 text-[10px] text-slate-400 uppercase tracking-[0.3em] font-bold">OR</span>
           </div>
-        </div>
+
+          <button 
+            type="button"
+            onClick={() => signIn("google")}
+            className="w-full flex items-center justify-center gap-4 py-4 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 transition-all text-base font-bold text-slate-900 shadow-sm active:scale-[0.99] cursor-pointer"
+          >
+            <FcGoogle size={22} />
+            Continue with Google
+          </button>
+        </motion.div>
       </div>
     </div>
   );

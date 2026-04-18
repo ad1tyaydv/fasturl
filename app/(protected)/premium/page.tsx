@@ -1,5 +1,6 @@
 "use client";
 
+import Navbar from "@/app/components/navbar";
 import { useState } from "react";
 
 
@@ -157,6 +158,7 @@ function Section({ section }: { section: ComparisonSection }) {
 export default function Premium() {
   return (
     <div className="min-h-screen bg-[#141414] text-white">
+      <Navbar />
       <main className="max-w-6xl mx-auto px-4 py-12">
 
         <div className="text-center mb-12">
