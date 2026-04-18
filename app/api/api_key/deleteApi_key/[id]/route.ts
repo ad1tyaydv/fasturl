@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/dbConfig";
 import jwt from "jsonwebtoken";
+import { redis } from "@/lib/redis";
 
 
 const JWT_SECRET = process.env.NEXTAUTH_SECRET!;
@@ -27,12 +28,17 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
             },
         });
 
+        const userId = decoded.userId;
+
         if (!user) {
             return NextResponse.json(
                 { message: "User not found" },
                 { status: 404 }
             );
         }
+
+        const cachedKey = `apiKeys:${userId}`;
+        await redis.del(cachedKey);
 
         const { id } = await params;
 
@@ -41,7 +47,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
                 id: id
             }
         })
-
 
         return NextResponse.json(
             {message: "Api_key deleted successfully",},

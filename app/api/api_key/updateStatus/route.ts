@@ -3,6 +3,7 @@ import { prisma } from "@/lib/dbConfig";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import Api_keyGenerator from "@/lib/api_keyGenerator";
+import { redis } from "@/lib/redis";
 
 
 const JWT_SECRET = process.env.NEXTAUTH_SECRET!;
@@ -28,6 +29,7 @@ export async function POST(req: NextRequest) {
                 id: decoded.userId,
             },
         });
+        const userId = decoded.userId;
 
         if (!user) {
             return NextResponse.json(
@@ -35,6 +37,9 @@ export async function POST(req: NextRequest) {
                 { status: 404 }
             );
         }
+
+        const cachedKey = `apiKeys:${userId}`
+        await redis.del(cachedKey);
 
         const { id, isActive } = await req.json();
 

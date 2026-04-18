@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/dbConfig";
 import shortUrlGenerator from "@/app/helpers/shortUrlGenerator";
 import bcrypt from "bcryptjs";
+import { redis } from "@/lib/redis";
 
 
 const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN!;
@@ -197,9 +198,14 @@ export async function POST(req: NextRequest) {
             },
         });
 
+        await redis.del(`apiKeyRequest:${key.userId}`);
+        await redis.del(`apiKeyLogs:${key.userId}`);
+
 
         await prisma.api_key.update({
-            where: { id: key.id },
+            where: {
+                id: key.id
+            },
             data: {
                 usageCount: {
                     increment: 1
@@ -210,7 +216,7 @@ export async function POST(req: NextRequest) {
             },
         });
 
-        
+
         await logApiRequest({
             apiKeyId: key.id,
             endpoint,

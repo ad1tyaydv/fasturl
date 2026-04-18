@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/dbConfig";
 import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs";
-import Api_keyGenerator from "@/lib/api_keyGenerator";
+import { Redis } from "@upstash/redis";
+import { redis } from "@/lib/redis";
 
 
 const JWT_SECRET = process.env.NEXTAUTH_SECRET!;
@@ -28,6 +28,7 @@ export async function GET(req: NextRequest) {
                 id: decoded.userId,
             },
         });
+        const userId = decoded.userId;
 
         if (!user) {
             return NextResponse.json(
@@ -36,26 +37,40 @@ export async function GET(req: NextRequest) {
             );
         }
 
-        const apiKeys = await prisma.api_key.findMany({
-            where: {
-                userId: decoded.userId
-            },
-            select: {
-                id: true,
-                name: true,
-                key: true,
-                createdAt: true,
-                isActive: true,
-                usageCount: true,
-                usageLimit: true
-            }
-        })
+        const cachedKey = `apiKeys:${userId}`;
+        const cachedData = await redis.get(cachedKey);
 
+        let apiKeys;
 
-        return NextResponse.json(
-            {message: "Api_keys fetched successfully", apiKeys},
-            {status: 200}
-        );
+        if (cachedData) {
+            return NextResponse.json({
+                message: "Api_keys fetched successfully",
+                apiKeys: cachedData
+            });
+
+        } else {
+            apiKeys = await prisma.api_key.findMany({
+                where: {
+                    userId: decoded.userId
+                },
+                select: {
+                    id: true,
+                    name: true,
+                    key: true,
+                    createdAt: true,
+                    isActive: true,
+                    usageCount: true,
+                    usageLimit: true
+                }
+            })
+
+            await redis.set(cachedKey, JSON.stringify(apiKeys));
+
+            return NextResponse.json(
+                { message: "Api_keys fetched successfully", apiKeys },
+                { status: 200 }
+            );
+        }
 
     } catch (error) {
         return NextResponse.json(

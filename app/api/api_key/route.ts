@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/dbConfig";
 import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs";
 import Api_keyGenerator from "@/lib/api_keyGenerator";
+import { redis } from "@/lib/redis";
 
 
 const JWT_SECRET = process.env.NEXTAUTH_SECRET!;
@@ -22,10 +22,11 @@ export async function POST(req: NextRequest) {
         const decoded = jwt.verify(token, JWT_SECRET) as {
             userId: string;
         };
+        const userId = decoded.userId;
 
         const user = await prisma.user.findUnique({
             where: {
-                id: decoded.userId,
+                id: userId
             },
         });
 
@@ -35,6 +36,9 @@ export async function POST(req: NextRequest) {
                 { status: 404 }
             );
         }
+
+        const cachedKey = `apiKeys:${userId}`
+        await redis.del(cachedKey);
 
         const data = await req.json();
 

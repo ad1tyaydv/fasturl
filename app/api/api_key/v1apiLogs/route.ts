@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/dbConfig";
 import jwt from "jsonwebtoken";
+import { redis } from "@/lib/redis";
 
 
 const JWT_SECRET = process.env.NEXTAUTH_SECRET!;
@@ -20,10 +21,11 @@ export async function GET(req: NextRequest) {
         const decoded = jwt.verify(token, JWT_SECRET) as {
             userId: string;
         };
+        const userId = decoded.userId;
 
         const user = await prisma.user.findUnique({
             where: {
-                id: decoded.userId,
+                id: userId
             },
         });
 
@@ -34,22 +36,36 @@ export async function GET(req: NextRequest) {
             );
         }
 
-        const apiLogs = await prisma.api_key.findMany({
-            where: {
-                userId: decoded.userId
-            },
-            select: {
-                apiLogs: true
-            }
-        })
+        const cachedKey = `apiKeyLogs:${userId}`;
+        const cachedData = await redis.get(cachedKey);
+
+        if (cachedData) {
+            return NextResponse.json({
+                message: "Api Key Logs fetched successfully",
+                apiLogs: cachedData
+            });
+
+        } else {
+            const apiLogs = await prisma.api_key.findMany({
+                where: {
+                    userId: decoded.userId
+                },
+                select: {
+                    apiLogs: true
+                }
+            })
+
+            await redis.set(cachedKey, JSON.stringify(apiLogs));
 
 
-        return NextResponse.json(
-            {message: "Api Logs fetched successfully", apiLogs},
-            {status: 200}
-        );
+            return NextResponse.json(
+                { message: "Api Logs fetched successfully", apiLogs },
+                { status: 200 }
+            );
+        }
 
     } catch (error) {
+        console.log(error)
         return NextResponse.json(
             { message: "Something went wrong" },
             { status: 500 }
