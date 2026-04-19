@@ -3,17 +3,16 @@
 import axios from "axios";
 import { useEffect, useState, useCallback, useMemo, Suspense } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Toaster, toast } from "react-hot-toast";
-
+import { Toaster } from "react-hot-toast";
 import { HugeiconsIcon } from '@hugeicons/react';
-import {
-  Share05Icon, Delete02Icon, QrCodeIcon, Edit03Icon, MagicWand01Icon,
-  CircleLock01Icon, Search02Icon, CircleUnlock01Icon, CopyCheckIcon, Tick02Icon,
-  CopyIcon, ArrowLeft01Icon, ArrowRight01Icon, Link04Icon, Analytics01Icon
-} from '@hugeicons/core-free-icons';
+import { Search02Icon } from '@hugeicons/core-free-icons';
 
 import Navbar from "../../components/navbar";
+import Sidebar from "@/app/components/urlsPageSidebar";
 import BulkLinks from "../../components/bulkLinks";
+import UrlItem from "@/app/components/links";
+import ApiLinksTab from "@/app/components/apiLinks";
+
 import { SkeletonLoader } from "@/app/loaders/links";
 import { FilterDropDown, FilterType } from "@/app/dropDown/urlsPageDropDown";
 import PasswordProtectionModal from "@/app/modals/linkPasswordProtection";
@@ -25,11 +24,10 @@ const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN;
 
 const getRelativeTime = (dateString?: string) => {
   if (!dateString) return "Just now";
-
   const date = new Date(dateString);
   const now = new Date();
-
   const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
   if (diffInSeconds < 60) return `${diffInSeconds}s ago`;
   const diffInMinutes = Math.floor(diffInSeconds / 60);
   if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
@@ -39,17 +37,15 @@ const getRelativeTime = (dateString?: string) => {
   return date.toLocaleDateString();
 };
 
-type ViewType = "links" | "bulk";
+type ViewType = "links" | "bulk" | "api";
+
 
 function AllUrlsPageClient() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const initialParam = searchParams.get("types") as ViewType;
-  const initialView = ["links", "bulk"].includes(initialParam) ? initialParam : "links";
-  const [view, setView] = useState<ViewType>(initialView);
-
+  const [view, setView] = useState<ViewType>((searchParams.get("types") as ViewType) || "links");
   const [data, setData] = useState<any[]>([]);
   const [tier, setTier] = useState("FREE");
   const [loading, setLoading] = useState(true);
@@ -60,13 +56,6 @@ function AllUrlsPageClient() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  const [copiedUrlId, setCopiedUrlId] = useState<string | null>(null);
-
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
-
-  const [isSavingName, setIsSavingName] = useState(false);
-  const [tempName, setTempName] = useState("");
   const [selectedLink, setSelectedLink] = useState<any>(null);
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
@@ -79,30 +68,13 @@ function AllUrlsPageClient() {
   };
 
 
-  const getDomain = (url: string) => {
-    try {
-      return new URL(url).hostname.replace("www.", "");
-
-    } catch {
-      return "";
-    }
-  };
-
-  const getLogo = (url: string) => {
-    const domain = getDomain(url);
-    return `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
-  };
-
-
   const fetchData = useCallback(async () => {
-
+    if (view === "api") return; 
     try {
       setLoading(true);
-      const endpoint = view === "links" ? "/api/fetchUrls" : "/api/shortUrl/bulkLinks/fetchBulkLinks";
-
+      const endpoint = view === "bulk" ? "/api/shortUrl/bulkLinks/fetchBulkLinks" : "/api/fetchUrls";
       const res = await axios.get(endpoint);
-      const rawData = view === "links" ? res.data.urls : res.data.bulkLinks;
-      setData(rawData || []);
+      setData((view === "bulk" ? res.data.bulkLinks : res.data.urls) || []);
 
     } catch (err) {
       setData([]);
@@ -117,389 +89,114 @@ function AllUrlsPageClient() {
     const initAuth = async () => {
       try {
         const res = await axios.get("/api/auth/me");
+
         if (res.data.authenticated) {
           setIsLoggedIn(true);
           setTier(res.data.plan || "FREE");
 
-        } else {
-          router.push("/auth/signin");
-        }
+        } else router.push("/auth/signin");
 
-      } catch {
-        router.push("/auth/signin");
-      }
+      } catch { router.push("/auth/signin"); }
     };
     initAuth();
 
   }, [router]);
 
 
-  useEffect(() => {
-    if (isLoggedIn) fetchData();
-
-  }, [fetchData, isLoggedIn]);
-
-
-  useEffect(() => {
-    setCurrentPage(1);
-
-  }, [view, searchQuery, statusFilter]);
-
-
-  const copyToClipboard = (url: string, id: string) => {
-    navigator.clipboard.writeText(url);
-    setCopiedUrlId(id);
-    toast.success("Link copied!");
-    setTimeout(() => setCopiedUrlId(null), 2000);
-  };
-
-
-  const saveName = async (id: string) => {
-    if (!tempName.trim()) {
-      setEditingId(null);
-      return;
-    }
-
-    setIsSavingName(true);
-
-    try {
-      await axios.post("/api/shortUrl/linkName", {
-        linkId: id,
-        name: tempName.trim(),
-      });
-
-      toast.success("Name updated!");
-      await fetchData();
-
-    } catch {
-      toast.error("Update failed");
-
-    } finally {
-      setIsSavingName(false);
-      setEditingId(null);
-    }
-  };
-
-
-  const handleLinkDelete = async (url: any) => {
-    setDeletingId(url.id);
-
-    try {
-      await axios.post(`/api/shortUrl/delete/${url.id}`);
-      await fetchData();
-
-      toast.success("Link deleted successfully")
-
-    } catch (error) {
-      console.log("Error while deleting the link");
-      toast.error("Failed to delete link");
-
-    } finally {
-      setDeletingId(null);
-    }
-  };
-
+  useEffect(() => { if (isLoggedIn) fetchData(); }, [fetchData, isLoggedIn]);
 
   const filteredData = useMemo(() => {
+    if (view === "api") return [];
     let result = [...data];
 
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
-      result = result.filter((item) => {
-        const query = q;
-
-        if (view === "links") {
-          return (
-            item.linkName?.toLowerCase().includes(query) ||
-            item.shorturl?.toLowerCase().includes(query) ||
-            item.original?.toLowerCase().includes(query)
-          );
-        }
-
-        return (item.name || "Bulk link").toLowerCase().includes(query);
-      });
-    }
-
-    const now = new Date();
-    if (statusFilter === "protected") {
-      result = result.filter((item) => !!item.password);
-
-    } else if (statusFilter === "today") {
-      result = result.filter(
-        (item) => new Date(item.createdAt).toDateString() === now.toDateString()
+      result = result.filter(item => 
+        view === "links" 
+          ? (item.linkName?.toLowerCase().includes(q) || item.shorturl?.toLowerCase().includes(q))
+          : (item.name || "").toLowerCase().includes(q)
       );
-
-    } else if (statusFilter === "7days") {
-      const sevenDaysAgo = new Date();
-      sevenDaysAgo.setDate(now.getDate() - 7);
-      result = result.filter((item) => new Date(item.createdAt) >= sevenDaysAgo);
-
-    } else if (statusFilter === "30days") {
-      const thirtyDaysAgo = new Date();
-      thirtyDaysAgo.setDate(now.getDate() - 30);
-      result = result.filter((item) => new Date(item.createdAt) >= thirtyDaysAgo);
     }
 
-    if (statusFilter === "most-clicked") {
-      result.sort((a, b) => {
-        const clicksA = view === "links" ? a.clicks || 0 : a.links?.reduce((acc: number, l: any) => acc + (l.clicks || 0), 0) || 0;
-        const clicksB = view === "links" ? b.clicks || 0 : b.links?.reduce((acc: number, l: any) => acc + (l.clicks || 0), 0) || 0;
-        return clicksB - clicksA;
-      });
-
-    } else {
-      result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-    }
+    result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
     return result;
+  }, [data, searchQuery, view]);
 
-  }, [data, searchQuery, statusFilter, view]);
 
-
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const paginatedData = filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
-
+  
   return (
     <div className="h-screen bg-[#141414] text-white flex flex-col overflow-hidden">
       <Toaster position="bottom-center" />
       <Navbar />
 
       <div className="flex flex-col sm:flex-row flex-1 w-full max-w-[1600px] mx-auto overflow-hidden">
-
-        <aside className="w-full sm:w-64 p-4 sm:p-8 sm:border-r border-neutral-800 flex flex-row sm:flex-col gap-2 overflow-x-auto sm:overflow-hidden border-b sm:border-b-0 shrink-0">
-          {["links", "bulk"].map((item) => (
-            <button
-              key={item}
-              onClick={() => handleViewChange(item as ViewType)}
-              className={`
-                text-left px-4 py-2.5 rounded-lg font-three transition-colors whitespace-nowrap 
-                cursor-pointer text-lg sm:text-xl
-                ${view === item
-                  ? "bg-neutral-800 text-white"
-                  : "text-neutral-500 hover:text-white hover:bg-neutral-800/50"
-                }
-              `}
-            >
-              {item === "links" && "Links"}
-              {item === "bulk" && "Bulk Links"}
-            </button>
-          ))}
-        </aside>
+        <Sidebar view={view} onViewChange={handleViewChange} />
 
         <main className="flex-1 w-full px-6 py-8 sm:px-10 sm:py-10 min-w-0 overflow-y-auto">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 border-b border-neutral-800 pb-4">
-            <div className="flex items-center gap-2 text-2xl sm:text-4xl font-one tracking-tight">
-              <span className="text-white">
-                {view === "links" && "Saved URLs"}
-                {view === "bulk" && "Bulk Links"}
-              </span>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 border-b border-neutral-800 pb-6">
+            <div>
+              <h1 className="text-2xl sm:text-4xl font-one tracking-tight">
+                {view === "links" ? "My Links" : view === "bulk" ? "Bulk Links" : "API Requests"}
+              </h1>
+              <p className="text-neutral-500 text-sm mt-1">
+                {view === "api" ? "Links generated via your API keys." : "Track and manage your shortened URLs."}
+              </p>
             </div>
-            <span className="px-4 py-1.5 font-bold bg-[#1c1c1c] border border-neutral-700 rounded-lg text-sm">
-              Total - {filteredData.length}
-            </span>
+            
+            {view !== "api" && (
+              <div className="flex items-center gap-3">
+                <span className="px-4 py-2 font-bold bg-neutral-900 border border-neutral-800 rounded-lg text-xs uppercase tracking-widest text-neutral-400">
+                  Total - {filteredData.length}
+                </span>
+              </div>
+            )}
           </div>
 
-          {view === "links" && (
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 mt-2">
-              <div className="relative w-full sm:w-[400px]">
-                <HugeiconsIcon icon={Search02Icon} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500" />
-                <input
-                  type="text"
-                  placeholder="Search links..."
-                  className="w-full pl-10 pr-3 py-3 bg-[#111111] font-three border border-neutral-800 rounded-lg text-white text-sm outline-none focus:border-neutral-600 transition-all"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
-              <FilterDropDown value={statusFilter} onChange={(val: FilterType) => setStatusFilter(val)} />
-            </div>
-          )}
-
-          {loading ? (
-            <SkeletonLoader />
+          {view === "api" ? (
+            <ApiLinksTab />
           ) : (
-            <div className="fade-in">
-              {view === "links" ? (
-                <div className="flex flex-col w-full">
-                  {paginatedData.map((url: any) => (
-                    <div key={url.id} className="flex items-center justify-between py-5 px-4 border-b border-neutral-800/60 hover:bg-[#1a1a1a] group transition-colors">
-                      <div className="flex items-start gap-4 w-[40%] min-w-0 pr-4">
-                        <div className="mt-1 w-8 h-8 rounded-full bg-neutral-800 flex items-center justify-center overflow-hidden shrink-0">
-                          {url.original ? (
-                            <img
-                              src={getLogo(url.original)}
-                              alt="logo"
-                              className="w-full h-full object-cover"
-                              onError={(e) => {
-                                (e.target as HTMLImageElement).style.display = "none";
-                              }}
-                            />
-                          ) : (
-                            <HugeiconsIcon icon={Link04Icon} />
-                          )}
-                        </div>
-                        <div className="flex flex-col min-w-0 w-full">
-                          {editingId === url.id ? (
-                            <div className="flex items-center gap-2">
-                              <input
-                                autoFocus
-                                className="bg-[#111111] border border-neutral-700 rounded px-2 py-1 text-white w-full outline-none"
-                                value={tempName}
-                                onChange={(e) => setTempName(e.target.value)}
-                                onKeyDown={(e) => e.key === "Enter" && !isSavingName && saveName(url.id)}
-                                disabled={isSavingName}
-                              />
-                              <button
-                                onClick={() => saveName(url.id)}
-                                disabled={isSavingName}
-                                className={`text-green-500 transition-opacity ${isSavingName ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'}`}
-                              >
-                                {isSavingName ? (
-                                  <div className="w-[22px] h-[22px] border-2 border-t-transparent rounded-full animate-spin"></div>
-                                ) : (
-                                  <HugeiconsIcon icon={Tick02Icon} />
-                                )}
-                              </button>
-                            </div>
-                          ) : (
-                            <span className="text-white font-one text-xl truncate tracking-wide">{url.linkName || "Untitled Link"}</span>
-                          )}
-                          <span className="text-neutral-500 font-three text-base truncate">{NEXT_DOMAIN}/{url.shorturl}</span>
-                        </div>
-                      </div>
+            <>
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
+                <div className="relative w-full sm:w-[400px]">
+                  <HugeiconsIcon icon={Search02Icon} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500" />
+                  <input
+                    type="text"
+                    placeholder="Search links..."
+                    className="w-full pl-10 pr-3 py-3 bg-[#111111] border border-neutral-800 rounded-xl text-white text-sm outline-none focus:border-neutral-600 transition-all"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
+                <FilterDropDown value={statusFilter} onChange={(val: FilterType) => setStatusFilter(val)} />
+              </div>
 
-                      <div className="hidden md:flex w-[10%] shrink-0">
-                        {url.password && (
-                          <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">
-                            <HugeiconsIcon icon={CircleLock01Icon} size={15} />
-                            <span className="text-[10px] uppercase tracking-widest font-one">Protected</span>
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="w-[10%] flex flex-col">
-                        <span className="text-white font-semibold">{url.clicks || 0} clicks</span>
-                      </div>
-
-                      <div className="flex items-center justify-end gap-3 text-neutral-400 w-[30%] opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity">
-                        <button onClick={() => { setSelectedLink(url); setIsPasswordModalOpen(true); }} className={`p-2 rounded-md cursor-pointer transition-colors ${url.password ? 'text-blue-500' : 'hover:text-white'}`}>
-                          {url.password ? <HugeiconsIcon icon={CircleLock01Icon} /> : <HugeiconsIcon icon={CircleUnlock01Icon} />}
-                        </button>
-                        <button onClick={() => { setSelectedLink(url); setIsCustomModalOpen(true); }} className="hover:text-white p-2 cursor-pointer">
-                          <HugeiconsIcon icon={MagicWand01Icon} />
-                        </button>
-                        <button onClick={() => window.open(`${NEXT_DOMAIN}/${url.shorturl}`, '_blank')} className="hover:text-white p-2 cursor-pointer">
-                          <HugeiconsIcon icon={Share05Icon} />
-                        </button>
-                        <button onClick={() => copyToClipboard(`${NEXT_DOMAIN}/${url.shorturl}`, url.id)} className={`p-2 cursor-pointer ${copiedUrlId === url.id ? "text-green-500" : "hover:text-white"}`}>
-                          {copiedUrlId === url.id ? <HugeiconsIcon icon={CopyCheckIcon} /> : <HugeiconsIcon icon={CopyIcon} />}
-                        </button>
-                        <button onClick={() => { setSelectedLink(url); setIsQrModalOpen(true); }} className="hover:text-white p-2 cursor-pointer">
-                          <HugeiconsIcon icon={QrCodeIcon} />
-                        </button>
-                        <button onClick={() => router.push(`/analytics?link=${url.shorturl}`)} className="hover:text-white p-2 cursor-pointer">
-                          <HugeiconsIcon icon={Analytics01Icon} />
-                        </button>
-                        <button onClick={() => { setEditingId(url.id); setTempName(url.linkName || ""); }} className="hover:text-white p-2 cursor-pointer">
-                          <HugeiconsIcon icon={Edit03Icon} />
-                        </button>
-                        <button
-                          onClick={() => handleLinkDelete(url)}
-                          disabled={deletingId === url.id}
-                          className={`p-2 transition-opacity ${deletingId === url.id
-                            ? 'text-red-500 cursor-not-allowed opacity-70'
-                            : 'hover:text-red-500 cursor-pointer'
-                            }`}
-                        >
-                          {deletingId === url.id ? (
-                            <div className="w-[20px] h-[20px] border-2 border-red-500 border-t-transparent rounded-full animate-spin"></div>
-                          ) : (
-                            <HugeiconsIcon icon={Delete02Icon} />
-                          )}
-                        </button>
-                      </div>
-
-                      <div className="w-[10%] text-right text-neutral-500 text-sm font-medium">{getRelativeTime(url.createdAt)}</div>
+              {loading ? <SkeletonLoader /> : (
+                <div className="fade-in">
+                  {view === "links" ? (
+                    <div className="flex flex-col w-full">
+                      {paginatedData.map((url) => (
+                        <UrlItem 
+                          key={url.id} 
+                          url={url} 
+                          nextDomain={NEXT_DOMAIN} 
+                          onRefresh={fetchData}
+                          onOpenQr={(u) => { setSelectedLink(u); setIsQrModalOpen(true); }}
+                          onOpenPassword={(u) => { setSelectedLink(u); setIsPasswordModalOpen(true); }}
+                          onOpenCustom={(u) => { setSelectedLink(u); setIsCustomModalOpen(true); }}
+                          getRelativeTime={getRelativeTime} 
+                          router={router}
+                        />
+                      ))}
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <BulkLinks
-                  bulkLinks={paginatedData}
-                  onRefresh={fetchData}
-                  domain={NEXT_DOMAIN!}
-                  userPlan={tier}
-                  searchQuery={searchQuery}
-                  setSearchQuery={setSearchQuery}
-                  statusFilter={statusFilter}
-                  setStatusFilter={setStatusFilter}
-                />
-              )}
-
-              {totalPages > 1 && (
-                <div className="flex justify-center items-center gap-2 mt-8 pb-10 flex-wrap">
-
-                  <button
-                    disabled={currentPage === 1}
-                    onClick={() => setCurrentPage((prev) => prev - 1)}
-                    className="join-item btn btn-outline bg-neutral-900 border-neutral-700 text-white hover:bg-neutral-800 disabled:opacity-40"
-                  >
-                    <HugeiconsIcon icon={ArrowLeft01Icon} /> Prev
-                  </button>
-
-                  {(() => {
-                    const pages = [];
-
-                    for (let i = 1; i <= totalPages; i++) {
-                      if (
-                        i === 1 ||
-                        i === totalPages ||
-                        (i >= currentPage - 2 && i <= currentPage + 2)
-                      ) {
-                        pages.push(i);
-                      } else if (
-                        i === currentPage - 3 ||
-                        i === currentPage + 3
-                      ) {
-                        pages.push("...");
-                      }
-                    }
-
-                    return pages.map((page, index) =>
-                      page === "..." ? (
-                        <span
-                          key={index}
-                          className="px-2 text-neutral-500"
-                        >
-                          ...
-                        </span>
-                      ) : (
-                        <button
-                          key={page}
-                          onClick={() => setCurrentPage(Number(page))}
-                          className={`btn btn-square ${currentPage === page
-                            ? "bg-white text-black"
-                            : "bg-neutral-900 border-neutral-700 text-white hover:bg-neutral-800"
-                            }`}
-                        >
-                          {page}
-                        </button>
-                      )
-                    );
-                  })()}
-
-                  <button
-                    disabled={currentPage === totalPages}
-                    onClick={() => setCurrentPage((prev) => prev + 1)}
-                    className="join-item btn btn-outline bg-neutral-900 border-neutral-700 text-white hover:bg-neutral-800 disabled:opacity-40"
-                  >
-                    Next <HugeiconsIcon icon={ArrowRight01Icon} />
-                  </button>
-
+                  ) : (
+                    <BulkLinks bulkLinks={paginatedData} onRefresh={fetchData} domain={NEXT_DOMAIN!} userPlan={tier} searchQuery={searchQuery} setSearchQuery={setSearchQuery} statusFilter={statusFilter} setStatusFilter={setStatusFilter} />
+                  )}
                 </div>
               )}
-            </div>
+            </>
           )}
         </main>
       </div>
@@ -512,9 +209,5 @@ function AllUrlsPageClient() {
 }
 
 export default function AllUrlsPage() {
-  return (
-    <Suspense fallback={<SkeletonLoader />}>
-      <AllUrlsPageClient />
-    </Suspense>
-  )
+  return <Suspense fallback={<SkeletonLoader />}><AllUrlsPageClient /></Suspense>;
 }

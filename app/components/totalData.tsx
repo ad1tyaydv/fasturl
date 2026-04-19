@@ -1,11 +1,31 @@
 "use client";
 
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+
+function useCountUp(endValue: number, duration: number = 800) {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    let startTimestamp: number | null = null;
+    const step = (timestamp: number) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+      
+      setCount(Math.floor(progress * endValue));
+      
+      if (progress < 1) {
+        window.requestAnimationFrame(step);
+      }
+    };
+    window.requestAnimationFrame(step);
+  }, [endValue, duration]);
+
+  return count;
+}
 
 export default function TotalData() {
   const [stats, setStats] = useState({ links: 0, qr: 0, clicks: 0, customers: 0 });
-
 
   useEffect(() => {
     const fetchUserStats = async () => {
@@ -17,40 +37,24 @@ export default function TotalData() {
           clicks: res.data.totalClicks || 0,
           customers: res.data.totalUsers || 0 
         });
-        
       } catch (e) {
         console.log("Stats not available yet");
       }
     };
-
     fetchUserStats();
-
   }, []);
 
+  const displayLinks = useCountUp(stats.links);
+  const displayQR = useCountUp(stats.qr);
+  const displayClicks = useCountUp(stats.clicks);
+  const displayCustomers = useCountUp(stats.customers);
 
   const statItems = [
-    {
-      topLabel: "Powering",
-      value: stats.links,
-      bottomLabel: "Links",
-    },
-    {
-      topLabel: "Generated",
-      value: stats.qr,
-      bottomLabel: "QR Codes",
-    },
-    {
-      topLabel: "Serving",
-      value: stats.clicks,
-      bottomLabel: "Clicks",
-    },
-    {
-      topLabel: "Trusted By",
-      value: stats.customers,
-      bottomLabel: "Happy Customers",
-    }
+    { topLabel: "Powering", value: displayLinks, bottomLabel: "Links" },
+    { topLabel: "Generated", value: displayQR, bottomLabel: "QR Codes" },
+    { topLabel: "Serving", value: displayClicks, bottomLabel: "Clicks" },
+    { topLabel: "Trusted By", value: displayCustomers, bottomLabel: "Happy Customers" }
   ];
-
 
   return (
     <section className="w-full bg-[#141414] py-20 border-t border-neutral-800">
@@ -65,7 +69,10 @@ export default function TotalData() {
                 {item.topLabel}
               </p>
 
-              <h3 className="text-[#1D9BF0] text-4xl md:text-6xl font-one tracking-tight">
+              <h3 className="text-[#1D9BF0] text-4xl md:text-6xl font-one tracking-tight tabular-nums">
+                {/* The "tabular-nums" class ensures digits don't jump horizontally 
+                   while they are rapidly changing from right to left 
+                */}
                 {item.value.toLocaleString()} +
               </h3>
 

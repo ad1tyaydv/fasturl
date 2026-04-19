@@ -7,11 +7,10 @@ import { Loader2 } from "lucide-react";
 
 import { HugeiconsIcon } from '@hugeicons/react';
 import {
-  File02Icon, Download01Icon, Search02Icon, Delete02Icon,
+  File02Icon, Download01Icon, Delete02Icon,
   Edit03Icon, CircleLock01Icon, CircleUnlock01Icon, Tick02Icon, ArrowRight01Icon, ArrowLeft01Icon
 } from '@hugeicons/core-free-icons';
 
-import { FilterDropDown, FilterType } from "@/app/dropDown/urlsPageDropDown";
 import BulkPasswordModal from "../modals/bulkPasswordProtection";
 import BulkDownloadModal from "../modals/bulkModalDownload";
 import BulkLinkDetails from "./bulkLinkDetails";
@@ -36,7 +35,7 @@ export default function BulkLinks({
 }: any) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [tempName, setTempName] = useState("");
-  const [savingId, setSavingId] = useState<string | null>(null); // New state for spinner
+  const [savingId, setSavingId] = useState<string | null>(null);
   const [showDownloadModal, setShowDownloadModal] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [selectedBatch, setSelectedBatch] = useState<any>(null);
@@ -79,6 +78,7 @@ export default function BulkLinks({
     }
   };
 
+  
   const handleDeleteBatch = async (urlId: string) => {
 
     const loadingToast = toast.loading("Deleting batch...");
@@ -103,17 +103,6 @@ export default function BulkLinks({
 
   return (
     <div className="flex flex-col gap-2 w-full">
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 mt-2">
-        <div className="relative w-full sm:w-[320px]">
-          <HugeiconsIcon icon={Search02Icon} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500" />
-          <input
-            type="text" placeholder="Search batches..."
-            className="w-full pl-10 pr-3 py-3 bg-[#111111] font-three border border-neutral-800 rounded-lg text-white text-sm outline-none focus:border-neutral-600 transition-all"
-            value={displaySearch} onChange={(e) => setDisplaySearch(e.target.value)}
-          />
-        </div>
-        <FilterDropDown value={statusFilter} onChange={(val: FilterType) => setStatusFilter(val)} />
-      </div>
 
       <div className="flex flex-col w-full">
         {bulkLinks.length > 0 ? (

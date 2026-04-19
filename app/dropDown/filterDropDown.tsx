@@ -33,7 +33,6 @@ export function AnalyticsFilter({ sortOrder, setSortOrder }: FilterProps) {
       <DropdownMenuTrigger asChild>
         <Button 
           variant="outline" 
-          // Added font-three here to match the trigger text
           className="bg-[#1a1a1a] border-neutral-800 text-white hover:bg-[#252525] hover:text-white font-three rounded-lg flex items-center gap-2 h-10 outline-none focus:ring-1 focus:ring-neutral-700"
         >
           <IoFilterOutline size={18} className="text-blue-500" />

@@ -3,8 +3,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import {
-  IoPencilOutline, IoEyeOutline,
-  IoEyeOffOutline, IoCalendarOutline
+  IoEyeOutline, IoEyeOffOutline, IoCalendarOutline
 } from "react-icons/io5";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
@@ -13,7 +12,7 @@ import "react-day-picker/dist/style.css";
 import { format } from "date-fns";
 import toast from "react-hot-toast";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { PencilEdit02Icon } from "@hugeicons/core-free-icons";
+import { Calendar03Icon, PencilEdit02Icon, ViewIcon, ViewOffSlashIcon } from "@hugeicons/core-free-icons";
 
 interface LinkPasswordProps {
   isOpen: boolean;
@@ -159,9 +158,9 @@ export default function LinkPasswordModal({ isOpen, onClose, selectedUrl, onSucc
                 className="px-4 text-neutral-500 hover:text-white cursor-pointer"
               >
                 {showPassword ? (
-                  <IoEyeOffOutline size={20} />
+                  <HugeiconsIcon icon={ViewOffSlashIcon} />
                 ) : (
-                  <IoEyeOutline size={20} />
+                  <HugeiconsIcon icon={ViewIcon} />
                 )}
               </button>
             </div>
@@ -177,10 +176,10 @@ export default function LinkPasswordModal({ isOpen, onClose, selectedUrl, onSucc
             <button
               onClick={() => setShowCalendar(!showCalendar)}
               disabled={isUpdating || isRemoving}
-              className="w-full p-3 border border-neutral-700 bg-[#111111] text-white font-three rounded-lg flex justify-between items-center"
+              className="w-full p-3 border border-neutral-700 bg-[#111111] text-white font-three rounded-lg flex justify-between items-center cursor-pointer"
             >
               {expiryDate ? format(expiryDate, "PPP") : "Pick expiry date"}
-              <IoCalendarOutline size={20} />
+              <HugeiconsIcon icon={Calendar03Icon} />
             </button>
 
             {showCalendar && (

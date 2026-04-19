@@ -353,7 +353,7 @@ export default function QRGenerator() {
 
       <FaqSection />
       
-      {isLoggedIn && <TotalData />}
+      <TotalData />
 
       <Footer />      
     </div>

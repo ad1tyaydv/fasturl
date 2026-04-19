@@ -338,7 +338,9 @@ export default function Dashboard() {
       {copied && (
         <div className="fixed font-one top-24 left-1/2 -translate-x-1/2 px-6 py-3 shadow-2xl z-[100] text-white font-bold rounded-full animate-in fade-in slide-in-from-top-6 duration-300">
           <div role="alert" className="alert alert-success">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 shrink-0 stroke-current" fill="none" viewBox="0 0 24 24">
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              className="h-6 w-6 shrink-0 stroke-current" fill="none" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <span>Link copied successfully!</span>
@@ -352,7 +354,7 @@ export default function Dashboard() {
         </div>
       )}
 
-      {isLoggedIn && <TotalData />}
+      <TotalData />
       <Footer />
     </div>
   );
