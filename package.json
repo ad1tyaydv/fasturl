@@ -34,7 +34,7 @@
     "csv-parser": "^3.2.0",
     "dns": "^0.2.2",
     "dodopayments": "^2.28.2",
-    "framer-motion": "^12.36.0",
+    "framer-motion": "^12.38.0",
     "geoip-lite": "^2.0.0",
     "html2canvas": "^1.4.1",
     "i18n-iso-countries": "^7.14.0",

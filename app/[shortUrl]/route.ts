@@ -5,12 +5,14 @@ import { countryMap } from "../helpers/getCountryName";
 import { redis } from "@/lib/redis";
 import { UAParser } from "ua-parser-js";
 
+
 const ANON_USER_CLICK = process.env.ANONYMOUS_USER_CLICK!;
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ shortUrl: string }> }) {
 
     try {
         const { shortUrl } = await params;
+
 
         let originalUrl = await redis.get(`link:${shortUrl}`);
 
@@ -37,37 +39,41 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ shor
             }
         }
 
-        let findUrl;
+        
+        const findUrl = await prisma.link.findUnique({
+            where: {
+                shorturl: shortUrl,
+            },
+        });
 
-        if (!originalUrl){
-            findUrl = await prisma.link.findUnique({
+        if (!findUrl) {
+            return NextResponse.json(
+                { message: "URL not found" },
+                { status: 404 }
+            );
+        }
+
+        if (findUrl.expiresAt && new Date() > findUrl.expiresAt) {
+            await prisma.link.delete({
                 where: {
-                    shorturl: shortUrl,
-                },
+                    shorturl: shortUrl
+                }
             });
 
-            if (!findUrl) {
-                return NextResponse.json(
-                    { message: "URL not found" },
-                    { status: 404 }
-                );
-            }
+            await redis.del(`link:${shortUrl}`);
 
+            return NextResponse.redirect(new URL("/expired", req.url));
+        }
+
+        if (!originalUrl) {
             originalUrl = findUrl.original;
 
             await redis.set(`link:${shortUrl}`, originalUrl, {
                 ex: 60 * 60 * 24,
             });
-
-        } else {
-            findUrl = await prisma.link.findUnique({
-                where: {
-                    shorturl: shortUrl,
-                },
-            });
         }
 
-        if(findUrl?.password) {
+        if (findUrl?.password) {
             return NextResponse.redirect(new URL(`/verify/${shortUrl}`, req.url));
         }
 
@@ -100,7 +106,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ shor
                 else if (domain.includes("instagram")) referrer = "Instagram";
                 else if (domain.includes("google")) referrer = "Google";
                 else referrer = domain;
-                
+
             } catch {
 
             }
