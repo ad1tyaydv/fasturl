@@ -50,6 +50,7 @@ export async function POST(req: NextRequest) {
         const token = jwt.sign(
             {
                 userId: userSignup.id,
+                username: userSignup.userName,
                 email: data.email,
                 plan: userSignup.plan,
                 planExpiresAt: userSignup.planExpiresAt
@@ -72,6 +73,7 @@ export async function POST(req: NextRequest) {
             path: "/",
             maxAge: 60 * 60 * 24 * 365,
         });
+        
 
         return response;
         

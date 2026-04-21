@@ -21,6 +21,41 @@ export async function POST(req: NextRequest) {
     const decoded = jwt.verify(token, JWT_SECRET) as {
       userId: string;
     };
+    const userId = decoded.userId;
+
+    const totalDomains = await prisma.customDomain.count({
+      where: {
+        userId: userId
+      }
+    })
+
+    const userTier = await prisma.user.findUnique({
+      where: {
+      id: userId
+      },
+      select: {
+        plan: true
+      }
+    })
+
+    if(userTier?.plan === "FREE") {
+      return NextResponse.json(
+        {message: "Please upgrade to add more domains!"},
+        {status: 401}
+      )
+
+    } else if(userTier?.plan === "ESSENTIAL" && totalDomains >= 4) {
+      return NextResponse.json(
+        {message: "You can add only upto 4 custom domains."},
+        {status: 401}
+      )
+
+    } else if(userTier?.plan === "PRO" && totalDomains >= 10) {
+      return NextResponse.json(
+        {message: "You can add only upto 10 custom domains."},
+        {status: 401}
+      )
+    }
 
     const { domain } = await req.json();
 
@@ -45,7 +80,7 @@ export async function POST(req: NextRequest) {
 
     const existing = await prisma.customDomain.findFirst({
       where: {
-        userId: decoded.userId,
+        userId: userId,
         domain: rootDomain,
         subDomain: subDomain
       }
@@ -77,7 +112,7 @@ export async function POST(req: NextRequest) {
         cnameTarget: cnameTarget,
         cnameVerfied: false,
         isActive: false,
-        userId: decoded.userId
+        userId: userId
       }
     });
 

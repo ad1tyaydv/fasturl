@@ -21,7 +21,7 @@ interface LinkPasswordProps {
   onSuccess: () => void;
 }
 
-export default function LinkPasswordModal({ isOpen, onClose, selectedUrl, onSuccess }: LinkPasswordProps) {
+export default function LinkPasswordProtectionModal({ isOpen, onClose, selectedUrl, onSuccess }: LinkPasswordProps) {
   const [password, setPassword] = useState("");
   const [expiryDate, setExpiryDate] = useState<Date | undefined>();
   const [showCalendar, setShowCalendar] = useState(false);

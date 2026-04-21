@@ -5,7 +5,7 @@ import { Loader2, Clock, ShieldCheck, ShieldOff, ChevronLeft, ChevronRight } fro
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import { RequestsFilter, TimeFilter } from "@/app/dropDown/apiRequestDropDown";
+import { ApiRequestsFilter, ApiTimeFilter } from "@/app/dropDown/apiRequestDropDown";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Settings02Icon } from "@hugeicons/core-free-icons";
 
@@ -29,13 +29,13 @@ interface FlatRow {
 
 const PAGE_SIZE = 25;
 
-export default function ApiLinksTab() {
+export default function ApiLinks() {
   const router = useRouter();
   const [allRows, setAllRows] = useState<FlatRow[]>([]);
   const [apiKeyNames, setApiKeyNames] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedKey, setSelectedKey] = useState<string>("all");
-  const [timeFilter, setTimeFilter] = useState<TimeFilter>("all");
+  const [timeFilter, setTimeFilter] = useState<ApiTimeFilter>("all");
   const [page, setPage] = useState(1);
 
   useEffect(() => {
@@ -70,7 +70,6 @@ export default function ApiLinksTab() {
     }
   };
 
-
   const filteredRows = useMemo(() => {
     let rows = [...allRows];
 
@@ -89,13 +88,10 @@ export default function ApiLinksTab() {
 
   }, [allRows, selectedKey, timeFilter]);
 
-
   const totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
   const pagedRows = filteredRows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-
   useEffect(() => { setPage(1); }, [selectedKey, timeFilter]);
-
 
   return (
     <div className="animate-in fade-in duration-300">
@@ -114,7 +110,7 @@ export default function ApiLinksTab() {
         </div>
 
         <div className="flex items-center justify-end w-full md:w-auto">
-          <RequestsFilter
+          <ApiRequestsFilter
             apiKeyNames={apiKeyNames}
             selectedKey={selectedKey}
             setSelectedKey={setSelectedKey}
@@ -136,29 +132,29 @@ export default function ApiLinksTab() {
         </div>
       ) : (
         <>
-          <div className="rounded-xl border border-neutral-800/60 overflow-hidden bg-[#111111]">
-            <table className="w-full text-sm text-neutral-300">
+          <div className="rounded-xl border border-neutral-800/60 overflow-x-auto bg-[#111111]">
+            <table className="w-full min-w-[600px] text-sm text-neutral-300">
               <thead>
                 <tr className="border-b border-neutral-800 bg-neutral-900/50">
-                  <th className="text-left text-xs font-medium text-neutral-500 px-6 py-4 uppercase">Short URL</th>
-                  <th className="text-left text-xs font-medium text-neutral-500 px-6 py-4 uppercase">API Key</th>
-                  <th className="text-left text-xs font-medium text-neutral-500 px-6 py-4 uppercase">Protected</th>
-                  <th className="text-left text-xs font-medium text-neutral-500 px-6 py-4 uppercase">Created</th>
+                  <th className="text-left text-xs font-medium text-neutral-500 px-6 py-4 uppercase whitespace-nowrap">Short URL</th>
+                  <th className="text-left text-xs font-medium text-neutral-500 px-6 py-4 uppercase whitespace-nowrap">API Key</th>
+                  <th className="text-left text-xs font-medium text-neutral-500 px-6 py-4 uppercase whitespace-nowrap">Protected</th>
+                  <th className="text-left text-xs font-medium text-neutral-500 px-6 py-4 uppercase whitespace-nowrap">Created</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-neutral-800/40">
                 {pagedRows.map((row, i) => (
                   <tr key={i} className="hover:bg-neutral-800/30 transition-colors">
-                    <td className="px-6 py-4 font-mono text-xs text-blue-400">{row.shorturl}</td>
-                    <td className="px-6 py-4 text-neutral-400">{row.keyName}</td>
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-4 font-mono text-xs text-blue-400 whitespace-nowrap">{row.shorturl}</td>
+                    <td className="px-6 py-4 text-neutral-400 whitespace-nowrap">{row.keyName}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
                       {row.isProtected ? (
                         <div className="flex items-center gap-1.5 text-green-500"><ShieldCheck size={14}/> <span>Yes</span></div>
                       ) : (
                         <div className="flex items-center gap-1.5 text-neutral-600"><ShieldOff size={14}/> <span>No</span></div>
                       )}
                     </td>
-                    <td className="px-6 py-4 text-neutral-500 text-xs">
+                    <td className="px-6 py-4 text-neutral-500 text-xs whitespace-nowrap">
                       {new Date(row.createdAt).toLocaleDateString("en-IN", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
                     </td>
                   </tr>

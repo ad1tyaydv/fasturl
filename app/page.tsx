@@ -13,7 +13,7 @@ import {
 import Navbar from "./components/navbar";
 import PricingSection from "./components/PricingSection";
 import TotalData from "./components/totalData";
-import FasturlFeatures from "./components/features";
+import Features from "./components/features";
 import FaqSection from "./components/faqSection";
 import Footer from "./components/footer";
 import { DomainDropdown } from "./dropDown/domainDropDown";
@@ -76,8 +76,21 @@ export default function Dashboard() {
   }, []);
 
 
+  const isValidUrl = (value: string) => {
+    try {
+      new URL(value);
+      return true;
+
+    } catch {
+      return false;
+    }
+  };
+
   const handleShortUrl = async (originalUrl: string) => {
-    if (!originalUrl) return;
+    if (!originalUrl || !isValidUrl(originalUrl)) {
+      toast.error("Please enter a valid URL!");
+      return;
+    }
     try {
       setLoading(true);
       const res = await axios.post("/api/shortUrl", {
@@ -88,6 +101,9 @@ export default function Dashboard() {
       const generatedShortUrl = res.data.shortUrl;
       setShortUrl(generatedShortUrl);
       setUrl(`${selectedDomain}/${generatedShortUrl}`);
+
+      setLinksLeft((prev) => Math.max(0, prev - 1));
+
 
     } catch (error: any) {
       if (error.response?.status === 401) {
@@ -133,8 +149,13 @@ export default function Dashboard() {
 
     setIsLoadingQr(true);
     try {
-      const res = await axios.post("/api/qrCode", { shortUrl: shortUrl, longUrl: url });
-      setShowQr(res.data.qrImage);
+      const res = await axios.post("/api/qrCode", {
+        shortUrl: shortUrl,
+        longUrl: url
+      });
+      if (res.data.qrImage && typeof res.data.qrImage === "string") {
+        setShowQr(res.data.qrImage);
+      }
 
     } catch (error: any) {
       if (error.response?.status === 429) setUpgradeMsg(true);
@@ -189,26 +210,27 @@ export default function Dashboard() {
               Shorten Your <span className="text-red-500">Links</span> Instantly
             </h1>
 
-            <p className="font-one text-lg text-neutral-400 max-w-lg mx-auto lg:mx-0 mb-4">
+            <p className="font-one text-lg text-neutral-400 max-w-lg mx-auto lg:mx-0 mb-4 px-2 sm:px-0">
               Transform long URLs into brandable short links with analytics, custom domains, and QR codes.
             </p>
 
-            <p className="font-one text-lg text-neutral-400 max-w-lg mx-auto lg:mx-0 mb-8">
+            <p className="hidden lg:block font-one text-lg text-neutral-400 max-w-lg mx-auto lg:mx-0 mb-8">
               Share links, Generate QR Codes, view analytics and more than just a URL shortener.
             </p>
 
             {userPlan === "FREE" && (
-              <div className="flex justify-center lg:justify-start">
+              <div className="flex justify-center lg:justify-start mb-8 lg:mb-0">
                 <Button
                   onClick={() => router.push("/premium")}
                   className="px-5 py-5 font-bold bg-white text-black transition-all duration-300 flex items-center gap-2 group cursor-pointer"
                 >
                   View Plans
-                  <span className="group-hover:translate-x-1 transition-transform"><HugeiconsIcon icon={ArrowRightDoubleIcon} /></span>
+                  <span className="group-hover:translate-x-1 transition-transform">
+                    <HugeiconsIcon icon={ArrowRightDoubleIcon} />
+                  </span>
                 </Button>
               </div>
             )}
-
           </div>
 
           <div className="flex-1 w-full max-w-xl">
@@ -268,11 +290,7 @@ export default function Dashboard() {
               {isLoggedIn && (
                 <div className="mb-4">
                   <span className="px-3 py-1.5 bg-[#1c1c1c] border border-neutral-800 text-sm font-medium text-neutral-400 inline-block rounded-lg shadow-sm">
-                    {userPlan === "FREE" ? (
-                      <>You have <strong className="text-white">{linksLeft}</strong> links left this month</>
-                    ) : (
-                      <>You have <strong className="text-white">{linksLeft}</strong> links left this month</>
-                    )}
+                    You have <strong className="text-white">{linksLeft}</strong> links left this month
                   </span>
                 </div>
               )}
@@ -285,7 +303,7 @@ export default function Dashboard() {
                       Generating your QR...
                     </p>
                   </div>
-                ) : showQr && typeof showQr === "string" ? (
+                ) : typeof showQr === "string" ? (
                   <div className="flex flex-col items-center animate-in fade-in zoom-in duration-500">
 
                     <div className="bg-white p-1 rounded-md">
@@ -329,7 +347,7 @@ export default function Dashboard() {
       </section>
 
 
-      <FasturlFeatures isLoggedIn={isLoggedIn} userPlan={userPlan} />
+      <Features isLoggedIn={isLoggedIn} userPlan={userPlan} />
       <div className="w-full h-px bg-neutral-800/50 my-12 shadow-sm"></div>
       <div ref={pricingRef}><PricingSection /></div>
       <div className="w-full h-px bg-neutral-800/50 my-12 shadow-sm"></div>
@@ -338,8 +356,8 @@ export default function Dashboard() {
       {copied && (
         <div className="fixed font-one top-24 left-1/2 -translate-x-1/2 px-6 py-3 shadow-2xl z-[100] text-white font-bold rounded-full animate-in fade-in slide-in-from-top-6 duration-300">
           <div role="alert" className="alert alert-success">
-            <svg 
-              xmlns="http://www.w3.org/2000/svg" 
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
               className="h-6 w-6 shrink-0 stroke-current" fill="none" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>

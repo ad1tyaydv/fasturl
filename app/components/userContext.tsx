@@ -33,6 +33,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
       if (data) {
         setUser(data);
+
       } else {
         setUser(null);
       }
@@ -110,7 +111,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       }, 1000);
       
     } catch (error) {
-      console.log("Logout error:", error);
+      
     }
   };
 

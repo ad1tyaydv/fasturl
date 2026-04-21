@@ -8,13 +8,11 @@ const BASE_URL = process.env.NEXT_PUBLIC_DOMAIN;
 function CodeBlock({ code, language = "bash" }: { code: string; language?: string }) {
     const [copied, setCopied] = useState(false);
 
-    
     const handleCopy = () => {
         navigator.clipboard.writeText(code);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
     };
-
 
     return (
         <div className="relative group bg-neutral-900 border border-neutral-800 rounded-lg overflow-hidden mb-4">
@@ -46,7 +44,7 @@ function CodeBlock({ code, language = "bash" }: { code: string; language?: strin
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
     return (
-        <div className="mb-10">
+        <div className="mb-10 font-one">
             <h3 className="text-lg font-bold text-white mb-3 pb-2 border-b border-neutral-800">
                 {title}
             </h3>
@@ -57,8 +55,9 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 export default function DocsTab() {
     return (
-        <div className="animate-in fade-in duration-300">
-            <div className="mb-8">
+        <div className="animate-in fade-in duration-300 font-one">
+            {/* Header section - Hidden on mobile, shown from sm breakpoint up */}
+            <div className="mb-8 hidden sm:block">
                 <h2 className="text-2xl font-bold text-white mb-1">Docs</h2>
                 <p className="text-neutral-400 text-sm">
                     Learn how to authenticate and use the API in your applications.
@@ -66,7 +65,7 @@ export default function DocsTab() {
             </div>
 
             <Section title="Authentication">
-                <p className="text-neutral-400 text-sm mb-4">
+                <p className="text-neutral-400 text-sm mb-4 leading-relaxed">
                     Use your API key in the <code className="text-blue-400">Authorization</code> header as a Bearer token.
                 </p>
                 <CodeBlock
@@ -81,7 +80,7 @@ export default function DocsTab() {
             </Section>
 
             <Section title="Create Short Link">
-                <p className="text-neutral-400 text-sm mb-4">
+                <p className="text-neutral-400 text-sm mb-4 leading-relaxed">
                     Create a new short link with optional password, expiry, and custom name.
                 </p>
 
@@ -96,11 +95,6 @@ export default function DocsTab() {
   "password": "123456",
   "expiry": "2026-05-01"
 }'`}
-                />
-
-                <CodeBlock
-                    language="bash"
-                    code={`curl -X POST ${BASE_URL}/v1/shortLink -H "Authorization: Bearer YOUR_API_KEY" -H "Content-Type: application/json" -d '{"url":"https://google.com","linkName":"Google Homepage","password":"123456","expiry":"2026-05-01"}'`}
                 />
 
                 <CodeBlock
@@ -121,20 +115,13 @@ export default function DocsTab() {
 
 const data = await res.json();`}
                 />
-
-                <CodeBlock
-                    language="json"
-                    code={`{
-  "shortUrl": "http://localhost:3000/abc123"
-}`}
-                />
             </Section>
 
             <Section title="Response Format">
                 <CodeBlock
                     language="json"
                     code={`{
-  "shortUrl": "http://localhost:3000/abc123"
+  "shortUrl": "${BASE_URL}/abc123"
 }`}
                 />
             </Section>

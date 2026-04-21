@@ -19,6 +19,7 @@ import Navbar from "@/app/components/navbar";
 import PricingSection from "@/app/components/PricingSection";
 import FaqSection from "@/app/components/faqSection";
 import TotalData from "@/app/components/totalData";
+import Features from "@/app/components/features";
 import Footer from "@/app/components/footer";
 import { Button } from "@/components/ui/button";
 
@@ -338,6 +339,8 @@ export default function QRGenerator() {
           )}
         </div>
       </section>
+
+      <Features isLoggedIn={isLoggedIn} userPlan={userPlan} />
 
       <div ref={pricingRef}>
         <PricingSection />

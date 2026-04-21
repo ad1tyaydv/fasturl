@@ -17,7 +17,7 @@ interface FasturlFeaturesProps {
 }
 
 
-export default function FasturlFeatures({ isLoggedIn, userPlan }: FasturlFeaturesProps) {
+export default function Features({ isLoggedIn, userPlan }: FasturlFeaturesProps) {
   const router = useRouter();
 
   const handleAccess = (path: string) => {
@@ -62,7 +62,7 @@ export default function FasturlFeatures({ isLoggedIn, userPlan }: FasturlFeature
       title: "Link Management",
       desc: "Organize, edit, and delete your links in one dashboard.",
       icon: <IoListOutline size={28} />,
-      path: "/urls",
+      path: "/links?types=links",
       color: "bg-orange-600 hover:bg-orange-700",
       border: "border-orange-900/30",
     },

@@ -23,36 +23,36 @@ const COMPARISON_SECTIONS: ComparisonSection[] = [
   {
     title: "Links & QR Codes",
     rows: [
-      { label: "Links per month",    free: "100",    essential: "10,000",  pro: "40,000"  },
-      { label: "QR Codes per month", free: "30",     essential: "300",     pro: "2,000"   },
+      { label: "Links per month", free: "100", essential: "10,000", pro: "40,000" },
+      { label: "QR Codes per month", free: "30", essential: "300", pro: "2,000" },
     ],
   },
   {
     title: "Analytics & Tracking",
     rows: [
-      { label: "Click tracking",  free: true,  essential: true,  pro: true  },
-      { label: "Location",        free: true,  essential: true,  pro: true  },
-      { label: "Browsers",        free: false, essential: true,  pro: true  },
-      { label: "OS details",      free: false, essential: true,  pro: true  },
-      { label: "Devices",         free: false, essential: true,  pro: true  },
-      { label: "Top referrers",   free: false, essential: true,  pro: true  },
+      { label: "Click tracking", free: true, essential: true, pro: true },
+      { label: "Location", free: true, essential: true, pro: true },
+      { label: "Browsers", free: false, essential: true, pro: true },
+      { label: "OS details", free: false, essential: true, pro: true },
+      { label: "Devices", free: false, essential: true, pro: true },
+      { label: "Top referrers", free: false, essential: true, pro: true },
     ],
   },
   {
     title: "Advanced Features",
     rows: [
-      { label: "Bulk create",       free: false, essential: true,         pro: true          },
-      { label: "Custom domains",    free: false, essential: "4 domains",  pro: "10 domains"  },
-      { label: "Custom URLs",       free: false, essential: false,        pro: true          },
-      { label: "API access",        free: false, essential: false,        pro: true          },
-      { label: "Security options",  free: false, essential: false,        pro: true          },
+      { label: "Bulk create", free: false, essential: true, pro: true },
+      { label: "Custom domains", free: false, essential: "4 domains", pro: "10 domains" },
+      { label: "Custom URLs", free: false, essential: false, pro: true },
+      { label: "API access", free: false, essential: false, pro: true },
+      { label: "Security options", free: false, essential: false, pro: true },
     ],
   },
   {
     title: "Pricing",
     rows: [
-      { label: "Price per month",    free: "₹0",    essential: "₹300",   pro: "₹1,200"  },
-      { label: "Original price",     free: "—",     essential: "₹1,200", pro: "₹5,600"  },
+      { label: "Price per month", free: "₹0", essential: "₹300", pro: "₹1,200" },
+      { label: "Original price", free: "—", essential: "₹1,200", pro: "₹5,600" },
     ],
   },
 ];
@@ -83,11 +83,11 @@ function ChevronIcon({ open }: { open: boolean }) {
 function Cell({ value, tier }: { value: CellValue; tier: "free" | "essential" | "pro" }) {
   const colBg =
     tier === "essential" ? "bg-blue-500/5" :
-    tier === "pro"       ? "bg-yellow-500/5" : "";
+      tier === "pro" ? "bg-yellow-500/5" : "";
 
   const checkColor =
     tier === "essential" ? "text-blue-400" :
-    tier === "pro"       ? "text-yellow-400" : "text-white/30";
+      tier === "pro" ? "text-yellow-400" : "text-white/30";
 
   if (value === true) {
     return (
@@ -105,7 +105,7 @@ function Cell({ value, tier }: { value: CellValue; tier: "free" | "essential" | 
     );
   }
 
-  
+
   if (value === "—") {
     return (
       <div className={`px-3 py-3.5 flex items-center justify-center text-white/20 text-lg ${colBg}`}>
@@ -144,9 +144,9 @@ function Section({ section }: { section: ComparisonSection }) {
           className={`grid grid-cols-[2fr_1fr_1fr_1fr] border-t border-white/5 hover:bg-white/[0.04] transition-colors ${i % 2 !== 0 ? "bg-white/[0.015]" : ""}`}
         >
           <div className="px-5 py-3.5 text-sm text-white/60">{row.label}</div>
-          <Cell value={row.free}      tier="free"      />
+          <Cell value={row.free} tier="free" />
           <Cell value={row.essential} tier="essential" />
-          <Cell value={row.pro}       tier="pro"       />
+          <Cell value={row.pro} tier="pro" />
         </div>
       ))}
     </div>
@@ -156,6 +156,38 @@ function Section({ section }: { section: ComparisonSection }) {
 
 
 export default function Premium() {
+  const [loading, setLoading] = useState<"ESSENTIAL" | "PRO" | null>(null);
+
+  async function handleCheckout(plan: "ESSENTIAL" | "PRO") {
+    try {
+      setLoading(plan);
+
+      const res = await fetch("/api/billing/checkout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ plan }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error);
+      }
+
+      window.location.href = data.checkout_url;
+
+    } catch (error) {
+      console.error(error);
+      alert("Unable to start checkout");
+      
+    } finally {
+      setLoading(null);
+    }
+  }
+
   return (
     <div className="min-h-screen bg-[#141414] text-white">
       <Navbar />
@@ -224,8 +256,12 @@ export default function Premium() {
                 </li>
               ))}
             </ul>
-            <button className="w-full py-2.5 rounded-xl bg-blue-500 hover:bg-blue-400 text-white text-sm font-semibold transition-colors cursor-pointer">
-              Upgrade to Essentials
+            <button
+              onClick={() => handleCheckout("ESSENTIAL")}
+              disabled={loading === "ESSENTIAL"}
+              className="w-full py-2.5 rounded-xl bg-blue-500 hover:bg-blue-400 text-white text-sm font-semibold transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {loading === "ESSENTIAL" ? "Redirecting..." : "Upgrade to Essentials"}
             </button>
           </div>
 
@@ -258,8 +294,12 @@ export default function Premium() {
                 </li>
               ))}
             </ul>
-            <button className="w-full py-2.5 rounded-xl bg-yellow-500 hover:bg-yellow-400 text-black text-sm font-semibold transition-colors cursor-pointer">
-              Upgrade to Pro
+            <button
+              onClick={() => handleCheckout("PRO")}
+              disabled={loading === "PRO"}
+              className="w-full py-2.5 rounded-xl bg-yellow-500 hover:bg-yellow-400 text-black text-sm font-semibold transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {loading === "PRO" ? "Redirecting..." : "Upgrade to Pro"}
             </button>
           </div>
 
@@ -291,13 +331,21 @@ export default function Premium() {
               </button>
             </div>
             <div className="px-3 py-4 flex items-center justify-center bg-blue-500/5">
-              <button className="px-4 py-2 text-xs rounded-xl bg-blue-500 hover:bg-blue-400 text-white transition-colors font-semibold">
-                Get Essentials
+              <button
+                onClick={() => handleCheckout("ESSENTIAL")}
+                disabled={loading === "ESSENTIAL"}
+                className="px-4 py-2 text-xs rounded-xl bg-blue-500 hover:bg-blue-400 text-white transition-colors font-semibold disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {loading === "ESSENTIAL" ? "Redirecting..." : "Get Essentials"}
               </button>
             </div>
             <div className="px-3 py-4 flex items-center justify-center bg-yellow-500/5">
-              <button className="px-4 py-2 text-xs rounded-xl bg-yellow-500 hover:bg-yellow-400 text-black transition-colors font-semibold">
-                Get Pro
+              <button
+                onClick={() => handleCheckout("PRO")}
+                disabled={loading === "PRO"}
+                className="px-4 py-2 text-xs rounded-xl bg-yellow-500 hover:bg-yellow-400 text-black transition-colors font-semibold disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {loading === "PRO" ? "Redirecting..." : "Get Pro"}
               </button>
             </div>
           </div>

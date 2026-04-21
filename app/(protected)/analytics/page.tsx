@@ -3,21 +3,21 @@
 
 import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
-import { Loader2, Lock } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Loader2, Lock, ChevronLeft } from "lucide-react";
 
 import { HugeiconsIcon } from '@hugeicons/react';
 import {
-  AnalyticsUpIcon, Search01Icon, QrCodeIcon }
+  AnalyticsUpIcon, Search01Icon, Link04Icon, PlusSignIcon }
   from '@hugeicons/core-free-icons';
 
 import Navbar from "@/app/components/navbar";
 import ClicksAnalytics from "@/app/components/analytics/clicks";
 import BrowserAnalytics from "@/app/components/analytics/browsers";
-import DeviceListAnalytics from "@/app/components/analytics/devices";
-import CountryAnalytics from "@/app/components/analytics/location";
+import DeviceAnalytics from "@/app/components/analytics/devices";
+import LocationAnalytics from "@/app/components/analytics/location";
 import OSAnalytics from "@/app/components/analytics/os";
 import ReferrerAnalytics from "@/app/components/analytics/referrers";
-
 import { AnalyticsDropDown } from "@/app/dropDown/analyticsDropDown";
 
 
@@ -51,6 +51,7 @@ function PremiumBlock({ children, isFree }: { children: React.ReactNode; isFree:
 
 
 export default function AnalyticsPage() {
+  const router = useRouter();
   const [urls, setUrls] = useState<any[]>([]);
   const [tier, setTier] = useState<string>("FREE");
   const [searchQuery, setSearchQuery] = useState("");
@@ -60,7 +61,6 @@ export default function AnalyticsPage() {
   const [fetchingStats, setFetchingStats] = useState(false);
   const [days, setDays] = useState<number>(7);
 
-
   const fetchAnalytics = async (linkId: string) => {
     setFetchingStats(true);
     try {
@@ -68,10 +68,13 @@ export default function AnalyticsPage() {
         method: "POST",
         body: JSON.stringify({ linkId }),
       });
+      
       const data = await res.json();
       setAnalyticsData(data);
+
     } catch (err) {
       console.error(err);
+
     } finally {
       setFetchingStats(false);
     }
@@ -96,7 +99,6 @@ export default function AnalyticsPage() {
           const fetchedUrls: any[] = data.urls || [];
           setUrls(fetchedUrls);
 
-          // Deep-link: read ?link=<shorturl> from current URL on mount
           const params = new URLSearchParams(window.location.search);
           const slug = params.get("link");
           if (slug) {
@@ -107,26 +109,28 @@ export default function AnalyticsPage() {
             }
           }
         }
+
       } catch (e) {
         console.error("Initialization error:", e);
+
       } finally {
         setLoading(false);
       }
     }
     init();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
+  }, []);
 
   const handleLinkClick = async (url: any) => {
     setSelectedLink(url.id);
-
-    // Update browser URL to /analytics?link=<shorturl> without navigation/redirect
     window.history.replaceState(null, "", `/analytics?link=${url.shorturl}`);
-
     fetchAnalytics(url.id);
   };
 
+  const handleBackToList = () => {
+    setSelectedLink(null);
+    window.history.replaceState(null, "", `/analytics`);
+  };
 
   const filteredUrls = useMemo(() => {
     const filtered = urls.filter((url) => {
@@ -137,6 +141,7 @@ export default function AnalyticsPage() {
       );
     });
 
+
     return filtered.sort((a, b) => {
       const dateA = new Date(a.createdAt || 0).getTime();
       const dateB = new Date(b.createdAt || 0).getTime();
@@ -144,24 +149,42 @@ export default function AnalyticsPage() {
     });
   }, [urls, searchQuery]);
 
-
   const isFree = tier === "FREE";
 
-
+  
   return (
     <div className="flex flex-col h-screen bg-black text-white font-sans selection:bg-blue-500/30">
       <Navbar />
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden bg-[#141414]">
         {loading ? (
           <div className="flex flex-1 items-center justify-center bg-[#141414]">
             <Loader2 className="animate-spin text-blue-500 w-8 h-8" />
           </div>
+        ) : urls.length === 0 ? (
+          <div className="flex-1 flex flex-col items-center justify-center p-6">
+            <div className="w-full max-w-2xl py-20 px-4 flex flex-col items-center justify-center border-2 border-dashed border-neutral-800 rounded-3xl bg-[#1c1c1c]/30 fade-in">
+              <div className="p-4 bg-neutral-900 rounded-2xl border border-neutral-800 mb-6">
+                <HugeiconsIcon icon={Link04Icon} className="w-10 h-10 text-neutral-500" />
+              </div>
+              <h2 className="text-xl sm:text-2xl font-one mb-2 text-white text-center">
+                Generate your first shorturl to see analytics
+              </h2>
+              <p className="text-neutral-500 font-three text-sm mb-8 text-center max-w-sm">
+                Shorten your long links to start tracking clicks, locations, and more in real-time.
+              </p>
+              <button 
+                onClick={() => router.push("/")} 
+                className="bg-white text-black hover:bg-neutral-200 font-three px-8 py-3 rounded-xl flex items-center gap-2 transition-colors cursor-pointer"
+              >
+                <HugeiconsIcon icon={PlusSignIcon} className="w-5 h-5" /> Create Link
+              </button>
+            </div>
+          </div>
         ) : (
           <>
-            <aside className="w-80 border-r border-neutral-900 flex flex-col bg-[#141414] shrink-0">
+            <aside className={`border-r border-neutral-900 flex-col bg-[#141414] shrink-0 ${selectedLink ? 'hidden md:flex md:w-80' : 'flex w-full md:w-80'}`}>
               <div className="p-6 space-y-4">
-
                 <div className="relative group">
                   <HugeiconsIcon icon={Search01Icon} className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500 group-focus-within:text-blue-500 transition-colors" />
                   <input
@@ -196,16 +219,25 @@ export default function AnalyticsPage() {
               </div>
             </aside>
 
-            <main className="flex-1 overflow-y-auto bg-[#141414]">
+            <main className={`flex-1 overflow-y-auto bg-[#141414] ${!selectedLink ? 'hidden md:block' : 'block'}`}>
               {!selectedLink ? (
                 <div className="h-full flex flex-col items-center justify-center text-neutral-600">
                   <HugeiconsIcon icon={AnalyticsUpIcon} size={40} />
                   <p className="text-sm mt-4">Click a link on the left to see performance</p>
                 </div>
               ) : (
-                <div className="p-10 max-w-[1400px] mx-auto space-y-10">
+                <div className="p-6 md:p-10 max-w-[1400px] mx-auto space-y-8 md:space-y-10">
                   <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <h1 className="text-4xl font-three tracking-tight cursor-pointer">Link Analytics Dashboard</h1>
+                    <div className="flex flex-col items-start gap-2">
+                      <button 
+                        onClick={handleBackToList}
+                        className="md:hidden flex items-center gap-2 text-sm text-neutral-400 hover:text-white transition-colors"
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                        Back
+                      </button>
+                      <h1 className="text-3xl md:text-4xl font-three tracking-tight cursor-pointer">Link Analytics</h1>
+                    </div>
                     <AnalyticsDropDown days={days} setDays={setDays} />
                   </header>
 
@@ -220,7 +252,7 @@ export default function AnalyticsPage() {
 
                   <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <PremiumBlock isFree={isFree}>
-                      <CountryAnalytics data={analyticsData?.countries} days={days} />
+                      <LocationAnalytics data={analyticsData?.countries} days={days} />
                     </PremiumBlock>
 
                     <PremiumBlock isFree={isFree}>
@@ -228,7 +260,7 @@ export default function AnalyticsPage() {
                     </PremiumBlock>
 
                     <PremiumBlock isFree={isFree}>
-                      <DeviceListAnalytics data={analyticsData?.devices} days={days} />
+                      <DeviceAnalytics data={analyticsData?.devices} days={days} />
                     </PremiumBlock>
                   </section>
 

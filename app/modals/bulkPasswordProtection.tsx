@@ -21,7 +21,7 @@ interface BulkPasswordProps {
   onSuccess: () => void;
 }
 
-export default function BulkPasswordModal({
+export default function BulkPasswordProtectionModal({
   isOpen,
   onClose,
   selectedBatch,

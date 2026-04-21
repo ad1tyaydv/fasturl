@@ -4,6 +4,7 @@ import QRCode from "qrcode";
 import jwt from "jsonwebtoken";
 import { redis } from "@/lib/redis";
 
+
 const JWT_SECRET = process.env.NEXTAUTH_SECRET!;
 
 function add30Days(date: Date) {
@@ -48,7 +49,6 @@ export async function POST(req: NextRequest) {
 
     const now = new Date();
 
-    // ----------------- INIT CYCLE -----------------
     let cycleStart = user.cycleStart;
     let cycleEnd = user.cycleEnd;
 
@@ -66,24 +66,19 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // ----------------- RESET CYCLE -----------------
     if (cycleEnd && now > new Date(cycleEnd)) {
       cycleStart = now;
       cycleEnd = add30Days(now);
 
       await prisma.user.update({
         where: { id: userId },
-        data: {
-          cycleStart,
-          cycleEnd,
-        },
+        data: { cycleStart, cycleEnd },
       });
     }
 
-    // ----------------- LIMITS -----------------
-    let limit = 2;
-    if (user.plan === "ESSENTIAL") limit = 200;
-    if (user.plan === "PRO") limit = 2000;
+    let limit = 30;
+    if (user.plan === "ESSENTIAL") limit = 500;
+    if (user.plan === "PRO") limit = 5000;
 
     const count = await prisma.qr.count({
       where: {
@@ -107,7 +102,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // ----------------- QR GENERATION -----------------
     const fullShortUrl = `${process.env.NEXT_PUBLIC_DOMAIN}/${data.shortUrl}`;
 
     const qr = await QRCode.toDataURL(fullShortUrl, {
@@ -120,17 +114,35 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    const saveQR = await prisma.qr.create({
-      data: {
-        userId,
-        longUrl: data.longUrl,
-        shortUrl: data.shortUrl,
-        qrImage: qr,
-        ipAddress: ip,
-      },
+    const saveQR = await prisma.$transaction(async (tx) => {
+      const created = await tx.qr.create({
+        data: {
+          userId,
+          longUrl: data.longUrl,
+          shortUrl: data.shortUrl,
+          qrImage: qr,
+          ipAddress: ip,
+        },
+      });
+
+      await tx.user.update({
+        where: { id: userId },
+        data: {
+          totalQr: {
+            decrement: 1,
+          },
+        },
+      });
+
+      return created;
     });
 
-    await redis.del(`qrs-left:${userId}`);
+    const cachedKey = `qrs-left:${userId}`;
+    const cachedData = await redis.get(cachedKey);
+    if(!cachedData) {
+      await redis.set(cachedKey, user.totalQr);
+    }
+    await redis.decr(cachedKey);
 
     return NextResponse.json({
       message: "QR generated successfully!",
@@ -140,7 +152,6 @@ export async function POST(req: NextRequest) {
     });
 
   } catch (error) {
-    console.log(error);
     return NextResponse.json(
       { message: "Something went wrong!" },
       { status: 500 }

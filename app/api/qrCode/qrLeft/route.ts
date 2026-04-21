@@ -76,7 +76,8 @@ export async function GET(req: NextRequest) {
                          : Date.now() + 7 * 24 * 60 * 60 * 1000;
 
         const seconds = Math.floor((expiresAt - Date.now()) / 1000);
-        await redis.set(cachedKey, qrLeft, {ex: seconds});
+        
+        await redis.set(cachedKey, qrLeft);
 
         return NextResponse.json(
             {message: "Links left", qrLeft}

@@ -24,14 +24,12 @@ import {
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import Navbar from "../../components/navbar";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import FasturlFeatures from "@/app/components/features";
+import Features from "@/app/components/features";
 import FaqSection from "@/app/components/faqSection";
 import TotalData from "@/app/components/totalData";
 import Footer from "@/app/components/footer";
-
 
 const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN;
 
@@ -51,12 +49,10 @@ const getRelativeTime = (dateString?: string) => {
   return date.toLocaleDateString();
 };
 
-
 export default function BulkCreateLinks() {
   const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
-  const [authLoading, setAuthLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [status, setStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
@@ -83,40 +79,47 @@ export default function BulkCreateLinks() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
 
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const res = await axios.get("/api/auth/me");
+        
+        if (!res.data.authenticated) {
+          router.push("/auth/signin");
+          return;
+        }
+
+        setIsLoggedIn(true);
+        setUserPlan(res.data.plan || "FREE");
+        localStorage.setItem("plan", res.data.plan || "FREE");
+        await fetchPastBulkLinks();
+
+      } catch (error) {
+        router.push("/auth/signin");
+      } finally {
+
+      }
+    };
+    checkAuth();
+  }, [router]);
+
   const fetchPastBulkLinks = async () => {
     try {
       const res = await axios.get("/api/shortUrl/bulkLinks/fetchBulkLinks");
       setPastBulkLinks(res.data.bulkLinks || res.data || []);
-
     } catch (error) {
       console.error("Failed to fetch past bulk links", error);
     }
   };
 
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const res = await axios.get("/api/auth/me");
-        const authenticated = !!res.data.authenticated;
-        setIsLoggedIn(authenticated);
-
-        if (authenticated) {
-          setUserPlan(res.data.plan || "FREE");
-          localStorage.setItem("plan", res.data.plan || "FREE");
-          await fetchPastBulkLinks();
-        }
-
-      } catch {
-        setIsLoggedIn(false);
-
-      } finally {
-        setAuthLoading(false);
-      }
-    };
-    checkAuth();
-
-  }, [router]);
+  const checkPlanAccess = () => {
+    if (userPlan === "FREE") {
+      router.push("/premium");
+      return false;
+    }
+    return true;
+  };
 
 
   const handleGenerateMore = () => {
@@ -128,33 +131,26 @@ export default function BulkCreateLinks() {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
-
     if (selectedFile && selectedFile.type === "text/csv") {
       setFile(selectedFile);
       setStatus(null);
       setCreatedLinks([]);
-
     } else {
       alert("Please upload a valid CSV file.");
     }
   };
 
-
   const handleUpload = async () => {
-    if (userPlan === "FREE") {
-      router.push("/premium");
-      return;
-    }
+    if (!checkPlanAccess()) return;
+
     if (!file) return;
 
     if (expiryDate) {
       const selected = new Date(expiryDate);
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-
       if (selected < today) {
         setStatus({ type: "error", message: "Invalid Date: Expiry cannot be in the past." });
         return;
@@ -173,63 +169,48 @@ export default function BulkCreateLinks() {
       const res = await axios.post("/api/shortUrl/bulkLinks", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-
-      setStatus({
-        type: "success",
-        message: `Successfully created ${res.data.count} short links!`
-      });
-
+      setStatus({ type: "success", message: `Successfully created ${res.data.count} short links!` });
       setCreatedLinks(res.data.success || []);
       await fetchPastBulkLinks();
       setFile(null);
-
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || "";
       if (errorMessage.toLowerCase().includes("limit") || error.response?.status === 403) {
         setShowLimitModal(true);
       }
-      setStatus({
-        type: "error",
-        message: errorMessage || "Failed to process bulk upload."
-      });
-
+      setStatus({ type: "error", message: errorMessage || "Failed to process bulk upload." });
     } finally {
       setLoading(false);
     }
   };
 
-
   const handleUpdateName = async (id: string, newName: string) => {
+    if (!checkPlanAccess()) return;
     if (!newName.trim()) return;
+
     try {
       await axios.post("/api/shortUrl/bulkLinks/updateName", { linkId: id, name: newName });
       setPastBulkLinks((prev) =>
         prev.map((link) => (link.id === id ? { ...link, name: newName } : link))
       );
-
     } catch (err) {
       console.error("Failed to update name:", err);
-
     } finally {
       setEditingId(null);
     }
   };
-
 
   const handleDelete = async (id: string) => {
     setDeletingId(id);
     try {
       await axios.post(`/api/shortUrl/bulkLinks/delete/${id}`);
       setPastBulkLinks((prev) => prev.filter((link) => link.id !== id));
-
     } catch (error) {
       console.error("Failed to delete bulk links", error);
-
     } finally {
       setDeletingId(null);
     }
   };
-
 
   const exportPDF = () => {
     const doc = new jsPDF();
@@ -242,7 +223,6 @@ export default function BulkCreateLinks() {
     doc.save("links.pdf");
   };
 
-
   const exportCSV = () => {
     const headers = "Original URL,Short URL\n";
     const rows = createdLinks.map(l => `${l.original},${NEXT_DOMAIN}/${l.short}`).join("\n");
@@ -254,7 +234,6 @@ export default function BulkCreateLinks() {
     a.click();
   };
 
-
   const closeAllModals = () => {
     setSelectedUrl(null);
     setIsPasswordModalOpen(false);
@@ -265,7 +244,6 @@ export default function BulkCreateLinks() {
     setIsEditingExpiry(false);
   };
 
-
   const handleAddPassword = async () => {
     try {
       const finalPassword = isEditingPassword ? password : selectedUrl?.password;
@@ -275,19 +253,15 @@ export default function BulkCreateLinks() {
         password: finalPassword,
         expiryDate: finalExpiry,
       });
-
       toast.success("Protection Updated successfully");
       await fetchPastBulkLinks();
       closeAllModals();
-
     } catch (error) {
       console.log("Update failed");
     }
   };
 
-
   const topFiveLinks = pastBulkLinks.slice(0, 5);
-
 
   return (
     <div className="min-h-screen bg-[#141414] text-white transition-colors duration-300">
@@ -316,7 +290,11 @@ export default function BulkCreateLinks() {
             <div className="flex-1 flex flex-col min-h-0">
               <div className="flex-1 flex flex-col gap-3 min-h-0">
                 <div
-                  onClick={() => !createdLinks.length && fileInputRef.current?.click()}
+                  onClick={() => {
+                    if (!createdLinks.length) {
+                        fileInputRef.current?.click();
+                    }
+                  }}
                   className={`border-2 border-dashed rounded-xl p-6 flex-1 flex flex-col items-center justify-center transition-all duration-200 relative
                       ${createdLinks.length > 0 ? 'border-neutral-800 bg-[#1a1a1a] cursor-default' : file ? 'border-blue-500 bg-blue-500/10 cursor-pointer' : 'border-neutral-700 hover:border-blue-500 cursor-pointer'}`}
                 >
@@ -501,14 +479,11 @@ export default function BulkCreateLinks() {
                         <div className="flex items-center justify-end gap-1 text-neutral-300 shrink-0 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                           <button
                             onClick={() => {
-                              if (userPlan !== "PRO" && userPlan !== "ULTRA") {
-                                router.push("/premium");
-                              } else {
-                                setSelectedUrl(link);
-                                setIsPasswordModalOpen(true);
-                                setIsEditingPassword(!link.password);
-                                setIsEditingExpiry(!link.expiresAt);
-                              }
+                              if (!checkPlanAccess()) return;
+                              setSelectedUrl(link);
+                              setIsPasswordModalOpen(true);
+                              setIsEditingPassword(!link.password);
+                              setIsEditingExpiry(!link.expiresAt);
                             }}
                             className={`p-1.5 rounded-md transition-colors cursor-pointer hover:text-white hover:bg-neutral-800`}
                             title="Password Protection"
@@ -522,6 +497,7 @@ export default function BulkCreateLinks() {
 
                           <button
                             onClick={() => {
+                              if (!checkPlanAccess()) return;
                               setEditingId(link.id);
                               setTempName(link.name || "Bulk Link");
                             }}
@@ -550,7 +526,7 @@ export default function BulkCreateLinks() {
 
                   <div className="mt-4 pt-4 border-t border-neutral-800 shrink-0">
                     <button
-                      onClick={() => router.push('/urls?types=bulk')}
+                      onClick={() => router.push('/links?types=bulk')}
                       className="w-full flex items-center justify-between px-4 py-3 bg-[#1c1c1c] hover:bg-[#252525] border border-neutral-800 rounded-xl transition-all group cursor-pointer"
                     >
                       <span className="font-semibold text-sm text-neutral-300 group-hover:text-white">Manage all links</span>
@@ -733,14 +709,10 @@ export default function BulkCreateLinks() {
         </div>
       )}
 
-      <FasturlFeatures isLoggedIn={isLoggedIn} userPlan={userPlan} />
-
+      <Features isLoggedIn={isLoggedIn} userPlan={userPlan} />
       <div className="w-full h-px bg-neutral-800/50 my-12 shadow-sm"></div>
-
       <FaqSection />
-
       <TotalData />
-
       <Footer />
     </div>
   );

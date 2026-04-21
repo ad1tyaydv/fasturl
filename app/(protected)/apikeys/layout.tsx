@@ -1,27 +1,26 @@
 "use client";
 
-import { Suspense } from "react";
+import { useState, Suspense, useEffect } from "react";
+import axios from "axios";
 import { useRouter, useSearchParams } from "next/navigation";
 import Navbar from "../../components/navbar";
-import { Loader2 } from "lucide-react";
+import { Loader2, Menu, X, ChevronRight } from "lucide-react";
 import AllKeysTab from "./api/page";
 import RequestsTab from "./requests/page";
 import DocsTab from "./docs/page";
 import LogsTab from "./apiLogs/page";
 
 const tabs = [
-  { id: "allkeys",  label: "All Keys" },
+  { id: "allkeys", label: "All Keys" },
   { id: "requests", label: "Requests" },
-  { id: "logs",     label: "API Logs" },
-  { id: "docs",     label: "Docs" },
+  { id: "logs", label: "API Logs" },
+  { id: "docs", label: "Docs" },
 ];
-
 
 function ApiKeysSidebar() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const activeTab = searchParams.get("type") ?? "allkeys";
-
 
   return (
     <aside className="hidden md:flex fixed top-[64px] left-0 h-[calc(100vh-64px)] w-64 flex-col bg-[#141414] border-r border-neutral-800 px-4 py-6 z-10">
@@ -44,31 +43,40 @@ function ApiKeysSidebar() {
   );
 }
 
-
-function MobileSidebar() {
+function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const activeTab = searchParams.get("type") ?? "allkeys";
 
   return (
-    <div className="flex md:hidden gap-2 mb-6 overflow-x-auto pb-1">
-      {tabs.map((tab) => (
-        <button
-          key={tab.id}
-          onClick={() => router.push(`/apikeys?type=${tab.id}`)}
-          className={`whitespace-nowrap px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
-            activeTab === tab.id
-              ? "bg-neutral-800 text-white"
-              : "text-neutral-400 hover:bg-neutral-800/50 hover:text-neutral-200"
-          }`}
-        >
-          {tab.label}
-        </button>
-      ))}
+    <div className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
+      isOpen ? "max-h-[400px] opacity-100 mb-8" : "max-h-0 opacity-0 pointer-events-none"
+    }`}>
+      <nav className="flex flex-col gap-2 p-2 bg-[#1a1a1a] rounded-xl border border-neutral-800">
+        {tabs.map((tab) => {
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => {
+                router.push(`/apikeys?type=${tab.id}`);
+                onClose();
+              }}
+              className={`flex items-center justify-between px-4 py-4 rounded-lg font-medium transition-all cursor-pointer ${
+                isActive
+                  ? "bg-[#1D9BF0] text-white"
+                  : "text-neutral-400 hover:bg-neutral-800/50"
+              }`}
+            >
+              <span>{tab.label}</span>
+              {isActive && <ChevronRight size={18} />}
+            </button>
+          );
+        })}
+      </nav>
     </div>
   );
 }
-
 
 function ApiKeysContent() {
   const searchParams = useSearchParams();
@@ -76,16 +84,41 @@ function ApiKeysContent() {
 
   return (
     <div className="flex-1 min-w-0">
-      {activeTab === "allkeys"  && <AllKeysTab />}
+      {activeTab === "allkeys" && <AllKeysTab />}
       {activeTab === "requests" && <RequestsTab />}
-      {activeTab === "logs"     && <LogsTab />}
-      {activeTab === "docs"     && <DocsTab />}
+      {activeTab === "logs" && <LogsTab />}
+      {activeTab === "docs" && <DocsTab />}
     </div>
   );
 }
 
+function ApiKeysPageInner() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const router = useRouter();
 
-export default function ApiKeysPage() {
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const res = await axios.get("/api/auth/me");
+
+        if (!res.data?.authenticated) {
+          router.replace("/auth/signin");
+          return;
+        }
+
+        if (res.data.plan === "FREE") {
+          router.replace("/premium");
+          return;
+        }
+
+      } catch {
+        router.replace("/auth/signin");
+      }
+    };
+
+    checkAuth();
+  }, [router]);
+
   return (
     <div className="min-h-screen bg-[#141414] text-white transition-colors duration-300">
       <Navbar />
@@ -96,19 +129,31 @@ export default function ApiKeysPage() {
 
       <div className="md:pl-64">
         <main className="pt-6 pb-12 px-4 sm:px-8">
-          <div className="mb-6">
-            <h1 className="text-3xl sm:text-4xl font-bold text-white">API Keys</h1>
+          <div className="flex items-center justify-between mb-8">
+            <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
+              API Keys
+            </h1>
+
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="md:hidden p-2.5 bg-neutral-800/50 rounded-lg border border-neutral-700 text-neutral-300 hover:text-white transition-all active:scale-95 cursor-pointer"
+            >
+              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
           </div>
 
           <Suspense fallback={null}>
-            <MobileSidebar />
+            <MobileMenu
+              isOpen={isMobileMenuOpen}
+              onClose={() => setIsMobileMenuOpen(false)}
+            />
           </Suspense>
 
           <Suspense
             fallback={
               <div className="flex items-center gap-3 text-neutral-400 py-10">
                 <Loader2 className="w-5 h-5 animate-spin text-blue-500" />
-                <span className="text-sm font-medium">Loading...</span>
+                <span className="text-sm font-medium">Loading content...</span>
               </div>
             }
           >
@@ -118,4 +163,8 @@ export default function ApiKeysPage() {
       </div>
     </div>
   );
+}
+
+export default function ApiKeysPage() {
+  return <ApiKeysPageInner />;
 }

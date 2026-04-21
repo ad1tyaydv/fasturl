@@ -14,23 +14,23 @@ import { ArrowDown01Icon, Clock01Icon, Key01Icon } from "@hugeicons/core-free-ic
 import { HugeiconsIcon } from "@hugeicons/react";
 
 
-export type TimeFilter = "all" | "today" | "7days" | "28days";
+export type ApiTimeFilter = "all" | "today" | "7days" | "28days";
 
-interface RequestsFilterProps {
+interface ApiRequestsFilterProps {
   apiKeyNames: string[];
   selectedKey: string;
   setSelectedKey: (key: string) => void;
-  timeFilter: TimeFilter;
-  setTimeFilter: (time: TimeFilter) => void;
+  timeFilter: ApiTimeFilter;
+  setTimeFilter: (time: ApiTimeFilter) => void;
 }
 
-export function RequestsFilter({
+export function ApiRequestsFilter({
   apiKeyNames,
   selectedKey,
   setSelectedKey,
   timeFilter,
   setTimeFilter,
-}: RequestsFilterProps) {
+}: ApiRequestsFilterProps) {
   const getTimeLabel = () => {
     switch (timeFilter) {
       case "today":  return "Today";
@@ -102,7 +102,7 @@ export function RequestsFilter({
             Time Range
           </DropdownMenuLabel>
           <DropdownMenuSeparator className="bg-neutral-800" />
-          {(["all", "today", "7days", "28days"] as TimeFilter[]).map((val) => (
+          {(["all", "today", "7days", "28days"] as ApiTimeFilter[]).map((val) => (
             <DropdownMenuCheckboxItem
               key={val}
               checked={timeFilter === val}

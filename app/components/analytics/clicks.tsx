@@ -57,7 +57,6 @@ export default function ClicksAnalytics({ data = [], days = 7 }: ClicksAnalytics
     [chartData]
   )
 
-
   return (
     <Card className="bg-black text-white overflow-hidden border-none shadow-none">
       <CardHeader className="flex flex-col items-stretch border-b border-neutral-800 p-0 sm:flex-row">
@@ -75,8 +74,8 @@ export default function ClicksAnalytics({ data = [], days = 7 }: ClicksAnalytics
       </CardHeader>
       
       <CardContent className="px-2 pt-6 sm:p-6">
-        <ChartContainer config={chartConfig} className="h-[250px] w-full">
-          <BarChart data={chartData} margin={{ top: 10 }}>
+        <ChartContainer config={chartConfig} className="h-[250px] w-full focus:outline-none">
+          <BarChart data={chartData} margin={{ top: 10 }} barCategoryGap="25%" className="focus:outline-none">
             <CartesianGrid 
               vertical={false} 
               stroke="#262626" 
@@ -88,7 +87,7 @@ export default function ClicksAnalytics({ data = [], days = 7 }: ClicksAnalytics
               tickLine={false}
               axisLine={false}
               tickMargin={12}
-              interval={days > 14 ? 4 : 0} 
+              minTickGap={32}
               style={{ fontSize: '11px', fill: '#737373' }}
               tickFormatter={(val) => {
                 const date = new Date(val)
@@ -116,7 +115,11 @@ export default function ClicksAnalytics({ data = [], days = 7 }: ClicksAnalytics
               dataKey="total" 
               fill={chartConfig.total.color} 
               radius={[2, 2, 0, 0]}
-              barSize={days > 14 ? 12 : 24} 
+              maxBarSize={36} 
+              activeBar={false}
+              isAnimationActive={false}
+              className="focus:outline-none"
+              style={{ outline: 'none' }}
             />
           </BarChart>
         </ChartContainer>

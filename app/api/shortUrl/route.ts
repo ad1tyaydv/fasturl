@@ -148,24 +148,43 @@ export async function POST(req: NextRequest) {
 
     const shortUrl = shortUrlGenerator();
 
-    const urlShort = await prisma.link.create({
-      data: {
-        userId,
-        original: originalLink,
-        shorturl: shortUrl,
-        ipAddress: ip,
-      },
+    const urlShort = await prisma.$transaction(async (tx) => {
+      const created = await tx.link.create({
+        data: {
+          userId,
+          original: originalLink,
+          shorturl: shortUrl,
+          ipAddress: ip,
+        },
+      });
+
+      await tx.user.update({
+        where: {
+          id: userId
+        },
+        data: {
+          totalLinks: {
+            decrement: 1,
+          },
+        },
+      });
+
+      const cacheKey = `links-left:${userId}`;
+      await redis.decr(cacheKey);
+
+      return created;
     });
 
     await redis.del(`fetchLinks:${userId}`);
 
     return NextResponse.json({
       message: "Short URL created!",
-      shortUrl: urlShort.shorturl,
-      original: urlShort.original,
+      shortUrl: urlShort!.shorturl,
+      original: urlShort!.original,
     });
 
   } catch (error) {
+    console.log(error);
     return NextResponse.json(
       { message: "Server error, try again later" },
       { status: 500 }

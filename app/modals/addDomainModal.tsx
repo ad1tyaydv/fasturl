@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 
-interface ConnectDomainModalProps {
+interface AddDomainModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAdd: (domain: string) => Promise<void>;
@@ -18,12 +18,12 @@ interface ConnectDomainModalProps {
 }
 
 
-export default function ConnectDomainModal({ 
+export default function AddDomainModal({ 
   isOpen, 
   onClose, 
   onAdd, 
   isAdding 
-}: ConnectDomainModalProps) {
+}: AddDomainModalProps) {
   const [domain, setDomain] = useState("");
 
 

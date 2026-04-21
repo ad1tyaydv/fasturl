@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 const ANON_USER_CLICK = process.env.ANONYMOUS_USER_CLICK!;
 const COUNTID = process.env.COUNT_ID;
 
-export async function POST() {
+export async function GET() {
 
     try {
 

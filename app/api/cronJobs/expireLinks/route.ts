@@ -17,13 +17,12 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const nowUTC = new Date();
-    const nowIST = new Date(nowUTC.getTime() + 5.5 * 60 * 60 * 1000);
+    const now = new Date();
     
     const expiredLinks = await prisma.link.findMany({
       where: {
         expiresAt: {
-          lte: nowIST
+          lte: now
         }
       },
       select: {
@@ -35,7 +34,7 @@ export async function GET(request: NextRequest) {
     const deleted = await prisma.link.deleteMany({
       where: {
         expiresAt: {
-          lte: nowIST
+          lte: now
         }
       }
     });

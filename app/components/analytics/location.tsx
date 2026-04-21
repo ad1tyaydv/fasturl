@@ -29,7 +29,7 @@ interface CountryAnalyticsProps {
   days?: number
 }
 
-export default function CountryAnalytics({ data = [], days = 7 }: CountryAnalyticsProps) {
+export default function LocationAnalytics({ data = [], days = 7 }: CountryAnalyticsProps) {
   const [showModal, setShowModal] = useState(false)
 
   const sortedData = useMemo(() => {

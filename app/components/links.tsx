@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import { HugeiconsIcon } from '@hugeicons/react';
@@ -19,10 +19,10 @@ interface UrlItemProps {
   onOpenCustom: (url: any) => void;
   getRelativeTime: (date?: string) => string;
   router: any;
+  userPlan?: string;
 }
 
-
-export default function UrlItem({
+export default function Links({
   url,
   nextDomain,
   onRefresh,
@@ -30,25 +30,29 @@ export default function UrlItem({
   onOpenPassword,
   onOpenCustom,
   getRelativeTime,
-  router
+  router,
+  userPlan = "FREE"
 }: UrlItemProps) {
+
   const [isEditing, setIsEditing] = useState(false);
   const [isSavingName, setIsSavingName] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [tempName, setTempName] = useState(url.linkName || "");
   const [copied, setCopied] = useState(false);
 
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  const isFree = userPlan === "FREE";
 
   const getDomain = (url: string) => {
     try { return new URL(url).hostname.replace("www.", ""); } catch { return ""; }
   };
 
-
   const getLogo = (url: string) => {
     const domain = getDomain(url);
     return `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
   };
-
 
   const copyToClipboard = (link: string) => {
     navigator.clipboard.writeText(link);
@@ -56,7 +60,6 @@ export default function UrlItem({
     toast.success("Link copied!");
     setTimeout(() => setCopied(false), 2000);
   };
-
 
   const saveName = async () => {
     if (!tempName.trim()) {
@@ -69,16 +72,13 @@ export default function UrlItem({
       await axios.post("/api/shortUrl/linkName", { linkId: url.id, name: tempName.trim() });
       toast.success("Name updated!");
       await onRefresh();
-
     } catch {
       toast.error("Update failed");
-
     } finally {
       setIsSavingName(false);
       setIsEditing(false);
     }
   };
-
 
   const handleDelete = async () => {
     setIsDeleting(true);
@@ -86,19 +86,35 @@ export default function UrlItem({
       await axios.post(`/api/shortUrl/delete/${url.id}`);
       await onRefresh();
       toast.success("Link deleted successfully");
-
-    } catch (error) {
+    } catch {
       toast.error("Failed to delete link");
-
     } finally {
       setIsDeleting(false);
     }
   };
 
-  
+  const handleRestrictedAction = (cb: () => void) => {
+    if (isFree) {
+      router.push("/premium");
+      return;
+    }
+    cb();
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowMobileMenu(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   return (
-    <div className="flex items-center justify-between py-5 px-4 border-b border-neutral-800/60 hover:bg-[#1a1a1a] group transition-colors">
-      <div className="flex items-start gap-4 w-[40%] min-w-0 pr-4">
+    <div className="relative flex items-center justify-between py-5 px-4 border-b border-neutral-800/60 hover:bg-[#1a1a1a] group transition-colors">
+
+      <div className="flex items-start gap-4 w-[65%] md:w-[40%] min-w-0 pr-4">
         <div className="mt-1 w-8 h-8 rounded-full bg-neutral-800 flex items-center justify-center overflow-hidden shrink-0">
           {url.original ? (
             <img src={getLogo(url.original)} alt="logo" className="w-full h-full object-cover" onError={(e) => (e.currentTarget.style.display = "none")} />
@@ -106,6 +122,7 @@ export default function UrlItem({
             <HugeiconsIcon icon={Link04Icon} />
           )}
         </div>
+
         <div className="flex flex-col min-w-0 w-full">
           {isEditing ? (
             <div className="flex items-center gap-2">
@@ -117,7 +134,7 @@ export default function UrlItem({
                 onKeyDown={(e) => e.key === "Enter" && !isSavingName && saveName()}
                 disabled={isSavingName}
               />
-              <button onClick={saveName} disabled={isSavingName} className="text-green-500">
+              <button onClick={saveName} disabled={isSavingName} className="text-green-500 shrink-0">
                 {isSavingName ? <div className="w-[22px] h-[22px] border-2 border-t-transparent rounded-full animate-spin" /> : <HugeiconsIcon icon={Tick02Icon} />}
               </button>
             </div>
@@ -137,28 +154,50 @@ export default function UrlItem({
         )}
       </div>
 
-      <div className="w-[10%] flex flex-col">
-        <span className="text-white font-semibold">{url.clicks || 0} clicks</span>
+      <div className="w-[20%] md:w-[10%] flex flex-col items-end md:items-start">
+        <span className="text-white font-semibold text-sm md:text-base">{url.clicks || 0} clicks</span>
       </div>
 
-      <div className="flex items-center justify-end gap-3 text-neutral-400 w-[30%] opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity">
-        <button onClick={() => onOpenPassword(url)} className={`p-2 rounded-md cursor-pointer transition-colors ${url.password ? 'text-blue-500' : 'hover:text-white'}`}>
+      <div className="hidden md:flex items-center justify-end gap-3 text-neutral-400 w-[30%] opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity">
+
+        <button onClick={() => handleRestrictedAction(() => onOpenPassword(url))} className={`p-2 rounded-md cursor-pointer transition-colors ${url.password ? 'text-blue-500' : 'hover:text-white'}`}>
           {url.password ? <HugeiconsIcon icon={CircleLock01Icon} /> : <HugeiconsIcon icon={CircleUnlock01Icon} />}
         </button>
-        <button onClick={() => onOpenCustom(url)} className="hover:text-white p-2 cursor-pointer"><HugeiconsIcon icon={MagicWand01Icon} /></button>
-        <button onClick={() => window.open(`${nextDomain}/${url.shorturl}`, '_blank')} className="hover:text-white p-2 cursor-pointer"><HugeiconsIcon icon={Share05Icon} /></button>
+
+        <button onClick={() => handleRestrictedAction(() => onOpenCustom(url))} className="hover:text-white p-2 cursor-pointer">
+          <HugeiconsIcon icon={MagicWand01Icon} />
+        </button>
+
+        <button onClick={() => window.open(`${nextDomain}/${url.shorturl}`, '_blank')} className="hover:text-white p-2 cursor-pointer">
+          <HugeiconsIcon icon={Share05Icon} />
+        </button>
+
         <button onClick={() => copyToClipboard(`${nextDomain}/${url.shorturl}`)} className={`p-2 cursor-pointer ${copied ? "text-green-500" : "hover:text-white"}`}>
           {copied ? <HugeiconsIcon icon={CopyCheckIcon} /> : <HugeiconsIcon icon={CopyIcon} />}
         </button>
-        <button onClick={() => onOpenQr(url)} className="hover:text-white p-2 cursor-pointer"><HugeiconsIcon icon={QrCodeIcon} /></button>
-        <button onClick={() => router.push(`/analytics?link=${url.shorturl}`)} className="hover:text-white p-2 cursor-pointer"><HugeiconsIcon icon={Analytics01Icon} /></button>
-        <button onClick={() => { setIsEditing(true); setTempName(url.linkName || ""); }} className="hover:text-white p-2 cursor-pointer"><HugeiconsIcon icon={Edit03Icon} /></button>
+
+        <button onClick={() => onOpenQr(url)} className="hover:text-white p-2 cursor-pointer">
+          <HugeiconsIcon icon={QrCodeIcon} />
+        </button>
+
+        <button onClick={() => router.push(`/analytics?link=${url.shorturl}`)} className="hover:text-white p-2 cursor-pointer">
+          <HugeiconsIcon icon={Analytics01Icon} />
+        </button>
+
+        <button onClick={() => { setIsEditing(true); setTempName(url.linkName || ""); }} className="hover:text-white p-2 cursor-pointer">
+          <HugeiconsIcon icon={Edit03Icon} />
+        </button>
+
         <button onClick={handleDelete} disabled={isDeleting} className="p-2 hover:text-red-500 cursor-pointer">
           {isDeleting ? <div className="w-[20px] h-[20px] border-2 border-red-500 border-t-transparent rounded-full animate-spin" /> : <HugeiconsIcon icon={Delete02Icon} />}
         </button>
+
       </div>
 
-      <div className="w-[10%] text-right text-neutral-500 text-sm font-medium">{getRelativeTime(url.createdAt)}</div>
+      <div className="hidden md:block w-[10%] text-right text-neutral-500 text-sm font-medium">
+        {getRelativeTime(url.createdAt)}
+      </div>
+
     </div>
   );
 }

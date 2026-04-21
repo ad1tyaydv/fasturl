@@ -21,7 +21,7 @@ interface DeviceAnalyticsProps {
   days?: number
 }
 
-export default function DeviceListAnalytics({ data = [], days = 7 }: DeviceAnalyticsProps) {
+export default function DeviceAnalytics({ data = [], days = 7 }: DeviceAnalyticsProps) {
   const [showModal, setShowModal] = useState(false)
 
   const allData = useMemo(() => {

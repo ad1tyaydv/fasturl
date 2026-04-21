@@ -17,7 +17,7 @@ interface UserAccountNavProps {
   trigger?: React.ReactNode;
 }
 
-export function UserAccountNav({ user, onLogout, trigger }: UserAccountNavProps) {
+export function NavbarDropDown({ user, onLogout, trigger }: UserAccountNavProps) {
   const router = useRouter();
 
   return (

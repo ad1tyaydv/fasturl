@@ -7,7 +7,6 @@ datasource db {
   provider = "postgresql"
 }
 
-
 enum Plan {
   FREE
   ESSENTIAL
@@ -15,89 +14,95 @@ enum Plan {
 }
 
 model User {
-  id                  String      @id @default(uuid())
-  email               String      @unique
-  password            String?
-  userName            String?
+  id       String  @id @default(uuid())
+  email    String  @unique
+  password String?
+  userName String?
 
-  twofactorEnabled    Boolean     @default(false)
-  twofactorSecret     String?
+  twofactorEnabled Boolean @default(false)
+  twofactorSecret  String?
 
-  provider            String?
-  image               String?
+  provider String?
+  image    String?
 
-  ipAddress           String?
+  ipAddress String?
 
-  totalLinks          Int         @default(0)
-  totalQr             Int         @default(0)
+  totalLinks Int @default(0)
+  totalQr    Int @default(0)
 
-  plan                Plan        @default(FREE)
-  planStartedAt       DateTime?
-  planExpiresAt       DateTime?
+  plan          Plan      @default(FREE)
+  planStartedAt DateTime?
+  planExpiresAt DateTime?
 
-  cycleStart          DateTime?
-  cycleEnd            DateTime?
+  subscriptionId String?
+  customerId     String?
 
-  links               Link[]
-  qr                  Qr[]
-  bulkLinks           BulkLinks[]
-  domain              CustomDomain[]
-  api_key              Api_key[]
+  billingStatus     String?
+  cancelAtPeriodEnd Boolean @default(false)
 
-  createdAt           DateTime    @default(now())
+  cycleStart DateTime?
+  cycleEnd   DateTime?
+
+  links     Link[]
+  qr        Qr[]
+  bulkLinks BulkLinks[]
+  domain    CustomDomain[]
+  api_key   Api_key[]
+
+  createdAt DateTime @default(now())
 }
 
 model Link {
-  id           String      @id @default(uuid())
-  linkName     String?
-  shorturl     String      @unique
-  original     String
+  id       String  @id @default(uuid())
+  linkName String?
+  shorturl String  @unique
+  original String
 
-  clicks       Int         @default(0)
-  clickLogs    Click[]
+  clicks    Int     @default(0)
+  clickLogs Click[]
 
-  bulkLinksId  String?
-  bulk         BulkLinks?  @relation(fields: [bulkLinksId], references: [id])
+  bulkLinksId String?
+  bulk        BulkLinks? @relation(fields: [bulkLinksId], references: [id])
 
-  apiLinkId   String?
-  apiLink     Api_key?     @relation(fields: [apiLinkId], references: [id])
+  apiLinkId String?
+  apiLink   Api_key? @relation(fields: [apiLinkId], references: [id])
 
-  checkBulk    Boolean     @default(false)
-  api_link     Boolean     @default(false)
+  checkBulk Boolean @default(false)
+  api_link  Boolean @default(false)
 
-  ipAddress    String?
+  ipAddress String?
 
-  password     String?
-  isProtected  Boolean     @default(false)
-  expiresAt    DateTime?
-  
-  userId       String
-  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  password    String?
+  isProtected Boolean   @default(false)
+  expiresAt   DateTime?
 
-  createdAt   DateTime    @default(now())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
 }
 
 model Click {
-  id          String      @id @default(uuid())
+  id String @id @default(uuid())
 
-  linkId      String
-  link        Link        @relation(fields: [linkId], references: [id])
+  linkId String
+  link   Link   @relation(fields: [linkId], references: [id])
 
-  qrId        String?
-  qr          Qr?         @relation(fields: [qrId], references: [id])
+  qrId String?
+  qr   Qr?     @relation(fields: [qrId], references: [id])
 
-  ip          String
-  country     String?
-  state       String?
-  city        String?
+  ip      String
+  country String?
+  state   String?
+  city    String?
 
-  device      String?
-  browser     String?
-  OS          String?
+  device  String?
+  browser String?
+  OS      String?
 
-  referrer    String?
+  referrer String?
 
-  createdAt   DateTime    @default(now())
+  createdAt DateTime @default(now())
 
   @@index([linkId])
   @@index([qrId])
@@ -105,130 +110,126 @@ model Click {
 }
 
 model Qr {
-  id          String      @id @default(uuid())
-  qrName      String?
-  shortUrl    String
-  longUrl     String
+  id       String  @id @default(uuid())
+  qrName   String?
+  shortUrl String
+  longUrl  String
 
-  qrImage     String
+  qrImage String
 
-  clicks      Int         @default(0)
-  clickLogs   Click[]
+  clicks    Int     @default(0)
+  clickLogs Click[]
 
-  ipAddress   String?
+  ipAddress String?
 
-  userId      String
-  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  createdAt   DateTime    @default(now())
+  createdAt DateTime @default(now())
 }
 
 model BulkLinks {
-  id         String      @id @default(uuid())
+  id String @id @default(uuid())
 
-  name       String      @default("")
+  name String @default("")
 
-  password   String?
-  expiresAt  DateTime?
+  password  String?
+  expiresAt DateTime?
 
-  links      Link[]
+  links Link[]
 
-  userId     String
-  user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  createdAt  DateTime     @default(now())
+  createdAt DateTime @default(now())
 }
 
 model CustomDomain {
-  id           String   @id @default(uuid())
-  domain       String
-  subDomain    String?
+  id        String  @id @default(uuid())
+  domain    String
+  subDomain String?
 
-  txtValue     String?
-  txtName      String?
-  txtVerified  Boolean  @default(false)
+  txtValue    String?
+  txtName     String?
+  txtVerified Boolean @default(false)
 
   cnameTarget  String?
-  cnameVerfied Boolean  @default(false)
+  cnameVerfied Boolean @default(false)
 
-  isActive     Boolean  @default(false)
-  
-  userId       String
-  user         User     @relation(fields: [userId], references: [id])
+  isActive Boolean @default(false)
 
-  createdAt    DateTime @default(now())
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
 
   @@unique([domain, subDomain])
 }
 
-
 model Api_key {
-  id            String    @id @default(uuid())
-  key           String    @unique
-  name          String?
+  id   String  @id @default(uuid())
+  key  String  @unique
+  name String?
 
-  usageLimit    Int       @default(1000)
-  usageCount    Int       @default(0)
+  usageLimit Int @default(1000)
+  usageCount Int @default(0)
 
-  success       Int       @default(0)
-  failed        Int       @default(0)
+  success Int @default(0)
+  failed  Int @default(0)
 
-  isActive      Boolean   @default(true)
+  isActive Boolean @default(true)
 
-  userId        String
-  user          User      @relation(fields: [userId], references: [id])
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
 
-  apiLinks      Link[]
-  apiLogs       ApiLog[]
+  apiLinks Link[]
+  apiLogs  ApiLog[]
 
-  createdAt     DateTime  @default(now())
+  createdAt DateTime @default(now())
 
   @@index([userId])
 }
 
-
 model ApiLog {
-  id         String   @id @default(uuid())
-  endpoint   String
-  method     String
+  id       String @id @default(uuid())
+  endpoint String
+  method   String
 
-  status     Int
-  success    Boolean
-  error      String?
-  
-  ipAddress  String?
-  device     String?
+  status  Int
+  success Boolean
+  error   String?
 
-  apiKeyId   String
-  apiKey     Api_key  @relation(fields: [apiKeyId], references: [id])
+  ipAddress String?
+  device    String?
 
-  createdAt  DateTime @default(now())
+  apiKeyId String
+  apiKey   Api_key @relation(fields: [apiKeyId], references: [id])
+
+  createdAt DateTime @default(now())
 
   @@index([apiKeyId])
   @@index([createdAt])
 }
 
-
 model OTP {
-  id          String      @id @default(uuid())
-  userId      String
-  email       String?
+  id     String  @id @default(uuid())
+  userId String
+  email  String?
 
-  otp         String
+  otp String
 
-  reason      String?
+  reason String?
 
-  isUsed      Boolean      @default(false)
+  isUsed Boolean @default(false)
 
-  expiresAt   DateTime
-  
-  createdAt   DateTime    @default(now())
+  expiresAt DateTime
+
+  createdAt DateTime @default(now())
 }
 
-
 model Count {
-  countId     String      @id @default(uuid())
-  linkCount   Int         @default(0)
-  qrCount     Int         @default(0)
-  totalClicks Int         @default(0)
+  countId     String @id @default(uuid())
+  linkCount   Int    @default(0)
+  qrCount     Int    @default(0)
+  totalClicks Int    @default(0)
 }

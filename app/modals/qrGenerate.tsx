@@ -12,7 +12,7 @@ interface QRCodeModalProps {
   selectedUrl: any;
 }
 
-export default function QRCodeModal({ isOpen, onClose, selectedUrl }: QRCodeModalProps) {
+export default function QRCodeGenerateModal({ isOpen, onClose, selectedUrl }: QRCodeModalProps) {
   const [qrImage, setQrImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -30,7 +30,7 @@ export default function QRCodeModal({ isOpen, onClose, selectedUrl }: QRCodeModa
 
 
   const handleGenerateQr = async () => {
-    if (!selectedUrl?.original) {
+    if (!selectedUrl?.original && !selectedUrl?.longUrl && typeof selectedUrl !== "object") {
         console.error("No original URL found for QR generation");
         return;
     }
@@ -38,13 +38,13 @@ export default function QRCodeModal({ isOpen, onClose, selectedUrl }: QRCodeModa
     try {
       setIsLoading(true);
       const res = await axios.post("/api/qrCode", {
-        shortUrl: selectedUrl.shorturl,
-        longUrl: selectedUrl.original,
+        shortUrl: selectedUrl?.shorturl || selectedUrl?.shortUrl || "short",
+        longUrl: selectedUrl?.original || selectedUrl?.longUrl || "long"
       });
 
       console.log(res.data.qrImage)
 
-      if (res.data.qrImage) {
+      if (res.data.qrImage && typeof res.data.qrImage === "string") {
         setQrImage(res.data.qrImage);
       }
 
@@ -92,10 +92,10 @@ export default function QRCodeModal({ isOpen, onClose, selectedUrl }: QRCodeModa
 
           <div className="text-center space-y-1 w-full px-4">
             <p className="text-white font-one text-lg truncate uppercase tracking-tight">
-              {selectedUrl?.name || "Untitled Link"}
+              {typeof selectedUrl === "object" ? "QR Code" : (selectedUrl?.linkName || selectedUrl?.qrName || "Untitled Link")}
             </p>
             <p className="text-neutral-500 font-three text-xs truncate">
-              {selectedUrl?.original}
+              {typeof selectedUrl === "object" ? "Generated QR" : (selectedUrl?.original || selectedUrl?.longUrl)}
             </p>
           </div>
         </div>
@@ -108,7 +108,7 @@ export default function QRCodeModal({ isOpen, onClose, selectedUrl }: QRCodeModa
             onClick={() => {
                 const link = document.createElement("a");
                 link.href = qrImage!;
-                link.download = `qr-${selectedUrl?.name || 'code'}.png`;
+                link.download = `qr-${typeof selectedUrl === "object" ? "code" : (selectedUrl?.linkName || selectedUrl?.qrName || 'code')}.png`;
                 link.click();
             }}
             disabled={isLoading || !qrImage}

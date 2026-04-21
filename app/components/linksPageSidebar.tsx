@@ -15,21 +15,16 @@ interface SidebarProps {
 }
 
 
-export default function Sidebar({ view, onViewChange }: SidebarProps) {
+export default function UrlsPageSidebar({ view, onViewChange }: SidebarProps) {
   const menuItems = [
     { id: "links", label: "My Links", icon: Link04Icon },
     { id: "bulk", label: "Bulk Links", icon: Layers01Icon },
     { id: "api", label: "API Links", icon: CodeIcon },
   ];
 
-  
+
   return (
     <aside className="w-full sm:w-56 p-3 sm:p-5 sm:border-r border-neutral-800/60 flex flex-row sm:flex-col gap-1.5 overflow-x-auto sm:overflow-hidden border-b sm:border-b-0 shrink-0">
-      <div className="hidden sm:block px-3 mb-4">
-        <h3 className="text-[10px] uppercase tracking-[0.2em] text-neutral-500 font-bold">
-          Navigation
-        </h3>
-      </div>
 
       {menuItems.map((item) => (
         <button

@@ -29,11 +29,9 @@ export default function ApiKeysPage() {
   const [togglingId, setTogglingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-
   useEffect(() => {
     fetchApiKeys();
   }, []);
-
 
   const fetchApiKeys = async () => {
     try {
@@ -125,17 +123,17 @@ export default function ApiKeysPage() {
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
+          {/* Updated Manage Button - Removed variant="outline" */}
           <Button
             onClick={() => router.push("/apikeys")}
-            variant="outline"
-            className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-2.5 rounded-none gap-2 cursor-pointer transition-all"
+            className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-2.5 rounded-none gap-2 cursor-pointer transition-all border-none"
           >
             <Settings2 className="w-4 h-4" />
             Manage
           </Button>
           <Button
             onClick={() => setIsModalOpen(true)}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-2.5 rounded-none gap-2 cursor-pointer transition-all"
+            className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-2.5 rounded-none gap-2 cursor-pointer transition-all border-none"
           >
             <Plus className="w-4 h-4" />
             Generate Key
