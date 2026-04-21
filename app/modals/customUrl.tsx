@@ -20,18 +20,15 @@ export default function CustomUrlModal({ isOpen, onClose, selectedUrl, onSuccess
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
-      
     } else {
       document.body.style.overflow = "unset";
     }
     return () => {
       document.body.style.overflow = "unset";
     };
-
   }, [isOpen]);
 
   useEffect(() => {
@@ -43,9 +40,15 @@ export default function CustomUrlModal({ isOpen, onClose, selectedUrl, onSuccess
 
   if (!isOpen || !selectedUrl) return null;
 
-
   const handleUpdate = async () => {
-    if (!customUrl) return setErrorMessage("Please enter an alias");
+    if (!customUrl) {
+      return setErrorMessage("Please enter an alias");
+    }
+
+    if (customUrl.length < 5) {
+      return setErrorMessage("Alias must be at least 5 characters");
+    }
+
     setErrorMessage("");
     setIsLoading(true);
 
@@ -54,6 +57,7 @@ export default function CustomUrlModal({ isOpen, onClose, selectedUrl, onSuccess
         shortUrl: selectedUrl?.id,
         customUrl: customUrl,
       });
+      
       toast.success("Short URL updated successfully!");
       onSuccess();
       onClose();
@@ -65,7 +69,7 @@ export default function CustomUrlModal({ isOpen, onClose, selectedUrl, onSuccess
       } else {
         toast.error("Something went wrong");
       }
-
+      
     } finally {
       setIsLoading(false);
     }
@@ -125,7 +129,7 @@ export default function CustomUrlModal({ isOpen, onClose, selectedUrl, onSuccess
               <p className="text-sm text-red-500 font-two mt-1">{errorMessage}</p>
             ) : (
               <p className="text-[10px] font-three text-neutral-500 uppercase tracking-widest mt-1">
-                Max 25 characters
+                Min 5, Max 25 characters
               </p>
             )}
           </div>

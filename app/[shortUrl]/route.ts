@@ -39,7 +39,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ shor
             }
         }
 
-        
+
         const findUrl = await prisma.link.findUnique({
             where: {
                 shorturl: shortUrl,
@@ -53,6 +53,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ shor
             );
         }
 
+
         if (findUrl.expiresAt && new Date() > findUrl.expiresAt) {
             await prisma.link.delete({
                 where: {
@@ -65,16 +66,18 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ shor
             return NextResponse.redirect(new URL("/expired", req.url));
         }
 
-        if (!originalUrl) {
-            originalUrl = findUrl.original;
-
-            await redis.set(`link:${shortUrl}`, originalUrl, {
-                ex: 60 * 60 * 24,
-            });
-        }
+        // if(findUrl.redirectTo) {
+        //     return NextResponse.redirect(new URL(`/r/${findUrl.shorturl}`, req.url));
+        // }
 
         if (findUrl?.password) {
             return NextResponse.redirect(new URL(`/verify/${shortUrl}`, req.url));
+        }
+
+        if (!originalUrl) {
+            originalUrl = findUrl.original;
+
+            await redis.set(`link:${shortUrl}`, originalUrl, { ex: 60 * 60 * 24 });
         }
 
         const ip = req.headers.get("x-forwarded-for")?.split(",")[0] || req.headers.get("x-real-ip") || "127.0.0.1";

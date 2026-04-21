@@ -9,10 +9,10 @@ import { useUser } from "@/app/components/userContext";
 import { motion } from "framer-motion";
 import { Command } from "lucide-react";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { 
-  ViewIcon, 
-  ViewOffSlashIcon, 
-  ArrowRight01Icon, 
+import {
+  ViewIcon,
+  ViewOffSlashIcon,
+  ArrowRight01Icon,
   ArrowLeft01Icon,
   Loading02Icon,
   FingerPrintIcon,
@@ -20,7 +20,7 @@ import {
 
 export default function Login() {
   const router = useRouter();
-  const { setUser } = useUser();
+  const { refreshUser } = useUser();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -57,10 +57,8 @@ export default function Login() {
         toast.success("Security verification required", { id: loginToast });
 
       } else {
-        setUser(loggedInUser);
-        if (loggedInUser) {
-          localStorage.setItem("user", loggedInUser.plan);
-        }
+        await refreshUser();
+
         toast.success("Welcome back!", { id: loginToast });
         router.push("/");
       }
@@ -119,12 +117,8 @@ export default function Login() {
       });
 
       if (res.status === 200 && res.data.success) {
-        const loggedInUser = res.data.user;
-        setUser(loggedInUser);
+        await refreshUser();
 
-        if (loggedInUser) {
-          localStorage.setItem("user", loggedInUser.plan);
-        }
         toast.success("Access granted", { id: verifyToast });
         router.push("/");
       }
@@ -141,7 +135,7 @@ export default function Login() {
     }
   };
 
-  
+
   return (
     <div className="min-h-screen w-full bg-white text-black font-sans selection:bg-black selection:text-white flex overflow-hidden">
       <Toaster position="bottom-right" reverseOrder={false} />
@@ -271,8 +265,8 @@ export default function Login() {
                     <HugeiconsIcon icon={Loading02Icon} className="w-5 h-5 animate-spin" />
                   ) : (
                     <>
-                    Sign In
-                    <HugeiconsIcon icon={ArrowRight01Icon} />
+                      Sign In
+                      <HugeiconsIcon icon={ArrowRight01Icon} />
                     </>
                   )}
                 </button>

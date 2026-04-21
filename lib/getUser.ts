@@ -2,18 +2,15 @@ export async function getUser() {
   try {
     const res = await fetch("/api/auth/me", {
       credentials: "include",
-      cache: "no-store",
     });
 
     if (!res.ok) return null;
 
     const data = await res.json();
 
-    if (!data?.authenticated) return null;
-
-    return data;
+    return data?.authenticated ? data : null;
     
-  } catch (err) {
+  } catch {
     return null;
   }
 }

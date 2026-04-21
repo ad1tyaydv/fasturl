@@ -12,7 +12,8 @@ export async function GET(req: NextRequest) {
 
         if (!token) {
             return NextResponse.json(
-                { authenticated: false }
+                { authenticated: false },
+                { status: 401 }
             );
         }
 
@@ -51,9 +52,10 @@ export async function GET(req: NextRequest) {
         })
 
         if (!checkPlan) {
-            return NextResponse.json({
-                authenticated: false
-            })
+            return NextResponse.json(
+                { authenticated: false },
+                { status: 401 }
+            );
         }
 
         const expiresAt = checkPlan.planExpiresAt;
@@ -101,8 +103,9 @@ export async function GET(req: NextRequest) {
         });
 
     } catch (error) {
-        return NextResponse.json({
-            authenticated: false
-        });
+        return NextResponse.json(
+            { authenticated: false },
+            { status: 401 }
+        );
     }
 }

@@ -47,6 +47,7 @@ export async function GET(req: NextRequest) {
                         original: true,
                         linkName: true,
                         clicks: true,
+                        redirectTo: true,
                         password: true,
                         createdAt: true
                     },

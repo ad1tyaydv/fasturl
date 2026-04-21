@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { 
+import {
   Check,
   Command,
 } from "lucide-react";
@@ -18,7 +18,7 @@ import { ViewIcon, ViewOffSlashIcon, ArrowRight01Icon, Tick02Icon } from "@hugei
 
 export default function SignupPage() {
   const router = useRouter();
-  const { setUser } = useUser();
+  const { refreshUser } = useUser();
 
   const [formData, setFormData] = useState({
     userName: "",
@@ -50,11 +50,8 @@ export default function SignupPage() {
         email: formData.email,
         password: formData.password
       });
-      
-      const newUser = { userName: formData.userName, email: formData.email, plan: "FREE" };
-      localStorage.setItem("user", JSON.stringify(newUser));
-      localStorage.setItem("plan", "FREE");
-      setUser(newUser);
+
+      await refreshUser();
 
       toast.success("Welcome to Fasturl!", { id: signupToast });
       setTimeout(() => router.push("/"), 1000);
@@ -74,7 +71,7 @@ export default function SignupPage() {
 
       <div className="hidden lg:flex lg:w-[55%] relative flex-col justify-between p-16 bg-[#0a0a0a] text-white">
         <div className="absolute inset-0 opacity-20 pointer-events-none">
-            <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_20%_30%,#333_0%,transparent_50%)]" />
+          <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_20%_30%,#333_0%,transparent_50%)]" />
         </div>
 
         <div className="relative z-10 flex items-center gap-3 cursor-pointer" onClick={() => router.push("/")}>
@@ -95,7 +92,7 @@ export default function SignupPage() {
               <span className="italic font-serif opacity-90">is noisy enough.</span> <br />
               Keep your links clean. <br />
             </h1>
-            
+
             <div className="space-y-6 mt-16 border-l border-white/10 pl-8">
               <p className="text-sm text-white/40 max-w-xs leading-relaxed italic">
                 "We built Fasturl because we were tired of cluttered dashboards. We wanted something that felt calm, intentional, and human."
@@ -113,15 +110,15 @@ export default function SignupPage() {
       </div>
 
       <div className="w-full lg:w-[45%] flex items-center justify-center bg-white overflow-y-auto p-8">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="w-full max-w-[400px]" 
+          className="w-full max-w-[400px]"
         >
           <div className="lg:hidden flex items-center gap-3 mb-10">
             <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
-                <Command className="text-white" size={16} />
+              <Command className="text-white" size={16} />
             </div>
             <span className="font-bold tracking-[0.2em] text-[10px] uppercase">Fasturl</span>
           </div>
@@ -130,7 +127,7 @@ export default function SignupPage() {
             <h2 className="text-4xl font-bold tracking-tighter mb-3">Create account</h2>
             <p className="text-slate-400 text-base font-medium">
               Already a member?{" "}
-              <button 
+              <button
                 onClick={() => router.push("/auth/signin")}
                 className="text-black font-bold hover:underline underline-offset-4 transition-all cursor-pointer"
               >
@@ -188,13 +185,12 @@ export default function SignupPage() {
               </div>
             </div>
 
-            <div 
+            <div
               className="flex items-center gap-4 cursor-pointer group py-1"
               onClick={() => setAgreed(!agreed)}
             >
-              <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-all shrink-0 ${
-                agreed ? 'bg-black border-black shadow-sm' : 'border-slate-200 group-hover:border-slate-300'
-              }`}>
+              <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-all shrink-0 ${agreed ? 'bg-black border-black shadow-sm' : 'border-slate-200 group-hover:border-slate-300'
+                }`}>
                 {agreed && <HugeiconsIcon icon={Tick02Icon} className="text-white stroke-[4px]" />}
               </div>
               <span className="text-xs text-slate-400 font-medium select-none">
@@ -223,7 +219,7 @@ export default function SignupPage() {
             <span className="absolute bg-white px-5 text-[10px] text-slate-400 uppercase tracking-[0.3em] font-bold">OR</span>
           </div>
 
-          <button 
+          <button
             type="button"
             onClick={() => signIn("google")}
             className="w-full flex items-center justify-center gap-4 py-4 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 transition-all text-base font-bold text-slate-900 shadow-sm active:scale-[0.99] cursor-pointer"

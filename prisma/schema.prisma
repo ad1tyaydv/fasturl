@@ -76,6 +76,8 @@ model Link {
   isProtected Boolean   @default(false)
   expiresAt   DateTime?
 
+  redirectTo  String?
+
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
