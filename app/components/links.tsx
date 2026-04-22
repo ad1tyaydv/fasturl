@@ -74,8 +74,10 @@ export default function Links({
       await axios.post("/api/shortUrl/linkName", { linkId: url.id, name: tempName.trim() });
       toast.success("Name updated!");
       await onRefresh();
+      
     } catch {
       toast.error("Update failed");
+
     } finally {
       setIsSavingName(false);
       setIsEditing(false);
@@ -88,12 +90,15 @@ export default function Links({
       await axios.post(`/api/shortUrl/delete/${url.id}`);
       await onRefresh();
       toast.success("Link deleted successfully");
+
     } catch {
       toast.error("Failed to delete link");
+
     } finally {
       setIsDeleting(false);
     }
   };
+
 
   const handleRestrictedAction = (cb: () => void) => {
     if (isFree) {
@@ -109,15 +114,16 @@ export default function Links({
         setShowMobileMenu(false);
       }
     };
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
 
   return (
     <>
       <div className="relative flex items-center justify-between py-5 px-4 border-b border-neutral-800/60 hover:bg-[#1a1a1a] group transition-colors">
 
-        {/* Info Section */}
         <div className="flex items-start gap-4 w-[65%] md:w-[35%] min-w-0 pr-4">
           <div className="mt-1 w-8 h-8 rounded-full bg-neutral-800 flex items-center justify-center overflow-hidden shrink-0">
             {url.original ? (
@@ -149,7 +155,6 @@ export default function Links({
           </div>
         </div>
 
-        {/* Protected Section */}
         <div className="hidden md:flex w-[15%] shrink-0 pr-4">
           {url.password && (
             <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">
@@ -185,7 +190,6 @@ export default function Links({
             <HugeiconsIcon icon={QrCodeIcon} />
           </button>
 
-          {/* Conditional Color for Redirect Icon */}
           <button 
             onClick={() => setIsRedirectModalOpen(true)} 
             className={`p-2 cursor-pointer transition-colors ${url.redirectTo ? 'text-blue-500' : 'hover:text-white'}`} 

@@ -20,14 +20,65 @@ import QrCodes from "@/app/components/qrCodes";
 import Links from "@/app/components/links";
 import ApiLinks from "@/app/components/apiLinks";
 
-import { SkeletonLoader } from "@/app/loaders/links";
 import { FilterDropDown, FilterType } from "@/app/dropDown/urlsPageDropDown";
 import LinkPasswordProtectionModal from "@/app/modals/linkPasswordProtection";
 import CustomUrlModal from "@/app/modals/customUrl";
 import QRCodeGenerateModal from "@/app/modals/qrGenerate";
 import { Button } from "@/components/ui/button";
 
+
 const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN;
+
+const LinksSkeleton = () => (
+  <div className="relative flex items-center justify-between py-5 px-4 border-b border-neutral-800/60 animate-pulse">
+    <div className="flex items-start gap-4 w-[65%] md:w-[35%] min-w-0 pr-4">
+      <div className="mt-1 w-8 h-8 rounded-full bg-neutral-800 shrink-0" />
+      <div className="flex flex-col gap-2.5 w-full">
+        <div className="h-5 w-[140px] bg-neutral-800 rounded-md" />
+        <div className="h-4 w-[200px] bg-neutral-800/50 rounded-md" />
+      </div>
+    </div>
+
+    <div className="hidden md:flex w-[15%] shrink-0 pr-4">
+      <div className="h-6 w-20 bg-neutral-800/30 rounded-md" />
+    </div>
+
+    <div className="w-[20%] md:w-[20%] flex flex-col items-end md:items-start">
+      <div className="h-5 w-12 bg-neutral-800/60 rounded" />
+    </div>
+
+
+    <div className="hidden md:block w-[10%] text-right">
+      <div className="h-4 w-14 bg-neutral-800/40 rounded ml-auto" />
+    </div>
+  </div>
+);
+
+const QrSkeleton = () => (
+  <div className="flex items-center py-8 px-5 border-b border-neutral-800/60 animate-pulse">
+    <div className="shrink-0 mr-6 w-16 h-16 bg-neutral-800" />
+    <div className="flex-1 flex flex-col gap-3">
+      <div className="h-6 w-1/3 bg-neutral-800 rounded" />
+      <div className="h-4 w-1/2 bg-neutral-800 rounded opacity-50" />
+    </div>
+    <div className="h-10 w-24 bg-neutral-800 rounded-xl mr-8" />
+    <div className="h-4 w-16 bg-neutral-800 rounded" />
+  </div>
+);
+
+const BulkSkeleton = () => (
+  <div className="flex items-center py-5 px-4 border-b border-neutral-800/60 animate-pulse">
+    <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-500 shrink-0 mr-4">
+      <HugeiconsIcon icon={File02Icon} />
+    </div>
+    <div className="flex-1 flex flex-col gap-2">
+      <div className="h-5 w-1/4 bg-neutral-800 rounded" />
+      <div className="h-4 w-1/3 bg-neutral-800 rounded opacity-50" />
+    </div>
+    <div className="h-4 w-16 bg-neutral-800 rounded ml-auto" />
+  </div>
+);
+
 
 const getRelativeTime = (dateString?: string) => {
   if (!dateString) return "Just now";
@@ -66,15 +117,14 @@ function AllLinks() {
   const [isCustomModalOpen, setIsCustomModalOpen] = useState(false);
   const [isDetailViewOpen, setIsDetailViewOpen] = useState(false);
 
-
   const handleViewChange = (newView: LocalViewType) => {
     setView(newView);
     router.push(`${pathname}?types=${newView}`);
   };
 
-
   const fetchData = useCallback(async () => {
     if (view === "api") return;
+
     try {
       setLoading(true);
       let endpoint = "";
@@ -96,11 +146,11 @@ function AllLinks() {
     }
   }, [view]);
 
-
   useEffect(() => {
     const initAuth = async () => {
       try {
         const res = await axios.get("/api/auth/me");
+
         if (res.data.authenticated) {
           setIsLoggedIn(true);
           setTier(res.data.plan || "FREE");
@@ -127,7 +177,6 @@ function AllLinks() {
       const now = new Date();
       result = result.filter((item) => {
         const itemDate = new Date(item.createdAt);
-
         switch (statusFilter) {
           case "today":
             return (
@@ -146,6 +195,7 @@ function AllLinks() {
         }
       });
     }
+
 
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
@@ -175,7 +225,6 @@ function AllLinks() {
             )
           );
         }
-
         return false;
       });
     }
@@ -208,10 +257,10 @@ function AllLinks() {
               </p>
             </div>
 
-            {view !== "api" && data.length > 0 && (
+            {view !== "api" && (data.length > 0 || loading) && (
               <div className="flex items-center gap-3">
                 <span className="px-4 py-2 font-bold bg-neutral-900 border border-neutral-800 rounded-lg text-xs uppercase tracking-widest text-neutral-400">
-                  Total - {filteredData.length}
+                  {loading ? "Loading..." : `Total - ${filteredData.length}`}
                 </span>
               </div>
             )}
@@ -221,7 +270,7 @@ function AllLinks() {
             <ApiLinks />
           ) : (
             <>
-              {data.length > 0 && !isDetailViewOpen && (
+              {(data.length > 0 || loading) && !isDetailViewOpen && (
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-6 fade-in">
                   <div className="relative w-full sm:max-w-[450px] flex-1">
                     <HugeiconsIcon icon={Search02Icon} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-500 w-5 h-5" />
@@ -239,8 +288,15 @@ function AllLinks() {
                 </div>
               )}
 
-              {loading ? <SkeletonLoader /> : data.length === 0 ? (
-                /* EMPTY STATE UI */
+              {loading ? (
+                <div className="flex flex-col w-full">
+                  {[...Array(6)].map((_, i) => (
+                    view === "qr" ? <QrSkeleton key={i} /> : 
+                    view === "bulk" ? <BulkSkeleton key={i} /> : 
+                    <LinksSkeleton key={i} />
+                  ))}
+                </div>
+              ) : data.length === 0 ? (
                 <div className="w-full py-24 px-4 flex flex-col items-center justify-center border-2 border-dashed border-neutral-800 rounded-3xl bg-[#1c1c1c]/30 mt-4 fade-in">
                   <div className="p-5 bg-neutral-900 rounded-2xl border border-neutral-800 mb-6">
                     <HugeiconsIcon
@@ -325,5 +381,5 @@ function AllLinks() {
 }
 
 export default function AllLinksPage() {
-  return <Suspense fallback={<SkeletonLoader />}><AllLinks /></Suspense>;
+  return <Suspense fallback={<div className="flex flex-col w-full p-10"><LinksSkeleton /></div>}><AllLinks /></Suspense>;
 }

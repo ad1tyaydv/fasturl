@@ -13,7 +13,8 @@ import {
   ArrowRight01Icon, 
   ArrowLeft01Icon,
   Edit02Icon,
-  Tick02Icon
+  Tick02Icon,
+  Edit03Icon
 } from '@hugeicons/core-free-icons';
 
 
@@ -154,7 +155,7 @@ export default function QrCodes({
                   className={`p-3 hover:text-white hover:bg-neutral-800 rounded-xl transition-colors cursor-pointer text-neutral-400 ${editingId === qr.id ? 'hidden' : 'flex'}`}
                   title="Edit Name"
                 >
-                  <HugeiconsIcon icon={Edit02Icon} size={22} />
+                  <HugeiconsIcon icon={Edit03Icon} />
                 </button>
 
                 <button
@@ -162,14 +163,14 @@ export default function QrCodes({
                   className="p-3 hover:text-white hover:bg-neutral-800 rounded-xl transition-colors cursor-pointer text-neutral-400"
                   title="Download"
                 >
-                  <HugeiconsIcon icon={Download01Icon} size={22} />
+                  <HugeiconsIcon icon={Download01Icon} />
                 </button>
                 <button
                   onClick={() => handleDeleteQr(qr.id)}
                   className="p-3 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-colors cursor-pointer text-neutral-400"
                   title="Delete"
                 >
-                  <HugeiconsIcon icon={Delete02Icon} size={22} />
+                  <HugeiconsIcon icon={Delete02Icon} />
                 </button>
               </div>
 
