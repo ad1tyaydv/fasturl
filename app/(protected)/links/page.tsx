@@ -5,11 +5,18 @@ import { useEffect, useState, useCallback, useMemo, Suspense } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Toaster } from "react-hot-toast";
 import { HugeiconsIcon } from '@hugeicons/react';
-import { Search02Icon, PlusSignIcon, Link04Icon, File02Icon } from '@hugeicons/core-free-icons';
+import {
+  Search02Icon,
+  PlusSignIcon,
+  Link04Icon,
+  File02Icon,
+  QrCode01Icon
+} from '@hugeicons/core-free-icons';
 
 import Navbar from "../../components/navbar";
 import UrlsPageSidebar from "@/app/components/linksPageSidebar";
 import BulkLinks from "../../components/bulkLinks";
+import QrCodes from "@/app/components/qrCodes";
 import Links from "@/app/components/links";
 import ApiLinks from "@/app/components/apiLinks";
 
@@ -35,14 +42,14 @@ const getRelativeTime = (dateString?: string) => {
   return date.toLocaleDateString();
 };
 
-type ViewType = "links" | "bulk" | "api";
+type LocalViewType = "links" | "bulk" | "api" | "qr";
 
 function AllLinks() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const [view, setView] = useState<ViewType>((searchParams.get("types") as ViewType) || "links");
+  const [view, setView] = useState<LocalViewType>((searchParams.get("types") as LocalViewType) || "links");
   const [data, setData] = useState<any[]>([]);
   const [tier, setTier] = useState("FREE");
   const [loading, setLoading] = useState(true);
@@ -59,24 +66,36 @@ function AllLinks() {
   const [isCustomModalOpen, setIsCustomModalOpen] = useState(false);
   const [isDetailViewOpen, setIsDetailViewOpen] = useState(false);
 
-  const handleViewChange = (newView: ViewType) => {
+
+  const handleViewChange = (newView: LocalViewType) => {
     setView(newView);
     router.push(`${pathname}?types=${newView}`);
   };
+
 
   const fetchData = useCallback(async () => {
     if (view === "api") return;
     try {
       setLoading(true);
-      const endpoint = view === "bulk" ? "/api/shortUrl/bulkLinks/fetchBulkLinks" : "/api/fetchUrls";
+      let endpoint = "";
+      if (view === "bulk") endpoint = "/api/shortUrl/bulkLinks/fetchBulkLinks";
+      else if (view === "qr") endpoint = "/api/fetchQR";
+      else endpoint = "/api/fetchUrls";
+
       const res = await axios.get(endpoint);
-      setData((view === "bulk" ? res.data.bulkLinks : res.data.urls) || []);
+
+      if (view === "bulk") setData(res.data.bulkLinks || []);
+      else if (view === "qr") setData(res.data.qrs || []);
+      else setData(res.data.urls || []);
+
     } catch (err) {
       setData([]);
+
     } finally {
       setLoading(false);
     }
   }, [view]);
+
 
   useEffect(() => {
     const initAuth = async () => {
@@ -85,30 +104,90 @@ function AllLinks() {
         if (res.data.authenticated) {
           setIsLoggedIn(true);
           setTier(res.data.plan || "FREE");
-        } else router.push("/auth/signin");
+
+        } else {
+          router.push("/auth/signin");
+        }
+
       } catch { router.push("/auth/signin"); }
     };
     initAuth();
+
   }, [router]);
 
+
   useEffect(() => { if (isLoggedIn) fetchData(); }, [fetchData, isLoggedIn]);
+
 
   const filteredData = useMemo(() => {
     if (view === "api") return [];
     let result = [...data];
+
+    if (statusFilter !== "all") {
+      const now = new Date();
+      result = result.filter((item) => {
+        const itemDate = new Date(item.createdAt);
+
+        switch (statusFilter) {
+          case "today":
+            return (
+              itemDate.getDate() === now.getDate() &&
+              itemDate.getMonth() === now.getMonth() &&
+              itemDate.getFullYear() === now.getFullYear()
+            );
+          case "7days":
+            const sevenDaysAgo = new Date(now.setDate(now.getDate() - 7));
+            return itemDate >= sevenDaysAgo;
+          case "30days":
+            const thirtyDaysAgo = new Date(now.setDate(now.getDate() - 30));
+            return itemDate >= thirtyDaysAgo;
+          default:
+            return true;
+        }
+      });
+    }
+
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
-      result = result.filter(item =>
-        view === "links"
-          ? (item.linkName?.toLowerCase().includes(q) || item.shorturl?.toLowerCase().includes(q))
-          : (item.name || "").toLowerCase().includes(q)
-      );
+      result = result.filter(item => {
+        if (view === "links") {
+          return (
+            item.linkName?.toLowerCase().includes(q) ||
+            item.shorturl?.toLowerCase().includes(q) ||
+            item.longUrl?.toLowerCase().includes(q)
+          );
+        }
+
+        if (view === "qr") {
+          return (
+            item.qrName?.toLowerCase().includes(q) ||
+            item.shortUrl?.toLowerCase().includes(q) ||
+            item.longUrl?.toLowerCase().includes(q)
+          );
+        }
+
+        if (view === "bulk") {
+          return (
+            item.name?.toLowerCase().includes(q) ||
+            item.links?.some((l: any) =>
+              l.linkName?.toLowerCase().includes(q) ||
+              l.shorturl?.toLowerCase().includes(q)
+            )
+          );
+        }
+
+        return false;
+      });
     }
+
     result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     return result;
-  }, [data, searchQuery, view]);
+
+  }, [data, searchQuery, view, statusFilter]);
+
 
   const paginatedData = filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
 
   return (
     <div className="h-screen bg-[#141414] text-white flex flex-col overflow-hidden">
@@ -119,14 +198,13 @@ function AllLinks() {
         <UrlsPageSidebar view={view} onViewChange={handleViewChange} />
 
         <main className="flex-1 w-full px-4 py-6 sm:px-10 sm:py-10 min-w-0 overflow-y-auto">
-          {/* Header Section */}
           <div className="hidden sm:flex sm:items-center justify-between gap-4 mb-8 border-b border-neutral-800 pb-6">
             <div>
               <h1 className="text-4xl font-one tracking-tight">
-                {view === "links" ? "My Links" : view === "bulk" ? "Bulk Links" : "API Requests"}
+                {view === "links" ? "My Links" : view === "bulk" ? "Bulk Links" : view === "qr" ? "QR Codes" : "API Requests"}
               </h1>
               <p className="text-neutral-500 text-sm mt-1">
-                {view === "api" ? "Links generated via your API keys." : "Track and manage your shortened URLs."}
+                {view === "api" ? "Links generated via your API keys." : "Track and manage your shortened URLs and assets."}
               </p>
             </div>
 
@@ -143,14 +221,13 @@ function AllLinks() {
             <ApiLinks />
           ) : (
             <>
-              {/* Search & Filter - Only show if data exists or user is searching */}
               {data.length > 0 && !isDetailViewOpen && (
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-6 fade-in">
                   <div className="relative w-full sm:max-w-[450px] flex-1">
                     <HugeiconsIcon icon={Search02Icon} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-500 w-5 h-5" />
                     <input
                       type="text"
-                      placeholder="Search links..."
+                      placeholder={`Search ${view}...`}
                       className="w-full pl-11 pr-4 py-3 bg-[#111111] border border-neutral-800 rounded-xl text-white text-sm outline-none focus:border-neutral-600 transition-all shadow-sm"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
@@ -163,33 +240,35 @@ function AllLinks() {
               )}
 
               {loading ? <SkeletonLoader /> : data.length === 0 ? (
-                /* EMPTY STATE UI - Dotted Rectangle */
+                /* EMPTY STATE UI */
                 <div className="w-full py-24 px-4 flex flex-col items-center justify-center border-2 border-dashed border-neutral-800 rounded-3xl bg-[#1c1c1c]/30 mt-4 fade-in">
                   <div className="p-5 bg-neutral-900 rounded-2xl border border-neutral-800 mb-6">
-                    <HugeiconsIcon 
-                        icon={view === "links" ? Link04Icon : File02Icon} 
-                        className="w-12 h-12 text-neutral-500" 
+                    <HugeiconsIcon
+                      icon={view === "links" ? Link04Icon : view === "qr" ? QrCode01Icon : File02Icon}
+                      className="w-12 h-12 text-neutral-500"
                     />
                   </div>
                   <h2 className="text-2xl sm:text-3xl font-one mb-3 text-white text-center">
-                    {view === "links" ? "Create your first link" : "No bulk batches discovered"}
+                    {view === "links" ? "Create your first link" : view === "qr" ? "No QR codes found" : "No bulk batches discovered"}
                   </h2>
                   <p className="text-neutral-500 font-three text-sm mb-10 text-center max-w-sm leading-relaxed">
-                    {view === "links" 
-                        ? "Shorten your long URLs and track their performance with detailed analytics." 
+                    {view === "links"
+                      ? "Shorten your long URLs and track their performance with detailed analytics."
+                      : view === "qr"
+                        ? "Generate custom QR codes to bridge the gap between offline and online."
                         : "Group multiple links together into a single batch for easier management."}
                   </p>
-                  <Button 
-                    onClick={() => router.push(view === "links" ? "/" : "/bulk-create")} 
+                  <Button
+                    onClick={() => router.push(view === "links" || view === "qr" ? "/" : "/bulk-create")}
                     className="bg-white text-black hover:bg-neutral-200 font-three px-6 py-4 rounded-xl flex items-center gap-2 text-lg transition-all"
                   >
-                    <HugeiconsIcon icon={PlusSignIcon} className="w-6 h-6" /> 
-                    {view === "links" ? "Shorten Now" : "Create Bulk Links"}
+                    <HugeiconsIcon icon={PlusSignIcon} className="w-6 h-6" />
+                    {view === "links" || view === "qr" ? "Create Now" : "Create Bulk Links"}
                   </Button>
                 </div>
               ) : (
                 <div className="fade-in">
-                  {view === "links" ? (
+                  {view === "links" && (
                     <div className="flex flex-col w-full">
                       {paginatedData.map((url) => (
                         <Links
@@ -206,7 +285,9 @@ function AllLinks() {
                         />
                       ))}
                     </div>
-                  ) : (
+                  )}
+
+                  {view === "bulk" && (
                     <BulkLinks
                       bulkLinks={paginatedData}
                       onRefresh={fetchData}
@@ -218,6 +299,15 @@ function AllLinks() {
                       setStatusFilter={setStatusFilter}
                       setIsDetailViewOpen={setIsDetailViewOpen}
                       itemCount={filteredData.length}
+                    />
+                  )}
+
+                  {view === "qr" && (
+                    <QrCodes
+                      qrCodes={paginatedData}
+                      onRefresh={fetchData}
+                      itemCount={filteredData.length}
+                      router={router}
                     />
                   )}
                 </div>

@@ -242,13 +242,13 @@ export default function Premium() {
               {[
                 "10,000 links/month",
                 "300 QR Codes/month",
-                "Full click analytics",
-                "Browsers, OS & devices",
-                "Top referrers",
+                "Detailed analytics",
                 "Bulk link creation",
                 "Custom URLs",
+                "Let people know where they're being redirected",
                 "4 custom domains",
                 "Security options",
+                "Support 24/7",
               ].map((f) => (
                 <li key={f} className="flex items-center gap-2 text-sm text-white/70">
                   <CheckIcon className="w-4 h-4 shrink-0 text-blue-400" />
@@ -279,14 +279,14 @@ export default function Premium() {
               {[
                 "40,000 links/month",
                 "2,000 QR Codes/month",
-                "Full click analytics",
-                "Browsers, OS & devices",
-                "Top referrers",
+                "Detailed analytics",
                 "Bulk link creation",
-                "10 custom domains",
                 "Custom URLs",
+                "Let people know where they're being redirected",
+                "10 custom domains",
                 "API access",
                 "Security options",
+                "Priority Support 24/7",
               ].map((f) => (
                 <li key={f} className="flex items-center gap-2 text-sm text-white/70">
                   <CheckIcon className="w-4 h-4 shrink-0 text-yellow-400" />

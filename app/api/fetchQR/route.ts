@@ -46,6 +46,7 @@ export async function GET(req: NextRequest) {
                 longUrl: true,
                 shortUrl: true,
                 qrImage: true,
+                qrName: true,
                 clicks: true,
                 createdAt: true,
             },

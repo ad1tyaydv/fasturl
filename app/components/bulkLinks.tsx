@@ -95,8 +95,10 @@ export default function BulkLinks({
       toast.success("Updated");
       onRefresh();
       setEditingId(null);
+
     } catch {
       toast.error("Failed to update");
+      
     } finally {
       setSavingId(null);
     }

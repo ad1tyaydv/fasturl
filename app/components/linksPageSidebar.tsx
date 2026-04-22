@@ -5,9 +5,16 @@ import {
   Link04Icon,
   Layers01Icon,
   CodeIcon,
+  QrCodeIcon,
 } from '@hugeicons/core-free-icons';
 
-type ViewType = "links" | "bulk" | "api";
+
+interface SidebarProps {
+  view: ViewType;
+  onViewChange: (view: ViewType) => void;
+}
+
+type ViewType = "links" | "bulk" | "api" | "qr";
 
 interface SidebarProps {
   view: ViewType;
@@ -19,6 +26,7 @@ export default function UrlsPageSidebar({ view, onViewChange }: SidebarProps) {
   const menuItems = [
     { id: "links", label: "My Links", icon: Link04Icon },
     { id: "bulk", label: "Bulk Links", icon: Layers01Icon },
+    { id: "qr", label: "QR Codes", icon: QrCodeIcon },
     { id: "api", label: "API Links", icon: CodeIcon },
   ];
 
