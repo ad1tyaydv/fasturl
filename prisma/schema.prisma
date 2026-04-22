@@ -14,42 +14,42 @@ enum Plan {
 }
 
 model User {
-  id       String  @id @default(uuid())
-  email    String  @unique
-  password String?
-  userName String?
+  id                String    @id @default(uuid())
+  email             String    @unique
+  password          String?
+  userName          String?
 
-  twofactorEnabled Boolean @default(false)
-  twofactorSecret  String?
+  twofactorEnabled  Boolean   @default(false)
+  twofactorSecret   String?
 
-  provider String?
-  image    String?
+  provider          String?
+  image             String?
 
-  ipAddress String?
+  ipAddress         String?
 
-  totalLinks Int @default(0)
-  totalQr    Int @default(0)
+  totalLinks        Int       @default(0)
+  totalQr           Int       @default(0)
 
-  plan          Plan      @default(FREE)
-  planStartedAt DateTime?
-  planExpiresAt DateTime?
+  plan              Plan      @default(FREE)
+  planStartedAt     DateTime?
+  planExpiresAt     DateTime?
 
-  subscriptionId String?
-  customerId     String?
+  subscriptionId    String?
+  customerId        String?
 
   billingStatus     String?
-  cancelAtPeriodEnd Boolean @default(false)
+  cancelAtPeriodEnd Boolean    @default(false)
 
-  cycleStart DateTime?
-  cycleEnd   DateTime?
+  cycleStart        DateTime?
+  cycleEnd          DateTime?
 
-  links     Link[]
-  qr        Qr[]
-  bulkLinks BulkLinks[]
-  domain    CustomDomain[]
-  api_key   Api_key[]
+  links             Link[]
+  qr                Qr[]
+  bulkLinks         BulkLinks[]
+  domain            CustomDomain[]
+  api_key           Api_key[]
 
-  createdAt DateTime @default(now())
+  createdAt         DateTime   @default(now())
 }
 
 model Link {
@@ -57,6 +57,9 @@ model Link {
   linkName String?
   shorturl String  @unique
   original String
+
+  subdomain String?
+  domain   String?
 
   clicks    Int     @default(0)
   clickLogs Click[]

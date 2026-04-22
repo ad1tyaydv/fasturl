@@ -17,11 +17,12 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ shor
         let originalUrl = await redis.get(`link:${shortUrl}`);
 
         const domain = req.headers.get("host");
+        let parts, subDomain, rootDomain
 
         if (domain && !domain.includes("fasturl.in") && !domain.includes("localhost")) {
-            const parts = domain.split(".");
-            const subDomain = parts.length > 2 ? parts.slice(0, -2).join(".") : null;
-            const rootDomain = parts.slice(-2).join(".");
+            parts = domain.split(".");
+            subDomain = parts.length > 2 ? parts.slice(0, -2).join(".") : null;
+            rootDomain = parts.slice(-2).join(".");
 
             const domainExists = await prisma.customDomain.findFirst({
                 where: {
@@ -40,10 +41,12 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ shor
         }
 
 
-        const findUrl = await prisma.link.findUnique({
+        const findUrl = await prisma.link.findFirst({
             where: {
                 shorturl: shortUrl,
-            },
+                domain: rootDomain,
+                subdomain: subDomain
+            }
         });
 
         if (!findUrl) {

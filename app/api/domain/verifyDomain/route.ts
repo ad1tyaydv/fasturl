@@ -165,6 +165,10 @@ export async function POST(req: NextRequest) {
 
                 const data = await response.json();
 
+                if (!response.ok && data.error?.code !== "domain_already_exists") {
+                    throw new Error("Failed to add domain to Vercel");
+                }
+
                 console.log("Vercel domain response:", data);
 
             } catch (error) {

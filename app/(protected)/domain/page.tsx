@@ -10,7 +10,7 @@ import {
 import { HugeiconsIcon } from '@hugeicons/react';
 import {
   PlusSignIcon, Search01Icon, Globe02Icon, ArrowDown01Icon, CopyIcon,
-  CopyCheckIcon, Delete02Icon, InformationCircleIcon
+  CopyCheckIcon, Delete02Icon
 } from '@hugeicons/core-free-icons';
 
 import { Toaster, toast } from "react-hot-toast";
@@ -21,9 +21,11 @@ import Navbar from "../../components/navbar";
 import { SkeletonLoader } from "@/app/loaders/links";
 import AddDomainModal from "@/app/modals/addDomainModal";
 import { FilterDomainDropDown, DomainFilterType } from "@/app/dropDown/filterDomainDropDown";
+import { useUser } from "@/app/components/userContext";
 
 export default function DomainsPage() {
   const router = useRouter();
+  const { user } = useUser();
 
   const [domains, setDomains] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -55,13 +57,14 @@ export default function DomainsPage() {
   useEffect(() => {
     const initAuth = async () => {
       try {
-        const res = await axios.get("/api/auth/me");
-        if (res.data.authenticated) {
+        const plan = user?.plan || "FREE";
+        setUserTier(plan);
+        if (plan !== "FREE" && plan !== "") {
           setIsLoggedIn(true);
-          setUserTier(res.data.tier || "FREE");
         } else {
           router.push("/auth/signin");
         }
+
       } catch {
         router.push("/auth/signin");
       }

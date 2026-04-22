@@ -23,6 +23,22 @@ export async function POST(req: NextRequest) {
       "127.0.0.1";
 
     const data = await req.json();
+
+    let domain = null;
+    let subDomain = null;
+
+    if (data.customDomain) {
+      const parts = data.customDomain.split(".");
+
+      if (parts.length > 2) {
+        subDomain = parts[0];
+        domain = parts.slice(1).join(".");
+
+      } else {
+        domain = data.customDomain;
+      }
+    }
+
     const token = req.cookies.get("token")?.value;
 
     let userId = ANON_USER_ID;
@@ -155,6 +171,8 @@ export async function POST(req: NextRequest) {
           original: originalLink,
           shorturl: shortUrl,
           ipAddress: ip,
+          domain: domain,
+          subdomain: subDomain
         },
       });
 
