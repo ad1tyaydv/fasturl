@@ -44,6 +44,8 @@ export async function GET(req: NextRequest) {
                     select: {
                         id: true,
                         shorturl: true,
+                        domain: true,
+                        subdomain: true,
                         original: true,
                         linkName: true,
                         clicks: true,

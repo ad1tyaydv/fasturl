@@ -47,6 +47,13 @@ export default function Links({
 
   const isFree = userPlan === "FREE";
 
+  const getShortLink = () => {
+    if (url.domain && url.subdomain) {
+      return `${url.subdomain}.${url.domain}/${url.shorturl}`;
+    }
+    return `${nextDomain}/${url.shorturl}`;
+  };
+
   const getDomain = (url: string) => {
     try { return new URL(url).hostname.replace("www.", ""); } catch { return ""; }
   };
@@ -74,7 +81,7 @@ export default function Links({
       await axios.post("/api/shortUrl/linkName", { linkId: url.id, name: tempName.trim() });
       toast.success("Name updated!");
       await onRefresh();
-      
+
     } catch {
       toast.error("Update failed");
 
@@ -151,7 +158,9 @@ export default function Links({
             ) : (
               <span className="text-white font-one text-xl truncate tracking-wide">{url.linkName || "Untitled Link"}</span>
             )}
-            <span className="text-neutral-500 font-three text-base truncate">{nextDomain}/{url.shorturl}</span>
+            <span className="text-neutral-500 font-three text-base truncate">
+              {getShortLink()}
+            </span>
           </div>
         </div>
 
@@ -169,7 +178,7 @@ export default function Links({
         </div>
 
         <div className="hidden md:flex items-center justify-end gap-3 text-neutral-400 w-[30%] opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity">
-          
+
           <button onClick={() => handleRestrictedAction(() => onOpenPassword(url))} className={`p-2 rounded-md cursor-pointer transition-colors ${url.password ? 'text-blue-500' : 'hover:text-white'}`}>
             {url.password ? <HugeiconsIcon icon={CircleLock01Icon} /> : <HugeiconsIcon icon={CircleUnlock01Icon} />}
           </button>
@@ -190,9 +199,9 @@ export default function Links({
             <HugeiconsIcon icon={QrCodeIcon} />
           </button>
 
-          <button 
-            onClick={() => setIsRedirectModalOpen(true)} 
-            className={`p-2 cursor-pointer transition-colors ${url.redirectTo ? 'text-blue-500' : 'hover:text-white'}`} 
+          <button
+            onClick={() => setIsRedirectModalOpen(true)}
+            className={`p-2 cursor-pointer transition-colors ${url.redirectTo ? 'text-blue-500' : 'hover:text-white'}`}
             title="Redirect Info"
           >
             <HugeiconsIcon icon={SentIcon} />
@@ -216,9 +225,9 @@ export default function Links({
         </div>
       </div>
 
-      <RedirectToModal 
-        isOpen={isRedirectModalOpen} 
-        onClose={() => setIsRedirectModalOpen(false)} 
+      <RedirectToModal
+        isOpen={isRedirectModalOpen}
+        onClose={() => setIsRedirectModalOpen(false)}
         selectedUrl={url}
         onSuccess={onRefresh}
       />

@@ -142,6 +142,8 @@ function AllLinks() {
     }
   }, [view]);
 
+  
+
   useEffect(() => {
     const initAuth = async () => {
       try {
@@ -153,7 +155,9 @@ function AllLinks() {
           router.push("/auth/signin");
         }
 
-      } catch { router.push("/auth/signin"); }
+      } catch { 
+        router.push("/auth/signin");
+      }
     };
     initAuth();
 
