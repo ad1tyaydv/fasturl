@@ -1,10 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  Check,
-  Command,
-} from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
 import { motion } from "framer-motion";
 import axios from "axios";
@@ -14,7 +10,6 @@ import toast, { Toaster } from "react-hot-toast";
 import { useUser } from "@/app/components/userContext";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ViewIcon, ViewOffSlashIcon, ArrowRight01Icon, Tick02Icon } from "@hugeicons/core-free-icons";
-
 
 export default function SignupPage() {
   const router = useRouter();
@@ -29,11 +24,9 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
   const [agreed, setAgreed] = useState(false);
 
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
-
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,182 +45,173 @@ export default function SignupPage() {
       });
 
       await refreshUser();
-
       toast.success("Welcome to Fasturl!", { id: signupToast });
       setTimeout(() => router.push("/"), 1000);
-
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Signup failed.", { id: signupToast });
-
     } finally {
       setLoading(false);
     }
   };
 
-
   return (
-    <div className="min-h-screen w-full bg-white text-black font-sans selection:bg-black selection:text-white flex overflow-hidden">
-      <Toaster position="bottom-right" reverseOrder={false} />
+    <div className="min-h-screen w-full flex flex-col lg:flex-row overflow-hidden bg-[#0A0A0A] text-white selection:bg-[#F07D51] selection:text-white">
+      <Toaster 
+        position="bottom-right" 
+        toastOptions={{
+          style: {
+            background: '#18181B',
+            color: '#fff',
+            border: '1px solid #27272A'
+          }
+        }} 
+      />
 
-      <div className="hidden lg:flex lg:w-[55%] relative flex-col justify-between p-16 bg-[#0a0a0a] text-white">
-        <div className="absolute inset-0 opacity-20 pointer-events-none">
-          <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_20%_30%,#333_0%,transparent_50%)]" />
-        </div>
-
-        <div className="relative z-10 flex items-center gap-3 cursor-pointer" onClick={() => router.push("/")}>
-          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(255,255,255,0.1)]">
-            <Command className="text-black" size={22} />
+      <div className="w-full lg:w-1/2 bg-[#0F0F0F] p-8 lg:p-20 flex flex-col relative overflow-hidden min-h-[60vh] lg:min-h-screen border-r border-zinc-800/50">
+        
+        <div 
+          className="relative z-20 flex items-center gap-3 cursor-pointer w-fit group mb-auto lg:pt-4" 
+          onClick={() => router.push("/")}
+        >
+          <div className="w-10 h-10 flex items-center justify-center transition-transform group-hover:scale-110">
+            <img src="/favicon.ico" alt="Fasturl Logo" className="w-full h-full object-contain" />
           </div>
-          <span className="text-sm font-bold tracking-[0.3em] uppercase">Fasturl</span>
+          <span className="text-2xl font-bold text-white tracking-tight">Fasturl</span>
         </div>
 
-        <div className="relative z-10 max-w-2xl">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
+        <div className="relative z-10 flex-grow flex flex-col justify-center lg:-mt-32">
+          <motion.div 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="max-w-xl"
           >
-            <h1 className="text-7xl font-light leading-[1.05] tracking-tight mb-10">
-              The internet <br />
-              <span className="italic font-serif opacity-90">is noisy enough.</span> <br />
-              Keep your links clean. <br />
+            <h1 className="text-6xl lg:text-7xl font-extrabold text-white leading-[1.05] mb-10">
+              Shorten links, <br /> 
+              <span className="text-[#F07D51]">expand</span> your digital reach.
             </h1>
-
-            <div className="space-y-6 mt-16 border-l border-white/10 pl-8">
-              <p className="text-sm text-white/40 max-w-xs leading-relaxed italic">
-                "We built Fasturl because we were tired of cluttered dashboards. We wanted something that felt calm, intentional, and human."
-              </p>
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-px bg-white/20" />
-                <span className="text-[10px] uppercase tracking-[0.4em] text-white/30 font-bold">fasturl</span>
-              </div>
-            </div>
+            <p className="text-zinc-400 text-xl lg:text-2xl leading-relaxed max-w-md">
+              Tired of messy URLs? Join Fasturl to create clean, professional, and trackable links in seconds.
+            </p>
           </motion.div>
         </div>
 
-        <div className="relative z-10 flex items-center gap-10 opacity-30">
-        </div>
+        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-[#F07D51]/10 rounded-full blur-[120px] opacity-30 pointer-events-none" />
+        <div className="absolute bottom-[-5%] right-[-5%] w-96 h-96 bg-[#F07D51]/5 rounded-full blur-[100px] opacity-20 pointer-events-none" />
       </div>
 
-      <div className="w-full lg:w-[45%] flex items-center justify-center bg-white overflow-y-auto p-8">
-        <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="w-full max-w-[400px]"
-        >
-          <div className="lg:hidden flex items-center gap-3 mb-10">
-            <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
-              <Command className="text-white" size={16} />
-            </div>
-            <span className="font-bold tracking-[0.2em] text-[10px] uppercase">Fasturl</span>
-          </div>
-
-          <div className="mb-10 text-center lg:text-left">
-            <h2 className="text-4xl font-bold tracking-tighter mb-3">Create account</h2>
-            <p className="text-slate-400 text-base font-medium">
-              Already a member?{" "}
-              <button
+      <div className="w-full lg:w-1/2 p-8 lg:p-20 flex flex-col justify-center bg-[#0A0A0A] min-h-screen">
+        <div className="max-w-[440px] mx-auto w-full">
+          <div className="mb-12">
+            <h2 className="text-4xl font-extrabold text-white mb-3">Get Started</h2>
+            <p className="text-zinc-500 font-medium text-lg">
+              Already have an account?{" "}
+              <button 
                 onClick={() => router.push("/auth/signin")}
-                className="text-black font-bold hover:underline underline-offset-4 transition-all cursor-pointer"
+                className="text-[#F07D51] font-bold hover:text-[#ff8e66] cursor-pointer transition-all"
               >
-                Log in
+                Sign In
               </button>
             </p>
           </div>
 
+          <button 
+            type="button"
+            onClick={() => signIn("google")}
+            className="w-full flex items-center justify-center gap-3 py-4 border border-zinc-800 bg-zinc-900/50 rounded-2xl hover:bg-zinc-800 transition-all font-bold text-zinc-200 shadow-sm cursor-pointer mb-10 group"
+          >
+            <FcGoogle size={24} className="group-hover:scale-110 transition-transform" />
+            Continue with Google
+          </button>
+
+          <div className="relative flex items-center justify-center mb-10">
+            <div className="w-full border-t border-zinc-800"></div>
+            <span className="absolute bg-[#0A0A0A] px-6 text-[11px] text-zinc-500 font-bold uppercase tracking-[0.3em]">or join with email</span>
+          </div>
+
           <form onSubmit={handleSignup} className="space-y-6">
-            <div className="space-y-2.5">
-              <label className="text-[12px] font-bold uppercase tracking-[0.2em] text-black ml-0.5">Username</label>
+            <div className="space-y-2">
+              <label className="text-[12px] font-bold uppercase tracking-widest text-zinc-500 ml-1">Username</label>
               <input
                 name="userName"
                 type="text"
-                placeholder="Username"
+                placeholder="Pick a unique username"
                 value={formData.userName}
                 onChange={handleChange}
-                className="w-full px-5 py-4 rounded-2xl border border-slate-200 text-base focus:border-black focus:ring-4 focus:ring-black/5 outline-none transition-all placeholder:text-slate-300 bg-slate-50/30"
+                className="w-full px-6 py-4 rounded-2xl border border-zinc-800 bg-zinc-900/50 focus:bg-zinc-900 focus:border-[#F07D51] focus:ring-4 focus:ring-[#F07D51]/10 outline-none transition-all placeholder:text-zinc-600 text-lg text-white"
                 required
               />
             </div>
 
-            <div className="space-y-2.5">
-              <label className="text-[12px] font-bold uppercase tracking-[0.2em] text-black ml-0.5">Email Address</label>
+            <div className="space-y-2">
+              <label className="text-[12px] font-bold uppercase tracking-widest text-zinc-500 ml-1">Email Address</label>
               <input
                 type="email"
                 name="email"
-                placeholder="you@domain.com"
+                placeholder="name@example.com"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full px-5 py-4 rounded-2xl border border-slate-200 text-base focus:border-black focus:ring-4 focus:ring-black/5 outline-none transition-all placeholder:text-slate-300 bg-slate-50/30"
+                className="w-full px-6 py-4 rounded-2xl border border-zinc-800 bg-zinc-900/50 focus:bg-zinc-900 focus:border-[#F07D51] focus:ring-4 focus:ring-[#F07D51]/10 outline-none transition-all placeholder:text-zinc-600 text-lg text-white"
                 required
               />
             </div>
 
-            <div className="space-y-2.5">
-              <label className="text-[12px] font-bold uppercase tracking-[0.2em] text-black ml-0.5">Secure Password</label>
-              <div className="relative group">
+            <div className="space-y-2">
+              <label className="text-[12px] font-bold uppercase tracking-widest text-zinc-500 ml-1">Secure Password</label>
+              <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
                   name="password"
-                  placeholder="••••••••"
+                  placeholder="Create a password"
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full px-5 py-4 rounded-2xl border border-slate-200 text-base focus:border-black focus:ring-4 focus:ring-black/5 outline-none transition-all placeholder:text-slate-300 bg-slate-50/30"
+                  className="w-full px-6 py-4 rounded-2xl border border-zinc-800 bg-zinc-900/50 focus:bg-zinc-900 focus:border-[#F07D51] focus:ring-4 focus:ring-[#F07D51]/10 outline-none transition-all placeholder:text-zinc-600 text-lg text-white"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 hover:text-black transition-colors cursor-pointer"
+                  className="absolute right-6 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-[#F07D51] cursor-pointer transition-colors"
                 >
-                  {showPassword ? <HugeiconsIcon icon={ViewOffSlashIcon} /> : <HugeiconsIcon icon={ViewIcon} />}
+                  {showPassword ? <HugeiconsIcon icon={ViewOffSlashIcon} size={22} /> : <HugeiconsIcon icon={ViewIcon} size={22} />}
                 </button>
               </div>
             </div>
 
             <div
-              className="flex items-center gap-4 cursor-pointer group py-1"
+              className="flex items-center gap-4 cursor-pointer group pt-2"
               onClick={() => setAgreed(!agreed)}
             >
-              <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-all shrink-0 ${agreed ? 'bg-black border-black shadow-sm' : 'border-slate-200 group-hover:border-slate-300'
-                }`}>
-                {agreed && <HugeiconsIcon icon={Tick02Icon} className="text-white stroke-[4px]" />}
+              <div className={`w-6 h-6 rounded-lg border flex items-center justify-center transition-all shrink-0 ${agreed ? 'bg-[#F07D51] border-[#F07D51] shadow-lg shadow-[#F07D51]/20' : 'border-zinc-700 group-hover:border-zinc-500'}`}>
+                {agreed && <HugeiconsIcon icon={Tick02Icon} size={14} className="text-white stroke-[4px]" />}
               </div>
-              <span className="text-xs text-slate-400 font-medium select-none">
-                I agree to the <span className="text-black font-bold">Terms</span> and <span className="text-black font-bold">Privacy Policy</span>.
+              <span className="text-sm text-zinc-500 select-none font-medium leading-snug">
+                I agree to the <span className="text-zinc-200 font-bold cursor-pointer hover:underline">Terms</span> and <span className="text-zinc-200 font-bold cursor-pointer hover:underline">Privacy Policy</span>.
               </span>
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-4.5 rounded-2xl bg-black text-white font-bold text-sm transition-all hover:bg-zinc-800 active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3 shadow-xl mt-2 cursor-pointer"
+              className="w-full py-5 rounded-2xl bg-[#F07D51] text-white font-bold text-xl transition-all hover:bg-[#e06d41] hover:shadow-[0_0_30px_rgba(240,125,81,0.3)] active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3 mt-6 cursor-pointer"
             >
               {loading ? (
-                <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                <div className="w-7 h-7 border-3 border-white/20 border-t-white rounded-full animate-spin" />
               ) : (
                 <>
-                  Create an account
-                  <HugeiconsIcon icon={ArrowRight01Icon} />
+                  Create Free Account
+                  <HugeiconsIcon icon={ArrowRight01Icon} size={24} />
                 </>
               )}
             </button>
           </form>
-
-          <div className="relative flex items-center justify-center my-10">
-            <div className="w-full border-t border-slate-100"></div>
-            <span className="absolute bg-white px-5 text-[10px] text-slate-400 uppercase tracking-[0.3em] font-bold">OR</span>
+          
+          <div className="mt-12 text-center">
+             <p className="text-[11px] text-zinc-600 uppercase tracking-widest font-bold">
+                Trusted by 50,000+ creators worldwide
+             </p>
           </div>
-
-          <button
-            type="button"
-            onClick={() => signIn("google")}
-            className="w-full flex items-center justify-center gap-4 py-4 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 transition-all text-base font-bold text-slate-900 shadow-sm active:scale-[0.99] cursor-pointer"
-          >
-            <FcGoogle size={22} />
-            Continue with Google
-          </button>
-        </motion.div>
+        </div>
       </div>
     </div>
   );

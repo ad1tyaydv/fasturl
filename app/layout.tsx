@@ -16,8 +16,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Fasturl",
-  description: "Fasturl",
+  title: "fasturl",
+  description: "fasturl",
+  icons: {
+    icon: "/favicon.ico",
+  }
 };
 
 export default function RootLayout({

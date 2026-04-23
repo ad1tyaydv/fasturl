@@ -4,9 +4,9 @@ import axios from "axios";
 import { useEffect, useState, useCallback, useMemo, Suspense } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Toaster } from "react-hot-toast";
+import { SearchIcon } from "lucide-react";
 import { HugeiconsIcon } from '@hugeicons/react';
 import {
-  Search02Icon,
   PlusSignIcon,
   Link04Icon,
   File02Icon,
@@ -24,7 +24,10 @@ import { FilterDropDown, FilterType } from "@/app/dropDown/urlsPageDropDown";
 import LinkPasswordProtectionModal from "@/app/modals/linkPasswordProtection";
 import CustomUrlModal from "@/app/modals/customUrl";
 import QRCodeGenerateModal from "@/app/modals/qrGenerate";
+
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { ButtonGroup } from "@/components/ui/button-group";
 
 
 const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN;
@@ -38,16 +41,12 @@ const LinksSkeleton = () => (
         <div className="h-4 w-[200px] bg-neutral-800/50 rounded-md" />
       </div>
     </div>
-
     <div className="hidden md:flex w-[15%] shrink-0 pr-4">
       <div className="h-6 w-20 bg-neutral-800/30 rounded-md" />
     </div>
-
     <div className="w-[20%] md:w-[20%] flex flex-col items-end md:items-start">
       <div className="h-5 w-12 bg-neutral-800/60 rounded" />
     </div>
-
-
     <div className="hidden md:block w-[10%] text-right">
       <div className="h-4 w-14 bg-neutral-800/40 rounded ml-auto" />
     </div>
@@ -78,7 +77,6 @@ const BulkSkeleton = () => (
     <div className="h-4 w-16 bg-neutral-800 rounded ml-auto" />
   </div>
 );
-
 
 const getRelativeTime = (dateString?: string) => {
   if (!dateString) return "Just now";
@@ -124,7 +122,6 @@ function AllLinks() {
 
   const fetchData = useCallback(async () => {
     if (view === "api") return;
-
     try {
       setLoading(true);
       let endpoint = "";
@@ -133,7 +130,6 @@ function AllLinks() {
       else endpoint = "/api/fetchUrls";
 
       const res = await axios.get(endpoint);
-
       if (view === "bulk") setData(res.data.bulkLinks || []);
       else if (view === "qr") setData(res.data.qrs || []);
       else setData(res.data.urls || []);
@@ -150,11 +146,9 @@ function AllLinks() {
     const initAuth = async () => {
       try {
         const res = await axios.get("/api/auth/me");
-
         if (res.data.authenticated) {
           setIsLoggedIn(true);
           setTier(res.data.plan || "FREE");
-
         } else {
           router.push("/auth/signin");
         }
@@ -185,17 +179,18 @@ function AllLinks() {
               itemDate.getFullYear() === now.getFullYear()
             );
           case "7days":
-            const sevenDaysAgo = new Date(now.setDate(now.getDate() - 7));
+            const sevenDaysAgo = new Date();
+            sevenDaysAgo.setDate(now.getDate() - 7);
             return itemDate >= sevenDaysAgo;
           case "30days":
-            const thirtyDaysAgo = new Date(now.setDate(now.getDate() - 30));
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(now.getDate() - 30);
             return itemDate >= thirtyDaysAgo;
           default:
             return true;
         }
       });
     }
-
 
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
@@ -207,7 +202,6 @@ function AllLinks() {
             item.longUrl?.toLowerCase().includes(q)
           );
         }
-
         if (view === "qr") {
           return (
             item.qrName?.toLowerCase().includes(q) ||
@@ -215,7 +209,6 @@ function AllLinks() {
             item.longUrl?.toLowerCase().includes(q)
           );
         }
-
         if (view === "bulk") {
           return (
             item.name?.toLowerCase().includes(q) ||
@@ -231,7 +224,6 @@ function AllLinks() {
 
     result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     return result;
-
   }, [data, searchQuery, view, statusFilter]);
 
 
@@ -272,15 +264,22 @@ function AllLinks() {
             <>
               {(data.length > 0 || loading) && !isDetailViewOpen && (
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-6 fade-in">
-                  <div className="relative w-full sm:max-w-[450px] flex-1">
-                    <HugeiconsIcon icon={Search02Icon} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-500 w-5 h-5" />
-                    <input
-                      type="text"
-                      placeholder={`Search ${view}...`}
-                      className="w-full pl-11 pr-4 py-3 bg-[#111111] border border-neutral-800 rounded-xl text-white text-sm outline-none focus:border-neutral-600 transition-all shadow-sm"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                    />
+                  <div className="w-full sm:max-w-[450px] flex-1">
+                    <ButtonGroup className="w-full shadow-sm">
+                      <Input 
+                        placeholder={`Search ${view}...`}
+                        className="bg-[#111111] border-neutral-800 text-white focus-visible:ring-0 focus-visible:border-neutral-600 h-11"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                      />
+                      <Button 
+                        variant="outline" 
+                        aria-label="Search"
+                        className="bg-neutral-900 border-neutral-800 hover:bg-neutral-800 hover:text-white h-11 px-4"
+                      >
+                        <SearchIcon className="w-4 h-4 text-neutral-400" />
+                      </Button>
+                    </ButtonGroup>
                   </div>
                   <div className="w-full sm:w-auto flex justify-end">
                     <FilterDropDown value={statusFilter} onChange={(val: FilterType) => setStatusFilter(val)} />
@@ -381,5 +380,9 @@ function AllLinks() {
 }
 
 export default function AllLinksPage() {
-  return <Suspense fallback={<div className="flex flex-col w-full p-10"><LinksSkeleton /></div>}><AllLinks /></Suspense>;
+  return (
+    <Suspense fallback={<div className="flex flex-col w-full p-10"><LinksSkeleton /></div>}>
+      <AllLinks />
+    </Suspense>
+  );
 }

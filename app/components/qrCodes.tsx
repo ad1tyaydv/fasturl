@@ -12,7 +12,6 @@ import {
   PlusSignIcon, 
   ArrowRight01Icon, 
   ArrowLeft01Icon,
-  Edit02Icon,
   Tick02Icon,
   Edit03Icon
 } from '@hugeicons/core-free-icons';

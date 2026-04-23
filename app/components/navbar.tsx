@@ -55,6 +55,7 @@ export default function Navbar() {
       await logout();
       setIsSidebarOpen(false);
       router.push("/");
+
     } catch (error) {
       console.error("Logout failed");
     }
@@ -69,12 +70,19 @@ export default function Navbar() {
     <>
       <nav className="flex items-center justify-between px-6 sm:px-10 py-6 border-b border-neutral-800 z-30 shrink-0 bg-[#141414] text-white sticky top-0 shadow-sm">
         <div className="flex items-center gap-10">
-          <h1
-            className="text-xl sm:text-2xl font-three font-bold cursor-pointer tracking-tighter"
+          <div
+            className="flex items-center gap-2 cursor-pointer group"
             onClick={() => router.push("/")}
           >
-            FASTURL
-          </h1>
+            <img
+              src="/favicon.ico"
+              alt="FastURL Logo"
+              className="w-7 h-7 object-contain"
+            />
+            <h1 className="text-xl sm:text-2xl font-three font-bold tracking-tighter">
+              FASTURL
+            </h1>
+          </div>
 
           <div className="hidden lg:flex items-center gap-1">
             {menuItems.map((item: MenuItem) => {
@@ -89,8 +97,8 @@ export default function Navbar() {
                   key={item.path}
                   onClick={() => router.push(item.path)}
                   className={`px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 shrink-0 cursor-pointer ${isActive
-                      ? "bg-[#1D9BF0] text-white shadow-sm"
-                      : "text-neutral-400 hover:bg-[#222222] hover:text-white"
+                    ? "bg-[#1D9BF0] text-white shadow-sm"
+                    : "text-neutral-400 hover:bg-[#222222] hover:text-white"
                     }`}
                 >
                   {item.name}
@@ -208,8 +216,8 @@ export default function Navbar() {
                   key={item.path}
                   onClick={() => navigateTo(item.path)}
                   className={`w-full flex items-center gap-4 px-5 py-4 rounded-xl font-three font-medium text-lg transition-all ${isActive
-                      ? "bg-[#1D9BF0] text-white shadow-lg shadow-[#1D9BF0]/20"
-                      : "text-neutral-400 hover:bg-[#1e1e1e] hover:text-white"
+                    ? "bg-[#1D9BF0] text-white shadow-lg shadow-[#1D9BF0]/20"
+                    : "text-neutral-400 hover:bg-[#1e1e1e] hover:text-white"
                     }`}
                 >
                   <Icon
@@ -235,7 +243,7 @@ export default function Navbar() {
               className="flex items-center gap-4 px-5 py-4 rounded-xl font-three font-medium text-lg text-red-400 hover:bg-red-500/10 transition-all"
             >
               <HugeiconsIcon icon={Logout05Icon} />
-                Logout
+              Logout
             </button>
           </div>
         </div>

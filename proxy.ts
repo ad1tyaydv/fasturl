@@ -19,6 +19,12 @@ export async function proxy(req: NextRequest) {
     if(pathName.startsWith('/api/cronJobs')) {
         return NextResponse.next();
     }
+
+    if(token && (pathName === "/auth/signup" || pathName === "/auth/signin")) {
+        return NextResponse.redirect(new URL("/", req.url));
+    }
+
+
     const protectedRoutes = ['/urls', '/qr', '/analytics']
 
     const isProtectedRoute = protectedRoutes.some(route => pathName.startsWith(route))

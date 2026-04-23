@@ -10,6 +10,7 @@ import { HugeiconsIcon } from '@hugeicons/react';
 import {
   Analytics01Icon, ArrowRightDoubleIcon, QrCodeIcon }
   from '@hugeicons/core-free-icons';
+import { useUser } from "./userContext";
 
 interface FasturlFeaturesProps {
   isLoggedIn: boolean;
@@ -19,13 +20,14 @@ interface FasturlFeaturesProps {
 
 export default function Features({ isLoggedIn, userPlan }: FasturlFeaturesProps) {
   const router = useRouter();
+  const { user } = useUser();
 
   const handleAccess = (path: string) => {
     if (!isLoggedIn) {
       router.push("/auth/signin");
       return;
     }
-    if (userPlan === "FREE") {
+    if (user.plan === "FREE") {
       router.push("/premium");
       return;
     }

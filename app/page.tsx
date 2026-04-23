@@ -19,6 +19,7 @@ import Footer from "./components/footer";
 import { DomainDropdown } from "./dropDown/domainDropDown";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { UpgradeAlert } from "./modals/upgradeAlert";
 
 
 const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN!;
@@ -366,11 +367,14 @@ export default function Dashboard() {
         </div>
       )}
 
-      {upgradeMsg && (
-        <div className="fixed font-one bottom-10 left-1/2 -translate-x-1/2 px-8 py-3 shadow-2xl z-[100] bg-white text-black font-bold rounded-full animate-bounce border border-neutral-200">
-          Upgrade your plan for more links!
-        </div>
-      )}
+      <UpgradeAlert
+        isOpen={upgradeMsg}
+        onClose={setUpgradeMsg}
+        onConfirm={() => {
+          setUpgradeMsg(false);
+          pricingRef.current?.scrollIntoView({ behavior: "smooth" });
+        }}
+      />
 
       <TotalData />
       <Footer />

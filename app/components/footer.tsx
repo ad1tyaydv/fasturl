@@ -1,12 +1,8 @@
 "use client";
 
+import { NewTwitterIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import Link from "next/link";
-import { 
-  IoLogoFacebook, 
-  IoLogoInstagram, 
-  IoLogoLinkedin, 
-  IoLogoTwitter 
-} from "react-icons/io5";
 
 
 export default function Footer() {
@@ -17,11 +13,11 @@ export default function Footer() {
       title: "Features",
       links: [
         { name: "Link Editor", href: "/" },
-        { name: "Link Management", href: "/urls" },
-        { name: "Branded Links", href: "/urls" },
+        { name: "Link Management", href: "/links?types=links" },
+        { name: "Branded Links", href: "/links?types=links" },
         { name: "Short URL Tracking", href: "/analytics" },
         { name: "QR Code Generator", href: "/qr" },
-        { name: "Short URL API", href: "/shortapi" },
+        { name: "Short URL API", href: "/apikeys" },
       ],
     },
     {
@@ -45,11 +41,9 @@ export default function Footer() {
     {
       title: "Legal",
       links: [
-        { name: "Terms of Service", href: "/terms" },
-        { name: "Privacy Policy", href: "/privacy" },
-        { name: "Cookie Policy", href: "#" },
-        { name: "Accessibility Statement", href: "#" },
-        { name: "Privacy Manager", href: "#" },
+        { name: "Terms of Service", href: "/legal/terms" },
+        { name: "Privacy Policy", href: "/legal/privacyPolicy" },
+        { name: "Cookie Policy", href: "/legal/cookies" },
       ],
     },
   ];
@@ -81,17 +75,9 @@ export default function Footer() {
 
           <div className="col-span-2 flex flex-col items-center lg:items-end justify-center lg:justify-start gap-6 lg:ml-auto">
             <div className="flex gap-6">
+              <span className="text-neutral-500">Follow us on</span>
               <Link href="#" className="text-neutral-400 hover:text-white transition-colors cursor-pointer">
-                <IoLogoFacebook size={22} />
-              </Link>
-              <Link href="#" className="text-neutral-400 hover:text-white transition-colors cursor-pointer">
-                <IoLogoInstagram size={22} />
-              </Link>
-              <Link href="#" className="text-neutral-400 hover:text-white transition-colors cursor-pointer">
-                <IoLogoLinkedin size={22} />
-              </Link>
-              <Link href="#" className="text-neutral-400 hover:text-white transition-colors cursor-pointer">
-                <IoLogoTwitter size={22} />
+                <HugeiconsIcon icon={NewTwitterIcon} />
               </Link>
             </div>
 
