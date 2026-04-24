@@ -41,7 +41,11 @@ export async function POST(req: NextRequest) {
                 password: hashedPassword,
                 plan: "FREE",
                 totalLinks: 100,
+                linksUsed: 0,
+                totalLinksCreated: 0,
                 totalQr: 30,
+                qrUsed :0,
+                totalQrCreated: 0,
                 cycleStart: now,
                 cycleEnd: new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)
             }

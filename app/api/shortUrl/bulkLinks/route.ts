@@ -112,8 +112,11 @@ export async function POST(req: NextRequest) {
                     id: decoded.userId
                 },
                 data: {
-                    totalLinks: {
-                        decrement: totalRequestedLinks
+                    linksUsed: {
+                        increment: totalRequestedLinks
+                    },
+                    totalLinksCreated: {
+                        increment: totalRequestedLinks
                     }
                 }
             })
@@ -157,7 +160,7 @@ export async function POST(req: NextRequest) {
                         id: decoded.userId
                     },
                     data: {
-                        totalLinks: {
+                        linksUsed: {
                             increment: refund
                         }
                     }

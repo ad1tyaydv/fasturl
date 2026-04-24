@@ -12,7 +12,7 @@ import {
 
 import { HugeiconsIcon } from '@hugeicons/react';
 import {
-  Refresh04Icon, Download01Icon, QrCodeIcon }
+  Refresh04Icon, Download01Icon }
   from '@hugeicons/core-free-icons';
 
 import Navbar from "@/app/components/navbar";

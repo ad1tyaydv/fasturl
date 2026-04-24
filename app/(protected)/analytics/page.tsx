@@ -19,6 +19,7 @@ import LocationAnalytics from "@/app/components/analytics/location";
 import OSAnalytics from "@/app/components/analytics/os";
 import ReferrerAnalytics from "@/app/components/analytics/referrers";
 import { AnalyticsDropDown } from "@/app/dropDown/analyticsDropDown";
+import { useUser } from "@/app/components/userContext";
 
 
 const DOMAIN = process.env.NEXT_PUBLIC_DOMAIN!;
@@ -52,6 +53,9 @@ function PremiumBlock({ children, isFree }: { children: React.ReactNode; isFree:
 
 export default function AnalyticsPage() {
   const router = useRouter();
+  const { user } = useUser();
+  
+
   const [urls, setUrls] = useState<any[]>([]);
   const [tier, setTier] = useState<string>("FREE");
   const [searchQuery, setSearchQuery] = useState("");

@@ -28,7 +28,12 @@ model User {
   ipAddress         String?
 
   totalLinks        Int       @default(0)
+  linksUsed         Int       @default(0)
+  totalLinksCreated  Int?       @default(0)
+
   totalQr           Int       @default(0)
+  qrUsed         Int       @default(0)
+  totalQrCreated     Int?       @default(0)
 
   plan              Plan      @default(FREE)
   planStartedAt     DateTime?
@@ -48,6 +53,8 @@ model User {
   bulkLinks         BulkLinks[]
   domain            CustomDomain[]
   api_key           Api_key[]
+  subscription      Subscription[]
+  payment           Payment[]
 
   createdAt         DateTime   @default(now())
 }
@@ -230,6 +237,45 @@ model OTP {
   expiresAt DateTime
 
   createdAt DateTime @default(now())
+}
+
+model Subscription {
+  id              String   @id @default(uuid())
+
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
+
+  plan            String
+  status          String
+
+  subscriptionId  String   @unique
+  customerId      String?
+
+  planStartedAt DateTime?
+  planEndedAt   DateTime?
+
+  cancelAtPeriodEnd Boolean @default(false)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Payment {
+  id            String   @id @default(uuid())
+
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+
+  paymentId     String   @unique
+  subscriptionId String?
+
+  amount        Int
+  currency      String
+
+  status        String
+  method        String?
+
+  createdAt     DateTime @default(now())
 }
 
 model Count {

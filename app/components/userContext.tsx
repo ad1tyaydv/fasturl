@@ -6,6 +6,8 @@ import { getUser } from "@/lib/getUser";
 type UserContextType = {
   user: any | null;
   loading: boolean;
+  linksLeft: number;
+  setLinksLeft: React.Dispatch<React.SetStateAction<number>>;
   refreshUser: () => Promise<void>;
   logout: () => void;
 };
@@ -15,7 +17,7 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
-
+  const [linksLeft, setLinksLeft] = useState(0);
   const refreshUser = async () => {
     const data = await getUser();
     setUser(data);
@@ -23,9 +25,25 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const init = async () => {
-      const data = await getUser();
-      setUser(data);
-      setLoading(false);
+      try {
+        const data = await getUser();
+
+        if (data) {
+          setUser(data);
+          setLinksLeft(data.totalLinks ?? 0);
+
+        } else {
+          setUser(null);
+          setLinksLeft(0);
+        }
+
+      } catch (err) {
+        setUser(null);
+        setLinksLeft(0);
+        
+      } finally {
+        setLoading(false);
+      }
     };
 
     init();
@@ -37,7 +55,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <UserContext.Provider value={{ user, loading, refreshUser, logout }}>
+    <UserContext.Provider value={{ user, loading, linksLeft, setLinksLeft, refreshUser, logout }}>
       {children}
     </UserContext.Provider>
   );

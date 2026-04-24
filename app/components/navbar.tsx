@@ -3,10 +3,9 @@ import { useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useUser } from "./userContext";
 import { NavbarDropDown } from "../dropDown/navbarDropDown";
+import Link from "next/link";
 import {
   X,
-  LogOut,
-  User,
   LayoutDashboard,
   Link2,
   LayoutGrid,
@@ -26,6 +25,7 @@ interface MenuItem {
   path: string;
   icon: LucideIcon;
 }
+
 
 export default function Navbar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -61,18 +61,14 @@ export default function Navbar() {
     }
   };
 
-  const navigateTo = (path: string) => {
-    router.push(path);
-    setIsSidebarOpen(false);
-  };
-
+  
   return (
     <>
       <nav className="flex items-center justify-between px-6 sm:px-10 py-6 border-b border-neutral-800 z-30 shrink-0 bg-[#141414] text-white sticky top-0 shadow-sm">
         <div className="flex items-center gap-10">
-          <div
+          <Link
+            href="/"
             className="flex items-center gap-2 cursor-pointer group"
-            onClick={() => router.push("/")}
           >
             <img
               src="/favicon.ico"
@@ -82,7 +78,7 @@ export default function Navbar() {
             <h1 className="text-xl sm:text-2xl font-three font-bold tracking-tighter">
               FASTURL
             </h1>
-          </div>
+          </Link>
 
           <div className="hidden lg:flex items-center gap-1">
             {menuItems.map((item: MenuItem) => {
@@ -93,16 +89,16 @@ export default function Navbar() {
                   : pathname.startsWith(basePath);
 
               return (
-                <button
+                <Link
                   key={item.path}
-                  onClick={() => router.push(item.path)}
-                  className={`px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 shrink-0 cursor-pointer ${isActive
+                  href={item.path}
+                  className={`px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 shrink-0 ${isActive
                     ? "bg-[#1D9BF0] text-white shadow-sm"
                     : "text-neutral-400 hover:bg-[#222222] hover:text-white"
                     }`}
                 >
                   {item.name}
-                </button>
+                </Link>
               );
             })}
           </div>
@@ -116,16 +112,16 @@ export default function Navbar() {
             </div>
           ) : user ? (
             <>
-              <button
-                onClick={() => router.push("/premium")}
-                className={`hidden sm:block border font-three px-5 py-2 rounded-lg font-bold text-xs uppercase transition-all duration-500 cursor-pointer shadow-sm
+              <Link
+                href="/premium"
+                className={`hidden sm:block border font-three px-5 py-2 rounded-lg font-bold text-xs uppercase transition-all duration-500 shadow-sm
                   ${isPaid
                     ? "bg-linear-to-r from-amber-400 via-yellow-200 to-amber-500 text-black border-amber-500 shadow-[0_0_15px_rgba(251,191,36,0.3)]"
                     : "bg-[#222222] text-white border-neutral-700 hover:bg-[#333333]"
                   }`}
               >
                 {tier}
-              </button>
+              </Link>
 
               <div className="lg:block hidden">
                 <NavbarDropDown
@@ -150,10 +146,10 @@ export default function Navbar() {
               </div>
 
               <div
-                className="lg:hidden block"
+                className="lg:hidden block cursor-pointer"
                 onClick={() => setIsSidebarOpen(true)}
               >
-                <div className="w-9 h-9 rounded-full overflow-hidden bg-[#1e1e1e] border border-white/10 flex items-center justify-center cursor-pointer active:scale-95 transition-all">
+                <div className="w-9 h-9 rounded-full overflow-hidden bg-[#1e1e1e] border border-white/10 flex items-center justify-center active:scale-95 transition-all">
                   {avatarUrl ? (
                     <img
                       src={avatarUrl}
@@ -169,18 +165,18 @@ export default function Navbar() {
               </div>
             </>
           ) : (
-            <button
-              onClick={() => router.push("/auth/signin")}
-              className="bg-white text-black hover:bg-gray-200 px-6 sm:px-8 py-2.5 rounded-lg transition-all cursor-pointer font-three text-sm font-semibold shadow-sm"
+            <Link
+              href="/auth/signin"
+              className="bg-white text-black hover:bg-gray-200 px-6 sm:px-8 py-2.5 rounded-lg transition-all font-three text-sm font-semibold shadow-sm"
             >
               Login
-            </button>
+            </Link>
           )}
         </div>
       </nav>
 
       <div
-        className={`fixed inset-0 bg-black/70 backdrop-blur-md z-[100] transition-opacity duration-300 lg:hidden ${isSidebarOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+        className={`fixed inset-0 bg-black/70 backdrop-blur-md z-[100] transition-opacity duration-300 lg:hidden ${isSidebarOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
           }`}
         onClick={() => setIsSidebarOpen(false)}
       />
@@ -197,7 +193,7 @@ export default function Navbar() {
 
             <button
               onClick={() => setIsSidebarOpen(false)}
-              className="p-3 bg-[#1e1e1e] hover:bg-[#282828] text-neutral-400 hover:text-white rounded-full transition-all duration-200 mr-8 border border-white/5 active:scale-90"
+              className="p-3 bg-[#1e1e1e] hover:bg-[#282828] text-neutral-400 hover:text-white rounded-full transition-all duration-200 border border-white/5 active:scale-90"
             >
               <X className="w-6 h-6" />
             </button>
@@ -212,10 +208,11 @@ export default function Navbar() {
                   : pathname.startsWith(basePath);
               const Icon = item.icon;
               return (
-                <button
+                <Link
                   key={item.path}
-                  onClick={() => navigateTo(item.path)}
-                  className={`w-full flex items-center gap-4 px-5 py-4 rounded-xl font-three font-medium text-lg transition-all ${isActive
+                  href={item.path}
+                  onClick={() => setIsSidebarOpen(false)}
+                  className={`flex items-center gap-4 px-5 py-4 rounded-xl font-three font-medium text-lg transition-all ${isActive
                     ? "bg-[#1D9BF0] text-white shadow-lg shadow-[#1D9BF0]/20"
                     : "text-neutral-400 hover:bg-[#1e1e1e] hover:text-white"
                     }`}
@@ -225,27 +222,41 @@ export default function Navbar() {
                       }`}
                   />
                   {item.name}
-                </button>
+                </Link>
               );
             })}
           </div>
 
-          <div className="mt-auto p-6 bg-[#181818]/50 border-t border-neutral-800 flex flex-col gap-2 pb-10">
-            <button
-              onClick={() => navigateTo("/settings/profile")}
-              className="flex items-center gap-4 px-5 py-4 rounded-xl font-three font-medium text-lg text-neutral-300 hover:bg-[#222222] transition-all"
-            >
-              <HugeiconsIcon icon={User02Icon} />
-              Manage Account
-            </button>
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-4 px-5 py-4 rounded-xl font-three font-medium text-lg text-red-400 hover:bg-red-500/10 transition-all"
-            >
-              <HugeiconsIcon icon={Logout05Icon} />
-              Logout
-            </button>
-          </div>
+          {user ? (
+            <div className="mt-auto p-6 bg-[#181818]/50 border-t border-neutral-800 flex flex-col gap-2 pb-10">
+              <Link
+                href="/settings/profile"
+                onClick={() => setIsSidebarOpen(false)}
+                className="flex items-center gap-4 px-5 py-4 rounded-xl font-three font-medium text-lg text-neutral-300 hover:bg-[#222222] transition-all"
+              >
+                <HugeiconsIcon icon={User02Icon} />
+                Manage Account
+              </Link>
+
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-4 px-5 py-4 rounded-xl font-three font-medium text-lg text-red-400 hover:bg-red-500/10 transition-all text-left"
+              >
+                <HugeiconsIcon icon={Logout05Icon} />
+                Logout
+              </button>
+            </div>
+          ) : (
+            <div className="mt-auto p-6 border-t border-neutral-800">
+              <Link 
+                href="/auth/signin" 
+                onClick={() => setIsSidebarOpen(false)}
+                className="block w-full py-3 bg-white text-black rounded-xl font-bold hover:bg-gray-200 transition-all text-center"
+              >
+                Login
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </>

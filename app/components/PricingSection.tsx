@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import { useUser } from "./userContext";
+import { set } from "date-fns";
 
 function CheckIcon({ className }: { className?: string }) {
   return (
@@ -24,6 +26,7 @@ function CheckIcon({ className }: { className?: string }) {
 
 export default function Premium() {
   const router = useRouter();
+  const { user, logout, loading } = useUser();
 
   const handleUpgrade = async (plan: string) => {
     try {

@@ -38,6 +38,8 @@ export async function GET(req: NextRequest) {
                 image: true,
                 email: true,
                 plan: true,
+                linksUsed: true,
+                qrUsed: true,
                 planExpiresAt: true,
                 planStartedAt: true,
                 twofactorEnabled: true,
@@ -95,9 +97,11 @@ export async function GET(req: NextRequest) {
             planExpiresAt: planExpiresAt,
             twofactorEnabled: checkPlan.twofactorEnabled,
             totalLinks: checkPlan._count.links,
+            linksUsed: checkPlan.linksUsed,
             image: checkPlan.image,
             bulkLinks: checkPlan._count.bulkLinks,
             totalQrCodes: checkPlan._count.qr,
+            qrUsed: checkPlan.qrUsed,
             isActive: isActive,
             daysLeft: daysLeft
         });

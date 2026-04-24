@@ -181,9 +181,12 @@ export async function POST(req: NextRequest) {
           id: userId
         },
         data: {
-          totalLinks: {
-            decrement: 1,
+          linksUsed: {
+            increment: 1,
           },
+          totalLinksCreated: {
+            increment: 1
+          }
         },
       });
 

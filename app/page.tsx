@@ -20,13 +20,16 @@ import { DomainDropdown } from "./dropDown/domainDropDown";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { UpgradeAlert } from "./modals/upgradeAlert";
+import { useUser } from "./components/userContext";
 
 
 const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN!;
 
 export default function Dashboard() {
   const router = useRouter();
+  const { user } = useUser();
   const pricingRef = useRef<HTMLDivElement>(null);
+
 
   const [url, setUrl] = useState("");
   const [shortUrl, setShortUrl] = useState("");
@@ -41,12 +44,27 @@ export default function Dashboard() {
 
   const [authLoading, setAuthLoading] = useState(true);
   const [isLoadingQr, setIsLoadingQr] = useState(false);
+  const [display, setDisplay] = useState(false);
 
   const [selectedDomain, setSelectedDomain] = useState(NEXT_DOMAIN);
 
   const [modalConfig, setModalConfig] = useState<{
     show: boolean; title: string; description: string; buttonText: string; action: () => void;
   }>({ show: false, title: "", description: "", buttonText: "", action: () => { } });
+
+
+
+  useEffect(() => {
+    router.prefetch("/auth/signin");
+    router.prefetch("/links?types=links");
+    router.prefetch("/bulklinks");
+    router.prefetch("/qr");
+    router.prefetch("/analytics");
+    router.prefetch("/domain");
+    router.prefetch("/premium");
+    router.prefetch("/docs?docs=core");
+    router.prefetch("/settings/profile");
+  }, []);
 
 
   useEffect(() => {
@@ -350,8 +368,13 @@ export default function Dashboard() {
 
       <Features isLoggedIn={isLoggedIn} userPlan={userPlan} />
       <div className="w-full h-px bg-neutral-800/50 my-12 shadow-sm"></div>
-      <div ref={pricingRef}><PricingSection /></div>
-      <div className="w-full h-px bg-neutral-800/50 my-12 shadow-sm"></div>
+
+      {user?.plan === "FREE" && (
+        <div ref={pricingRef}>
+          <PricingSection />
+          <div className="w-full h-px bg-neutral-800/50 my-12 shadow-sm"></div>
+        </div>
+      )}
       <FaqSection />
 
       {copied && (

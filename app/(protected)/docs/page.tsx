@@ -1,281 +1,279 @@
 "use client";
-
-import React, { useState, useEffect, Suspense } from 'react';
-import Head from 'next/head';
-import { useRouter, useSearchParams } from 'next/navigation';
+import React, { useState, useEffect } from 'react';
+import { Search, FileText, ChevronDown, ChevronRight } from 'lucide-react';
 import Navbar from '@/app/components/navbar';
 
-const BlogContent = () => {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  
-  const activeFeature = searchParams.get('feature');
-  const [searchTerm, setSearchTerm] = useState('');
+interface DocSection {
+  subtitle: string;
+  text: string;
+}
 
-  const handleFeatureChange = (id: string | null) => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (id) {
-      params.set('feature', id);
-    } else {
-      params.delete('feature');
-    }
-    router.push(`?${params.toString()}`, { scroll: false });
-  };
+interface Doc {
+  id: string;
+  category: string;
+  title: string;
+  description: string;
+  sections: DocSection[];
+}
+
+const docsData: Record<string, Doc> = {
+  'what-is-url-shortener': {
+    id: 'what-is-url-shortener',
+    category: 'basics',
+    title: "What is a URL Shortener?",
+    description: "A URL shortener is a sophisticated digital tool that transforms long, cumbersome web addresses into concise, manageable links. It acts as a bridge, ensuring that complex data-heavy URLs are converted into human-readable strings while maintaining their original destination.",
+    sections: [
+      { subtitle: "The Core Concept", text: "At its most basic level, a URL shortener creates a unique alias for a long web address. This alias functions as a pointer within a database. When a user interacts with the shortened link, the system instantly identifies the mapped destination and routes the user there." },
+      { subtitle: "Why They Were Created", text: "The necessity for URL shorteners arose alongside the character limits of early social media. They were developed to improve the 'visual hygiene' of digital communication, replacing messy strings with professional-looking links." },
+      { subtitle: "Evolution of the Tool", text: "Modern shorteners aren't just about length; they are about control. They allow for link editing, detailed traffic attribution, and advanced security layers." }
+    ]
+  },
+  'how-it-works': {
+    id: 'how-it-works',
+    category: 'basics',
+    title: "How does it work?",
+    description: "The mechanics of URL shortening involve a combination of database management, clever hashing algorithms, and standard HTTP protocols.",
+    sections: [
+      { subtitle: "The Database Map", text: "When you submit a long URL, our system generates a unique identifier known as a 'slug'. This slug is stored in a high-speed relational database alongside the original long URL." },
+      { subtitle: "The Redirect Process", text: "When someone clicks the short link, our server looks up the slug and sends back an HTTP 301 Permanent Redirect, telling the browser where to go." },
+      { subtitle: "Algorithmic Generation", text: "To ensure every link is unique, we use Base62 encoding. This allows for billions of unique combinations using a very small number of characters." }
+    ]
+  },
+  'benefits': {
+    id: 'benefits',
+    category: 'basics',
+    title: "What are the benefits?",
+    description: "Modern URL shorteners provide a competitive edge in digital branding, data collection, and user experience.",
+    sections: [
+      { subtitle: "Aesthetics and Trust", text: "A clean, branded short link looks significantly more professional and increases 'link trust,' making users much more likely to click." },
+      { subtitle: "Actionable Analytics", text: "Short links act as tracking beacons. They allow you to see geographic location, referral sources, and device types in real-time." },
+      { subtitle: "Social Media Optimization", text: "Platforms like Instagram and X value brevity. Short links leave more room for compelling captions and hashtags." }
+    ]
+  },
+  'popular-shorteners': {
+    id: 'popular-shorteners',
+    category: 'basics',
+    title: "Popular Shorteners",
+    description: "The URL shortening landscape is diverse, offering everything from basic free redirectors to comprehensive enterprise-grade platforms.",
+    sections: [
+      { subtitle: "Industry Leaders", text: "Bitly and TinyURL are the most recognized names, pioneering link management for enterprises and offering deep integrations." },
+      { subtitle: "Modern Solutions", text: "Next-generation platforms like FastURL are built on modern serverless architectures, prioritizing speed and privacy-first analytics." },
+      { subtitle: "Niche and Open Source", text: "Open-source projects like Shlink or Polr allow businesses to self-host their own shortening service for total data sovereignty." }
+    ]
+  },
+  core: {
+    id: 'core',
+    category: 'features',
+    title: "Core Infrastructure",
+    description: "FastURL is engineered for the modern web, utilizing a globally distributed edge network to ensure links resolve instantly.",
+    sections: [
+      { subtitle: "Instant URL Shortening", text: "Our engine processes URLs in under 50ms, stripping out unnecessary bloat while preserving essential data." },
+      { subtitle: "Custom Short Links", text: "Define custom 'slugs' (like /sale) to improve memorability and boost click-through rates." },
+      { subtitle: "Fast Redirect Performance", text: "We utilize Anycast routing to ensure users reach the nearest node for sub-100ms redirection." },
+      { subtitle: "Reliable Infrastructure", text: "High-availability architecture ensures your links never go down, even during massive traffic spikes." }
+    ]
+  },
+  analytics: {
+    id: 'analytics',
+    category: 'features',
+    title: "Tracking & Analytics",
+    description: "Understand exactly who is clicking your links and where they are coming from with our robust suite of tracking tools.",
+    sections: [
+      { subtitle: "Total & Unique Click Tracking", text: "Distinguish between raw traffic and unique individual visitors to measure true campaign reach." },
+      { subtitle: "IP & Geographic Tracking", text: "Identify the location of your visitors to optimize regional marketing efforts and ad spend." },
+      { subtitle: "Device & Referrer Tracking", text: "See if users are on Mobile or Desktop and identify the source site bringing them in." },
+      { subtitle: "Real-Time Click Analytics", text: "Watch your campaign performance live as clicks happen, allowing for immediate strategy pivots." }
+    ]
+  },
+  security: {
+    id: 'security',
+    category: 'features',
+    title: "Security & Control",
+    description: "Security is the backbone of FastURL, protecting your sensitive data and keeping your links under total control.",
+    sections: [
+      { subtitle: "Password Protection", text: "Require a unique key before visitors can access the destination URL, perfect for gated content." },
+      { subtitle: "Link Expiration", text: "Set specific dates or click limits after which the link automatically deactivates." },
+      { subtitle: "Secure HTTPS Links", text: "Every link generated is encrypted with SSL to ensure safe browsing for your users." },
+      { subtitle: "Spam Protection", text: "Advanced filtering to prevent your links from being used for malicious intent or phishing." }
+    ]
+  },
+  customization: {
+    id: 'customization',
+    category: 'features',
+    title: "Branding & Customization",
+    description: "Transform generic links into powerful marketing assets that act as an extension of your brand identity.",
+    sections: [
+      { subtitle: "Custom Domain Support", text: "Use your own branded domain (e.g., links.yourbrand.com) to increase authority and trust." },
+      { subtitle: "QR Code Generation", text: "Instantly create high-resolution QR codes for any shortened link, optimized for print media." },
+      { subtitle: "Link Preview Customization", text: "Control the title and image that appears when your link is shared on social media platforms." },
+      { subtitle: "Campaign & UTM Support", text: "Easily attach UTM parameters to track marketing campaigns within Google Analytics or Mixpanel." }
+    ]
+  },
+  management: {
+    id: 'management',
+    category: 'features',
+    title: "Link Management",
+    description: "Managing thousands of links is simple with a dashboard designed for speed, efficiency, and power users.",
+    sections: [
+      { subtitle: "Bulk URL Shortening", text: "Shorten hundreds of links at once through our high-speed bulk creation engine via CSV." },
+      { subtitle: "Search & Filter Dashboard", text: "Find any link in seconds using our advanced real-time search and multi-tag filtering." },
+      { subtitle: "API & CSV Access", text: "Integration-ready tools for developers and large-scale data management workflows." },
+      { subtitle: "One-Click Management", text: "Edit, archive, or copy links instantly without refreshing the page, keeping you in flow." }
+    ]
+  }
+};
+
+export default function App() {
+  const [activeDocId, setActiveDocId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [openCategories, setOpenCategories] = useState<Record<string, boolean>>({ basics: true, features: true });
 
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [activeFeature]);
-
-  const featureContent = {
-    core: {
-      title: "Core Shortening Infrastructure",
-      subtitle: "The Foundation of FastURL",
-      image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=1200",
-      description: `FastURL is built on a high-availability global edge network designed to handle millions of redirects per second. Our core infrastructure ensures your links resolve almost instantly while providing a professional appearance.`,
-      points: [
-        { label: "Instant URL Shortening", text: "Compress long URLs instantly, removing bloat and tracking parameters for a sleek link." },
-        { label: "Custom Short Links", text: "Replace random characters with branded slugs to increase trust and click-through rates." },
-        { label: "Fast Redirect Performance", text: "Anycast routing ensures users reach the nearest node for sub-100ms redirection." },
-        { label: "Reliable Infrastructure", text: "High availability architecture ensures your links never go down during peak traffic." }
-      ]
-    },
-    analytics: {
-      title: "Deep Tracking & Analytics",
-      subtitle: "Data-Driven Insights",
-      image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=1200",
-      description: `Understand exactly who is clicking your links and where they are coming from. FastURL provides a robust suite of tracking tools that give you real-time data on your audience's behavior across different platforms and regions.`,
-      points: [
-        { label: "Total & Unique Click Tracking", text: "Distinguish between raw traffic and unique individual visitors to measure true reach." },
-        { label: "IP & Geographic Tracking", text: "Identify the location of your visitors to optimize your regional marketing efforts." },
-        { label: "Device & Referrer Tracking", text: "See if users are on Mobile or Desktop and identify the source site bringing them in." },
-        { label: "Real-Time Click Analytics", text: "Watch your campaign performance live as clicks happen in real-time." }
-      ]
-    },
-    security: {
-      title: "Secure Share & Link Control",
-      subtitle: "Advanced Privacy Features",
-      image: "https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&q=80&w=1200",
-      description: `Security is the backbone of FastURL. Our security suite allows you to go beyond simple redirection by adding layers of protection that keep your sensitive data safe and your links under your total control.`,
-      points: [
-        { label: "Password Protection", text: "Require a unique key before visitors can access the destination URL." },
-        { label: "Link Expiration", text: "Set specific dates or click limits after which the link automatically deactivates." },
-        { label: "Secure HTTPS Links", text: "Every link generated is encrypted with SSL to ensure safe browsing for your users." },
-        { label: "Spam Protection", text: "Advanced filtering to prevent your links from being used for malicious intent." }
-      ]
-    },
-    customization: {
-      title: "Branding & Customization",
-      subtitle: "Make it Your Own",
-      image: "https://images.unsplash.com/photo-1557838923-2985c318be48?auto=format&fit=crop&q=80&w=1200",
-      description: `Transform generic links into powerful marketing assets. With our customization features, your links act as an extension of your brand identity, ensuring consistency across every touchpoint.`,
-      points: [
-        { label: "Custom Domain Support", text: "Use your own branded domain (e.g., links.yourbrand.com) instead of our default." },
-        { label: "QR Code Generation", text: "Instantly create high-resolution QR codes for any shortened link for print media." },
-        { label: "Link Preview Customization", text: "Control the title and image that appears when your link is shared on social media." },
-        { label: "Campaign & UTM Support", text: "Easily attach UTM parameters to track marketing campaigns within Google Analytics." }
-      ]
-    },
-    management: {
-      title: "Advanced Link Management",
-      subtitle: "Workflow Efficiency",
-      image: "https://images.unsplash.com/photo-1507925921958-8a62f3d1a50d?auto=format&fit=crop&q=80&w=1200",
-      description: `Managing thousands of links shouldn't be a chore. Our dashboard is designed for speed and efficiency, allowing power users to manage their entire digital footprint from a single interface.`,
-      points: [
-        { label: "Bulk URL Shortening", text: "Shorten hundreds of links at once through our bulk creation engine." },
-        { label: "Search & Filter Dashboard", text: "Find any link in seconds using our advanced real-time search and filtering." },
-        { label: "API & CSV Access", text: "Integration-ready tools for developers and large-scale data management (Future)." },
-        { label: "One-Click Management", text: "Edit, delete, or copy links instantly without refreshing the page." }
-      ]
-    }
-  };
-
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.toLowerCase();
-    setSearchTerm(value);
-    if (value.length > 3 && !activeFeature) {
-      const elements = document.querySelectorAll('p, h2, h3, h1');
-      for (const element of Array.from(elements)) {
-        if (element.textContent?.toLowerCase().includes(value)) {
-          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          break;
-        }
+    const handleUrlChange = () => {
+      const params = new URLSearchParams(window.location.search);
+      const docParam = params.get('docs');
+      
+      if (docParam && docsData[docParam]) {
+        setActiveDocId(docParam);
+      } else {
+        setActiveDocId('core');
+        window.history.replaceState({}, '', '?docs=core');
       }
-    }
+    };
+
+    handleUrlChange();
+    window.addEventListener('popstate', handleUrlChange);
+    return () => window.removeEventListener('popstate', handleUrlChange);
+  }, []);
+
+  const handleNavigation = (id: string) => {
+    setActiveDocId(id);
+    const newUrl = `?docs=${id}`;
+    window.history.pushState({ path: newUrl }, '', newUrl);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const toggleCategory = (category: string) => {
+    setOpenCategories(prev => ({ ...prev, [category]: !prev[category] }));
+  };
+
+  const filteredDocs = Object.values(docsData).filter(doc => 
+    doc.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    doc.description.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const activeDoc = activeDocId ? docsData[activeDocId] : null;
+
+  const sidebarCategories = [
+    { id: 'basics', label: 'Getting Started' },
+    { id: 'features', label: 'Features' }
+  ];
+
+  
   return (
-    <div className="min-h-screen bg-white font-sans text-gray-800 selection:bg-blue-100">
-      <Head>
-        <title>FastURL.in | Professional SEO Optimized Link Management</title>
-        <meta name="description" content="Discover FastURL.in, the modern, fast, and secure URL shortener." />
-      </Head>
+    <div className="min-h-screen bg-white font-sans text-gray-900">
+      <div className="fixed top-0 left-0 right-0 z-50">
+        <Navbar />
+      </div>
+      
+      <div className="flex pt-16"> 
+        <aside className="w-72 border-r border-gray-200 flex flex-col fixed top-16 bottom-0 left-0 bg-white z-40">
+          <div className="p-6 border-b border-gray-200">
+            <div className="font-bold text-xl mb-6 tracking-tight"></div>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                <Search size={16} />
+              </div>
+              <input 
+                type="text" 
+                placeholder="Search documentation..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full border border-gray-300 py-2 pl-10 pr-3 rounded-none outline-none focus:border-gray-900 transition-colors placeholder-gray-400 text-sm"
+              />
+            </div>
+          </div>
 
-      <Navbar />
+          <nav className="flex-1 overflow-y-auto p-4">
+            {filteredDocs.length === 0 ? (
+              <div className="px-2 py-4 text-sm text-gray-500 italic">No results</div>
+            ) : (
+              sidebarCategories.map(category => {
+                const catDocs = filteredDocs.filter(doc => doc.category === category.id);
+                if (catDocs.length === 0) return null;
+                return (
+                  <div key={category.id} className="mb-8">
+                    <button 
+                      onClick={() => toggleCategory(category.id)}
+                      className="w-full flex items-center justify-between text-xs font-bold uppercase tracking-wider text-gray-500 mb-3 px-2 hover:text-gray-900"
+                    >
+                      {category.label}
+                      {openCategories[category.id] ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                    </button>
+                    {openCategories[category.id] && (
+                      <ul className="space-y-1">
+                        {catDocs.map((doc) => (
+                          <li key={doc.id}>
+                            <button
+                              onClick={() => handleNavigation(doc.id)}
+                              className={`w-full text-left px-2 py-2 flex items-center gap-2 text-sm border-l-2 transition-all ${
+                                activeDocId === doc.id 
+                                  ? 'border-gray-900 font-bold text-gray-900' 
+                                  : 'border-transparent text-gray-600 hover:text-gray-900'
+                              }`}
+                            >
+                              <FileText size={14} className={activeDocId === doc.id ? "text-gray-900" : "text-gray-400"} />
+                              <span className="truncate">{doc.title}</span>
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                );
+              })
+            )}
+          </nav>
+        </aside>
 
-      <main className="mx-auto max-w-5xl px-6 py-12">
-        {activeFeature && featureContent[activeFeature as keyof typeof featureContent] ? (
-          <div className="animate-in fade-in duration-500">
-            <button 
-              onClick={() => handleFeatureChange(null)}
-              className="mb-10 flex items-center text-sm font-bold tracking-wide text-blue-600 hover:text-blue-800 transition-colors"
-            >
-              ← BACK TO OVERVIEW
-            </button>
-            
-            <header className="mb-12">
-              <span className="text-xs font-bold uppercase tracking-[0.2em] text-gray-400">
-                {featureContent[activeFeature as keyof typeof featureContent].subtitle}
-              </span>
-              <h1 className="mt-2 text-4xl font-black text-gray-900 md:text-5xl">
-                {featureContent[activeFeature as keyof typeof featureContent].title}
+        <main className="flex-1 ml-72 p-12 lg:p-24 max-w-5xl">
+          {activeDoc ? (
+            <article className="animate-in fade-in duration-500">
+              <div className="text-sm text-gray-500 mb-8 flex items-center gap-2">
+                <span>Docs</span>
+                <span>/</span>
+                <span className="text-gray-900 font-medium">{activeDoc.title}</span>
+              </div>
+
+              <h1 className="text-4xl lg:text-5xl font-bold tracking-tight text-gray-900 mb-8">
+                {activeDoc.title}
               </h1>
-            </header>
-
-            <img 
-              src={featureContent[activeFeature as keyof typeof featureContent].image} 
-              alt={activeFeature}
-              className="mb-12 h-[400px] w-full rounded-3xl object-cover shadow-xl"
-            />
-
-            <div className="max-w-3xl">
-              <p className="mb-16 text-lg leading-relaxed text-gray-600">
-                {featureContent[activeFeature as keyof typeof featureContent].description}
+              
+              <p className="text-xl text-gray-600 leading-relaxed mb-16 pb-8 border-b border-gray-200">
+                {activeDoc.description}
               </p>
 
-              <div className="space-y-16">
-                {featureContent[activeFeature as keyof typeof featureContent].points.map((point, idx) => (
-                  <section key={idx} className="border-l-4 border-blue-600 pl-8">
-                    <h3 className="text-xl font-bold text-gray-900">{point.label}</h3>
-                    <p className="mt-4 leading-relaxed text-gray-600">
-                      {point.text}
-                    </p>
+              <div className="space-y-12">
+                {activeDoc.sections.map((section, idx) => (
+                  <section key={idx}>
+                    <h2 className="text-2xl font-semibold text-gray-900 mb-4">{section.subtitle}</h2>
+                    <p className="text-lg text-gray-700 leading-relaxed">{section.text}</p>
                   </section>
                 ))}
               </div>
-            </div>
 
-            <div className="mt-24 border-t border-gray-100 pt-12">
-              <button 
-                onClick={() => handleFeatureChange(null)}
-                className="rounded-full bg-gray-900 px-8 py-3 text-sm font-bold text-white hover:bg-gray-800 transition-all"
-              >
-                Return to Main Blog
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div className="animate-in fade-in duration-500">
-
-            <section className="mb-24 text-center">
-              <h1 className="text-5xl font-black tracking-tight text-gray-900 md:text-7xl">
-                The Science of <span className="text-blue-600">Short Links</span>
-              </h1>
-              <p className="mx-auto mt-8 max-w-2xl text-xl leading-relaxed text-gray-500">
-                A link is more than a destination; it's a data-rich gateway. 
-                Explore our professional ecosystem designed for speed, brand, and growth.
-              </p>
-            </section>
-
-            <div className="grid gap-16 md:grid-cols-2">
-              <section className="space-y-6">
-                <h2 className="text-2xl font-bold text-gray-900">What is FastURL?</h2>
-                <p className="leading-relaxed text-gray-600">
-                  FastURL is a link management ecosystem built for performance. We transform 
-                  long, user-unfriendly URLs into professional digital assets that track 
-                  every interaction while loading in less than 100ms.
-                </p>
-              </section>
-
-              <section className="space-y-6">
-                <h2 className="text-2xl font-bold text-gray-900">Experience Centric</h2>
-                <p className="leading-relaxed text-gray-600">
-                  With a clean modern UI and mobile-responsive design, FastURL makes sharing 
-                  content effortless. From one-click copy to fast-loading pages, we prioritize 
-                  the user experience of both you and your audience.
-                </p>
-              </section>
-            </div>
-
-            <section className="mt-32">
-              <h2 className="mb-12 text-3xl font-black text-gray-900">Explore Capabilities</h2>
-              <div className="grid gap-8 md:grid-cols-3">
-                {/* Feature Card: Core */}
-                <div onClick={() => handleFeatureChange('core')} className="group cursor-pointer overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm transition-all hover:shadow-xl">
-                  <div className="aspect-[16/10] overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=600" className="h-full w-full object-cover transition-transform group-hover:scale-105" alt="Core" />
-                  </div>
-                  <div className="p-6">
-                    <h3 className="text-xl font-bold">Performance Infrastructure</h3>
-                    <p className="mt-2 text-sm text-gray-500 line-clamp-2">High availability, low latency redirects, and custom slug engines.</p>
-                  </div>
-                </div>
-
-                {/* Feature Card: Analytics */}
-                <div onClick={() => handleFeatureChange('analytics')} className="group cursor-pointer overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm transition-all hover:shadow-xl">
-                  <div className="aspect-[16/10] overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=600" className="h-full w-full object-cover transition-transform group-hover:scale-105" alt="Analytics" />
-                  </div>
-                  <div className="p-6">
-                    <h3 className="text-xl font-bold">Deep Tracking</h3>
-                    <p className="mt-2 text-sm text-gray-500 line-clamp-2">Total clicks, unique visitors, geo-location, and device tracking.</p>
-                  </div>
-                </div>
-
-                {/* Feature Card: Customization */}
-                <div onClick={() => handleFeatureChange('customization')} className="group cursor-pointer overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm transition-all hover:shadow-xl">
-                  <div className="aspect-[16/10] overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1557838923-2985c318be48?auto=format&fit=crop&q=80&w=600" className="h-full w-full object-cover transition-transform group-hover:scale-105" alt="Branding" />
-                  </div>
-                  <div className="p-6">
-                    <h3 className="text-xl font-bold">Marketing & SEO</h3>
-                    <p className="mt-2 text-sm text-gray-500 line-clamp-2">Custom domains, QR codes, and UTM parameter support.</p>
-                  </div>
-                </div>
-
-                {/* Feature Card: Management */}
-                <div onClick={() => handleFeatureChange('management')} className="group cursor-pointer overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm transition-all hover:shadow-xl">
-                  <div className="aspect-[16/10] overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1507925921958-8a62f3d1a50d?auto=format&fit=crop&q=80&w=600" className="h-full w-full object-cover transition-transform group-hover:scale-105" alt="Management" />
-                  </div>
-                  <div className="p-6">
-                    <h3 className="text-xl font-bold">Link Management</h3>
-                    <p className="mt-2 text-sm text-gray-500 line-clamp-2">Bulk URL shortening, dashboard search, and management tools.</p>
-                  </div>
-                </div>
-
-                {/* Feature Card: Security */}
-                <div onClick={() => handleFeatureChange('security')} className="group cursor-pointer overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm transition-all hover:shadow-xl">
-                  <div className="aspect-[16/10] overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&q=80&w=600" className="h-full w-full object-cover transition-transform group-hover:scale-105" alt="Security" />
-                  </div>
-                  <div className="p-6">
-                    <h3 className="text-xl font-bold">Security Features</h3>
-                    <p className="mt-2 text-sm text-gray-500 line-clamp-2">Password protection, link expiration, and spam filtering.</p>
-                  </div>
-                </div>
+              <div className="mt-24 pt-8 border-t border-gray-200 flex justify-between text-sm text-gray-500">
+                <span>FastURL Documentation</span>
+                <span>Last updated: Today</span>
               </div>
-            </section>
-
-            <footer className="mt-32 rounded-[3rem] bg-gray-900 px-8 py-16 text-center text-white">
-              <h2 className="text-4xl font-bold">Scale Your Branding</h2>
-              <p className="mt-4 text-gray-400">Join thousands of users shortening links with FastURL.</p>
-              <button className="mt-10 rounded-full bg-white px-12 py-4 font-bold text-black transition-all hover:bg-gray-200">
-                Get Started for Free
-              </button>
-            </footer>
-          </div>
-        )}
-      </main>
+            </article>
+          ) : (
+            <div className="flex items-center justify-center h-full text-gray-500">
+              Select a document from the sidebar to start reading.
+            </div>
+          )}
+        </main>
+      </div>
     </div>
   );
-};
-
-const FastURLBlog = () => {
-  return (
-    <Suspense fallback={<div className="min-h-screen bg-white" />}>
-      <BlogContent />
-    </Suspense>
-  );
-};
-
-export default FastURLBlog;
+}

@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
         const client = getDodoClient();
 
         const origin = getOrigin(req);
-        const returnUrl = process.env.DODO_PAYMENTS_RETURN_URL ?? `${origin}/settings/subscription`;
+        const returnUrl = process.env.DODO_PAYMENTS_RETURN_URL;
 
         const session = await client.checkoutSessions.create({
             product_cart: [{ product_id: productId, quantity: 1 }],
@@ -56,19 +56,16 @@ export async function POST(req: NextRequest) {
                 user_id: decoded.userId,
                 plan,
                 source: "nextjs_premium_page",
-            } as Record<string, string>,
+            },
         });
 
-        return NextResponse.json(
-            {
-                checkout_url: (session as Record<string, any>).checkout_url,
-                session_id: (session as Record<string, any>).session_id,
-            },
-            { status: 200 },
-        );
-        
+        return NextResponse.json({
+            checkout_url: session?.checkout_url,
+            session_id: session?.session_id,
+        });
+
     } catch (error) {
         console.error("Checkout error:", error);
-        return NextResponse.json({ error: "Internal error" }, { status: 500 });
-    }
+        return NextResponse.json({ message: "Internal error" }, { status: 500 });
+    } 
 }

@@ -128,9 +128,12 @@ export async function POST(req: NextRequest) {
       await tx.user.update({
         where: { id: userId },
         data: {
-          totalQr: {
-            decrement: 1,
+          qrUsed: {
+            increment: 1,
           },
+          totalQrCreated: {
+            increment: 1
+          }
         },
       });
 
