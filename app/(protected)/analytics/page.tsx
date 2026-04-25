@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
@@ -9,7 +9,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import { HugeiconsIcon } from '@hugeicons/react';
 import {
-  AnalyticsUpIcon, Search01Icon, Link04Icon, PlusSignIcon, File02Icon 
+  AnalyticsUpIcon, Search01Icon, Link04Icon, File02Icon 
 } from '@hugeicons/core-free-icons';
 
 import Navbar from "@/app/components/navbar";
@@ -21,9 +21,8 @@ import OSAnalytics from "@/app/components/analytics/os";
 import ReferrerAnalytics from "@/app/components/analytics/referrers";
 import { AnalyticsDropDown } from "@/app/dropDown/analyticsDropDown";
 import { useUser } from "@/app/components/userContext";
-
-// Import the new component
 import { AnalyticsTypeToggle, AnalyticsType } from "@/app/dropDown/analyticsTypeDropDown";
+
 
 const DOMAIN = process.env.NEXT_PUBLIC_DOMAIN!;
 
@@ -49,12 +48,13 @@ function PremiumBlock({ children, isFree }: { children: React.ReactNode; isFree:
   );
 }
 
+
 export default function AnalyticsPage() {
   const router = useRouter();
   const { user } = useUser();
   
   const [analyticsType, setAnalyticsType] = useState<AnalyticsType>("links");
-  const [isChangingType, setIsChangingType] = useState(false); // New Loading State
+  const [isChangingType, setIsChangingType] = useState(false);
   
   const [urls, setUrls] = useState<any[]>([]);
   const [bulkBatches, setBulkBatches] = useState<any[]>([]);
@@ -65,6 +65,7 @@ export default function AnalyticsPage() {
   const [loading, setLoading] = useState(true);
   const [fetchingStats, setFetchingStats] = useState(false);
   const [days, setDays] = useState<number>(7);
+
 
   const fetchAnalytics = async (id: string, type: AnalyticsType) => {
     setFetchingStats(true);
@@ -78,12 +79,15 @@ export default function AnalyticsPage() {
       });
       const data = await res.json();
       setAnalyticsData(data);
+
     } catch (err) {
       console.error(err);
+
     } finally {
       setFetchingStats(false);
     }
   };
+
 
   useEffect(() => {
     async function init() {
@@ -110,16 +114,18 @@ export default function AnalyticsPage() {
         }
       } catch (e) {
         console.error("Initialization error:", e);
+
       } finally {
         setLoading(false);
       }
     }
     init();
+
   }, []);
+
 
   const handleTypeChange = (newType: AnalyticsType) => {
     setIsChangingType(true);
-    // Mimic the 1s delay for a premium feel
     setTimeout(() => {
         setAnalyticsType(newType);
         setSelectedId(null);
@@ -127,6 +133,7 @@ export default function AnalyticsPage() {
         setIsChangingType(false);
     }, 1000);
   };
+
 
   const filteredItems = useMemo(() => {
     const items = analyticsType === "links" ? urls : bulkBatches;
@@ -140,10 +147,12 @@ export default function AnalyticsPage() {
     }).sort((a: any, b: any) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
   }, [urls, bulkBatches, searchQuery, analyticsType]);
 
+
   const handleItemClick = (item: any) => {
     setSelectedId(item.id);
     fetchAnalytics(item.id, analyticsType);
   };
+
 
   const isFree = tier === "FREE";
 
@@ -153,7 +162,6 @@ export default function AnalyticsPage() {
 
       <div className="flex flex-1 overflow-hidden bg-[#141414] relative">
         
-        {/* --- GLOBAL TYPE LOADER --- */}
         <AnimatePresence>
           {isChangingType && (
             <motion.div 
@@ -161,7 +169,7 @@ export default function AnalyticsPage() {
               className="absolute inset-0 z-[150] flex flex-col items-center justify-center bg-[#141414]/80 backdrop-blur-md"
             >
               <div className="relative">
-                <Loader2 className="w-12 h-12 text-blue-500 animate-spin" />
+                <Loader2 className="w-12 h-12 text-white animate-spin" />
                 <div className="absolute inset-0 bg-blue-500/20 blur-2xl rounded-full" />
               </div>
               <p className="mt-4 text-zinc-500 text-xs font-bold tracking-widest uppercase animate-pulse">Switching Analytics...</p>
@@ -171,7 +179,7 @@ export default function AnalyticsPage() {
 
         {loading ? (
           <div className="flex flex-1 items-center justify-center bg-[#141414]">
-            <Loader2 className="animate-spin text-blue-500 w-8 h-8" />
+            <Loader2 className="animate-spin text-white w-8 h-8" />
           </div>
         ) : (
           <>
@@ -194,7 +202,7 @@ export default function AnalyticsPage() {
                   <button
                     key={item.id}
                     onClick={() => handleItemClick(item)}
-                    className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-200 group ${
+                    className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-200 group cursor-pointer ${
                       selectedId === item.id ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20" : "hover:bg-neutral-900"
                     }`}
                   >
@@ -212,56 +220,59 @@ export default function AnalyticsPage() {
             </aside>
 
             <main className={`flex-1 overflow-y-auto bg-[#141414] ${!selectedId ? 'hidden md:block' : 'block'}`}>
-              {!selectedId ? (
-                <div className="h-full flex flex-col items-center justify-center text-neutral-600">
-                  <HugeiconsIcon icon={AnalyticsUpIcon} size={40} />
-                  <p className="text-sm mt-4 italic">Select a {analyticsType === "links" ? "link" : "batch"} to begin</p>
-                </div>
-              ) : (
                 <div className="p-6 md:p-10 max-w-[1400px] mx-auto space-y-8 md:space-y-10">
                   <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="flex flex-col items-start gap-4">
-                      <button onClick={() => setSelectedId(null)} className="md:hidden flex items-center gap-2 text-sm text-neutral-400">
-                        <ChevronLeft className="w-4 h-4" /> Back
-                      </button>
+                      {selectedId && (
+                        <button onClick={() => setSelectedId(null)} className="md:hidden flex items-center gap-2 text-sm text-neutral-400 hover:text-white transition-colors">
+                            <ChevronLeft className="w-4 h-4" /> Back
+                        </button>
+                      )}
                       
-                      {/* --- USING SEPARATED DROPDOWN --- */}
                       <AnalyticsTypeToggle value={analyticsType} onChange={handleTypeChange} />
                     </div>
-                    <AnalyticsDropDown days={days} setDays={setDays} />
+                    {selectedId && <AnalyticsDropDown days={days} setDays={setDays} />}
                   </header>
 
-                  <section className="relative rounded-xl border border-neutral-800 bg-[#0a0a0a] overflow-hidden shadow-2xl">
-                    {fetchingStats && (
-                      <div className="absolute inset-0 z-50 bg-black/40 backdrop-blur-[2px] flex items-center justify-center">
-                        <Loader2 className="animate-spin text-blue-500" />
-                      </div>
-                    )}
-                    <ClicksAnalytics data={analyticsData?.clicks} days={days} />
-                  </section>
+                  {!selectedId ? (
+                    <div className="h-[60vh] flex flex-col items-center justify-center text-neutral-600 border border-dashed border-neutral-800 rounded-3xl bg-[#1c1c1c]/10">
+                      <HugeiconsIcon icon={AnalyticsUpIcon} size={48} className="opacity-20 mb-4" />
+                      <p className="text-sm font-medium">Select a {analyticsType === "links" ? "link" : "batch"} from the sidebar to view data</p>
+                    </div>
+                  ) : (
+                    <>
+                      <section className="relative rounded-xl border border-neutral-800 bg-[#0a0a0a] overflow-hidden shadow-2xl">
+                        {fetchingStats && (
+                          <div className="absolute inset-0 z-50 bg-black/40 backdrop-blur-[2px] flex items-center justify-center">
+                            <Loader2 className="animate-spin text-blue-500" />
+                          </div>
+                        )}
+                        <ClicksAnalytics data={analyticsData?.clicks} days={days} />
+                      </section>
 
-                  <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <PremiumBlock isFree={isFree}>
-                      <LocationAnalytics data={analyticsData?.countries} days={days} />
-                    </PremiumBlock>
-                    <PremiumBlock isFree={isFree}>
-                      <BrowserAnalytics data={analyticsData?.browsers} days={days} />
-                    </PremiumBlock>
-                    <PremiumBlock isFree={isFree}>
-                      <DeviceAnalytics data={analyticsData?.devices} days={days} />
-                    </PremiumBlock>
-                  </section>
+                      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <PremiumBlock isFree={isFree}>
+                          <LocationAnalytics data={analyticsData?.countries} days={days} />
+                        </PremiumBlock>
+                        <PremiumBlock isFree={isFree}>
+                          <BrowserAnalytics data={analyticsData?.browsers} days={days} />
+                        </PremiumBlock>
+                        <PremiumBlock isFree={isFree}>
+                          <DeviceAnalytics data={analyticsData?.devices} days={days} />
+                        </PremiumBlock>
+                      </section>
 
-                  <section className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-10">
-                    <PremiumBlock isFree={isFree}>
-                      <OSAnalytics data={analyticsData?.os} days={days} />
-                    </PremiumBlock>
-                    <PremiumBlock isFree={isFree}>
-                      <ReferrerAnalytics data={analyticsData?.referrers} days={days} />
-                    </PremiumBlock>
-                  </section>
+                      <section className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-10">
+                        <PremiumBlock isFree={isFree}>
+                          <OSAnalytics data={analyticsData?.os} days={days} />
+                        </PremiumBlock>
+                        <PremiumBlock isFree={isFree}>
+                          <ReferrerAnalytics data={analyticsData?.referrers} days={days} />
+                        </PremiumBlock>
+                      </section>
+                    </>
+                  )}
                 </div>
-              )}
             </main>
           </>
         )}

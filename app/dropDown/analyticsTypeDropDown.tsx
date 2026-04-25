@@ -1,15 +1,22 @@
 "use client";
 
 import React from "react";
+import { Button } from "@/components/ui/button";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
 import { HugeiconsIcon } from '@hugeicons/react';
-import { Link04Icon, File02Icon } from '@hugeicons/core-free-icons';
+import {
+  Link04Icon,
+  File02Icon,
+  ArrowDown01Icon,
+} from '@hugeicons/core-free-icons';
 
 export type AnalyticsType = "links" | "bulk";
 
@@ -20,30 +27,48 @@ interface AnalyticsTypeToggleProps {
 
 export function AnalyticsTypeToggle({ value, onChange }: AnalyticsTypeToggleProps) {
   return (
-    <Select value={value} onValueChange={(val) => onChange(val as AnalyticsType)}>
-      <SelectTrigger className="w-[220px] bg-[#111111] border-neutral-800 text-white rounded-lg outline-none cursor-pointer h-12 font-bold text-lg focus:ring-0">
-        <SelectValue placeholder="Select Type" />
-      </SelectTrigger>
-      
-      <SelectContent 
-        position="popper"
-        sideOffset={5} 
-        className="bg-[#1a1a1a] border-neutral-800 text-white rounded-lg w-[220px] z-[130]"
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button 
+          variant="outline" 
+          className="bg-[#1a1a1a] border-neutral-800 text-white hover:bg-[#252525] hover:text-white rounded-lg flex items-center gap-2 h-10 outline-none focus:ring-1 focus:ring-neutral-700 cursor-pointer px-4"
+        >
+          <HugeiconsIcon 
+            icon={value === "links" ? Link04Icon : File02Icon} 
+            size={18} 
+            className={value === "links" ? "text-blue-500" : "text-amber-500"}
+          />
+          <span className="text-sm font-bold capitalize">
+            {value === "links" ? "Link Analytics" : "Bulk Analytics"}
+          </span>
+          <HugeiconsIcon icon={ArrowDown01Icon} size={16} className="text-neutral-500" />
+        </Button>
+      </DropdownMenuTrigger>
+
+      <DropdownMenuContent 
+        align="start"
+        className="w-56 bg-[#1a1a1a] border-neutral-800 text-white shadow-2xl rounded-xl p-1.5"
       >
-        <SelectItem value="links" className="cursor-pointer hover:bg-neutral-800 py-3">
-            <div className="flex items-center gap-2">
-                <HugeiconsIcon icon={Link04Icon} size={16} className="text-blue-500" />
-                <span>Link Analytics</span>
-            </div>
-        </SelectItem>
-        <div className="h-[1px] bg-neutral-800 my-1 mx-2" />
-        <SelectItem value="bulk" className="cursor-pointer hover:bg-neutral-800 py-3">
-            <div className="flex items-center gap-2">
-                <HugeiconsIcon icon={File02Icon} size={16} className="text-amber-500" />
-                <span>Bulk Analytics</span>
-            </div>
-        </SelectItem>
-      </SelectContent>
-    </Select>
+        <DropdownMenuSeparator className="bg-neutral-800 mx-1" />
+        
+        <DropdownMenuCheckboxItem
+          checked={value === "links"}
+          onCheckedChange={() => onChange("links")}
+          className="cursor-pointer focus:bg-white focus:text-white py-3 rounded-lg flex items-center gap-2"
+        >
+          <HugeiconsIcon icon={Link04Icon} className="text-blue-500" />
+          <span className="font-medium">Link Analytics</span>
+        </DropdownMenuCheckboxItem>
+
+        <DropdownMenuCheckboxItem
+          checked={value === "bulk"}
+          onCheckedChange={() => onChange("bulk")}
+          className="cursor-pointer focus:bg-white focus:text-white py-3 rounded-lg flex items-center gap-2"
+        >
+          <HugeiconsIcon icon={File02Icon} className="text-amber-500" />
+          <span className="font-medium">Bulk Analytics</span>
+        </DropdownMenuCheckboxItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
