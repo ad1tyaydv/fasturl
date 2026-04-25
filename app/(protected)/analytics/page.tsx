@@ -103,14 +103,45 @@ export default function AnalyticsPage() {
           setTier(authData.plan || "FREE");
         }
 
+        let fetchedUrls = [];
         if (urlsRes?.ok) {
           const data = await urlsRes.json();
-          setUrls(data.urls || []);
+          fetchedUrls = data.urls || [];
+          setUrls(fetchedUrls);
         }
 
+        let fetchedBulk = [];
         if (bulkRes?.ok) {
           const data = await bulkRes.json();
-          setBulkBatches(data.bulkLinks || []);
+          fetchedBulk = data.bulkLinks || [];
+          setBulkBatches(fetchedBulk);
+        }
+
+        // Handle URL parameters for initial state
+        const search = window.location.search;
+        if (search.startsWith("?=")) {
+          const fullValue = search.substring(2);
+          const [typePart, idPart] = fullValue.split("/");
+          
+          let currentType: AnalyticsType = "links";
+          if (typePart === "bulkanalytics") {
+            currentType = "bulk";
+            setAnalyticsType("bulk");
+          } else {
+            setAnalyticsType("links");
+          }
+
+          if (idPart) {
+            const items = typePart === "bulkanalytics" ? fetchedBulk : fetchedUrls;
+            const item = items.find((i: any) => 
+              typePart === "bulkanalytics" ? i.id === idPart : i.shorturl === idPart
+            );
+            
+            if (item) {
+              setSelectedId(item.id);
+              fetchAnalytics(item.id, currentType);
+            }
+          }
         }
       } catch (e) {
         console.error("Initialization error:", e);
@@ -131,6 +162,9 @@ export default function AnalyticsPage() {
         setSelectedId(null);
         setAnalyticsData(null);
         setIsChangingType(false);
+        
+        const typeStr = newType === "links" ? "linkanalytics" : "bulkanalytics";
+        router.push(`/analytics?=${typeStr}`, { scroll: false });
     }, 1000);
   };
 
@@ -151,6 +185,10 @@ export default function AnalyticsPage() {
   const handleItemClick = (item: any) => {
     setSelectedId(item.id);
     fetchAnalytics(item.id, analyticsType);
+    
+    const typeStr = analyticsType === "links" ? "linkanalytics" : "bulkanalytics";
+    const identifier = analyticsType === "links" ? item.shorturl : item.id;
+    router.push(`/analytics?=${typeStr}/${identifier}`, { scroll: false });
   };
 
 

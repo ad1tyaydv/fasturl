@@ -12,7 +12,8 @@ import {
 
 import { HugeiconsIcon } from '@hugeicons/react';
 import {
-  Refresh04Icon, Download01Icon }
+  Refresh04Icon, Download01Icon, 
+  ArrowRight01Icon}
   from '@hugeicons/core-free-icons';
 
 import Navbar from "@/app/components/navbar";
@@ -31,7 +32,7 @@ export default function QRGenerator() {
   const [url, setUrl] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userPlan, setUserPlan] = useState("FREE");
-  const [qrsLeft, setQrsLeft] = useState(0);
+  const [qrsLeft, setQrsLeft] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [showQr, setShowQr] = useState<string | null>(null);
   const [upgradeMsg, setUpgradeMsg] = useState(false);
@@ -298,15 +299,33 @@ export default function QRGenerator() {
             </div>
           </div>
 
-          {isLoggedIn && (
-            <div className="mt-4 text-center animate-in fade-in slide-in-from-top-2">
-              <span className="px-3 py-1.5 bg-[#1c1c1c] border border-neutral-800 text-sm font-medium text-neutral-400 rounded-lg inline-block">
-                {userPlan === "FREE" ? (
-                  <>You have <strong className="text-white">{qrsLeft}</strong> QR codes left for today</>
-                ) : (
-                  <>You have <strong className="text-white">{qrsLeft}</strong> QR codes left this month</>
-                )}
+          {(isLoggedIn || authLoading) && (
+            <div className="mt-4 flex flex-col items-center gap-4 animate-in fade-in slide-in-from-top-2">
+              <span className="px-3 py-1.5 bg-[#1c1c1c] border border-neutral-800 text-sm font-medium text-neutral-400 rounded-lg inline-flex items-center gap-1.5 shadow-sm">
+                You have 
+                <span className="inline-flex items-center justify-center min-w-[20px]">
+                  {qrsLeft === null ? (
+                    <div className="w-3 h-3 border-2 border-neutral-600 border-t-white rounded-full animate-spin"></div>
+                  ) : (
+                    <strong className="text-white">{qrsLeft}</strong>
+                  )}
+                </span>
+                QR codes left {userPlan === "FREE" ? "for today" : "this month"}
               </span>
+
+              {isLoggedIn && (
+                <button
+                  onClick={() => router.push('/links?types=qr')}
+                  className="flex items-center justify-between gap-3 px-6 py-2.5 bg-[#1c1c1c] hover:bg-[#252525] border border-neutral-800 rounded-xl transition-all group cursor-pointer"
+                >
+                  <span className="font-semibold text-sm text-neutral-300 group-hover:text-white">Manage your QR codes</span>
+                  <HugeiconsIcon
+                    icon={ArrowRight01Icon}
+                    className="text-neutral-500 group-hover:text-white group-hover:translate-x-1 transition-all"
+                    size={18}
+                  />
+                </button>
+              )}
             </div>
           )}
 
@@ -342,9 +361,11 @@ export default function QRGenerator() {
 
       <Features isLoggedIn={isLoggedIn} userPlan={userPlan} />
 
-      <div ref={pricingRef}>
-        <PricingSection />
-      </div>
+      {(!isLoggedIn || userPlan === "FREE") && (
+        <div ref={pricingRef}>
+          <PricingSection />
+        </div>
+      )}
 
       {upgradeMsg && (
         <div className="fixed font-two bottom-10 left-1/2 -translate-x-1/2 px-8 py-3 rounded-full shadow-2xl text-sm sm:text-base z-50 animate-in slide-in-from-bottom-4 fade-in duration-300 bg-white text-black font-bold border border-transparent">

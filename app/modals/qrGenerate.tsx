@@ -70,8 +70,8 @@ export default function QRCodeGenerateModal({ isOpen, onClose, selectedUrl }: QR
         className="bg-[#1c1c1c] w-full max-w-lg p-6 sm:p-10 border border-neutral-800 rounded-xl relative animate-in fade-in zoom-in duration-200"
         onClick={(e) => e.stopPropagation()}
       >
-        <button onClick={onClose} className="absolute right-4 top-4 text-neutral-500 hover:text-white transition-colors">
-          <X size={24} />
+        <button onClick={onClose} className="absolute right-4 top-4 text-neutral-500 hover:text-white transition-colors cursor-pointer">
+          <X size={28} />
         </button>
 
         <h3 className="text-xl sm:text-2xl font-three mb-8 text-center text-white">Link QR Code</h3>
@@ -84,7 +84,7 @@ export default function QRCodeGenerateModal({ isOpen, onClose, selectedUrl }: QR
                 <p className="text-black text-[10px] font-bold font-three uppercase tracking-widest">Generating...</p>
               </div>
             ) : qrImage ? (
-              <img src={qrImage} alt="QR Code" className="w-full h-full p-4 object-contain" />
+              <img src={qrImage} alt="QR Code" className="w-full h-full p-0 object-contain" />
             ) : (
               <p className="text-neutral-400 text-xs">Preparing QR...</p>
             )}
@@ -101,7 +101,7 @@ export default function QRCodeGenerateModal({ isOpen, onClose, selectedUrl }: QR
         </div>
 
         <div className="flex justify-end gap-3">
-          <Button variant="outline" onClick={onClose} className="bg-transparent text-white border-neutral-700 hover:bg-[#2a2a2a]">
+          <Button variant="outline" onClick={onClose} className="bg-transparent text-white border-neutral-700 hover:bg-[#2a2a2a] cursor-pointer h-12 px-6 text-base">
             Close
           </Button>
           <Button
@@ -112,9 +112,9 @@ export default function QRCodeGenerateModal({ isOpen, onClose, selectedUrl }: QR
                 link.click();
             }}
             disabled={isLoading || !qrImage}
-            className="bg-white text-black hover:bg-gray-200 font-bold"
+            className="bg-white text-black hover:bg-gray-200 font-bold cursor-pointer h-12 px-6 text-base"
           >
-            <Download className="mr-2 h-4 w-4" /> Download
+            <Download className="mr-2 h-5 w-5" /> Download
           </Button>
         </div>
       </div>

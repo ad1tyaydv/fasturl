@@ -50,10 +50,10 @@ export default function Premium() {
 
         <div className="text-center mb-12">
           <h1 className="text-3xl font-bold mb-2">
-            Unlock the Full Potential of Your Links
+            The Best URL Shortener with Analytics & Branded Links
           </h1>
-          <p className="text-white/40 text-sm">
-            Stop guessing and start tracking. Deliver the insights you need to grow.
+          <p className="text-white/40 text-sm max-w-xl mx-auto">
+            Stop guessing and start tracking with our professional link management platform. Unlock deep insights with real-time click tracking and geo-targeted redirects.
           </p>
         </div>
 
@@ -61,7 +61,7 @@ export default function Premium() {
 
           <div className="rounded-2xl border border-white/10 bg-white/5 p-6 flex flex-col">
             <div className="flex items-center justify-between mb-4">
-              <span className="text-xl font-bold text-white/70">Free</span>
+              <span className="text-xl font-bold text-white/70">Free Tool</span>
               <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-white/10 text-white/50">
                 Current
               </span>
@@ -69,14 +69,15 @@ export default function Premium() {
 
             <div className="text-3xl font-bold mb-1">₹0</div>
             <div className="text-xs text-white/30 mb-5">
-              Perfect to get started
+              Perfect for simple url shortening
             </div>
 
             <ul className="flex flex-col gap-2 mb-6 flex-1">
               {[
-                "100 links/month",
-                "30 QR Codes/month",
-                "Click tracking",
+                "100 short links/month",
+                "30 dynamic QR codes/month",
+                "Basic click tracking",
+                "Standard link creator",
               ].map((f) => (
                 <li
                   key={f}
@@ -120,20 +121,20 @@ export default function Premium() {
             </div>
 
             <div className="text-xs text-white/30 mb-5">
-              Most popular choice
+              Advanced link analytics platform
             </div>
 
             <ul className="flex flex-col gap-2 mb-6 flex-1">
               {[
                 "10,000 links/month",
                 "300 QR Codes/month",
-                "Detailed analytics",
-                "Bulk link creation",
-                "Custom URLs",
-                "Let people know where they're being redirected",
-                "4 custom domains",
-                "Security options",
-                "Support 24/7",
+                "Real-time click analytics",
+                "Bulk url shortener tool",
+                "Custom short links & slugs",
+                "Branded links & Custom domains",
+                "4 custom domains included",
+                "Password protected links",
+                "Link expiration tool",
               ].map((f) => (
                 <li
                   key={f}
@@ -176,20 +177,19 @@ export default function Premium() {
             </div>
 
             <div className="text-xs text-white/30 mb-5">
-              For power users
+              Enterprise link shortener suite
             </div>
 
             <ul className="flex flex-col gap-2 mb-6 flex-1">
               {[
                 "40,000 links/month",
                 "2,000 QR Codes/month",
-                "Detailed analytics",
-                "Bulk link creation",
-                "Custom URLs",
-                "Let people know where they're being redirected",
+                "Advanced data analytics",
+                "Batch link shortener access",
+                "Branded short domains",
+                "Link shortening api",
                 "10 custom domains",
-                "API access",
-                "Security options",
+                "White label url shortener",
                 "Priority Support 24/7",
               ].map((f) => (
                 <li

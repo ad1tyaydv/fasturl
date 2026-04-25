@@ -15,7 +15,7 @@ import {
   Tick02Icon,
   Edit03Icon
 } from '@hugeicons/core-free-icons';
-
+import QrDownloadModal from "../modals/qrDownloadModal";
 
 const getRelativeTime = (dateString?: string) => {
   if (!dateString) return "Just now";
@@ -30,7 +30,6 @@ const getRelativeTime = (dateString?: string) => {
   return date.toLocaleDateString();
 };
 
-
 export default function QrCodes({
   qrCodes, onRefresh, itemCount, router
 }: any) {
@@ -39,9 +38,11 @@ export default function QrCodes({
   const [tempName, setTempName] = useState("");
   const [savingId, setSavingId] = useState<string | null>(null);
 
+  const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
+  const [selectedQrForDownload, setSelectedQrForDownload] = useState<any>(null);
+
   const itemsPerPage = 10;
   const totalPages = Math.ceil(itemCount / itemsPerPage);
-
 
   const handleDeleteQr = async (id: string) => {
     const loadingToast = toast.loading("Deleting QR Code...");
@@ -50,22 +51,20 @@ export default function QrCodes({
       await axios.delete(`/api/qrCode/delete/${id}`);
       toast.success("QR Code deleted", { id: loadingToast });
       onRefresh();
-
     } catch (error) {
       toast.error("Failed to delete", { id: loadingToast });
     }
   };
 
-
-  const handleDownload = (base64Data: string, fileName: string) => {
-    const link = document.createElement("a");
-    link.href = base64Data;
-    link.download = `${fileName || "qrcode"}.png`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const handleDownloadClick = (qr: any) => {
+    setSelectedQrForDownload({
+      qrImage: qr.qrImage,
+      shortUrl: qr.shortUrl.startsWith('http') ? qr.shortUrl : `${window.location.origin}/r/${qr.shortUrl}`,
+      longUrl: qr.longUrl,
+      qrName: qr.qrName || qr.name
+    });
+    setIsDownloadModalOpen(true);
   };
-
 
   const saveName = async (id: string) => {
     if (!tempName.trim()) {
@@ -83,15 +82,12 @@ export default function QrCodes({
       toast.success("QR Code name updated");
       onRefresh();
       setEditingId(null);
-
     } catch (error) {
       toast.error("Failed to update name");
-
     } finally {
       setSavingId(null);
     }
   };
-
 
   return (
     <div className="flex flex-col gap-3 w-full">
@@ -158,7 +154,7 @@ export default function QrCodes({
                 </button>
 
                 <button
-                  onClick={() => handleDownload(qr.qrImage, qr.name || `qr-${qr.id}`)}
+                  onClick={() => handleDownloadClick(qr)}
                   className="p-3 hover:text-white hover:bg-neutral-800 rounded-xl transition-colors cursor-pointer text-neutral-400"
                   title="Download"
                 >
@@ -179,7 +175,6 @@ export default function QrCodes({
             </div>
           ))
         ) : (
-          /* EMPTY STATE */
           <div className="w-full py-20 px-4 flex flex-col items-center justify-center border-2 border-dashed border-neutral-800 rounded-3xl bg-[#1c1c1c]/30 mt-4">
             <div className="p-4 bg-neutral-900 rounded-2xl border border-neutral-800 mb-6">
                 <HugeiconsIcon icon={QrCodeIcon} className="w-10 h-10 text-neutral-500" />
@@ -219,6 +214,12 @@ export default function QrCodes({
           </button>
         </div>
       )}
+
+      <QrDownloadModal 
+        isOpen={isDownloadModalOpen}
+        onClose={() => setIsDownloadModalOpen(false)}
+        qrData={selectedQrForDownload}
+      />
     </div>
   );
 }

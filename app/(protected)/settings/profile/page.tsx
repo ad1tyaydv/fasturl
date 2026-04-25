@@ -175,8 +175,8 @@ export default function Profile() {
   }
 
   return (
-    <div className="pl-6">
-      <h1 className="text-2xl font-bold mb-8">Profile Settings</h1>
+    <div className="pl-6 font-one">
+      <h1 className="text-2xl font-bold mb-8 text-white">Profile Settings</h1>
 
       <div className="flex items-center gap-5 mb-10">
         <div className="relative">
@@ -190,7 +190,7 @@ export default function Profile() {
           <p className="text-sm text-white/40 mb-3">{email}</p>
           <button
             onClick={openAvatarModal}
-            className="px-4 py-1.5 text-xs font-medium rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-colors"
+            className="px-4 py-1.5 text-xs font-medium rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-colors cursor-pointer"
           >
             Update Emoji
           </button>
@@ -212,7 +212,7 @@ export default function Profile() {
             <button
               onClick={handleUpdateUserName}
               disabled={updateUserNameLoader}
-              className="px-5 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium rounded transition-colors flex items-center justify-center gap-2 whitespace-nowrap text-sm"
+              className="px-5 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium rounded transition-colors flex items-center justify-center gap-2 whitespace-nowrap text-sm cursor-pointer"
             >
               {updateUserNameLoader ? <Loader2 className="w-3 h-3 animate-spin" /> : "Update"}
             </button>
@@ -233,7 +233,7 @@ export default function Profile() {
             <button
               onClick={handleUpdateEmail}
               disabled={updateEmailLoader}
-              className="px-5 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium rounded transition-colors flex items-center justify-center gap-2 whitespace-nowrap text-sm"
+              className="px-5 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium rounded transition-colors flex items-center justify-center gap-2 whitespace-nowrap text-sm cursor-pointer"
             >
               {updateEmailLoader ? <Loader2 className="w-3 h-3 animate-spin" /> : "Update"}
             </button>
@@ -248,7 +248,7 @@ export default function Profile() {
               <h2 className="text-base font-semibold text-white">Choose Emoji</h2>
               <button
                 onClick={() => setShowAvatarModal(false)}
-                className="text-white/40 hover:text-white transition-colors"
+                className="text-white/40 hover:text-white transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -259,7 +259,7 @@ export default function Profile() {
                 <button
                   key={i}
                   onClick={() => setTempAvatar(url)}
-                  className={`w-full aspect-square rounded-xl overflow-hidden border-2 transition-all ${
+                  className={`w-full aspect-square rounded-xl overflow-hidden border-2 transition-all cursor-pointer ${
                     tempAvatar === url
                       ? "border-blue-500 scale-105"
                       : "border-white/10 hover:border-white/30"
@@ -273,7 +273,7 @@ export default function Profile() {
             <button
               onClick={handleAvatarUpdate}
               disabled={updateImageLoader}
-              className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold rounded-xl transition-colors text-sm flex items-center justify-center gap-2"
+              className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold rounded-xl transition-colors text-sm flex items-center justify-center gap-2 cursor-pointer"
             >
               {updateImageLoader ? <Loader2 className="w-4 h-4 animate-spin" /> : "Update"}
             </button>

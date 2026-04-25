@@ -17,7 +17,6 @@ import Features from "./components/features";
 import FaqSection from "./components/faqSection";
 import Footer from "./components/footer";
 import { DomainDropdown } from "./dropDown/domainDropDown";
-import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { UpgradeAlert } from "./modals/upgradeAlert";
 import { useUser } from "./components/userContext";
@@ -36,7 +35,7 @@ export default function Dashboard() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userPlan, setUserPlan] = useState("FREE");
   const [links, setLinks] = useState<[]>([]);
-  const [linksLeft, setLinksLeft] = useState(0);
+  const [linksLeft, setLinksLeft] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const [showQr, setShowQr] = useState<string | boolean>(false);
@@ -71,15 +70,14 @@ export default function Dashboard() {
     const checkAuth = async () => {
       try {
         const res = await axios.get("/api/auth/me");
-        const linksLeft = await axios.get("/api/shortUrl/linksLeft");
-        const links = await axios.get("/api/fetchUrls");
-
         const authenticated = !!res.data.authenticated;
         setIsLoggedIn(authenticated);
-        setLinksLeft(linksLeft.data.linksLeft);
-        setLinks(links.data.urls);
 
         if (authenticated) {
+          const linksLeftRes = await axios.get("/api/shortUrl/linksLeft");
+          const linksRes = await axios.get("/api/fetchUrls");
+          setLinksLeft(linksLeftRes.data.linksLeft);
+          setLinks(linksRes.data.urls);
           setUserPlan(res.data.plan || "FREE");
         }
 
@@ -121,7 +119,9 @@ export default function Dashboard() {
       setShortUrl(generatedShortUrl);
       setUrl(`${selectedDomain}/${generatedShortUrl}`);
 
-      setLinksLeft((prev) => Math.max(0, prev - 1));
+      if (linksLeft !== null) {
+        setLinksLeft((prev) => Math.max(0, (prev || 0) - 1));
+      }
 
 
     } catch (error: any) {
@@ -226,30 +226,17 @@ export default function Dashboard() {
 
           <div className="flex-1 text-center lg:text-left lg:pt-6">
             <h1 className="text-3xl sm:text-3xl md:text-5xl font-bold mb-6 text-white leading-tight font-one tracking-tight">
-              Shorten Your <span className="text-red-500">Links</span> Instantly
+              The Best <span className="text-red-500">URL Shortener</span> for Branded Links
             </h1>
 
             <p className="font-one text-lg text-neutral-400 max-w-lg mx-auto lg:mx-0 mb-4 px-2 sm:px-0">
-              Transform long URLs into brandable short links with analytics, custom domains, and QR codes.
+              Transform long URLs into custom short links with advanced link performance analytics, branded url shortener features, and instant QR code generation.
             </p>
 
             <p className="hidden lg:block font-one text-lg text-neutral-400 max-w-lg mx-auto lg:mx-0 mb-8">
-              Share links, Generate QR Codes, view analytics and more than just a URL shortener.
+              FastURL is your all-in-one link management platform for digital marketing links, affiliate link shortener needs, and real time click tracking.
             </p>
 
-            {userPlan === "FREE" && (
-              <div className="flex justify-center lg:justify-start mb-8 lg:mb-0">
-                <Button
-                  onClick={() => router.push("/premium")}
-                  className="px-5 py-5 font-bold bg-white text-black transition-all duration-300 flex items-center gap-2 group cursor-pointer"
-                >
-                  View Plans
-                  <span className="group-hover:translate-x-1 transition-transform">
-                    <HugeiconsIcon icon={ArrowRightDoubleIcon} />
-                  </span>
-                </Button>
-              </div>
-            )}
           </div>
 
           <div className="flex-1 w-full max-w-xl">
@@ -306,10 +293,18 @@ export default function Dashboard() {
             </div>
 
             <div className="flex flex-col items-center mt-6 min-h-[280px] w-full">
-              {isLoggedIn && (
+              {(isLoggedIn || authLoading) && (
                 <div className="mb-4">
-                  <span className="px-3 py-1.5 bg-[#1c1c1c] border border-neutral-800 text-sm font-medium text-neutral-400 inline-block rounded-lg shadow-sm">
-                    You have <strong className="text-white">{linksLeft}</strong> links left this month
+                  <span className="px-3 py-1.5 bg-[#1c1c1c] border border-neutral-800 text-sm font-medium text-neutral-400 inline-flex items-center gap-1.5 rounded-lg shadow-sm">
+                    You have 
+                    <span className="inline-flex items-center justify-center min-w-[20px]">
+                      {linksLeft === null ? (
+                        <div className="w-3 h-3 border-2 border-neutral-600 border-t-white rounded-full animate-spin"></div>
+                      ) : (
+                        <strong className="text-white">{linksLeft}</strong>
+                      )}
+                    </span>
+                    links left this month
                   </span>
                 </div>
               )}
@@ -361,6 +356,34 @@ export default function Dashboard() {
                 </div>
               )}
             </div>
+          </div>
+        </div>
+
+        {/* Trusted By Section */}
+        <div className="mt-12 flex flex-col items-center justify-center gap-4 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300">
+          <div className="flex items-center gap-4 px-6 py-3 rounded-full bg-white/5 border border-white/10 backdrop-blur-md shadow-2xl">
+            <div className="flex -space-x-3">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div key={i} className="w-10 h-10 rounded-full border-2 border-[#141414] bg-neutral-800 flex items-center justify-center overflow-hidden">
+                  <img 
+                    src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${i + 42}`} 
+                    alt="User" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              ))}
+              <div className="w-10 h-10 rounded-full border-2 border-[#141414] bg-blue-600 flex items-center justify-center text-[10px] font-bold text-white shadow-lg shadow-blue-500/20">
+                500+
+              </div>
+            </div>
+            <div className="h-6 w-px bg-white/10 mx-1"></div>
+            <p className="text-neutral-300 font-one text-sm sm:text-base flex items-center gap-3">
+              <span className="relative flex h-3 w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+              </span>
+              Trusted by <span className="text-white font-bold underline decoration-blue-500/50 underline-offset-4">500+ global users</span>
+            </p>
           </div>
         </div>
       </section>

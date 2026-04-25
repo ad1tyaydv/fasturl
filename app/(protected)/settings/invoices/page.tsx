@@ -47,7 +47,7 @@ export default function BillingPage() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto mt-10 px-6">
+    <div className="w-full">
       <div className="mb-8">
         <h1 className="text-3xl font-three font-bold tracking-tight text-white">Billing History</h1>
         <p className="text-neutral-400 mt-1">Manage your subscriptions and download invoices.</p>

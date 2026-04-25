@@ -5,6 +5,8 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Analytics01Icon, ArrowRightDoubleIcon } from "@hugeicons/core-free-icons";
 
 
 type CellValue = true | false | string;
@@ -237,59 +239,163 @@ export default function Premium() {
     const isPro = plan === "PRO";
     const linkLimit = isPro ? 40000 : 10000;
     const qrLimit = isPro ? 2000 : 300;
+    const planColor = isPro ? "from-yellow-400 to-amber-600" : "from-blue-400 to-blue-600";
+    const planBorder = isPro ? "border-yellow-500/20" : "border-blue-500/20";
+    const planBg = isPro ? "bg-yellow-500/5" : "bg-blue-500/5";
 
     return (
-      <div className="min-h-screen bg-[#141414] text-white">
+      <div className="min-h-screen bg-[#141414] text-white font-one">
         <Navbar />
-        <main className="max-w-4xl mx-auto px-4 py-12">
-          <div className="mb-10">
-            <h1 className="text-3xl font-bold mb-2">Subscription Management</h1>
-            <p className="text-white/40 text-sm">Monitor your usage and manage your active plan.</p>
+        <main className="max-w-5xl mx-auto px-6 py-16">
+          
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+            <div>
+              <div className="flex items-center gap-3 mb-2">
+                <h1 className="text-4xl font-black tracking-tight">Premium Dashboard</h1>
+                <span className="px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20 text-green-400 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                  Active
+                </span>
+              </div>
+              <p className="text-neutral-500 text-lg">Manage your elite link shortening infrastructure.</p>
+            </div>
+            <div className="flex items-center gap-4">
+              <button 
+                onClick={() => window.open("mailto:fasturl@tutamail.com")}
+                className="px-5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm font-semibold hover:bg-white/10 transition-all"
+              >
+                Priority Support
+              </button>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className={`md:col-span-1 rounded-2xl border p-6 flex flex-col justify-between ${isPro ? 'border-yellow-500/30 bg-yellow-500/5' : 'border-blue-500/30 bg-blue-500/5'}`}>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            {/* Plan Card */}
+            <div className={`lg:col-span-1 rounded-3xl border ${planBorder} ${planBg} p-8 relative overflow-hidden flex flex-col justify-between group`}>
+              <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${planColor} opacity-10 blur-3xl -mr-10 -mt-10 group-hover:opacity-20 transition-opacity`} />
+              
               <div>
-                <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-md mb-4 inline-block ${isPro ? 'bg-yellow-500/20 text-yellow-400' : 'bg-blue-500/20 text-blue-400'}`}>
-                  Current Plan
-                </span>
-                <h2 className={`text-4xl font-black mb-1 ${isPro ? 'text-yellow-400' : 'text-blue-400'}`}>
+                <p className="text-white/40 text-xs font-bold uppercase tracking-[0.2em] mb-6">Current Tier</p>
+                <h2 className={`text-6xl font-black mb-2 bg-gradient-to-r ${planColor} bg-clip-text text-transparent italic`}>
                   {plan}
                 </h2>
-                <p className="text-white/40 text-xs">Monthly Billing</p>
+                <div className="flex items-center gap-2 text-white/60 text-sm mb-8">
+                  <span className="font-medium">Monthly Cycle</span>
+                  <span className="w-1 h-1 rounded-full bg-white/20" />
+                  <span className="text-white/40">Renews in {planExpiresAt ? Math.ceil((new Date(planExpiresAt).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) : 0} days</span>
+                </div>
+
+                <div className="space-y-4 mb-8">
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-white/40">Billing Period</span>
+                    <span className="text-white/80 font-mono">Monthly</span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-white/40">Next Invoice</span>
+                    <span className="text-white/80 font-mono">{planExpiresAt ? new Date(planExpiresAt).toLocaleDateString() : "N/A"}</span>
+                  </div>
+                </div>
               </div>
 
-              <div className="mt-8 space-y-3">
-                <div className="flex justify-between text-sm border-t border-white/5 pt-3">
-                  <span className="text-white/40">Started:</span>
-                  <span className="text-white/80 font-medium">
-                    {planStartedAt ? new Date(planStartedAt).toLocaleDateString() : "N/A"}
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-white/40">Renews:</span>
-                  <span className="text-white/80 font-medium">
-                    {planExpiresAt ? new Date(planExpiresAt).toLocaleDateString() : "N/A"}
-                  </span>
+              <div className="pt-6 border-t border-white/5">
+                {!isPro && (
+                  <button 
+                    onClick={() => handleCheckout("PRO")}
+                    className="w-full py-4 rounded-2xl bg-white text-black font-bold text-sm hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-white/5 flex items-center justify-center gap-2 group/btn"
+                  >
+                    Upgrade to PRO <HugeiconsIcon icon={ArrowRightDoubleIcon} size={18} className="group-hover/btn:translate-x-1 transition-transform" />
+                  </button>
+                )}
+                {isPro && (
+                  <div className="p-4 rounded-2xl bg-white/5 border border-white/5 text-center">
+                    <p className="text-white/60 text-xs font-medium">You are on the highest tier.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Usage Content */}
+            <div className="lg:col-span-2 space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <UsageStat
+                  label="Links Capacity"
+                  used={totalLinksUsed}
+                  limit={linkLimit}
+                  colorClass={isPro ? "bg-yellow-500" : "bg-blue-500"}
+                />
+                <UsageStat
+                  label="QR Engine"
+                  used={totalQrCodesUsed}
+                  limit={qrLimit}
+                  colorClass={isPro ? "bg-yellow-400" : "bg-blue-400"}
+                />
+              </div>
+
+              {/* Features Included */}
+              <div className="bg-white/5 border border-white/10 rounded-3xl p-8">
+                <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
+                  <HugeiconsIcon icon={Analytics01Icon} size={20} className="text-blue-400" />
+                  Unlocked Capabilities
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-12">
+                  {[
+                    "Detailed Click Analytics",
+                    "Advanced Geo-Tracking",
+                    "Bulk URL Creation",
+                    "Custom Branded Slugs",
+                    "High-Speed Redirection",
+                    isPro ? "Full Developer API Access" : "4 Custom Domains",
+                    isPro ? "10 Custom Domains" : "Priority Support",
+                    "Device & Browser Insights"
+                  ].map((feat, i) => (
+                    <div key={i} className="flex items-center gap-3 text-sm text-white/70">
+                      <div className={`w-5 h-5 rounded-full flex items-center justify-center ${isPro ? 'bg-yellow-500/10 text-yellow-500' : 'bg-blue-500/10 text-blue-500'}`}>
+                        <CheckIcon className="w-3 h-3" />
+                      </div>
+                      {feat}
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
 
-            <div className="md:col-span-2 grid grid-cols-1 gap-4">
-              <UsageStat
-                label="Links Created"
-                used={totalLinksUsed}
-                limit={linkLimit}
-                colorClass={isPro ? "bg-yellow-500" : "bg-blue-500"}
-              />
-              <UsageStat
-                label="QR Codes Generated"
-                used={totalQrCodesUsed}
-                limit={qrLimit}
-                colorClass={isPro ? "bg-yellow-400" : "bg-blue-400"}
-              />
-            </div>
           </div>
+
+          {/* Comparison Table Link */}
+          <div className="mt-16 text-center">
+            <p className="text-white/20 text-sm mb-4">Want to see how your plan stacks up?</p>
+            <button 
+              onClick={() => {
+                const el = document.getElementById('comparison');
+                el?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="text-white/40 hover:text-white underline underline-offset-8 decoration-white/10 hover:decoration-white transition-all text-xs uppercase tracking-widest font-bold"
+            >
+              View Full Comparison
+            </button>
+          </div>
+          
+          <div id="comparison" className="mt-32 pt-20">
+             <div className="mb-10 text-center">
+                <h2 className="text-3xl font-black mb-2 tracking-tight">Full Plan Breakdown</h2>
+                <p className="text-white/40 text-sm">Every detail of our infrastructure tiers.</p>
+              </div>
+
+              <div className="rounded-3xl border border-white/10 overflow-hidden bg-white/[0.01] backdrop-blur-3xl shadow-2xl">
+                <div className="grid grid-cols-[2fr_1fr_1fr_1fr] border-b border-white/10 bg-[#1a1a1a]">
+                  <div className="px-6 py-6 text-xs font-bold uppercase tracking-[0.2em] text-white/30">Infrastructure</div>
+                  <div className="px-3 py-6 text-center text-sm font-bold text-white/50">Free</div>
+                  <div className={`px-3 py-6 text-center text-sm font-bold ${!isPro ? 'text-blue-400 bg-blue-500/10' : 'text-blue-400/40'}`}>Essentials</div>
+                  <div className={`px-3 py-6 text-center text-sm font-bold ${isPro ? 'text-yellow-400 bg-yellow-500/10' : 'text-yellow-400/40'}`}>Pro</div>
+                </div>
+
+                {COMPARISON_SECTIONS.map((section) => (
+                  <Section key={section.title} section={section} />
+                ))}
+              </div>
+          </div>
+
         </main>
       </div>
     );
