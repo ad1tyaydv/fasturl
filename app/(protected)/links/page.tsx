@@ -20,7 +20,7 @@ import QrCodes from "@/app/components/qrCodes";
 import Links from "@/app/components/links";
 import ApiLinks from "@/app/components/apiLinks";
 
-import { FilterDropDown, FilterType } from "@/app/dropDown/urlsPageDropDown";
+import { FilterDropDown, FilterType } from "@/app/dropDown/linksDropDown";
 import LinkPasswordProtectionModal from "@/app/modals/linkPasswordProtection";
 import CustomUrlModal from "@/app/modals/customUrl";
 import QRCodeGenerateModal from "@/app/modals/qrGenerate";
@@ -28,6 +28,8 @@ import QRCodeGenerateModal from "@/app/modals/qrGenerate";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ButtonGroup } from "@/components/ui/button-group";
+import { BulkFilterDropDown, BulkFilterType } from "@/app/dropDown/bulkLinksDropDown";
+import { QrFilterDropDown, QrFilterType } from "@/app/dropDown/qrLinksDropDown";
 
 
 const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN;
@@ -142,7 +144,7 @@ function AllLinks() {
     }
   }, [view]);
 
-  
+
 
   useEffect(() => {
     const initAuth = async () => {
@@ -155,7 +157,7 @@ function AllLinks() {
           router.push("/auth/signin");
         }
 
-      } catch { 
+      } catch {
         router.push("/auth/signin");
       }
     };
@@ -175,6 +177,7 @@ function AllLinks() {
       const now = new Date();
       result = result.filter((item) => {
         const itemDate = new Date(item.createdAt);
+
         switch (statusFilter) {
           case "today":
             return (
@@ -182,14 +185,20 @@ function AllLinks() {
               itemDate.getMonth() === now.getMonth() &&
               itemDate.getFullYear() === now.getFullYear()
             );
-          case "7days":
+          case "7days": {
             const sevenDaysAgo = new Date();
             sevenDaysAgo.setDate(now.getDate() - 7);
             return itemDate >= sevenDaysAgo;
-          case "30days":
+          }
+          case "30days": {
             const thirtyDaysAgo = new Date();
             thirtyDaysAgo.setDate(now.getDate() - 30);
             return itemDate >= thirtyDaysAgo;
+          }
+          case "protected":
+            return item.password && item.password.trim() !== "";
+          case "most-clicked":
+            return true;
           default:
             return true;
         }
@@ -203,7 +212,7 @@ function AllLinks() {
           return (
             item.linkName?.toLowerCase().includes(q) ||
             item.shorturl?.toLowerCase().includes(q) ||
-            item.longUrl?.toLowerCase().includes(q)
+            item.original?.toLowerCase().includes(q)
           );
         }
         if (view === "qr") {
@@ -226,7 +235,13 @@ function AllLinks() {
       });
     }
 
-    result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    if (statusFilter === "most-clicked") {
+      result.sort((a, b) => (b.clicks || 0) - (a.clicks || 0));
+
+    } else {
+      result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    }
+
     return result;
   }, [data, searchQuery, view, statusFilter]);
 
@@ -270,23 +285,36 @@ function AllLinks() {
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-6 fade-in">
                   <div className="w-full sm:max-w-[450px] flex-1">
                     <ButtonGroup className="w-full shadow-sm">
-                      <Input 
+                      <Input
                         placeholder={`Search ${view}...`}
                         className="bg-[#111111] border-neutral-800 text-white focus-visible:ring-0 focus-visible:border-neutral-600 h-11"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                       />
-                      <Button 
-                        variant="outline" 
-                        aria-label="Search"
-                        className="bg-neutral-900 border-neutral-800 hover:bg-neutral-800 hover:text-white h-11 px-4"
-                      >
+                      <Button variant="outline" className="bg-neutral-900 border-neutral-800 hover:bg-neutral-800 hover:text-white h-11 px-4">
                         <SearchIcon className="w-4 h-4 text-neutral-400" />
                       </Button>
                     </ButtonGroup>
                   </div>
+
+                  {/* CONDITIONAL DROPDOWN RENDERING */}
                   <div className="w-full sm:w-auto flex justify-end">
-                    <FilterDropDown value={statusFilter} onChange={(val: FilterType) => setStatusFilter(val)} />
+                    {view === "bulk" ? (
+                      <BulkFilterDropDown
+                        value={statusFilter as BulkFilterType}
+                        onChange={(val) => setStatusFilter(val)}
+                      />
+                    ) : view === "qr" ? (
+                      <QrFilterDropDown
+                        value={statusFilter as QrFilterType}
+                        onChange={(val) => setStatusFilter(val)}
+                      />
+                    ) : (
+                      <FilterDropDown
+                        value={statusFilter}
+                        onChange={(val: FilterType) => setStatusFilter(val)}
+                      />
+                    )}
                   </div>
                 </div>
               )}
@@ -294,9 +322,9 @@ function AllLinks() {
               {loading ? (
                 <div className="flex flex-col w-full">
                   {[...Array(6)].map((_, i) => (
-                    view === "qr" ? <QrSkeleton key={i} /> : 
-                    view === "bulk" ? <BulkSkeleton key={i} /> : 
-                    <LinksSkeleton key={i} />
+                    view === "qr" ? <QrSkeleton key={i} /> :
+                      view === "bulk" ? <BulkSkeleton key={i} /> :
+                        <LinksSkeleton key={i} />
                   ))}
                 </div>
               ) : data.length === 0 ? (

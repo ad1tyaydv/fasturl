@@ -23,7 +23,7 @@ export function FilterDropDown({ value, onChange }: FilterDropDownProps) {
       </SelectTrigger>
       
       <SelectContent 
-        position="popper" 
+        position="popper"
         sideOffset={5} 
         className="bg-[#1a1a1a] border-neutral-800 text-white rounded-lg w-[200px]"
       >

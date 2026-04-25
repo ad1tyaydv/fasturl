@@ -12,7 +12,7 @@ import {
   Search02Icon
 } from '@hugeicons/core-free-icons';
 
-import { FilterDropDown, FilterType } from "@/app/dropDown/urlsPageDropDown";
+import { FilterDropDown, FilterType } from "@/app/dropDown/linksDropDown";
 
 const getRelativeTime = (dateString?: string) => {
   if (!dateString) return "Just now";

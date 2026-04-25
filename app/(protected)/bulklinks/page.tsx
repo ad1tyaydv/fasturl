@@ -83,7 +83,7 @@ export default function BulkCreateLinks() {
     const checkAuth = async () => {
       try {
         const res = await axios.get("/api/auth/me");
-        
+
         if (!res.data.authenticated) {
           router.push("/auth/signin");
           return;
@@ -213,25 +213,49 @@ export default function BulkCreateLinks() {
   };
 
   const exportPDF = () => {
+    // Safety Check: Prevent crash if data isn't an array or is empty
+    if (!Array.isArray(createdLinks) || createdLinks.length === 0) {
+      toast.error("No links available to export. Please generate links first.");
+      return;
+    }
+
     const doc = new jsPDF();
-    doc.text("Fasturl - Shortened Links", 14, 15);
+    doc.setFontSize(16);
+    doc.text("Fasturl - Shortened Links Report", 14, 15);
+
     autoTable(doc, {
       head: [['#', 'Original URL', 'Short URL']],
-      body: createdLinks.map((l, i) => [i + 1, l.original, `${NEXT_DOMAIN}/${l.short}`]),
-      startY: 20,
+      // Added optional chaining (?.) for extra safety
+      body: createdLinks?.map((l, i) => [
+        i + 1,
+        l.original || "N/A",
+        `${NEXT_DOMAIN}/${l.short || l.shorturl}`
+      ]),
+      startY: 25,
+      styles: { fontSize: 9 },
+      headStyles: { fillColor: [30, 30, 30] }
     });
-    doc.save("links.pdf");
+    doc.save("Fasturl_Links.pdf");
   };
 
   const exportCSV = () => {
+    if (!Array.isArray(createdLinks) || createdLinks.length === 0) {
+      toast.error("No links available to export.");
+      return;
+    }
+
     const headers = "Original URL,Short URL\n";
-    const rows = createdLinks.map(l => `${l.original},${NEXT_DOMAIN}/${l.short}`).join("\n");
+    const rows = createdLinks.map(l =>
+      `${l.original},${NEXT_DOMAIN}/${l.short || l.shorturl}`
+    ).join("\n");
+
     const blob = new Blob([headers + rows], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'links.csv';
+    a.download = 'Fasturl_Links.csv';
     a.click();
+    window.URL.revokeObjectURL(url); // Clean up memory
   };
 
   const closeAllModals = () => {
@@ -292,7 +316,7 @@ export default function BulkCreateLinks() {
                 <div
                   onClick={() => {
                     if (!createdLinks.length) {
-                        fileInputRef.current?.click();
+                      fileInputRef.current?.click();
                     }
                   }}
                   className={`border-2 border-dashed rounded-xl p-6 flex-1 flex flex-col items-center justify-center transition-all duration-200 relative
@@ -405,13 +429,6 @@ export default function BulkCreateLinks() {
                   </button>
                 ) : (
                   <div className="flex flex-col gap-3">
-                    <button
-                      onClick={() => setShowDownloadModal(true)}
-                      className="w-full py-4 bg-blue-600 text-white rounded-xl font-three flex items-center justify-center gap-2 hover:bg-blue-700 transition-all cursor-pointer shadow-lg shadow-blue-600/20"
-                    >
-                      <HugeiconsIcon icon={Download02Icon} /> Download Results
-                    </button>
-
                     <button
                       onClick={handleGenerateMore}
                       className="w-full flex items-center justify-center gap-2 py-3 text-sm font-bold text-neutral-400 hover:text-white hover:bg-neutral-800/50 rounded-xl transition-all border border-neutral-800 cursor-pointer"
@@ -551,23 +568,62 @@ export default function BulkCreateLinks() {
       </main>
 
       {showDownloadModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/80 cursor-pointer" onClick={() => setShowDownloadModal(false)} />
-          <div className="relative bg-[#1c1c1c] border border-neutral-800 w-full max-w-[320px] rounded-xl p-5 shadow-2xl">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="font-bold text-base text-white">Download As</h3>
-              <button onClick={() => setShowDownloadModal(false)} className="text-neutral-400 hover:text-white cursor-pointer">
-                <IoCloseOutline size={22} />
-              </button>
+        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
+          {/* Backdrop with blur */}
+          <div
+            className="absolute inset-0 bg-black/80 backdrop-blur-sm cursor-pointer"
+            onClick={() => setShowDownloadModal(false)}
+          />
+
+          {/* Modal Container: Increased size to max-w-[500px] and min-h */}
+          <div className="relative bg-[#0F0F0F] border border-neutral-800 w-full max-w-[500px] min-h-[350px] rounded-2xl p-8 shadow-2xl animate-in zoom-in-95 duration-200">
+
+            {/* Top Right Close Button */}
+            <button
+              onClick={() => setShowDownloadModal(false)}
+              className="absolute top-6 right-6 text-neutral-500 hover:text-white transition-colors cursor-pointer p-1"
+            >
+              <HugeiconsIcon icon={Cancel01Icon} size={24} />
+            </button>
+
+            <div className="mb-10">
+              <h3 className="text-white text-2xl font-bold mb-2">Export Results</h3>
+              <p className="text-neutral-500 text-sm font-three">
+                Your bulk links have been processed. Choose a format to save your data.
+              </p>
             </div>
-            <div className="flex flex-col gap-2">
-              <button onClick={() => { exportPDF(); setShowDownloadModal(false); }} className="flex items-center gap-3 p-3 rounded-lg border border-neutral-700 hover:bg-[#2a2a2a] transition-colors text-left cursor-pointer group">
-                <div className="w-8 h-8 rounded bg-red-500/10 flex items-center justify-center text-red-500 group-hover:scale-110 transition-transform"><HugeiconsIcon icon={Pdf02Icon} /></div>
-                <span className="text-sm font-medium text-white">PDF Document</span>
+
+            <div className="flex flex-col gap-4">
+              <button
+                onClick={() => { exportPDF(); setShowDownloadModal(false); }}
+                className="group flex items-center justify-between p-5 rounded-xl bg-zinc-900/50 border border-zinc-800 hover:border-red-500/50 hover:bg-zinc-900 transition-all cursor-pointer"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="p-3 bg-red-500/10 rounded-lg text-red-500 group-hover:scale-110 transition-transform">
+                    <HugeiconsIcon icon={Pdf02Icon} size={28} />
+                  </div>
+                  <div className="text-left">
+                    <span className="block text-white text-lg font-bold">PDF Document</span>
+                    <span className="text-xs text-neutral-500 uppercase tracking-widest font-bold">Professional Report</span>
+                  </div>
+                </div>
+                <HugeiconsIcon icon={ArrowRight01Icon} size={20} className="text-neutral-600 group-hover:text-white group-hover:translate-x-1 transition-all" />
               </button>
-              <button onClick={() => { exportCSV(); setShowDownloadModal(false); }} className="flex items-center gap-3 p-3 rounded-lg border border-neutral-700 hover:bg-[#2a2a2a] transition-colors text-left cursor-pointer group">
-                <div className="w-8 h-8 rounded bg-green-500/10 flex items-center justify-center text-green-500 group-hover:scale-110 transition-transform"><HugeiconsIcon icon={Csv02Icon} /></div>
-                <span className="text-sm font-medium text-white">CSV Spreadsheet</span>
+
+              <button
+                onClick={() => { exportCSV(); setShowDownloadModal(false); }}
+                className="group flex items-center justify-between p-5 rounded-xl bg-zinc-900/50 border border-zinc-800 hover:border-green-500/50 hover:bg-zinc-900 transition-all cursor-pointer"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="p-3 bg-green-500/10 rounded-lg text-green-500 group-hover:scale-110 transition-transform">
+                    <HugeiconsIcon icon={Csv02Icon} size={28} />
+                  </div>
+                  <div className="text-left">
+                    <span className="block text-white text-lg font-bold">CSV Spreadsheet</span>
+                    <span className="text-xs text-neutral-500 uppercase tracking-widest font-bold">Excel Compatible</span>
+                  </div>
+                </div>
+                <HugeiconsIcon icon={ArrowRight01Icon} size={20} className="text-neutral-600 group-hover:text-white group-hover:translate-x-1 transition-all" />
               </button>
             </div>
           </div>

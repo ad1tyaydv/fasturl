@@ -5,11 +5,12 @@ import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Loader2, Lock, ChevronLeft } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 import { HugeiconsIcon } from '@hugeicons/react';
 import {
-  AnalyticsUpIcon, Search01Icon, Link04Icon, PlusSignIcon }
-  from '@hugeicons/core-free-icons';
+  AnalyticsUpIcon, Search01Icon, Link04Icon, PlusSignIcon, File02Icon 
+} from '@hugeicons/core-free-icons';
 
 import Navbar from "@/app/components/navbar";
 import ClicksAnalytics from "@/app/components/analytics/clicks";
@@ -21,6 +22,8 @@ import ReferrerAnalytics from "@/app/components/analytics/referrers";
 import { AnalyticsDropDown } from "@/app/dropDown/analyticsDropDown";
 import { useUser } from "@/app/components/userContext";
 
+// Import the new component
+import { AnalyticsTypeToggle, AnalyticsType } from "@/app/dropDown/analyticsTypeDropDown";
 
 const DOMAIN = process.env.NEXT_PUBLIC_DOMAIN!;
 
@@ -33,13 +36,9 @@ function PremiumBlock({ children, isFree }: { children: React.ReactNode; isFree:
             <Lock className="w-6 h-6 text-neutral-400" />
           </div>
           <h3 className="text-white font-medium text-lg mb-1">Detailed Analytics Locked</h3>
-          <p className="text-neutral-400 text-sm mb-5 text-center px-4">
-            Upgrade your plan to see deeper insights.
-          </p>
+          <p className="text-neutral-400 text-sm mb-5 text-center px-4">Upgrade your plan to see deeper insights.</p>
           <Link href="/premium">
-            <button className="px-5 py-2 bg-white text-black font-medium rounded-lg text-sm hover:bg-neutral-200 transition-colors cursor-pointer">
-              Upgrade to Premium
-            </button>
+            <button className="px-5 py-2 bg-white text-black font-medium rounded-lg text-sm hover:bg-neutral-200 transition-colors cursor-pointer">Upgrade to Premium</button>
           </Link>
         </div>
       )}
@@ -50,150 +49,139 @@ function PremiumBlock({ children, isFree }: { children: React.ReactNode; isFree:
   );
 }
 
-
 export default function AnalyticsPage() {
   const router = useRouter();
   const { user } = useUser();
   
-
+  const [analyticsType, setAnalyticsType] = useState<AnalyticsType>("links");
+  const [isChangingType, setIsChangingType] = useState(false); // New Loading State
+  
   const [urls, setUrls] = useState<any[]>([]);
+  const [bulkBatches, setBulkBatches] = useState<any[]>([]);
   const [tier, setTier] = useState<string>("FREE");
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedLink, setSelectedLink] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [analyticsData, setAnalyticsData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [fetchingStats, setFetchingStats] = useState(false);
   const [days, setDays] = useState<number>(7);
 
-  const fetchAnalytics = async (linkId: string) => {
+  const fetchAnalytics = async (id: string, type: AnalyticsType) => {
     setFetchingStats(true);
     try {
-      const res = await fetch("/api/analytics/link", {
+      const endpoint = type === "links" ? "/api/analytics/link" : "/api/analytics/bulkLinks";
+      const payload = type === "links" ? { linkId: id } : { batchId: id };
+
+      const res = await fetch(endpoint, {
         method: "POST",
-        body: JSON.stringify({ linkId }),
+        body: JSON.stringify(payload),
       });
-      
       const data = await res.json();
       setAnalyticsData(data);
-
     } catch (err) {
       console.error(err);
-
     } finally {
       setFetchingStats(false);
     }
   };
 
-
   useEffect(() => {
     async function init() {
       try {
-        const [authRes, urlsRes] = await Promise.all([
+        const [authRes, urlsRes, bulkRes] = await Promise.all([
           fetch("/api/auth/me").catch(() => null),
           fetch("/api/fetchUrls").catch(() => null),
+          fetch("/api/shortUrl/bulkLinks/fetchBulkLinks").catch(() => null),
         ]);
 
-        if (authRes && authRes.ok) {
+        if (authRes?.ok) {
           const authData = await authRes.json();
           setTier(authData.plan || "FREE");
         }
 
-        if (urlsRes && urlsRes.ok) {
+        if (urlsRes?.ok) {
           const data = await urlsRes.json();
-          const fetchedUrls: any[] = data.urls || [];
-          setUrls(fetchedUrls);
-
-          const params = new URLSearchParams(window.location.search);
-          const slug = params.get("link");
-          if (slug) {
-            const match = fetchedUrls.find((u: any) => u.shorturl === slug);
-            if (match) {
-              setSelectedLink(match.id);
-              fetchAnalytics(match.id);
-            }
-          }
+          setUrls(data.urls || []);
         }
 
+        if (bulkRes?.ok) {
+          const data = await bulkRes.json();
+          setBulkBatches(data.bulkLinks || []);
+        }
       } catch (e) {
         console.error("Initialization error:", e);
-
       } finally {
         setLoading(false);
       }
     }
     init();
-
   }, []);
 
-  const handleLinkClick = async (url: any) => {
-    setSelectedLink(url.id);
-    window.history.replaceState(null, "", `/analytics?link=${url.shorturl}`);
-    fetchAnalytics(url.id);
+  const handleTypeChange = (newType: AnalyticsType) => {
+    setIsChangingType(true);
+    // Mimic the 1s delay for a premium feel
+    setTimeout(() => {
+        setAnalyticsType(newType);
+        setSelectedId(null);
+        setAnalyticsData(null);
+        setIsChangingType(false);
+    }, 1000);
   };
 
-  const handleBackToList = () => {
-    setSelectedLink(null);
-    window.history.replaceState(null, "", `/analytics`);
+  const filteredItems = useMemo(() => {
+    const items = analyticsType === "links" ? urls : bulkBatches;
+    const searchLower = searchQuery.toLowerCase();
+    
+    return items.filter((item) => {
+        if (analyticsType === "links") {
+            return item.shorturl?.toLowerCase().includes(searchLower) || item.linkName?.toLowerCase().includes(searchLower);
+        }
+        return item.name?.toLowerCase().includes(searchLower);
+    }).sort((a: any, b: any) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+  }, [urls, bulkBatches, searchQuery, analyticsType]);
+
+  const handleItemClick = (item: any) => {
+    setSelectedId(item.id);
+    fetchAnalytics(item.id, analyticsType);
   };
-
-  const filteredUrls = useMemo(() => {
-    const filtered = urls.filter((url) => {
-      const searchLower = searchQuery.toLowerCase();
-      return (
-        url.shorturl?.toLowerCase().includes(searchLower) ||
-        url.original?.toLowerCase().includes(searchLower)
-      );
-    });
-
-
-    return filtered.sort((a, b) => {
-      const dateA = new Date(a.createdAt || 0).getTime();
-      const dateB = new Date(b.createdAt || 0).getTime();
-      return dateB - dateA;
-    });
-  }, [urls, searchQuery]);
 
   const isFree = tier === "FREE";
 
-  
   return (
-    <div className="flex flex-col h-screen bg-black text-white font-sans selection:bg-blue-500/30">
+    <div className="flex flex-col h-screen bg-black text-white font-sans selection:bg-blue-500/30 overflow-hidden">
       <Navbar />
 
-      <div className="flex flex-1 overflow-hidden bg-[#141414]">
+      <div className="flex flex-1 overflow-hidden bg-[#141414] relative">
+        
+        {/* --- GLOBAL TYPE LOADER --- */}
+        <AnimatePresence>
+          {isChangingType && (
+            <motion.div 
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="absolute inset-0 z-[150] flex flex-col items-center justify-center bg-[#141414]/80 backdrop-blur-md"
+            >
+              <div className="relative">
+                <Loader2 className="w-12 h-12 text-blue-500 animate-spin" />
+                <div className="absolute inset-0 bg-blue-500/20 blur-2xl rounded-full" />
+              </div>
+              <p className="mt-4 text-zinc-500 text-xs font-bold tracking-widest uppercase animate-pulse">Switching Analytics...</p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {loading ? (
           <div className="flex flex-1 items-center justify-center bg-[#141414]">
             <Loader2 className="animate-spin text-blue-500 w-8 h-8" />
           </div>
-        ) : urls.length === 0 ? (
-          <div className="flex-1 flex flex-col items-center justify-center p-6">
-            <div className="w-full max-w-2xl py-20 px-4 flex flex-col items-center justify-center border-2 border-dashed border-neutral-800 rounded-3xl bg-[#1c1c1c]/30 fade-in">
-              <div className="p-4 bg-neutral-900 rounded-2xl border border-neutral-800 mb-6">
-                <HugeiconsIcon icon={Link04Icon} className="w-10 h-10 text-neutral-500" />
-              </div>
-              <h2 className="text-xl sm:text-2xl font-one mb-2 text-white text-center">
-                Generate your first shorturl to see analytics
-              </h2>
-              <p className="text-neutral-500 font-three text-sm mb-8 text-center max-w-sm">
-                Shorten your long links to start tracking clicks, locations, and more in real-time.
-              </p>
-              <button 
-                onClick={() => router.push("/")} 
-                className="bg-white text-black hover:bg-neutral-200 font-three px-8 py-3 rounded-xl flex items-center gap-2 transition-colors cursor-pointer"
-              >
-                <HugeiconsIcon icon={PlusSignIcon} className="w-5 h-5" /> Create Link
-              </button>
-            </div>
-          </div>
         ) : (
           <>
-            <aside className={`border-r border-neutral-900 flex-col bg-[#141414] shrink-0 ${selectedLink ? 'hidden md:flex md:w-80' : 'flex w-full md:w-80'}`}>
+            <aside className={`border-r border-neutral-900 flex-col bg-[#141414] shrink-0 ${selectedId ? 'hidden md:flex md:w-80' : 'flex w-full md:w-80'}`}>
               <div className="p-6 space-y-4">
                 <div className="relative group">
                   <HugeiconsIcon icon={Search01Icon} className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500 group-focus-within:text-blue-500 transition-colors" />
                   <input
                     type="text"
-                    placeholder="Search by name, url, slug"
+                    placeholder={`Search ${analyticsType}...`}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full bg-neutral-900 border border-neutral-800 rounded-lg py-2 pl-10 pr-4 text-sm focus:outline-none focus:border-blue-500/50 transition-all placeholder:text-neutral-600"
@@ -202,50 +190,48 @@ export default function AnalyticsPage() {
               </div>
 
               <div className="flex-1 overflow-y-auto px-3 space-y-1 custom-scrollbar cursor-pointer">
-                {filteredUrls.map((url) => (
+                {filteredItems.map((item) => (
                   <button
-                    key={url.id}
-                    onClick={() => handleLinkClick(url)}
+                    key={item.id}
+                    onClick={() => handleItemClick(item)}
                     className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-200 group ${
-                      selectedLink === url.id
-                        ? "bg-blue-600 text-white"
-                        : "hover:bg-neutral-900 hover:text-neutral-200"
+                      selectedId === item.id ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20" : "hover:bg-neutral-900"
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <div className={`w-1.5 h-1.5 rounded-full ${selectedLink === url.id ? "bg-white" : "bg-neutral-700"}`} />
-                      <div className="flex flex-col truncate cursor-pointer">
-                        <span className="truncate text-sm font-medium">{DOMAIN}/{url.shorturl}</span>
+                      <div className={`p-2 rounded-md ${selectedId === item.id ? "bg-white/20" : "bg-neutral-800"}`}>
+                        <HugeiconsIcon icon={analyticsType === "links" ? Link04Icon : File02Icon} size={14} />
                       </div>
+                      <span className="truncate text-sm font-medium">
+                        {analyticsType === "links" ? `${DOMAIN}/${item.shorturl}` : (item.name || "Untitled Batch")}
+                      </span>
                     </div>
                   </button>
                 ))}
               </div>
             </aside>
 
-            <main className={`flex-1 overflow-y-auto bg-[#141414] ${!selectedLink ? 'hidden md:block' : 'block'}`}>
-              {!selectedLink ? (
+            <main className={`flex-1 overflow-y-auto bg-[#141414] ${!selectedId ? 'hidden md:block' : 'block'}`}>
+              {!selectedId ? (
                 <div className="h-full flex flex-col items-center justify-center text-neutral-600">
                   <HugeiconsIcon icon={AnalyticsUpIcon} size={40} />
-                  <p className="text-sm mt-4">Click a link on the left to see performance</p>
+                  <p className="text-sm mt-4 italic">Select a {analyticsType === "links" ? "link" : "batch"} to begin</p>
                 </div>
               ) : (
                 <div className="p-6 md:p-10 max-w-[1400px] mx-auto space-y-8 md:space-y-10">
                   <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div className="flex flex-col items-start gap-2">
-                      <button 
-                        onClick={handleBackToList}
-                        className="md:hidden flex items-center gap-2 text-sm text-neutral-400 hover:text-white transition-colors"
-                      >
-                        <ChevronLeft className="w-4 h-4" />
-                        Back
+                    <div className="flex flex-col items-start gap-4">
+                      <button onClick={() => setSelectedId(null)} className="md:hidden flex items-center gap-2 text-sm text-neutral-400">
+                        <ChevronLeft className="w-4 h-4" /> Back
                       </button>
-                      <h1 className="text-3xl md:text-4xl font-three tracking-tight cursor-pointer">Link Analytics</h1>
+                      
+                      {/* --- USING SEPARATED DROPDOWN --- */}
+                      <AnalyticsTypeToggle value={analyticsType} onChange={handleTypeChange} />
                     </div>
                     <AnalyticsDropDown days={days} setDays={setDays} />
                   </header>
 
-                  <section className="relative rounded-xl border border-neutral-800 bg-[#0a0a0a] overflow-hidden">
+                  <section className="relative rounded-xl border border-neutral-800 bg-[#0a0a0a] overflow-hidden shadow-2xl">
                     {fetchingStats && (
                       <div className="absolute inset-0 z-50 bg-black/40 backdrop-blur-[2px] flex items-center justify-center">
                         <Loader2 className="animate-spin text-blue-500" />
@@ -258,11 +244,9 @@ export default function AnalyticsPage() {
                     <PremiumBlock isFree={isFree}>
                       <LocationAnalytics data={analyticsData?.countries} days={days} />
                     </PremiumBlock>
-
                     <PremiumBlock isFree={isFree}>
                       <BrowserAnalytics data={analyticsData?.browsers} days={days} />
                     </PremiumBlock>
-
                     <PremiumBlock isFree={isFree}>
                       <DeviceAnalytics data={analyticsData?.devices} days={days} />
                     </PremiumBlock>
@@ -272,7 +256,6 @@ export default function AnalyticsPage() {
                     <PremiumBlock isFree={isFree}>
                       <OSAnalytics data={analyticsData?.os} days={days} />
                     </PremiumBlock>
-
                     <PremiumBlock isFree={isFree}>
                       <ReferrerAnalytics data={analyticsData?.referrers} days={days} />
                     </PremiumBlock>

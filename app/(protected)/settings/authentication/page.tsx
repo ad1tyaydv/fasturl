@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 import { Loader2, X, AlertTriangle, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ViewIcon, ViewOffSlashIcon } from "@hugeicons/core-free-icons";
 
 // --- Sub-components ---
 
@@ -128,6 +130,7 @@ export default function AuthenticationPage() {
   const [toast, setToast] = useState<string | null>(null);
   const [otpError, setOtpError] = useState("");
 
+
   const handleUpdatePassword = async () => {
     if (!currentPassword || !newPassword || !confirmPassword) {
       setToast("Please fill all fields");
@@ -137,22 +140,27 @@ export default function AuthenticationPage() {
       setToast("Passwords do not match");
       return;
     }
+
     setLoadingPassword(true);
     try {
       await axios.post("/api/auth/update/resetPassword", { currentPassword, newPassword });
       setToast("Password updated successfully");
       setCurrentPassword(""); setNewPassword(""); setConfirmPassword("");
+
     } catch (err: any) {
       setToast(err?.response?.data?.message || "Failed to update password");
+
     } finally {
       setLoadingPassword(false);
     }
   };
 
+
   const handleLogout = async () => {
     await axios.post("/api/auth/logout");
-    router.push("/auth/signin");
+    router.push("/");
   };
+
 
   const handleDeleteAccount = async () => {
     if (deleteConfirmation === "delete my account") {
@@ -160,16 +168,20 @@ export default function AuthenticationPage() {
       try {
         await axios.post("/api/auth/deleteAccount");
         await handleLogout();
+
       } catch (error) {
         console.error("Error deleting account", error);
+        
       } finally {
         setLoadingDelete(false);
       }
     }
   };
 
+
   const handleForgotPassword = async () => {
     setSendingOtp(true);
+
     try {
       const res = await axios.post("/api/auth/OTP/sendOTP");
       const email = res.data?.email || "your email";
@@ -177,47 +189,57 @@ export default function AuthenticationPage() {
       setOtp(Array(6).fill(""));
       setOtpError("");
       setOtpModalOpen(true);
+
     } catch (err) {
-      console.error(err);
+      console.error("Error while sending OTP");
+
     } finally {
       setSendingOtp(false);
     }
   };
 
+
   const handleVerifyOtp = async () => {
     const code = otp.join("");
     if (code.length < 6) return;
     setOtpLoading(true);
+
     try {
       await axios.post("/api/auth/OTP/verifyOTP", { otp: code });
       setOtpModalOpen(false);
       setResetModalOpen(true);
+
     } catch (err: any) {
       setOtpError(err?.response?.data?.message || "Invalid OTP.");
+
     } finally {
       setOtpLoading(false);
     }
   };
 
+
   const handleResetPassword = async () => {
     if (!resetNew || resetNew !== resetConfirm) return;
     setResetLoading(true);
+
     try {
       await axios.post("/api/auth/update/otpPassword", { password: resetNew });
       setResetModalOpen(false);
       setToast("Password updated successfully.");
+
     } catch (err) {
-      console.error(err);
+      console.error("Error resetting password with OTP");
+
     } finally {
       setResetLoading(false);
     }
   };
 
+
   return (
     <div className="animate-in fade-in duration-300 font-one">
       {toast && <Toast message={toast} onClose={() => setToast(null)} />}
 
-      {/* OTP Modal */}
       {otpModalOpen && (
         <Modal onClose={() => setOtpModalOpen(false)}>
           <h3 className="text-xl font-bold text-neutral-100 mb-1">Verify OTP</h3>
@@ -234,7 +256,6 @@ export default function AuthenticationPage() {
         </Modal>
       )}
 
-      {/* Reset Password Modal */}
       {resetModalOpen && (
         <Modal onClose={() => setResetModalOpen(false)}>
           <h3 className="text-xl font-bold text-neutral-100 mb-6">Reset Password</h3>
@@ -253,7 +274,7 @@ export default function AuthenticationPage() {
                     className="w-full bg-[#111] border border-neutral-800 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-[#1D9BF0]"
                   />
                   <button onClick={() => f.setShow(!f.show)} className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500">
-                    {f.show ? <IoEyeOffOutline /> : <IoEyeOutline />}
+                    {f.show ? <HugeiconsIcon icon={ViewIcon} /> : <HugeiconsIcon icon={ViewIcon} />}
                   </button>
                 </div>
               </div>
@@ -269,7 +290,6 @@ export default function AuthenticationPage() {
         </Modal>
       )}
 
-      {/* Update Password Main Section */}
       <div className="mb-12">
         <h2 className="text-2xl font-bold text-neutral-200 mb-8">Update Password</h2>
         <div className="space-y-5 max-w-2xl">
@@ -289,9 +309,9 @@ export default function AuthenticationPage() {
                 />
                 <button
                   type="button" onClick={() => field.setShow(!field.show)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-white transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-white transition-colors cursor-pointer"
                 >
-                  {field.show ? <IoEyeOffOutline size={18} /> : <IoEyeOutline size={18} />}
+                  {field.show ? <HugeiconsIcon icon={ViewOffSlashIcon} /> : <HugeiconsIcon icon={ViewIcon} />}
                 </button>
               </div>
             </div>
@@ -322,7 +342,6 @@ export default function AuthenticationPage() {
 
       <div className="w-full h-px bg-neutral-800/50 my-12 max-w-2xl" />
 
-      {/* Danger Zone Section */}
       <div className="pt-2">
         <h2 className="text-2xl font-bold text-neutral-200 mb-4">Danger Zone</h2>
         <p className="text-neutral-400 mb-8 max-w-2xl text-sm leading-relaxed">
@@ -333,9 +352,9 @@ export default function AuthenticationPage() {
           <Button
             variant="outline"
             onClick={() => setIsDeleting(true)}
-            className="flex items-center gap-2 border-neutral-800 text-red-500 hover:bg-red-500/10 hover:border-red-500/50 font-bold px-6 py-2.5 rounded-lg transition-all cursor-pointer"
+            className="flex items-center gap-2 bg-red-500 text-white hover:bg-red-700 hover:text-white font-bold px-5 py-5 rounded-lg transition-all cursor-pointer"
           >
-            <Trash2 size={16} />
+            <Trash2 />
             Delete Account
           </Button>
         ) : (
@@ -360,14 +379,14 @@ export default function AuthenticationPage() {
                 variant="destructive"
                 onClick={handleDeleteAccount}
                 disabled={deleteConfirmation !== "delete my account" || loadingDelete}
-                className="flex-1 sm:flex-none font-bold px-8 py-2.5 cursor-pointer"
+                className="flex-1 sm:flex-none font-bold bg-red-500 text-white hover:bg-red-700 hover:text-white  px-5 py-5 cursor-pointer"
               >
                 {loadingDelete ? <Loader2 className="animate-spin mx-auto" /> : "Confirm Delete"}
               </Button>
               <Button
                 variant="outline"
                 onClick={() => { setIsDeleting(false); setDeleteConfirmation(""); }}
-                className="flex-1 sm:flex-none bg-transparent border-neutral-700 text-neutral-400 hover:bg-neutral-800 font-bold cursor-pointer px-6"
+                className="flex-1 sm:flex-none bg-transparent border-neutral-700 text-neutral-400 hover:bg-neutral-400 font-bold cursor-pointer px-5 py-5"
               >
                 Cancel
               </Button>

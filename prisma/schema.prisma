@@ -72,10 +72,10 @@ model Link {
   clickLogs Click[]
 
   bulkLinksId String?
-  bulk        BulkLinks? @relation(fields: [bulkLinksId], references: [id])
+  bulk        BulkLinks? @relation(fields: [bulkLinksId], references: [id], onDelete: Cascade)
 
   apiLinkId String?
-  apiLink   Api_key? @relation(fields: [apiLinkId], references: [id])
+  apiLink   Api_key? @relation(fields: [apiLinkId], references: [id], onDelete: Cascade)
 
   checkBulk Boolean @default(false)
   api_link  Boolean @default(false)
@@ -98,10 +98,10 @@ model Click {
   id String @id @default(uuid())
 
   linkId String
-  link   Link   @relation(fields: [linkId], references: [id])
+  link   Link   @relation(fields: [linkId], references: [id], onDelete: Cascade)
 
   qrId String?
-  qr   Qr?     @relation(fields: [qrId], references: [id])
+  qr   Qr?     @relation(fields: [qrId], references: [id], onDelete: Cascade)
 
   ip      String
   country String?
@@ -171,7 +171,7 @@ model CustomDomain {
   isActive Boolean @default(false)
 
   userId String
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
 
@@ -192,7 +192,7 @@ model Api_key {
   isActive Boolean @default(true)
 
   userId String
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   apiLinks Link[]
   apiLogs  ApiLog[]
@@ -215,7 +215,7 @@ model ApiLog {
   device    String?
 
   apiKeyId String
-  apiKey   Api_key @relation(fields: [apiKeyId], references: [id])
+  apiKey   Api_key @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
 
@@ -242,7 +242,7 @@ model Subscription {
   id              String   @id @default(uuid())
 
   userId          String
-  user            User     @relation(fields: [userId], references: [id])
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   plan            String
   status          String
@@ -263,7 +263,7 @@ model Payment {
   id            String   @id @default(uuid())
 
   userId        String
-  user          User     @relation(fields: [userId], references: [id])
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   paymentId     String   @unique
   subscriptionId String?

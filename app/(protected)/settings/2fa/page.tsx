@@ -3,9 +3,17 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Loader2, ArrowLeft, X, ShieldCheck } from "lucide-react";
-import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import axios from "axios";
+
+// Shadcn Input OTP Components
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSeparator,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
+import React from "react";
 
 export default function TwoFactorPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -18,7 +26,6 @@ export default function TwoFactorPage() {
   const [isEnabled, setIsEnabled] = useState(false);
   const [loading, setloading] = useState(false);
 
-
   useEffect(() => {
     if (isModalOpen) {
       fetchQrCode();
@@ -27,14 +34,11 @@ export default function TwoFactorPage() {
       setOtp("");
       setError(null);
     }
-
   }, [isModalOpen]);
-
 
   useEffect(() => {
     const check2fa = async () => {
       setloading(true);
-
       try {
         const res = await axios.get("/api/auth/me");
         setIsEnabled(res.data.twofactorEnabled);
@@ -82,13 +86,12 @@ export default function TwoFactorPage() {
       toast.success("Two-factor authentication enabled successfully.");
 
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Verification failed");
+      setError("Verification failed. Check your code.");
 
     } finally {
       setIsVerifying(false);
     }
   };
-
 
   const handleDisable = async () => {
     try {
@@ -154,10 +157,9 @@ export default function TwoFactorPage() {
           onClick={() => setIsModalOpen(false)}
         >
           <div
-            className="relative z-50 w-full max-w-lg bg-[#141414] border border-neutral-800 p-6 sm:p-10 rounded-2xl shadow-2xl animate-in zoom-in-95"
+            className="relative z-50 w-full max-w-lg bg-[#0F0F0F] border border-zinc-800 p-6 sm:p-10 rounded-2xl shadow-2xl animate-in zoom-in-95"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Modal Header */}
             <div className="flex items-center justify-between mb-6">
               <button 
                 onClick={() => setIsModalOpen(false)}
@@ -178,66 +180,66 @@ export default function TwoFactorPage() {
             </div>
 
             <div className="text-center sm:text-left mb-8">
-              <h3 className="text-white text-xl font-bold mb-2 sm:hidden">Enable 2FA</h3>
               <p className="text-neutral-400 text-sm leading-relaxed">
-                Scan the QR code with your authenticator app, then enter the 6-digit code.
+                Scan this QR code with Google Authenticator or Authy, then enter the code below.
               </p>
             </div>
 
-            <div className="flex justify-center mb-8">
+            <div className="flex justify-center mb-10">
               {isLoading ? (
-                <div className="w-52 h-52 bg-neutral-900 border border-neutral-800 flex items-center justify-center rounded-xl">
+                <div className="w-48 h-48 sm:w-52 sm:h-52 bg-zinc-900 border border-zinc-800 flex items-center justify-center rounded-2xl">
                   <Loader2 className="w-8 h-8 animate-spin text-[#1D9BF0]" />
                 </div>
               ) : qrCode ? (
-                <div className="bg-white p-2 rounded-xl">
+                <div className="bg-white p-3 rounded-2xl shadow-xl shadow-white/5">
                    <img
                     src={qrCode}
                     alt="2FA QR Code"
-                    className="w-48 h-48 sm:w-52 sm:h-52"
+                    className="w-44 h-44 sm:w-48 sm:h-48"
                   />
                 </div>
               ) : null}
             </div>
 
             {error && (
-              <div className="bg-red-500/10 border border-red-500/20 text-red-500 px-4 py-3 text-sm mb-6 rounded-lg text-center">
+              <div className="bg-red-500/10 border border-red-500/20 text-red-500 px-4 py-3 text-sm mb-6 rounded-lg text-center font-medium">
                 {error}
               </div>
             )}
 
-            <div className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold text-neutral-500 uppercase tracking-widest mb-3 text-center sm:text-left">
-                  Verification Code
+            <div className="space-y-8">
+              <div className="flex flex-col items-center">
+                <label className="block text-[11px] font-bold text-neutral-500 uppercase tracking-widest mb-4">
+                  6-Digit Verification Code
                 </label>
-                <Input
-                  type="text"
-                  inputMode="numeric"
-                  placeholder="000 000"
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
-                  onKeyDown={(e) => e.key === "Enter" && handleVerify()}
-                  maxLength={6}
+                
+                <InputOTP 
+                  maxLength={6} 
+                  value={otp} 
+                  onChange={(val) => setOtp(val)}
                   disabled={isVerifying}
-                  className="h-14 text-center text-3xl font-mono font-bold bg-neutral-900 border-neutral-800 text-white placeholder-neutral-800 rounded-xl focus:border-[#1D9BF0] transition-all"
-                />
+                >
+                  <InputOTPGroup className="gap-2 sm:gap-3">
+                    {[...Array(6)].map((_, i) => (
+                      <React.Fragment key={i}>
+                        <InputOTPSlot 
+                          index={i} 
+                          className="w-12 h-14 sm:w-14 sm:h-16 rounded-xl border-zinc-800 bg-zinc-900/50 text-2xl font-bold focus:border-[#1D9BF0] focus:ring-4 focus:ring-[#1D9BF0]/10 transition-all text-white" 
+                        />
+                        {i === 2 && <InputOTPSeparator className="text-zinc-700 mx-1" />}
+                      </React.Fragment>
+                    ))}
+                  </InputOTPGroup>
+                </InputOTP>
               </div>
 
               <Button
                 onClick={handleVerify}
                 disabled={isVerifying || otp.length < 6}
-                className="bg-[#1D9BF0] hover:bg-blue-600 text-white font-bold w-full py-7 text-lg rounded-xl transition-all shadow-lg shadow-blue-500/10 cursor-pointer"
+                className="bg-[#1D9BF0] hover:bg-blue-600 text-white font-bold w-full py-7 text-lg rounded-xl transition-all shadow-lg shadow-blue-500/10 cursor-pointer "
               >
-                {isVerifying ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : "Confirm & Enable"}
+                {isVerifying ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : "Verify & Enable"}
               </Button>
-              
-              <button 
-                onClick={() => setIsModalOpen(false)}
-                className="w-full text-neutral-500 font-bold text-sm py-2 sm:hidden hover:text-white transition-colors cursor-pointer"
-              >
-                Cancel Setup
-              </button>
             </div>
           </div>
         </div>
