@@ -15,6 +15,7 @@ import {
   Zap,
   FileText,
   Settings,
+  Bell,
   LucideIcon,
 } from "lucide-react";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -112,6 +113,13 @@ export default function Navbar() {
             </div>
           ) : user ? (
             <>
+              <Link
+                href="/notification"
+                className="p-2 hover:bg-[#222222] rounded-full transition-colors"
+              >
+                <Bell className="w-6 h-6 text-neutral-400 hover:text-white" />
+              </Link>
+
               <Link
                 href="/premium"
                 className={`hidden sm:block border font-three px-5 py-2 rounded-lg font-bold text-xs uppercase transition-all duration-500 shadow-sm
@@ -225,6 +233,23 @@ export default function Navbar() {
                 </Link>
               );
             })}
+            
+            {user && (
+              <Link
+                href="/notification"
+                onClick={() => setIsSidebarOpen(false)}
+                className={`flex items-center gap-4 px-5 py-4 rounded-xl font-three font-medium text-lg transition-all ${pathname === "/notification"
+                  ? "bg-[#1D9BF0] text-white shadow-lg shadow-[#1D9BF0]/20"
+                  : "text-neutral-400 hover:bg-[#1e1e1e] hover:text-white"
+                  }`}
+              >
+                <Bell
+                  className={`w-5 h-5 ${pathname === "/notification" ? "text-white" : "text-neutral-500"
+                    }`}
+                />
+                Notifications
+              </Link>
+            )}
           </div>
 
           {user ? (

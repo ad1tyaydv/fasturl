@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import ReactCountryFlag from "react-country-flag"
 import { HugeiconsIcon } from '@hugeicons/react'
 import { EarthIcon } from '@hugeicons/core-free-icons'
-import { IoCloseOutline } from "react-icons/io5"
+import { X } from "lucide-react"
 
 const getCountryFlag = (country: string): string | null => {
   const map: Record<string, string> = {
@@ -118,62 +118,77 @@ export default function LocationAnalytics({ data = [], days = 7 }: CountryAnalyt
 
       {showModal && (
         <div
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4"
-          style={{ backgroundColor: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }}
+          className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
           onClick={() => setShowModal(false)}
         >
           <div
-            className="bg-[#1a1a1a] border border-neutral-800 rounded-2xl w-full max-w-md shadow-2xl"
+            className="bg-[#1c1c1c] border border-neutral-800 rounded-3xl w-full max-w-xl shadow-2xl relative overflow-hidden animate-in fade-in zoom-in duration-200"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between px-6 pt-5 pb-4 border-b border-neutral-800">
-              <h2 className="text-sm font-semibold uppercase tracking-widest text-white font-three">
-                Countries
+            <button 
+              onClick={() => setShowModal(false)}
+              className="absolute right-6 top-6 text-neutral-500 hover:text-white transition-colors cursor-pointer z-10"
+            >
+              <X size={24} />
+            </button>
+
+            <div className="px-8 pt-8 pb-6">
+              <h2 className="text-2xl font-one font-bold text-white mb-1">
+                Locations
               </h2>
-              <div className="flex gap-6 text-xs uppercase tracking-widest text-neutral-500 font-three">
+              <p className="text-neutral-500 text-xs font-three uppercase tracking-widest">
+                Full breakdown of visitor locations
+              </p>
+            </div>
+
+            <div className="px-8 py-4 border-y border-neutral-800/50 flex justify-between text-[11px] font-bold uppercase tracking-widest text-neutral-500 font-three">
+              <span>Country</span>
+              <div className="flex gap-10">
                 <span>Visitors</span>
-                <span>%</span>
+                <span className="w-10 text-right">%</span>
               </div>
             </div>
 
-            <div className="px-6 py-4 flex flex-col gap-1 max-h-[380px] overflow-y-auto">
-              {sortedData.length > 0 ? (
-                sortedData.map((item, index) => {
-                  const pct = total > 0 ? Math.round((item.count / total) * 100) : 0
-                  return (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between py-2.5 px-3 rounded-lg hover:bg-white/5 transition-colors"
-                    >
-                      <div className="flex items-center gap-3 flex-1">
-                        <div className="w-7 h-7 flex items-center justify-center bg-neutral-900 rounded-md flex-shrink-0">
-                          <FlagIcon country={item.country} />
-                        </div>
-                        <span className="text-sm text-neutral-300">{item.country}</span>
+            <div className="px-4 py-2 flex flex-col gap-1 max-h-[450px] overflow-y-auto custom-scrollbar">
+              {sortedData.map((item, index) => {
+                const pct = total > 0 ? Math.round((item.count / total) * 100) : 0
+                return (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between py-3 px-4 rounded-2xl hover:bg-white/5 transition-colors group"
+                  >
+                    <div className="flex items-center gap-4 flex-1">
+                      <div className="w-8 h-8 flex items-center justify-center bg-neutral-900 rounded-lg flex-shrink-0">
+                        <FlagIcon country={item.country} />
                       </div>
-                      <div className="flex items-center gap-6 text-sm tabular-nums">
-                        <span className="text-white font-bold">{item.count.toLocaleString()}</span>
-                        <span className="text-neutral-500 w-10 text-right">{pct}%</span>
-                      </div>
+                      <span className="text-sm font-medium text-neutral-300 group-hover:text-white transition-colors">{item.country}</span>
                     </div>
-                  )
-                })
-              ) : (
-                <div className="py-12 text-center text-sm text-neutral-600 italic">
-                  No data found
-                </div>
-              )}
+                    <div className="flex items-center gap-10 text-sm tabular-nums font-three">
+                      <span className="text-white font-bold">{item.count.toLocaleString()}</span>
+                      <span className="text-neutral-500 w-10 text-right">{pct}%</span>
+                    </div>
+                  </div>
+                )
+              })}
             </div>
 
-            <div className="px-6 pb-5 pt-3 border-t border-neutral-800">
-              <button
-                onClick={() => setShowModal(false)}
-                className="w-full py-2.5 text-sm font-semibold text-neutral-400 hover:text-white hover:bg-white/5 rounded-xl transition-all border border-neutral-800 cursor-pointer"
-              >
-                Close
-              </button>
+            <div className="p-6 bg-neutral-900/30 border-t border-neutral-800 flex justify-between items-center text-[11px] text-neutral-500 font-three uppercase tracking-widest">
+               <span>Total Analytics</span>
+               <span className="text-white font-bold">{total.toLocaleString()} visitors</span>
             </div>
           </div>
+          <style jsx global>{`
+            .custom-scrollbar::-webkit-scrollbar {
+              width: 4px;
+            }
+            .custom-scrollbar::-webkit-scrollbar-track {
+              background: transparent;
+            }
+            .custom-scrollbar::-webkit-scrollbar-thumb {
+              background: #262626;
+              border-radius: 10px;
+            }
+          `}</style>
         </div>
       )}
     </>
