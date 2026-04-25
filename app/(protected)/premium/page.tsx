@@ -4,7 +4,7 @@ import Navbar from "@/app/components/navbar";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Sparkles, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 
 type CellValue = true | false | string;
@@ -227,7 +227,6 @@ export default function Premium() {
       <div className="min-h-screen bg-[#141414] flex flex-col items-center justify-center gap-4">
         <div className="relative">
             <div className="w-12 h-12 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin" />
-            <Sparkles className="w-4 h-4 text-blue-400 absolute -top-2 -right-2 animate-pulse" />
         </div>
         <p className="text-neutral-500 text-sm font-medium tracking-wide">Syncing your account...</p>
       </div>

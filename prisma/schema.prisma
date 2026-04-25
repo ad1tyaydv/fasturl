@@ -225,7 +225,6 @@ model ApiLog {
 
 model OTP {
   id     String  @id @default(uuid())
-  userId String
   email  String?
 
   otp String

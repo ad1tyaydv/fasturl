@@ -17,6 +17,7 @@ import {
   FingerPrintIcon,
 } from "@hugeicons/core-free-icons";
 
+
 export default function Login() {
   const router = useRouter();
   const { refreshUser } = useUser();
@@ -31,6 +32,7 @@ export default function Login() {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [verifying2FA, setVerifying2FA] = useState(false);
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -57,10 +59,12 @@ export default function Login() {
         toast.success("Welcome back!", { id: loginToast });
         router.push("/");
       }
+
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Login failed!", {
         id: loginToast,
       });
+
     } finally {
       setLoading(false);
     }
@@ -83,6 +87,7 @@ export default function Login() {
     const newOtp = [...otp];
     if (!otp[index] && index > 0) {
       otpRefs.current[index - 1]?.focus();
+
     } else {
       newOtp[index] = "";
       setOtp(newOtp);
@@ -110,12 +115,14 @@ export default function Login() {
         toast.success("Access granted", { id: verifyToast });
         router.push("/");
       }
+
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Invalid OTP", {
         id: verifyToast,
       });
       setOtp(["", "", "", "", "", ""]);
       otpRefs.current[0]?.focus();
+      
     } finally {
       setVerifying2FA(false);
     }
@@ -151,7 +158,7 @@ export default function Login() {
           >
             <h1 className="text-6xl lg:text-7xl font-extrabold text-white leading-[1.05] mb-10">
               Welcome back <br /> 
-              <span className="text-[#F07D51]">to your workspace.</span>
+              <span className="text-[#83c5be]">to your workspace.</span>
             </h1>
             <p className="text-zinc-400 text-xl lg:text-2xl leading-relaxed max-w-md">
                 Everything is ready for you. Log in to manage your links and view your analytics.
@@ -162,12 +169,12 @@ export default function Login() {
         <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-[#F07D51]/10 rounded-full blur-[120px] opacity-30 pointer-events-none" />
       </div>
 
-      <div className="w-full lg:w-1/2 p-8 lg:p-20 flex flex-col justify-center bg-[#0A0A0A] min-h-screen relative">
+      <div className="w-full lg:w-1/2 p-8 lg:p-20 flex flex-col justify-center bg-[#0F0F0F] min-h-screen relative">
         
         {show2FA && (
           <button
             onClick={() => setShow2FA(false)}
-            className="absolute top-10 left-10 lg:top-20 lg:left-20 flex items-center gap-2 text-zinc-500 hover:text-[#F07D51] transition-all cursor-pointer group z-20"
+            className="absolute top-10 left-10 lg:top-20 lg:left-20 flex items-center gap-2 text-zinc-500 hover:text-[#2a9d8f] transition-all cursor-pointer group z-20"
           >
             <HugeiconsIcon icon={ArrowLeft01Icon} className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
             <span className="text-sm font-bold uppercase tracking-widest">Go Back</span>
@@ -188,7 +195,7 @@ export default function Login() {
                   New here?{" "}
                   <button
                     onClick={() => router.push("/auth/signup")}
-                    className="text-[#F07D51] font-bold hover:text-[#ff8e66] cursor-pointer transition-all"
+                    className="text-[#83c5be] font-bold hover:text-[#2a9d8f] cursor-pointer transition-all"
                   >
                     Create an account
                   </button>
@@ -204,7 +211,7 @@ export default function Login() {
                     placeholder="name@company.com"
                     value={formData.email}
                     onChange={handleChange}
-                    className="w-full px-6 py-4 rounded-2xl border border-zinc-800 bg-zinc-900/50 focus:bg-zinc-900 focus:border-[#F07D51] focus:ring-4 focus:ring-[#F07D51]/10 outline-none transition-all placeholder:text-zinc-600 text-lg text-white"
+                    className="w-full px-6 py-4 rounded-2xl border border-zinc-800 bg-zinc-900/50 focus:bg-zinc-900 focus:border-[#83c5be] focus:ring-4 focus:ring-[#83c5be]/10 outline-none transition-all placeholder:text-zinc-600 text-lg text-white"
                     required
                   />
                 </div>
@@ -218,13 +225,13 @@ export default function Login() {
                       placeholder="••••••••"
                       value={formData.password}
                       onChange={handleChange}
-                      className="w-full px-6 py-4 rounded-2xl border border-zinc-800 bg-zinc-900/50 focus:bg-zinc-900 focus:border-[#F07D51] focus:ring-4 focus:ring-[#F07D51]/10 outline-none transition-all placeholder:text-zinc-600 text-lg text-white"
+                      className="w-full px-6 py-4 rounded-2xl border border-zinc-800 bg-zinc-900/50 focus:bg-zinc-900 focus:border-[#83c5be] focus:ring-4 focus:ring-[#83c5be]/10 outline-none transition-all placeholder:text-zinc-600 text-lg text-white"
                       required
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-6 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-[#F07D51] cursor-pointer transition-colors"
+                      className="absolute right-6 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-[#83c5be] cursor-pointer transition-colors"
                     >
                       {showPassword ? <HugeiconsIcon icon={ViewOffSlashIcon} size={22} /> : <HugeiconsIcon icon={ViewIcon} size={22} />}
                     </button>
@@ -234,7 +241,7 @@ export default function Login() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-5 rounded-2xl bg-[#F07D51] text-white font-bold text-xl transition-all hover:bg-[#e06d41] hover:shadow-[0_0_30px_rgba(240,125,81,0.3)] active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3 mt-4 cursor-pointer"
+                  className="w-full py-5 rounded-2xl bg-white text-black font-bold text-xl transition-all hover:bg-[#83c5be] hover:shadow-[0_0_30px_rgba(131,197,190,0.3)] active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3 mt-4 cursor-pointer"
                 >
                   {loading ? (
                     <HugeiconsIcon icon={Loading02Icon} className="w-7 h-7 animate-spin" />
@@ -247,7 +254,7 @@ export default function Login() {
                 </button>
               </form>
 
-              <div className="relative flex items-center justify-center my-10">
+              {/* <div className="relative flex items-center justify-center my-10">
                 <div className="w-full border-t border-zinc-800"></div>
                 <span className="absolute bg-[#0A0A0A] px-6 text-[11px] text-zinc-500 font-bold uppercase tracking-[0.3em]">or</span>
               </div>
@@ -258,7 +265,7 @@ export default function Login() {
               >
                 <FcGoogle size={24} className="group-hover:scale-110 transition-transform" />
                 Continue with Google
-              </button>
+              </button> */}
             </>
           ) : (
             <div className="flex flex-col items-center text-center">

@@ -30,9 +30,9 @@ export async function POST(req: NextRequest) {
 
     await prisma.oTP.create({
       data: {
-        userId: decoded.userId,
         email: decoded.email,
         otp: otp,
+        reason: "password reset",
         expiresAt: new Date(Date.now() + 10 * 60 * 1000),
       },
     });

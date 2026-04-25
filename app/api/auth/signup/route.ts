@@ -1,22 +1,20 @@
 import { prisma } from "@/lib/dbConfig";
 import { NextRequest, NextResponse } from "next/server";
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
+import { Resend } from "resend";
 
 
-const NEXTAUTH_SECRET = process.env.NEXTAUTH_SECRET!;
+const resend = new Resend(process.env.RESEND_API_KEY!);
 
 export async function POST(req: NextRequest) {
 
     try {
-        const now = new Date();
 
         const data = await req.json();
 
-        if (!data.email || !data.password || !data.userName) {
+        if (!data.email) {
             return NextResponse.json(
-                {message: "All fields are required"},
-                {status: 400});
+                { message: "All fields are required" },
+                { status: 400 });
         }
 
         const findUser = await prisma.user.findUnique({
@@ -25,67 +23,50 @@ export async function POST(req: NextRequest) {
             }
         })
 
-        if(findUser) {
+        if (findUser) {
             return NextResponse.json(
-                {message: "User already exists!"},
-                {status: 400}
+                { message: "User already exists!" },
+                { status: 400 }
             )
         }
 
-        const hashedPassword = await bcrypt.hash(data.password, 10);
 
-        const userSignup = await prisma.user.create({
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+        await prisma.oTP.create({
             data: {
-                userName: data.userName,
                 email: data.email,
-                password: hashedPassword,
-                plan: "FREE",
-                totalLinks: 100,
-                linksUsed: 0,
-                totalLinksCreated: 0,
-                totalQr: 30,
-                qrUsed :0,
-                totalQrCreated: 0,
-                cycleStart: now,
-                cycleEnd: new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)
-            }
-        })
-
-        const token = jwt.sign(
-            {
-                userId: userSignup.id,
-                username: userSignup.userName,
-                email: data.email,
-                plan: userSignup.plan,
-                planExpiresAt: userSignup.planExpiresAt
+                otp: otp,
+                reason: "signup",
+                expiresAt: new Date(Date.now() + 10 * 60 * 1000),
             },
-            NEXTAUTH_SECRET!,
-            {
-                expiresIn: "365d"
-            }
-        );
+        });
 
-        const response = NextResponse.json(
-            {message: "User signed up successfully"},
+        await resend.emails.send({
+            from: "FastURL <no-reply@fasturl.in>",
+            to: [data.email],
+            subject: "Password Reset OTP",
+            html: `
+        <div style="font-family: Arial; padding:20px;">
+          <h2>Thanks for using fasturl</h2>
+          <p>Your OTP is:</p>
+          <h1 style="letter-spacing:6px;">${otp}</h1>
+          <p>This OTP expires in 10 minutes.</p>
+        </div>
+      `,
+        });
+
+        return NextResponse.json(
+            {message: "Otp is sent to your email"},
             {status: 200}
         )
 
-        response.cookies.set("token", token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
-            path: "/",
-            maxAge: 60 * 60 * 24 * 365,
-        });
-        
 
-        return response;
-        
     } catch (error) {
         console.log(error);
         return NextResponse.json(
-            {message: "Error while signing up!", error},
-            {status: 500}
+            { message: "Error while signing up!", error },
+            { status: 500 }
         )
     }
 }
