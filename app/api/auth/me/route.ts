@@ -47,7 +47,12 @@ export async function GET(req: NextRequest) {
                     select: {
                         links: true,
                         bulkLinks: true,
-                        qr: true
+                        qr: true,
+                        notification: {
+                            where: {
+                                isRead: false
+                            }
+                        }
                     }
                 }
             }
@@ -102,6 +107,7 @@ export async function GET(req: NextRequest) {
             bulkLinks: checkPlan._count.bulkLinks,
             totalQrCodes: checkPlan._count.qr,
             qrUsed: checkPlan.qrUsed,
+            unreadNotifications: checkPlan._count.notification,
             isActive: isActive,
             daysLeft: daysLeft
         });

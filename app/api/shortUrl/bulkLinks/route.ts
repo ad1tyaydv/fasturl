@@ -5,6 +5,7 @@ import shortUrlGenerator from "@/app/helpers/shortUrlGenerator";
 import { prisma } from "@/lib/dbConfig";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
+import { redis } from "@/lib/redis";
 
 
 const NEXT_PUBLIC_BASE_URL = process.env.NEXT_PUBLIC_DOMAIN!
@@ -139,6 +140,8 @@ export async function POST(req: NextRequest) {
                 bulkLinksId: bulkHeader.id,
                 checkBulk: true
             }))
+
+            await redis.del(`fetchBulkLinks:${decoded.userId}`)
 
             const chunks = chunkArray(LinksToInsert, 2000);
             let createdCount = 0;

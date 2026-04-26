@@ -74,6 +74,15 @@ export async function POST(req: NextRequest) {
             }
         })
 
+        await prisma.notification.create({
+            data: {
+                userId: userId,
+                title: "two factor authentication",
+                message: "Your account is now more secure with two factor authentication.",
+                actionUrl: "/"
+            }
+        })
+
         return NextResponse.json(
             {message: "Two factor authentication enabled"},
             {status: 200}

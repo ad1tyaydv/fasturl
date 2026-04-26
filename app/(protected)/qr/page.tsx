@@ -25,18 +25,20 @@ import Footer from "@/app/components/footer";
 import { Button } from "@/components/ui/button";
 
 
+import { useUser } from "@/app/components/userContext";
+
 export default function QRGenerator() {
   const router = useRouter();
   const pricingRef = useRef<HTMLDivElement>(null);
+  const { user, loading: authLoading } = useUser();
 
   const [url, setUrl] = useState("");
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userPlan, setUserPlan] = useState("FREE");
+  const isLoggedIn = !!user;
+  const userPlan = user?.plan || "FREE";
   const [qrsLeft, setQrsLeft] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [showQr, setShowQr] = useState<string | null>(null);
   const [upgradeMsg, setUpgradeMsg] = useState(false);
-  const [authLoading, setAuthLoading] = useState(true);
 
   const [modalConfig, setModalConfig] = useState<{
     show: boolean;
@@ -148,32 +150,21 @@ export default function QRGenerator() {
 
 
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const res = await axios.get("/api/auth/me");
-        const count = await axios.get("/api/qrCode/qrLeft");
-        
-        const authenticated = !!res.data.authenticated;
-        setIsLoggedIn(authenticated);
-        setQrsLeft(count.data.qrLeft);
-        console.log(count.data)
-        console.log(count.data.qrLeft)
-
-        if (authenticated) {
-          setUserPlan(res.data.plan || "FREE");
+    const fetchQrLeft = async () => {
+      if (user) {
+        try {
+          const count = await axios.get("/api/qrCode/qrLeft");
+          setQrsLeft(count.data.qrLeft);
+        } catch (error) {
+          console.error("Error fetching qrLeft", error);
         }
-
-      } catch {
-        setIsLoggedIn(false);
-      }
-      finally {
-        setAuthLoading(false);
+      } else {
+        setQrsLeft(null);
       }
     };
 
-    checkAuth();
-    
-  }, [router]);
+    fetchQrLeft();
+  }, [user]);
 
 
   return (
@@ -331,13 +322,13 @@ export default function QRGenerator() {
 
           {showQr && (
             <div className="mt-10 flex flex-col items-center animate-in fade-in slide-in-from-top-4 duration-500">
-              <div className="bg-white p-6 rounded-3xl shadow-2xl border border-neutral-200 mb-6">
+              <div className="bg-white shadow-2xl border border-neutral-200 mb-6">
                 <img src={showQr} alt="Generated QR Code" className="w-52 h-52 object-contain" />
               </div>
               
               <Button
                 onClick={downloadQr}
-                className="bg-white text-black hover:bg-neutral-200 font-bold px-8 py-6 rounded-2xl text-lg shadow-lg shadow-white/5 transition-all active:scale-95 flex items-center gap-2 cursor-pointer"
+                className="bg-white text-black hover:bg-neutral-200 font-bold px-5 py-5 rounded-xl text-lg shadow-lg shadow-white/5 transition-all active:scale-95 flex items-center gap-2 cursor-pointer"
               >
                 <HugeiconsIcon icon={Download01Icon}/>
                 Download QR Code

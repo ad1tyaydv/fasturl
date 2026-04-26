@@ -164,7 +164,7 @@ export async function POST(req: NextRequest) {
 
     const shortUrl = shortUrlGenerator();
 
-    const urlShort = await prisma.$transaction(async (tx) => {
+    const { urlShort, updatedUser } = await prisma.$transaction(async (tx) => {
       const created = await tx.link.create({
         data: {
           userId,
@@ -176,7 +176,7 @@ export async function POST(req: NextRequest) {
         },
       });
 
-      await tx.user.update({
+      const updated = await tx.user.update({
         where: {
           id: userId
         },
@@ -193,13 +193,70 @@ export async function POST(req: NextRequest) {
       const cacheKey = `links-left:${userId}`;
       await redis.decr(cacheKey);
 
-      return created;
+      return { urlShort: created, updatedUser: updated };
     });
 
     await redis.del(`fetchLinks:${userId}`);
 
+
+    const count = updatedUser?.linksUsed;
+    const totalCount = updatedUser?.totalLinksCreated || 0;
+    const plan = updatedUser?.plan;
+    let milestoneMessage = "Short URL created!";
+
+    if (userId !== ANON_USER_ID) {
+      const milestones = [1, 10, 50, 100, 250, 500, 1000, 2500, 5000, 10000];
+      const freeMilestones = [10, 30, 50, 80, 100];
+
+      if (milestones.includes(totalCount)) {
+        let title = "Link Milestone!";
+        let message = `Congrats! You've created ${totalCount} links with fasturl.`;
+        
+        if (totalCount === 1) {
+          message = "Congrats on creating your first link! Try generating a QR code next.";
+        }
+
+        await prisma.notification.create({
+          data: {
+            userId: userId,
+            title: title,
+            message: message,
+            actionUrl: "/qr"
+          }
+        });
+        milestoneMessage = message;
+      }
+
+      if (plan === "FREE" && freeMilestones.includes(count)) {
+        const linksLeft = 100 - count;
+        let title = "Plan Usage Update";
+        let message = `You've used ${count} links this month. You have ${linksLeft} links left in your free plan.`;
+        
+        if (count === 100) {
+          message = "You've reached your free plan limit for this month. Upgrade to continue creating links.";
+
+        } else if (count >= 80) {
+          message = `Warning: You only have ${linksLeft} links left in your free plan. Upgrade now to avoid interruption.`;
+        }
+
+        await prisma.notification.create({
+          data: {
+            userId: userId,
+            title: title,
+            message: message,
+            actionUrl: "/premium"
+          }
+        });
+        
+        if (count >= 80) milestoneMessage = message;
+      }
+
+    } else {
+      milestoneMessage = "Short URL created! Note: Anonymous links expire soon. Sign up to manage your links.";
+    }
+
     return NextResponse.json({
-      message: "Short URL created!",
+      message: milestoneMessage,
       shortUrl: urlShort!.shorturl,
       original: urlShort!.original,
     });

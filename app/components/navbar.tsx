@@ -115,9 +115,14 @@ export default function Navbar() {
             <>
               <Link
                 href="/notification"
-                className="p-2 hover:bg-[#222222] rounded-full transition-colors"
+                className="p-2 hover:bg-[#222222] rounded-full transition-colors relative group"
               >
-                <Bell className="w-6 h-6 text-neutral-400 hover:text-white" />
+                <Bell className="w-6 h-6 text-neutral-400 group-hover:text-white" />
+                {user?.unreadNotifications > 0 && (
+                  <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-red-500 text-white text-[10px] font-bold flex items-center justify-center rounded-full border-2 border-[#141414]">
+                    {user.unreadNotifications > 9 ? "9+" : user.unreadNotifications}
+                  </span>
+                )}
               </Link>
 
               <Link

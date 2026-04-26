@@ -74,6 +74,15 @@ export async function POST(req: NextRequest) {
             }
         );
 
+        await prisma.notification.create({
+            data: {
+                userId: userSignup.id,
+                title: "signup",
+                message: "Welcome to fasturl, generate shorturl and qr codes for free.",
+                actionUrl: "/"
+            }
+        })
+
         const response = NextResponse.json(
             { message: "User signed up successfully", success: true },
             { status: 200 }

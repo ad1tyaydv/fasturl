@@ -114,7 +114,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    const saveQR = await prisma.$transaction(async (tx) => {
+    const { saveQR, updatedUser } = await prisma.$transaction(async (tx) => {
       const created = await tx.qr.create({
         data: {
           userId,
@@ -125,7 +125,7 @@ export async function POST(req: NextRequest) {
         },
       });
 
-      await tx.user.update({
+      const updated = await tx.user.update({
         where: { id: userId },
         data: {
           qrUsed: {
@@ -137,7 +137,7 @@ export async function POST(req: NextRequest) {
         },
       });
 
-      return created;
+      return { saveQR: created, updatedUser: updated };
     });
 
     const cachedKey = `qrs-left:${userId}`;
@@ -147,8 +147,60 @@ export async function POST(req: NextRequest) {
     }
     await redis.decr(cachedKey);
 
+
+    const qrCount = updatedUser?.qrUsed;
+    const totalCount = updatedUser?.totalQrCreated || 0;
+    const plan = updatedUser?.plan;
+    let milestoneMessage = "QR generated successfully!";
+
+    const milestones = [1, 10, 50, 100, 250, 500, 1000];
+    const freeMilestones = [5, 10, 20, 25, 30];
+
+    if (milestones.includes(totalCount)) {
+      let title = "QR Milestone!";
+      let message = `Congrats! You've created ${totalCount} QR codes with FastURL.`;
+      
+      if (totalCount === 1) {
+        message = "Congrats on creating your first QR code!";
+      }
+
+      await prisma.notification.create({
+        data: {
+          userId: userId,
+          title: title,
+          message: message,
+          actionUrl: "/qr"
+        }
+      });
+      milestoneMessage = message;
+    }
+
+    if (plan === "FREE" && freeMilestones.includes(qrCount)) {
+      const qrLeft = 30 - qrCount;
+      let title = "QR Usage Update";
+      let message = `You've used ${qrCount} QR codes this month. You have ${qrLeft} QR codes left in your free plan.`;
+      
+      if (qrCount === 30) {
+        message = "You've reached your free plan QR limit for this month. Upgrade to continue generating QR codes.";
+
+      } else if (qrCount >= 25) {
+        message = `Warning: You only have ${qrLeft} QR codes left in your free plan. Upgrade now to avoid interruption.`;
+      }
+
+      await prisma.notification.create({
+        data: {
+          userId: userId,
+          title: title,
+          message: message,
+          actionUrl: "/premium"
+        }
+      });
+      
+      if (qrCount >= 25) milestoneMessage = message;
+    }
+
     return NextResponse.json({
-      message: "QR generated successfully!",
+      message: milestoneMessage,
       shortUrl: saveQR.shortUrl,
       original: saveQR.longUrl,
       qrImage: saveQR.qrImage,

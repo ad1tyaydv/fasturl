@@ -55,6 +55,7 @@ model User {
   api_key           Api_key[]
   subscription      Subscription[]
   payment           Payment[]
+  notification      Notification[]
 
   createdAt         DateTime   @default(now())
 }
@@ -282,4 +283,22 @@ model Count {
   linkCount   Int    @default(0)
   qrCount     Int    @default(0)
   totalClicks Int    @default(0)
+}
+
+model Notification {
+  id          String   @id @default(uuid())
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  title       String
+  message     String
+
+  isRead      Boolean  @default(false)
+  readAt      DateTime?
+
+  metadata    Json?
+  actionUrl   String?
+
+  createdAt   DateTime  @default(now())
 }
