@@ -115,7 +115,7 @@ function Section({ section }: { section: ComparisonSection }) {
     <div>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="w-full border-t border-white/10 bg-white/[0.03] hover:bg-white/[0.05] transition-colors"
+        className="w-full border-t border-white/10 bg-white/[0.03] hover:bg-white/[0.05] transition-colors cursor-pointer"
       >
         <div className="px-5 py-3 flex items-center">
           <span className="text-sm font-semibold text-white/80">{section.title}</span>
@@ -265,7 +265,7 @@ export default function Premium() {
             <div className="flex items-center gap-4">
               <button 
                 onClick={() => window.open("mailto:fasturl@tutamail.com")}
-                className="px-5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm font-semibold hover:bg-white/10 transition-all"
+                className="px-5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm font-semibold hover:bg-white/10 transition-all cursor-pointer"
               >
                 Priority Support
               </button>
@@ -304,7 +304,7 @@ export default function Premium() {
                 {!isPro && (
                   <button 
                     onClick={() => handleCheckout("PRO")}
-                    className="w-full py-4 rounded-2xl bg-white text-black font-bold text-sm hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-white/5 flex items-center justify-center gap-2 group/btn"
+                    className="w-full py-4 rounded-2xl bg-white text-black font-bold text-sm hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-white/5 flex items-center justify-center gap-2 group/btn cursor-pointer"
                   >
                     Upgrade to PRO <HugeiconsIcon icon={ArrowRightDoubleIcon} size={18} className="group-hover/btn:translate-x-1 transition-transform" />
                   </button>

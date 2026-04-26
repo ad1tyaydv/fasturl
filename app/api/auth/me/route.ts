@@ -1,9 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { prisma } from "@/lib/dbConfig";
+import { redis } from "@/lib/redis";
 
 
 const JWT_SECRET = process.env.NEXTAUTH_SECRET!;
+
+function add30Days(date: Date) {
+  const d = new Date(date);
+  d.setDate(d.getDate() + 30);
+  return d;
+}
 
 export async function GET(req: NextRequest) {
 
@@ -26,8 +33,76 @@ export async function GET(req: NextRequest) {
             return NextResponse.json({ authenticated: false });
         }
 
-        let currentPlan = "FREE";
-        let isActive = false;
+        const user = await prisma.user.findUnique({
+            where: { id: decoded.userId },
+        });
+
+        if (!user) {
+            return NextResponse.json(
+                { authenticated: false },
+                { status: 401 }
+            );
+        }
+
+        if (user.plan !== "FREE" && user.planExpiresAt && new Date() > new Date(user.planExpiresAt)) {
+            const now = new Date();
+            const cycleEnd = add30Days(now);
+
+            await prisma.user.update({
+                where: { id: user.id },
+                data: {
+                    plan: "FREE",
+                    totalLinks: 100,
+                    totalQr: 30,
+                    billingStatus: null,
+                    linksUsed: 0,
+                    qrUsed: 0,
+                    cycleStart: now,
+                    cycleEnd: cycleEnd,
+                }
+            });
+
+            await prisma.api_key.updateMany({
+                where: {
+                    userId: decoded.userId
+                },
+                data: {
+                    isActive: false
+                }
+            })
+
+            await prisma.notification.create({
+                data: {
+                    userId: user.id,
+                    title: "Plan Expired",
+                    message: "Your plan has expired, upgrade to unlock all the features again.",
+                    actionUrl: "/premium"
+                }
+            });
+
+            await redis.del(`links-left:${decoded.userId}`)
+            await redis.del(`qrs-left:${decoded.userId}`)
+
+            return NextResponse.json({
+                userName: user.userName,
+                email: user.email,
+                authenticated: true,
+                plan: "FREE",
+                planStartedAt: null,
+                planExpiresAt: null,
+                twofactorEnabled: user.twofactorEnabled,
+                totalLinks: 0,
+                linksUsed: 0,
+                image: user.image,
+                bulkLinks: 0,
+                totalQrCodes: 0,
+                qrUsed: 0,
+                unreadNotifications: 1,
+                isActive: false,
+                daysLeft: 0
+            });
+        }
+        
 
         const checkPlan = await prisma.user.findUnique({
             where: {
@@ -65,6 +140,8 @@ export async function GET(req: NextRequest) {
             );
         }
 
+        let currentPlan = "FREE";
+        let isActive = false;
         const expiresAt = checkPlan.planExpiresAt;
 
         if (checkPlan.plan !== "FREE" && expiresAt && new Date(expiresAt) > new Date()) {
