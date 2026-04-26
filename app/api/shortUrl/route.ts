@@ -116,7 +116,8 @@ export async function POST(req: NextRequest) {
           },
           data: {
             cycleStart: cycleStart,
-            cycleEnd: cycleEnd
+            cycleEnd: cycleEnd,
+            linksUsed: 0
           },
         });
       }
@@ -129,7 +130,8 @@ export async function POST(req: NextRequest) {
           where: { id: userId },
           data: {
             cycleStart: cycleStart,
-            cycleEnd: cycleEnd
+            cycleEnd: cycleEnd,
+            linksUsed: 0
           },
         });
       }
@@ -138,17 +140,18 @@ export async function POST(req: NextRequest) {
       if (user.plan === "ESSENTIAL") limit = 10000;
       if (user.plan === "PRO") limit = 40000;
 
-      const count = await prisma.link.count({
+      const count = await prisma.user.findUnique({
         where: {
-          userId,
-          createdAt: {
-            gte: cycleStart,
-            lt: cycleEnd,
-          },
+          id: userId,
         },
+        select: {
+          linksUsed: true
+        }
       });
 
-      if (count >= limit) {
+      const linksUsed = count?.linksUsed || 0;
+
+      if (linksUsed >= limit) {
         return NextResponse.json(
           { message: user.plan === "FREE" ? "Upgrade to continue" : "Plan limit reached" },
           { status: 429 }

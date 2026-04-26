@@ -413,7 +413,16 @@ function AllLinks() {
 
 export default function AllLinksPage() {
   return (
-    <Suspense fallback={<div className="flex flex-col w-full p-10"><LinksSkeleton /></div>}>
+    <Suspense 
+      fallback={
+        <div className="h-screen bg-[#141414] text-white flex flex-col overflow-hidden">
+          <Navbar />
+          <div className="flex flex-col w-full p-10">
+            <LinksSkeleton />
+          </div>
+        </div>
+      }
+    >
       <AllLinks />
     </Suspense>
   );

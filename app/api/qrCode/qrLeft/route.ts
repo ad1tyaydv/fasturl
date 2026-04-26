@@ -6,6 +6,12 @@ import { redis } from "@/lib/redis";
 
 const JWT_SECRET = process.env.NEXTAUTH_SECRET!;
 
+function add30Days(date: Date) {
+  const d = new Date(date);
+  d.setDate(d.getDate() + 30);
+  return d;
+}
+
 export async function GET(req: NextRequest) {
 
     try {
@@ -39,8 +45,10 @@ export async function GET(req: NextRequest) {
             },
             select: {
                 plan: true,
+                cycleStart: true,
+                cycleEnd: true,
+                createdAt: true,
                 planStartedAt: true,
-                planExpiresAt: true
             }
         })
 
@@ -51,36 +59,68 @@ export async function GET(req: NextRequest) {
             )
         }
 
+        const now = new Date();
+        let cycleStart = user.cycleStart;
+        let cycleEnd = user.cycleEnd;
+
+        if (!cycleStart || !cycleEnd) {
+          cycleStart =
+            user.plan === "FREE"
+              ? user.createdAt
+              : user.planStartedAt || new Date();
+
+          cycleEnd = add30Days(cycleStart);
+
+          await prisma.user.update({
+            where: { id: userId },
+            data: { 
+              cycleStart, 
+              cycleEnd,
+              qrUsed: 0
+            },
+          });
+        }
+
+        if (cycleEnd && now > new Date(cycleEnd)) {
+          cycleStart = now;
+          cycleEnd = add30Days(now);
+
+          await prisma.user.update({
+            where: { id: userId },
+            data: { 
+              cycleStart, 
+              cycleEnd,
+              qrUsed: 0
+            },
+          });
+        }
+
         const currentUsageCount = await prisma.qr.count({
             where: {
                 userId: userId,
                 createdAt: {
-                    gte: user.planStartedAt ? new Date(user.planStartedAt) : new Date(0)
+                    gte: cycleStart,
+                    lt: cycleEnd,
                 }
             }
         })
 
         const planLimits: Record<string, number> = {
-            "FREE": 2,
-            "ESSENTIAL": 200,
+            "FREE": 30,
+            "ESSENTIAL": 300,
             "PRO": 2000,
         };
         
-        const limit = planLimits[user.plan] || 20;
+        const limit = planLimits[user.plan] || 30;
 
         let qrLeft = Math.max(0, limit - currentUsageCount);
 
-
-        const expiresAt = user.planExpiresAt 
-                         ? new Date(user.planExpiresAt).getTime()
-                         : Date.now() + 7 * 24 * 60 * 60 * 1000;
-
-        const seconds = Math.floor((expiresAt - Date.now()) / 1000);
+        const seconds = Math.floor((new Date(cycleEnd!).getTime() - Date.now()) / 1000);
         
-        await redis.set(cachedKey, qrLeft);
+        await redis.set(cachedKey, qrLeft, { ex: seconds });
 
         return NextResponse.json(
-            {message: "Links left", qrLeft}
+            {message: "QR left", qrLeft}
         )
         
     } catch (error) {

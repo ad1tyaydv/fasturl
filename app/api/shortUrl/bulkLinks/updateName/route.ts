@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/dbConfig";
+import { redis } from "@/lib/redis";
 import { NextRequest, NextResponse } from "next/server";
 
 
@@ -7,7 +8,7 @@ export async function POST(req: NextRequest) {
     try {
         const data = await req.json();
 
-        await prisma.bulkLinks.update({
+        const linkUpdate = await prisma.bulkLinks.update({
             where: {
                 id: data.linkId,
             },
@@ -15,6 +16,8 @@ export async function POST(req: NextRequest) {
                 name: data.name,
             }
         })
+
+        await redis.del(`fetchBulkLinks:${linkUpdate.userId}`);
 
         return NextResponse.json(
             {message: "Bulk link deleted"},

@@ -66,7 +66,6 @@ export async function POST(req: NextRequest) {
             }
         })
 
-
         return NextResponse.json({
             success: true,
             message: "Api_key generated successfully",

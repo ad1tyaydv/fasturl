@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/dbConfig";
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
+import { redis } from "@/lib/redis";
 
 export async function POST(req: NextRequest) {
   try {
@@ -24,7 +25,7 @@ export async function POST(req: NextRequest) {
     if (data.expiryDate) {
       expiresAt = new Date(data.expiryDate);
     }
-
+    
     await prisma.link.updateMany({
       where: {
         bulkLinksId: data.bulkLinkId,
@@ -36,7 +37,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    await prisma.bulkLinks.update({
+    const linkUpdate = await prisma.bulkLinks.update({
       where: {
         id: data.bulkLinkId,
       },
@@ -45,6 +46,8 @@ export async function POST(req: NextRequest) {
         expiresAt: expiresAt,
       },
     });
+    
+    await redis.del(`fetchBulkLinks:${linkUpdate.userId}`);
 
     return NextResponse.json(
       { message: "Password Protection added" },

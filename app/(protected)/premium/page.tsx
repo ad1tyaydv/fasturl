@@ -47,9 +47,9 @@ const COMPARISON_SECTIONS: ComparisonSection[] = [
     rows: [
       { label: "Bulk create", free: false, essential: true, pro: true },
       { label: "Custom domains", free: false, essential: "4 domains", pro: "10 domains" },
-      { label: "Custom URLs", free: false, essential: false, pro: true },
+      { label: "Custom URLs", free: false, essential: true, pro: true },
       { label: "API access", free: false, essential: false, pro: true },
-      { label: "Security options", free: false, essential: false, pro: true },
+      { label: "Security options", free: false, essential: true, pro: true },
     ],
   },
   {
@@ -226,11 +226,14 @@ export default function Premium() {
 
   if (isInitialLoading) {
     return (
-      <div className="min-h-screen bg-[#141414] flex flex-col items-center justify-center gap-4">
-        <div className="relative">
+      <div className="min-h-screen bg-[#141414] text-white">
+        <Navbar />
+        <div className="flex flex-col items-center justify-center gap-4 h-[calc(100vh-80px)]">
+          <div className="relative">
             <div className="w-12 h-12 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin" />
+          </div>
+          <p className="text-neutral-500 text-sm font-medium tracking-wide">Syncing your account...</p>
         </div>
-        <p className="text-neutral-500 text-sm font-medium tracking-wide">Syncing your account...</p>
       </div>
     );
   }
@@ -271,7 +274,6 @@ export default function Premium() {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             
-            {/* Plan Card */}
             <div className={`lg:col-span-1 rounded-3xl border ${planBorder} ${planBg} p-8 relative overflow-hidden flex flex-col justify-between group`}>
               <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${planColor} opacity-10 blur-3xl -mr-10 -mt-10 group-hover:opacity-20 transition-opacity`} />
               
@@ -315,7 +317,6 @@ export default function Premium() {
               </div>
             </div>
 
-            {/* Usage Content */}
             <div className="lg:col-span-2 space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <UsageStat
@@ -332,7 +333,6 @@ export default function Premium() {
                 />
               </div>
 
-              {/* Features Included */}
               <div className="bg-white/5 border border-white/10 rounded-3xl p-8">
                 <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
                   <HugeiconsIcon icon={Analytics01Icon} size={20} className="text-blue-400" />
@@ -362,7 +362,6 @@ export default function Premium() {
 
           </div>
 
-          {/* Comparison Table Link */}
           <div className="mt-16 text-center">
             <p className="text-white/20 text-sm mb-4">Want to see how your plan stacks up?</p>
             <button 
@@ -411,7 +410,6 @@ export default function Premium() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-16">
-          {/* Free Tier */}
           <div className="rounded-2xl border border-white/10 bg-white/5 p-6 flex flex-col">
             <div className="flex items-center justify-between mb-4">
               <span className="text-xl font-bold text-white/70">Free</span>
@@ -432,7 +430,6 @@ export default function Premium() {
             </button>
           </div>
 
-          {/* Essentials Tier */}
           <div className="rounded-2xl border border-blue-500/30 bg-blue-500/10 p-6 flex flex-col relative scale-105 shadow-2xl shadow-blue-500/10 z-10">
             <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-600 text-white px-4 py-1 rounded-full text-[11px] font-semibold shadow-md whitespace-nowrap">
               ⭐ Recommended
@@ -448,8 +445,15 @@ export default function Premium() {
             <div className="text-xs text-white/30 mb-5">Most popular choice</div>
             <ul className="flex flex-col gap-3 mb-8 flex-1">
               {[
-                "10,000 links/month", "300 QR Codes/month", "Detailed analytics", "Bulk creation",
-                "Custom URLs", "4 custom domains", "24/7 Support"
+                "10,000 links/month",
+                "300 QR Codes/month",
+                "Real-time click analytics",
+                "Bulk url shortener tool",
+                "Custom short links & slugs",
+                "Branded links & Custom domains",
+                "4 custom domains included",
+                "Password protected links",
+                "Link expiration tool",
               ].map((f) => (
                 <li key={f} className="flex items-center gap-2 text-sm text-white/80">
                   <CheckIcon className="w-4 h-4 shrink-0 text-blue-400" />
@@ -466,7 +470,6 @@ export default function Premium() {
             </button>
           </div>
 
-          {/* Pro Tier */}
           <div className="rounded-2xl border border-yellow-500/30 bg-yellow-500/10 p-6 flex flex-col">
             <div className="flex items-center justify-between mb-4">
               <span className="text-xl font-bold text-yellow-400">Pro</span>
@@ -479,8 +482,15 @@ export default function Premium() {
             <div className="text-xs text-white/30 mb-5">For power users</div>
             <ul className="flex flex-col gap-3 mb-8 flex-1">
               {[
-                "40,000 links/month", "2,000 QR Codes/month", "Full analytics", "API access",
-                "10 custom domains", "Priority Support"
+                "40,000 links/month",
+                "2,000 QR Codes/month",
+                "Advanced data analytics",
+                "Batch link shortener access",
+                "Branded short domains",
+                "Link shortening api",
+                "10 custom domains",
+                "White label url shortener",
+                "Priority Support 24/7",
               ].map((f) => (
                 <li key={f} className="flex items-center gap-2 text-sm text-white/80">
                   <CheckIcon className="w-4 h-4 shrink-0 text-yellow-400" />
@@ -498,7 +508,6 @@ export default function Premium() {
           </div>
         </div>
 
-        {/* Comparison Table */}
         <div className="mb-6">
           <h2 className="text-2xl font-bold mb-1">Compare plans</h2>
           <p className="text-white/30 text-sm">Full breakdown of features included in each tier.</p>

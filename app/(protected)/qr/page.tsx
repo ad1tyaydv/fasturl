@@ -301,7 +301,7 @@ export default function QRGenerator() {
                     <strong className="text-white">{qrsLeft}</strong>
                   )}
                 </span>
-                QR codes left {userPlan === "FREE" ? "for today" : "this month"}
+                QR codes left {userPlan === "FREE" ? "this month" : "this month"}
               </span>
 
               {isLoggedIn && (

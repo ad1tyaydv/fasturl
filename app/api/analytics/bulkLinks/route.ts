@@ -23,7 +23,9 @@ export async function POST(req: NextRequest) {
         }
 
         const bulk = await prisma.bulkLinks.findUnique({
-            where: { id: batchId },
+            where: {
+                id: batchId
+            },
             include: {
                 links: {
                     select: {

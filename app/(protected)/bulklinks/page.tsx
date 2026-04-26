@@ -4,18 +4,18 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import {
-  IoCloseOutline,
   IoCheckmarkCircleOutline,
   IoAlertCircleOutline,
   IoFileTrayFullOutline,
   IoRocketOutline,
   IoRefreshOutline,
   IoCalendarOutline,
+  IoHelpCircleOutline,
 } from "react-icons/io5";
 
 import { HugeiconsIcon } from '@hugeicons/react';
 import {
-  CloudUploadIcon, Download02Icon, Cancel01Icon, File02Icon,
+  CloudUploadIcon, Cancel01Icon, File02Icon,
   Calendar03Icon, ArrowRight01Icon, Delete02Icon,
   Edit03Icon, CircleLock01Icon, CircleUnlock01Icon, ViewIcon, ViewOffSlashIcon,
   Pdf02Icon, Csv02Icon, Tick02Icon
@@ -30,6 +30,8 @@ import Features from "@/app/components/features";
 import FaqSection from "@/app/components/faqSection";
 import TotalData from "@/app/components/totalData";
 import Footer from "@/app/components/footer";
+
+import { useUser } from "@/app/components/userContext";
 
 const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN;
 
@@ -50,6 +52,7 @@ const getRelativeTime = (dateString?: string) => {
 };
 
 export default function BulkCreateLinks() {
+  const { user, loading: userLoading } = useUser();
   const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
@@ -61,8 +64,7 @@ export default function BulkCreateLinks() {
 
   const [showDownloadModal, setShowDownloadModal] = useState(false);
   const [showLimitModal, setShowLimitModal] = useState(false);
-  const [userPlan, setUserPlan] = useState<string>("FREE");
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showHelpModal, setShowHelpModal] = useState(false);
 
   const [password, setPassword] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
@@ -80,28 +82,15 @@ export default function BulkCreateLinks() {
 
 
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const res = await axios.get("/api/auth/me");
-
-        if (!res.data.authenticated) {
-          router.push("/auth/signin");
-          return;
-        }
-
-        setIsLoggedIn(true);
-        setUserPlan(res.data.plan || "FREE");
-        localStorage.setItem("plan", res.data.plan || "FREE");
-        await fetchPastBulkLinks();
-
-      } catch (error) {
+    if (!userLoading) {
+      if (!user) {
         router.push("/auth/signin");
-      } finally {
 
+      } else {
+        fetchPastBulkLinks();
       }
-    };
-    checkAuth();
-  }, [router]);
+    }
+  }, [user, userLoading, router]);
 
   const fetchPastBulkLinks = async () => {
     try {
@@ -114,7 +103,7 @@ export default function BulkCreateLinks() {
 
 
   const checkPlanAccess = () => {
-    if (userPlan === "FREE") {
+    if ((user?.plan || "FREE") === "FREE") {
       router.push("/premium");
       return false;
     }
@@ -169,7 +158,14 @@ export default function BulkCreateLinks() {
       const res = await axios.post("/api/shortUrl/bulkLinks", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      setStatus({ type: "success", message: `Successfully created ${res.data.count} short links!` });
+
+      let successMessage = `Successfully created ${res.data.count} short links!`;
+      if (res.data.replacedCount > 0) {
+        successMessage = `Created ${res.data.count} links. Note: ${res.data.replacedCount} custom URLs already existed, so random ones were assigned.`;
+        toast.info(`${res.data.replacedCount} custom URLs already existed and were replaced with random ones.`);
+      }
+
+      setStatus({ type: "success", message: successMessage });
       setCreatedLinks(res.data.success || []);
       await fetchPastBulkLinks();
       setFile(null);
@@ -213,7 +209,6 @@ export default function BulkCreateLinks() {
   };
 
   const exportPDF = () => {
-    // Safety Check: Prevent crash if data isn't an array or is empty
     if (!Array.isArray(createdLinks) || createdLinks.length === 0) {
       toast.error("No links available to export. Please generate links first.");
       return;
@@ -225,7 +220,7 @@ export default function BulkCreateLinks() {
 
     autoTable(doc, {
       head: [['#', 'Original URL', 'Short URL']],
-      // Added optional chaining (?.) for extra safety
+    
       body: createdLinks?.map((l, i) => [
         i + 1,
         l.original || "N/A",
@@ -255,7 +250,7 @@ export default function BulkCreateLinks() {
     a.href = url;
     a.download = 'Fasturl_Links.csv';
     a.click();
-    window.URL.revokeObjectURL(url); // Clean up memory
+    window.URL.revokeObjectURL(url);
   };
 
   const closeAllModals = () => {
@@ -304,11 +299,14 @@ export default function BulkCreateLinks() {
         <div className="flex flex-col lg:flex-row items-stretch gap-8 lg:h-[540px]">
 
           <div className="w-full lg:w-[60%] xl:w-[65%] p-6 sm:p-8 border border-neutral-800 rounded-2xl shadow-sm relative text-white flex flex-col h-full">
-            <div className="mb-6 shrink-0">
-              <h2 className="text-2xl font-bold mb-2 text-white">Bulk Shorten Links</h2>
-              <p className="text-neutral-400 text-sm">
-                Upload your CSV file to generate shortened links instantly.
-              </p>
+            <div className="mb-6 shrink-0 flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-white">Bulk Shorten Links</h2>
+              <button 
+                onClick={() => setShowHelpModal(true)}
+                className="text-neutral-500 hover:text-white transition-colors cursor-pointer p-1"
+              >
+                <IoHelpCircleOutline size={20} />
+              </button>
             </div>
 
             <div className="flex-1 flex flex-col min-h-0">
@@ -424,7 +422,7 @@ export default function BulkCreateLinks() {
                         <span className="text-[10px] font-three opacity-80 uppercase tracking-widest mt-1">This may take some time, Please wait</span>
                       </>
                     ) : (
-                      userPlan === "FREE" ? "Upgrade to Shorten Bulk" : "Shorten Links"
+                      user?.plan === "FREE" ? "Upgrade to Shorten Bulk" : "Shorten Links"
                     )}
                   </button>
                 ) : (
@@ -765,7 +763,28 @@ export default function BulkCreateLinks() {
         </div>
       )}
 
-      <Features isLoggedIn={isLoggedIn} userPlan={userPlan} />
+      {showHelpModal && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/80 cursor-pointer" onClick={() => setShowHelpModal(false)} />
+          <div className="relative bg-[#1c1c1c] border border-neutral-800 w-full max-w-[400px] rounded-2xl p-6 shadow-2xl flex flex-col items-center text-center">
+            <div className="w-12 h-12 bg-blue-500/10 text-blue-500 rounded-full flex items-center justify-center mb-4">
+              <IoHelpCircleOutline size={30} />
+            </div>
+            <h3 className="text-xl font-bold mb-2 text-white">Bulk Shortening Instructions</h3>
+            <p className="text-neutral-400 mb-6 text-sm">
+              Upload your CSV file to generate shortened links instantly.
+            </p>
+            <button
+              onClick={() => setShowHelpModal(false)}
+              className="w-full py-3 bg-blue-600 text-white rounded-xl font-bold cursor-pointer hover:bg-blue-700 transition-colors"
+            >
+              Got it
+            </button>
+          </div>
+        </div>
+      )}
+
+      <Features isLoggedIn={!!user} userPlan={user?.plan || "FREE"} />
       <div className="w-full h-px bg-neutral-800/50 my-12 shadow-sm"></div>
       <FaqSection />
       <TotalData />

@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import QRCode from "qrcode";
 import jwt from "jsonwebtoken";
 import { redis } from "@/lib/redis";
+import { verifiedRateLimit } from "@/lib/rateLimit";
 
 
 const JWT_SECRET = process.env.NEXTAUTH_SECRET!;
@@ -47,6 +48,15 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const { success } = await verifiedRateLimit.limit(userId);
+
+    if (!success) {
+      return NextResponse.json(
+        { message: "Too many requests. Try later." },
+        { status: 429 }
+      );
+    }
+
     const now = new Date();
 
     let cycleStart = user.cycleStart;
@@ -62,7 +72,11 @@ export async function POST(req: NextRequest) {
 
       await prisma.user.update({
         where: { id: userId },
-        data: { cycleStart, cycleEnd },
+        data: { 
+          cycleStart, 
+          cycleEnd,
+          qrUsed: 0
+        },
       });
     }
 
@@ -72,13 +86,17 @@ export async function POST(req: NextRequest) {
 
       await prisma.user.update({
         where: { id: userId },
-        data: { cycleStart, cycleEnd },
+        data: { 
+          cycleStart, 
+          cycleEnd,
+          qrUsed: 0
+        },
       });
     }
 
     let limit = 30;
-    if (user.plan === "ESSENTIAL") limit = 500;
-    if (user.plan === "PRO") limit = 5000;
+    if (user.plan === "ESSENTIAL") limit = 300;
+    if (user.plan === "PRO") limit = 2000;
 
     const count = await prisma.qr.count({
       where: {

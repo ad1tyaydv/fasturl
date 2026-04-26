@@ -83,6 +83,16 @@ export async function POST(req: NextRequest) {
         },
       });
 
+      await prisma.notification.create({
+        data: {
+          userId,
+          title: "Plan Upgraded!",
+          message: `Your plan has been successfully upgraded to ${plan}. Enjoy your new limits!`,
+          metadata: { plan, event: "upgrade" },
+          actionUrl: "/premium"
+        }
+      });
+
       await prisma.payment.upsert({
         where: {
           paymentId: data.payment_id
@@ -132,6 +142,7 @@ export async function POST(req: NextRequest) {
       await redis.del(`qrs-left:${userId}`);
     }
 
+
     if (event === "payment.failed") {
       if (user.billingStatus === "active") {
         return NextResponse.json({ received: true });
@@ -143,6 +154,16 @@ export async function POST(req: NextRequest) {
         data: {
           billingStatus: "failed"
         },
+      });
+
+      await prisma.notification.create({
+        data: {
+          userId,
+          title: "Payment Failed",
+          message: `Your payment for the ${plan} plan failed. Please check your payment method and try again.`,
+          metadata: { plan, event: "payment_failed" },
+          actionUrl: "/premium"
+        }
       });
 
       await prisma.payment.upsert({
@@ -180,6 +201,7 @@ export async function POST(req: NextRequest) {
         });
       }
     }
+
 
     if (event === "payment.processing") {
       if (user.billingStatus === "active") {
@@ -236,6 +258,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
+
     if (event === "subscription.renewed") {
       const expiryDate = new Date();
       expiryDate.setMonth(expiryDate.getMonth() + 1);
@@ -276,6 +299,16 @@ export async function POST(req: NextRequest) {
           subscriptionId: null,
         },
       });
+
+      await prisma.notification.create({
+        data: {
+          userId,
+          title: "Subscription Cancelled",
+          message: "Your premium subscription has been cancelled. Your account has been reverted to the Free plan.",
+          metadata: { event: "subscription_cancelled" },
+          actionUrl: "/premium"
+        }
+      });
     }
 
     if (event === "payment.refunded") {
@@ -287,6 +320,16 @@ export async function POST(req: NextRequest) {
           plan: "FREE",
           billingStatus: "refunded",
         },
+      });
+
+      await prisma.notification.create({
+        data: {
+          userId,
+          title: "Payment Refunded",
+          message: "Your payment has been refunded, and your account has been reverted to the Free plan.",
+          metadata: { event: "payment_refunded" },
+          actionUrl: "/premium"
+        }
       });
     }
 
@@ -304,6 +347,16 @@ export async function POST(req: NextRequest) {
           billingStatus: "expired",
           subscriptionId: null,
         },
+      });
+
+      await prisma.notification.create({
+        data: {
+          userId,
+          title: "Subscription Expired",
+          message: "Your premium subscription has expired. Your account has been reverted to the Free plan.",
+          metadata: { event: "subscription_expired" },
+          actionUrl: "/premium"
+        }
       });
     }
 

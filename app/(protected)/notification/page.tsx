@@ -128,7 +128,7 @@ export default function NotificationPage() {
 
   const getIcon = (title: string) => {
     const t = title.toLowerCase();
-    if (t.includes("success") || t.includes("verified")) return CheckmarkCircle02Icon;
+    if (t.includes("success") || t.includes("verified") || t.includes("upgraded") || t.includes("plan")) return CheckmarkCircle02Icon;
     if (t.includes("error") || t.includes("failed")) return Alert02Icon;
     if (t.includes("2fa") || t.includes("security")) return InformationCircleIcon;
     if (t.includes("welcome")) return Mail01Icon;

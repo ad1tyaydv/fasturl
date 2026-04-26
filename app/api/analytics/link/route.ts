@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
         
         if (!linkId) {
             return NextResponse.json(
-                {message: "linkId required"}, 
+                {message: "linkId required"},
                 {status: 400}
             );
         }

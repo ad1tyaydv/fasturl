@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/dbConfig";
+import { redis } from "@/lib/redis";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -7,11 +8,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   try {
 
-    await prisma.bulkLinks.delete({
+    const linkUpdate = await prisma.bulkLinks.delete({
       where: {
         id: id,
       },
     });
+
+    await redis.del(`fetchBulkLinks:${linkUpdate.userId}`);
 
     return NextResponse.json(
       {message: "Link deleted"},
@@ -19,7 +22,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     );
 
   } catch (error) {
-    console.log(error);
     return NextResponse.json(
       { message: "Error while deleting link" },
       { status: 500 }

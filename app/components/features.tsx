@@ -137,7 +137,7 @@ export default function Features({ isLoggedIn }: FasturlFeaturesProps) {
                   duration: 1, 
                   ease: [0.22, 1, 0.36, 1],
                 }}
-                className="flex-1 relative"
+                className="flex-1 relative flex justify-center"
               >
                 <div className={`absolute -inset-4 rounded-3xl opacity-20 blur-2xl ${f.bgLight} transition-all duration-500 group-hover:opacity-30`}></div>
                 <motion.div 
@@ -146,7 +146,7 @@ export default function Features({ isLoggedIn }: FasturlFeaturesProps) {
                     rotateX: 1,
                   }}
                   transition={{ type: "spring", stiffness: 200, damping: 25 }}
-                  className={`relative aspect-video bg-[#1a1a1a] border ${f.border} rounded-3xl overflow-hidden shadow-2xl group cursor-pointer`}
+                  className={`relative aspect-video bg-[#1a1a1a] border ${f.border} rounded-2xl overflow-hidden shadow-2xl group cursor-pointer w-full max-w-[480px]`}
                   style={{ perspective: 1000 }}
                 >
                   <img 
