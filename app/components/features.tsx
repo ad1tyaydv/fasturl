@@ -88,11 +88,11 @@ export default function Features({ isLoggedIn }: FasturlFeaturesProps) {
 
   
   return (
-    <section className="py-24 px-6 bg-[#141414] border-t border-neutral-800 transition-colors duration-300 overflow-hidden font-one">
+    <section className="py-24 px-6 bg-background border-t border-border transition-colors duration-300 overflow-hidden font-one">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-20">
-          <h2 className="text-4xl md:text-5xl font-three font-bold mb-6 text-white tracking-tight">Everything You Need to <span className="text-red-500">Scale</span></h2>
-          <p className="text-neutral-400 font-one text-lg max-w-2xl mx-auto">Powerful link management tools and enterprise-grade analytics designed to help you track your brand's reach and engagement across the globe.</p>
+          <h2 className="text-4xl md:text-5xl font-three font-bold mb-6 text-foreground tracking-tight">Everything You Need to <span className="text-red-500">Scale</span></h2>
+          <p className="text-muted-foreground font-one text-lg max-w-2xl mx-auto">Powerful link management tools and enterprise-grade analytics designed to help you track your brand's reach and engagement across the globe.</p>
         </div>
 
         <div className="space-y-48">
@@ -115,8 +115,8 @@ export default function Features({ isLoggedIn }: FasturlFeaturesProps) {
                 <div className={`inline-flex p-3 rounded-2xl ${f.bgLight} ${f.accent} mb-2 shadow-sm`}>
                   {f.icon}
                 </div>
-                <h3 className="text-3xl font-one font-bold text-white leading-tight">{f.title}</h3>
-                <p className="text-lg text-neutral-400 font-three leading-relaxed">
+                <h3 className="text-3xl font-one font-bold text-foreground leading-tight">{f.title}</h3>
+                <p className="text-lg text-muted-foreground font-three leading-relaxed">
                   {f.desc}
                 </p>
                 <div className="pt-4">
@@ -146,7 +146,7 @@ export default function Features({ isLoggedIn }: FasturlFeaturesProps) {
                     rotateX: 1,
                   }}
                   transition={{ type: "spring", stiffness: 200, damping: 25 }}
-                  className={`relative aspect-video bg-[#1a1a1a] border ${f.border} rounded-2xl overflow-hidden shadow-2xl group cursor-pointer w-full max-w-[480px]`}
+                  className={`relative aspect-video bg-secondary border ${f.border} rounded-2xl overflow-hidden shadow-2xl group cursor-pointer w-full max-w-[480px]`}
                   style={{ perspective: 1000 }}
                 >
                   <img 
@@ -155,7 +155,7 @@ export default function Features({ isLoggedIn }: FasturlFeaturesProps) {
                     className="w-full h-full object-cover"
                   />
                   
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#141414] via-transparent to-transparent opacity-40 group-hover:opacity-20 transition-opacity duration-500"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-40 group-hover:opacity-20 transition-opacity duration-500"></div>
                 </motion.div>
               </motion.div>
             </div>

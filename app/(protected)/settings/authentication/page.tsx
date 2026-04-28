@@ -18,10 +18,10 @@ function Toast({ message, onClose }: { message: string; onClose: () => void }) {
   }, [onClose]);
 
   return (
-    <div className="fixed bottom-6 right-6 z-[100] bg-neutral-900 border border-neutral-800 text-white px-5 py-3 rounded-lg shadow-2xl flex items-center gap-3 animate-in slide-in-from-bottom-4 fade-in duration-300">
-      <span className="text-green-500 font-bold">✓</span>
+    <div className="fixed bottom-6 right-6 z-[100] bg-popover border border-border text-popover-foreground px-5 py-3 rounded-lg shadow-2xl flex items-center gap-3 animate-in slide-in-from-bottom-4 fade-in duration-300">
+      <span className="text-emerald-500 font-bold">✓</span>
       <span className="font-one text-sm">{message}</span>
-      <button onClick={onClose} className="text-neutral-500 hover:text-white ml-2 cursor-pointer">
+      <button onClick={onClose} className="text-muted-foreground hover:text-foreground ml-2 cursor-pointer">
         <X size={14} />
       </button>
     </div>
@@ -30,11 +30,11 @@ function Toast({ message, onClose }: { message: string; onClose: () => void }) {
 
 function Modal({ children, onClose }: { children: React.ReactNode; onClose: () => void }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm animate-in fade-in duration-200 p-4">
-      <div className="bg-[#1a1a1a] border border-neutral-800 rounded-2xl shadow-2xl p-6 sm:p-8 w-full max-w-md relative animate-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm animate-in fade-in duration-200 p-4">
+      <div className="bg-popover border border-border rounded-2xl shadow-2xl p-6 sm:p-8 w-full max-w-md relative animate-in zoom-in-95 duration-200">
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 text-neutral-500 hover:text-white transition-colors cursor-pointer"
+          className="absolute top-5 right-5 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
         >
           <X size={20} />
         </button>
@@ -90,7 +90,7 @@ function OtpInput({ value, onChange }: { value: string[]; onChange: (v: string[]
           onChange={(e) => handleChange(i, e.target.value)}
           onKeyDown={(e) => handleKey(i, e)}
           onPaste={handlePaste}
-          className="w-10 h-12 sm:w-12 sm:h-14 text-center text-xl font-bold bg-[#111] border border-neutral-800 rounded-lg text-white focus:outline-none focus:border-[#1D9BF0] transition-all caret-transparent"
+          className="w-10 h-12 sm:w-12 sm:h-14 text-center text-xl font-bold bg-secondary/50 border border-border rounded-lg text-foreground focus:outline-none focus:border-primary transition-all caret-transparent"
         />
       ))}
     </div>
@@ -242,12 +242,12 @@ export default function AuthenticationPage() {
 
       {otpModalOpen && (
         <Modal onClose={() => setOtpModalOpen(false)}>
-          <h3 className="text-xl font-bold text-neutral-100 mb-1">Verify OTP</h3>
-          <p className="text-neutral-400 text-sm mb-4">Sent to <span className="text-white font-semibold">{forgotEmail}</span></p>
+          <h3 className="text-xl font-bold text-foreground mb-1">Verify OTP</h3>
+          <p className="text-muted-foreground text-sm mb-4">Sent to <span className="text-foreground font-semibold">{forgotEmail}</span></p>
           <OtpInput value={otp} onChange={setOtp} />
-          {otpError && <p className="text-red-500 text-sm text-center -mt-4 mb-4">{otpError}</p>}
+          {otpError && <p className="text-destructive text-sm text-center -mt-4 mb-4">{otpError}</p>}
           <Button
-            className="w-full bg-[#1D9BF0] hover:bg-blue-600 text-white font-bold py-3 rounded-xl transition-all"
+            className="w-full bg-primary text-primary-foreground font-bold py-3 rounded-xl transition-all hover:opacity-90"
             onClick={handleVerifyOtp}
             disabled={otp.join("").length < 6 || otpLoading}
           >
@@ -258,22 +258,22 @@ export default function AuthenticationPage() {
 
       {resetModalOpen && (
         <Modal onClose={() => setResetModalOpen(false)}>
-          <h3 className="text-xl font-bold text-neutral-100 mb-6">Reset Password</h3>
+          <h3 className="text-xl font-bold text-foreground mb-6">Reset Password</h3>
           <div className="space-y-4">
             {[
               { label: "New Password", val: resetNew, set: setResetNew, show: showResetNew, setShow: setShowResetNew },
               { label: "Confirm Password", val: resetConfirm, set: setResetConfirm, show: showResetConfirm, setShow: setShowResetConfirm }
             ].map((f, i) => (
               <div key={i}>
-                <label className="block text-sm text-neutral-400 mb-1.5 font-medium">{f.label}</label>
+                <label className="block text-sm text-muted-foreground mb-1.5 font-medium">{f.label}</label>
                 <div className="relative">
                   <input
                     type={f.show ? "text" : "password"}
                     value={f.val}
                     onChange={(e) => f.set(e.target.value)}
-                    className="w-full bg-[#111] border border-neutral-800 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-[#1D9BF0]"
+                    className="w-full bg-background border border-border rounded-lg px-4 py-2.5 text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
                   />
-                  <button onClick={() => f.setShow(!f.show)} className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500">
+                  <button onClick={() => f.setShow(!f.show)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground cursor-pointer hover:text-foreground transition-colors">
                     {f.show ? <HugeiconsIcon icon={ViewIcon} /> : <HugeiconsIcon icon={ViewIcon} />}
                   </button>
                 </div>
@@ -281,7 +281,7 @@ export default function AuthenticationPage() {
             ))}
           </div>
           <Button
-            className="w-full mt-8 bg-white text-black hover:bg-neutral-200 font-bold py-3 rounded-xl"
+            className="w-full mt-8 bg-primary text-primary-foreground hover:opacity-90 font-bold py-3 rounded-xl transition-all shadow-lg"
             onClick={handleResetPassword}
             disabled={!resetNew || resetNew !== resetConfirm || resetLoading}
           >
@@ -291,7 +291,7 @@ export default function AuthenticationPage() {
       )}
 
       <div className="mb-12">
-        <h2 className="text-2xl font-bold text-neutral-200 mb-8">Update Password</h2>
+        <h2 className="text-2xl font-bold text-foreground mb-8">Update Password</h2>
         <div className="space-y-5 max-w-2xl">
           {[
             { label: "Current Password", val: currentPassword, set: setCurrentPassword, show: showCurrent, setShow: setShowCurrent },
@@ -299,17 +299,17 @@ export default function AuthenticationPage() {
             { label: "Confirm Password", val: confirmPassword, set: setConfirmPassword, show: showConfirm, setShow: setShowConfirm }
           ].map((field, idx) => (
             <div key={idx} className="grid grid-cols-1 sm:grid-cols-[180px_1fr] gap-2 sm:gap-4 items-center">
-              <label className="sm:text-right text-neutral-400 font-medium text-sm sm:text-base">{field.label}</label>
+              <label className="sm:text-right text-muted-foreground font-medium text-sm sm:text-base">{field.label}</label>
               <div className="relative">
                 <input
                   type={field.show ? "text" : "password"}
                   value={field.val}
                   onChange={(e) => field.set(e.target.value)}
-                  className="w-full bg-[#1a1a1a] border border-neutral-700 rounded-lg px-4 py-2.5 pr-10 focus:outline-none focus:border-[#1D9BF0] text-white transition-all"
+                  className="w-full bg-background border border-border rounded-lg px-4 py-2.5 pr-10 focus:outline-none focus:ring-1 focus:ring-ring text-foreground transition-all"
                 />
                 <button
                   type="button" onClick={() => field.setShow(!field.show)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-white transition-colors cursor-pointer"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                 >
                   {field.show ? <HugeiconsIcon icon={ViewOffSlashIcon} /> : <HugeiconsIcon icon={ViewIcon} />}
                 </button>
@@ -321,7 +321,7 @@ export default function AuthenticationPage() {
             <div className="hidden sm:block" />
             <div className="flex flex-row gap-2 sm:gap-3 w-full">
               <Button
-                className="flex-1 sm:flex-none bg-white text-black hover:bg-neutral-200 font-bold px-4 sm:px-10 py-2.5 cursor-pointer text-xs sm:text-sm"
+                className="flex-1 sm:flex-none bg-primary text-primary-foreground hover:opacity-90 font-bold px-4 sm:px-10 py-2.5 cursor-pointer text-xs sm:text-sm shadow-md transition-all"
                 onClick={handleUpdatePassword}
                 disabled={loadingPassword}
               >
@@ -329,7 +329,7 @@ export default function AuthenticationPage() {
               </Button>
               <Button
                 variant="outline"
-                className="flex-1 sm:flex-none bg-transparent border-neutral-700 text-neutral-400 hover:bg-neutral-800 hover:text-white font-bold px-4 sm:px-8 py-2.5 cursor-pointer text-xs sm:text-sm"
+                className="flex-1 sm:flex-none bg-transparent border-border text-muted-foreground hover:bg-secondary hover:text-foreground font-bold px-4 sm:px-8 py-2.5 cursor-pointer text-xs sm:text-sm transition-all"
                 onClick={handleForgotPassword}
                 disabled={sendingOtp}
               >
@@ -340,29 +340,29 @@ export default function AuthenticationPage() {
         </div>
       </div>
 
-      <div className="w-full h-px bg-neutral-800/50 my-12 max-w-2xl" />
+      <div className="w-full h-px bg-border my-12 max-w-2xl" />
 
       <div className="pt-2">
-        <h2 className="text-2xl font-bold text-neutral-200 mb-4">Danger Zone</h2>
-        <p className="text-neutral-400 mb-8 max-w-2xl text-sm leading-relaxed">
-          Deleting your account is permanent. All links and analytical data will be <span className="text-red-500 font-medium">removed forever.</span>
+        <h2 className="text-2xl font-bold text-foreground mb-4">Danger Zone</h2>
+        <p className="text-muted-foreground mb-8 max-w-2xl text-sm leading-relaxed">
+          Deleting your account is permanent. All links and analytical data will be <span className="text-destructive font-medium">removed forever.</span>
         </p>
 
         {!isDeleting ? (
           <Button
             variant="outline"
             onClick={() => setIsDeleting(true)}
-            className="flex items-center gap-2 bg-red-500 text-white hover:bg-red-700 hover:text-white font-bold px-5 py-5 rounded-lg transition-all cursor-pointer"
+            className="flex items-center gap-2 bg-destructive text-destructive-foreground hover:bg-destructive/90 font-bold px-5 py-5 rounded-lg transition-all cursor-pointer shadow-md"
           >
             <Trash2 />
             Delete Account
           </Button>
         ) : (
-          <div className="bg-[#1c1c1c] p-6 rounded-xl border border-neutral-800 max-w-2xl animate-in fade-in slide-in-from-top-2">
+          <div className="bg-secondary/30 p-6 rounded-xl border border-border max-w-2xl animate-in fade-in slide-in-from-top-2 shadow-sm">
             <div className="flex items-start gap-3 mb-6">
-              <AlertTriangle className="text-neutral-500 shrink-0 mt-0.5" size={18} />
-              <p className="text-neutral-300 text-sm">
-                To confirm, type <span className="font-bold text-white">delete my account</span> below.
+              <AlertTriangle className="text-amber-500 shrink-0 mt-0.5" size={18} />
+              <p className="text-foreground/80 text-sm">
+                To confirm, type <span className="font-bold text-foreground">delete my account</span> below.
               </p>
             </div>
             
@@ -370,7 +370,7 @@ export default function AuthenticationPage() {
               type="text"
               value={deleteConfirmation}
               onChange={(e) => setDeleteConfirmation(e.target.value)}
-              className="w-full bg-[#141414] border border-neutral-700 rounded-lg px-4 py-2.5 mb-6 focus:outline-none focus:border-neutral-500 text-white transition-all placeholder:text-neutral-700 text-sm"
+              className="w-full bg-background border border-border rounded-lg px-4 py-2.5 mb-6 focus:outline-none focus:border-muted-foreground/50 text-foreground transition-all placeholder:text-muted-foreground/30 text-sm"
               placeholder="delete my account"
             />
             
@@ -379,14 +379,14 @@ export default function AuthenticationPage() {
                 variant="destructive"
                 onClick={handleDeleteAccount}
                 disabled={deleteConfirmation !== "delete my account" || loadingDelete}
-                className="flex-1 sm:flex-none font-bold bg-red-500 text-white hover:bg-red-700 hover:text-white  px-5 py-5 cursor-pointer"
+                className="flex-1 sm:flex-none font-bold bg-destructive text-destructive-foreground hover:bg-destructive/90 px-5 py-5 cursor-pointer shadow-md"
               >
                 {loadingDelete ? <Loader2 className="animate-spin mx-auto" /> : "Confirm Delete"}
               </Button>
               <Button
                 variant="outline"
                 onClick={() => { setIsDeleting(false); setDeleteConfirmation(""); }}
-                className="flex-1 sm:flex-none bg-transparent border-neutral-700 text-neutral-400 hover:bg-neutral-400 font-bold cursor-pointer px-5 py-5"
+                className="flex-1 sm:flex-none bg-transparent border-border text-muted-foreground hover:bg-secondary hover:text-foreground font-bold cursor-pointer px-5 py-5 transition-all"
               >
                 Cancel
               </Button>

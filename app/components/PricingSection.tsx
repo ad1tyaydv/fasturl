@@ -63,32 +63,32 @@ export default function Premium() {
   };
 
   return (
-    <div className="min-h-screen bg-[#141414] text-white">
+    <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
       <main className="max-w-6xl mx-auto px-4 py-12">
 
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-2">
+        <div className="text-center mb-12">
+          <h1 className="text-3xl md:text-4xl font-bold mb-4 tracking-tight">
             The Best URL Shortener with Analytics & Branded Links
           </h1>
-          <p className="text-white/40 text-sm max-w-xl mx-auto">
+          <p className="text-muted-foreground text-base max-w-2xl mx-auto">
             Stop guessing and start tracking with our professional link management platform. Unlock deep insights with real-time click tracking and geo-targeted redirects.
           </p>
         </div>
 
-        <div className="flex flex-col items-center gap-4 mb-12">
-          <div className="flex items-center gap-3">
+        <div className="flex flex-col items-center gap-4 mb-16">
+          <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 mr-2">
-              <span className="text-[10px] font-bold bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full uppercase tracking-wider">
+              <span className="text-[10px] font-bold bg-green-500/20 text-green-600 dark:text-green-400 px-2 py-1 rounded-full uppercase tracking-wider">
                 Save upto 38%
               </span>
-              <span className={`text-sm font-medium transition-colors ${isAnnual ? "text-white" : "text-white/40"}`}>
+              <span className={`text-sm font-medium transition-colors ${isAnnual ? "text-foreground" : "text-muted-foreground"}`}>
                 Annually
               </span>
             </div>
             
             <button
               onClick={() => setIsAnnual(!isAnnual)}
-              className="relative w-12 h-6 rounded-full bg-white/10 transition-colors duration-200 focus:outline-none cursor-pointer"
+              className="relative w-12 h-6 rounded-full bg-secondary border border-border transition-colors duration-200 focus:outline-none cursor-pointer"
             >
               <div
                 className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-blue-500 transition-transform duration-200 ease-in-out ${
@@ -97,28 +97,28 @@ export default function Premium() {
               />
             </button>
             
-            <span className={`text-sm font-medium transition-colors ${!isAnnual ? "text-white" : "text-white/40"}`}>
+            <span className={`text-sm font-medium transition-colors ${!isAnnual ? "text-foreground" : "text-muted-foreground"}`}>
               Monthly
             </span>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
 
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-6 flex flex-col">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-xl font-bold text-white/70">Free Tool</span>
-              <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-white/10 text-white/50">
+          <div className="rounded-2xl border border-border bg-card p-8 flex flex-col shadow-sm">
+            <div className="flex items-center justify-between mb-6">
+              <span className="text-xl font-bold text-foreground/70">Free Tool</span>
+              <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-secondary text-muted-foreground">
                 Current
               </span>
             </div>
 
-            <div className="text-3xl font-bold mb-1">₹0</div>
-            <div className="text-xs text-white/30 mb-5">
+            <div className="text-4xl font-bold mb-1">₹0</div>
+            <div className="text-xs text-muted-foreground mb-8">
               Perfect for simple url shortening
             </div>
 
-            <ul className="flex flex-col gap-2 mb-6 flex-1">
+            <ul className="flex flex-col gap-3 mb-8 flex-1">
               {[
                 "100 short links/month",
                 "30 dynamic QR codes/month",
@@ -127,50 +127,50 @@ export default function Premium() {
               ].map((f) => (
                 <li
                   key={f}
-                  className="flex items-center gap-2 text-sm text-white/50"
+                  className="flex items-center gap-2.5 text-sm text-foreground/60"
                 >
-                  <CheckIcon className="w-4 h-4 shrink-0 text-white/30" />
+                  <CheckIcon className="w-4 h-4 shrink-0 text-muted-foreground/50" />
                   {f}
                 </li>
               ))}
             </ul>
 
-            <button className="w-full py-2.5 rounded-xl border border-white/10 text-sm text-white/40 font-medium cursor-default">
+            <button className="w-full py-3 rounded-xl border border-border bg-secondary/50 text-sm text-muted-foreground font-medium cursor-default">
               Start Free
             </button>
           </div>
 
-          <div className="rounded-2xl border border-blue-500/30 bg-blue-500/10 p-6 flex flex-col relative">
+          <div className="rounded-2xl border-2 border-blue-500/50 bg-blue-500/[0.03] dark:bg-blue-500/10 p-8 flex flex-col relative shadow-xl shadow-blue-500/5">
             <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-600 text-white px-4 py-1 rounded-full text-[11px] font-semibold shadow-md whitespace-nowrap">
               ⭐ Recommended
             </div>
 
-            <div className="flex items-center justify-between mb-4 pt-2">
-              <span className="text-xl font-bold text-blue-400">
+            <div className="flex items-center justify-between mb-6 pt-2">
+              <span className="text-xl font-bold text-blue-600 dark:text-blue-400">
                 Essentials
               </span>
-              <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-blue-500/20 text-blue-300">
+              <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-blue-500/20 text-blue-700 dark:text-blue-300">
                 Popular
               </span>
             </div>
 
-            <div className="flex items-baseline gap-2 mb-0.5">
-              <span className="text-sm line-through text-white/25">
+            <div className="flex items-baseline gap-2 mb-1">
+              <span className="text-sm line-through text-muted-foreground/50">
                 {isAnnual ? "₹14,400" : "₹1,200"}
               </span>
-              <span className="text-3xl font-bold">
+              <span className="text-4xl font-bold">
                 ₹{isAnnual ? "2,299" : "300"}
-                <span className="text-base font-normal text-white/40">
+                <span className="text-base font-normal text-muted-foreground ml-1">
                   {isAnnual ? "/yr" : "/mo"}
                 </span>
               </span>
             </div>
 
-            <div className="text-xs text-white/30 mb-5">
+            <div className="text-xs text-muted-foreground mb-8">
               Advanced link analytics platform
             </div>
 
-            <ul className="flex flex-col gap-2 mb-6 flex-1">
+            <ul className="flex flex-col gap-3 mb-8 flex-1">
               {[
                 "10,000 links/month",
                 "300 QR Codes/month",
@@ -184,9 +184,9 @@ export default function Premium() {
               ].map((f) => (
                 <li
                   key={f}
-                  className="flex items-center gap-2 text-sm text-white/70"
+                  className="flex items-center gap-2.5 text-sm text-foreground/80"
                 >
-                  <CheckIcon className="w-4 h-4 shrink-0 text-blue-400" />
+                  <CheckIcon className="w-4 h-4 shrink-0 text-blue-500" />
                   {f}
                 </li>
               ))}
@@ -195,39 +195,39 @@ export default function Premium() {
             <button
               onClick={() => handleUpgrade("ESSENTIALS")}
               disabled={loading !== null}
-              className="w-full py-2.5 rounded-xl bg-blue-500 hover:bg-blue-400 text-white text-sm font-semibold transition-colors cursor-pointer flex items-center justify-center gap-2 disabled:opacity-70"
+              className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition-all shadow-lg shadow-blue-600/20 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-70 active:scale-[0.98]"
             >
               {loading === "ESSENTIALS" ? <Loader2 className="w-4 h-4 animate-spin" /> : "Upgrade to Essentials"}
             </button>
           </div>
 
-          <div className="rounded-2xl border border-yellow-500/30 bg-yellow-500/10 p-6 flex flex-col">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-xl font-bold text-yellow-400">
+          <div className="rounded-2xl border border-border bg-card p-8 flex flex-col shadow-sm">
+            <div className="flex items-center justify-between mb-6">
+              <span className="text-xl font-bold text-amber-600 dark:text-yellow-400">
                 Pro
               </span>
-              <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-yellow-500/20 text-yellow-300">
+              <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-700 dark:text-yellow-300">
                 Best value
               </span>
             </div>
 
-            <div className="flex items-baseline gap-2 mb-0.5">
-              <span className="text-sm line-through text-white/25">
+            <div className="flex items-baseline gap-2 mb-1">
+              <span className="text-sm line-through text-muted-foreground/50">
                 {isAnnual ? "₹67,200" : "₹5,600"}
               </span>
-              <span className="text-3xl font-bold">
+              <span className="text-4xl font-bold">
                 ₹{isAnnual ? "8,999" : "1,200"}
-                <span className="text-base font-normal text-white/40">
+                <span className="text-base font-normal text-muted-foreground ml-1">
                   {isAnnual ? "/yr" : "/mo"}
                 </span>
               </span>
             </div>
 
-            <div className="text-xs text-white/30 mb-5">
+            <div className="text-xs text-muted-foreground mb-8">
               Enterprise link shortener suite
             </div>
 
-            <ul className="flex flex-col gap-2 mb-6 flex-1">
+            <ul className="flex flex-col gap-3 mb-8 flex-1">
               {[
                 "40,000 links/month",
                 "2,000 QR Codes/month",
@@ -241,9 +241,9 @@ export default function Premium() {
               ].map((f) => (
                 <li
                   key={f}
-                  className="flex items-center gap-2 text-sm text-white/70"
+                  className="flex items-center gap-2.5 text-sm text-foreground/80"
                 >
-                  <CheckIcon className="w-4 h-4 shrink-0 text-yellow-400" />
+                  <CheckIcon className="w-4 h-4 shrink-0 text-amber-500 dark:text-yellow-400" />
                   {f}
                 </li>
               ))}
@@ -252,7 +252,7 @@ export default function Premium() {
             <button
               onClick={() => handleUpgrade("PRO")}
               disabled={loading !== null}
-              className="w-full py-2.5 rounded-xl bg-yellow-500 hover:bg-yellow-400 text-black text-sm font-semibold transition-colors cursor-pointer flex items-center justify-center gap-2 disabled:opacity-70"
+              className="w-full py-3 rounded-xl bg-foreground text-background hover:opacity-90 text-sm font-semibold transition-all shadow-lg cursor-pointer flex items-center justify-center gap-2 disabled:opacity-70 active:scale-[0.98]"
             >
               {loading === "PRO" ? <Loader2 className="w-4 h-4 animate-spin" /> : "Upgrade to Pro"}
             </button>
@@ -260,13 +260,13 @@ export default function Premium() {
 
         </div>
 
-        <p className="mt-12 text-center text-white/30 text-sm">
+        <p className="mt-16 text-center text-muted-foreground text-sm">
           Need help choosing?{" "}
           <a
             href="https://mail.google.com/mail/?view=cm&fs=1&to=fasturl@tutamail.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-blue-400 hover:underline"
+            className="text-blue-500 hover:underline font-medium"
           >
             Contact our team
           </a>

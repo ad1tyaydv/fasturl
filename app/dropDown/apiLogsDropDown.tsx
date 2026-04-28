@@ -58,34 +58,34 @@ export function ApiLogsDropDown({
         <DropdownMenuTrigger asChild>
           <Button
             variant="outline"
-            className="flex-1 sm:flex-none bg-[#1a1a1a] border-neutral-800 text-white hover:bg-[#252525] hover:text-white rounded-lg flex items-center justify-center gap-1.5 sm:gap-2 h-10 sm:h-9 px-1 sm:px-4 outline-none focus:ring-1 focus:ring-neutral-700 cursor-pointer transition-all"
+            className="flex-1 sm:flex-none bg-background border-border text-foreground hover:bg-accent hover:text-accent-foreground rounded-lg flex items-center justify-center gap-1.5 sm:gap-2 h-10 sm:h-9 px-1 sm:px-4 outline-none focus:ring-1 focus:ring-ring cursor-pointer transition-all"
           >
             <HugeiconsIcon icon={CodeIcon} size={14} className="sm:size-[16px] shrink-0" />
             <span className="text-[12px] sm:text-sm truncate">
               {methodFilter === "all" ? "Method" : methodFilter}
             </span>
-            <HugeiconsIcon icon={ArrowDown01Icon} size={12} className="text-neutral-500 shrink-0" />
+            <HugeiconsIcon icon={ArrowDown01Icon} size={12} className="text-muted-foreground shrink-0" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent
           align="end"
-          className="w-40 sm:w-44 bg-[#1a1a1a] border-neutral-800 text-white shadow-2xl rounded-xl"
+          className="w-40 sm:w-44 bg-popover border-border text-popover-foreground shadow-2xl rounded-xl"
         >
-          <DropdownMenuLabel className="text-neutral-500 text-[10px] uppercase tracking-widest">
+          <DropdownMenuLabel className="text-muted-foreground text-[10px] uppercase tracking-widest">
             Method
           </DropdownMenuLabel>
-          <DropdownMenuSeparator className="bg-neutral-800" />
+          <DropdownMenuSeparator className="bg-border" />
           <DropdownMenuCheckboxItem
             checked={methodFilter === "all"}
             onCheckedChange={() => setMethodFilter("all")}
-            className="cursor-pointer focus:bg-[#252525] focus:text-white py-2"
+            className="cursor-pointer focus:bg-accent focus:text-accent-foreground py-2"
           >
             All Methods
           </DropdownMenuCheckboxItem>
           <DropdownMenuCheckboxItem
             checked={methodFilter === "POST"}
             onCheckedChange={() => setMethodFilter("POST")}
-            className="cursor-pointer focus:bg-[#252525] focus:text-white py-2 font-mono text-xs text-green-400"
+            className="cursor-pointer focus:bg-accent focus:text-accent-foreground py-2 font-mono text-xs text-green-600 dark:text-green-400"
           >
             POST
           </DropdownMenuCheckboxItem>
@@ -96,39 +96,39 @@ export function ApiLogsDropDown({
         <DropdownMenuTrigger asChild>
           <Button
             variant="outline"
-            className="flex-1 sm:flex-none bg-[#1a1a1a] border-neutral-800 text-white hover:bg-[#252525] hover:text-white rounded-lg flex items-center justify-center gap-1.5 sm:gap-2 h-10 sm:h-9 px-1 sm:px-4 outline-none focus:ring-1 focus:ring-neutral-700 cursor-pointer transition-all"
+            className="flex-1 sm:flex-none bg-background border-border text-foreground hover:bg-accent hover:text-accent-foreground rounded-lg flex items-center justify-center gap-1.5 sm:gap-2 h-10 sm:h-9 px-1 sm:px-4 outline-none focus:ring-1 focus:ring-ring cursor-pointer transition-all"
           >
             <HugeiconsIcon icon={CheckmarkCircle01Icon} size={14} className="sm:size-[16px] shrink-0" />
             <span className="text-[12px] sm:text-sm truncate">{getSuccessLabel(true)}</span>
-            <HugeiconsIcon icon={ArrowDown01Icon} size={12} className="text-neutral-500 shrink-0" />
+            <HugeiconsIcon icon={ArrowDown01Icon} size={12} className="text-muted-foreground shrink-0" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent
           align="end"
-          className="w-40 sm:w-44 bg-[#1a1a1a] border-neutral-800 text-white shadow-2xl rounded-xl"
+          className="w-40 sm:w-44 bg-popover border-border text-popover-foreground shadow-2xl rounded-xl"
         >
-          <DropdownMenuLabel className="text-neutral-500 text-[10px] uppercase tracking-widest">
+          <DropdownMenuLabel className="text-muted-foreground text-[10px] uppercase tracking-widest">
             Status
           </DropdownMenuLabel>
-          <DropdownMenuSeparator className="bg-neutral-800" />
+          <DropdownMenuSeparator className="bg-border" />
           <DropdownMenuCheckboxItem
             checked={successFilter === "all"}
             onCheckedChange={() => setSuccessFilter("all")}
-            className="cursor-pointer focus:bg-[#252525] focus:text-white py-2"
+            className="cursor-pointer focus:bg-accent focus:text-accent-foreground py-2"
           >
             All Status
           </DropdownMenuCheckboxItem>
           <DropdownMenuCheckboxItem
             checked={successFilter === "success"}
             onCheckedChange={() => setSuccessFilter("success")}
-            className="cursor-pointer focus:bg-[#252525] focus:text-white py-2 text-green-400"
+            className="cursor-pointer focus:bg-accent focus:text-accent-foreground py-2 text-green-600 dark:text-green-400"
           >
             Success
           </DropdownMenuCheckboxItem>
           <DropdownMenuCheckboxItem
             checked={successFilter === "failed"}
             onCheckedChange={() => setSuccessFilter("failed")}
-            className="cursor-pointer focus:bg-[#252525] focus:text-white py-2 text-red-400"
+            className="cursor-pointer focus:bg-accent focus:text-accent-foreground py-2 text-red-600 dark:text-red-400"
           >
             Failed
           </DropdownMenuCheckboxItem>
@@ -139,21 +139,21 @@ export function ApiLogsDropDown({
         <DropdownMenuTrigger asChild>
           <Button
             variant="outline"
-            className="flex-1 sm:flex-none bg-[#1a1a1a] border-neutral-800 text-white hover:bg-[#252525] hover:text-white rounded-lg flex items-center justify-center gap-1.5 sm:gap-2 h-10 sm:h-9 px-1 sm:px-4 outline-none focus:ring-1 focus:ring-neutral-700 cursor-pointer transition-all"
+            className="flex-1 sm:flex-none bg-background border-border text-foreground hover:bg-accent hover:text-accent-foreground rounded-lg flex items-center justify-center gap-1.5 sm:gap-2 h-10 sm:h-9 px-1 sm:px-4 outline-none focus:ring-1 focus:ring-ring cursor-pointer transition-all"
           >
             <HugeiconsIcon icon={Clock01Icon} size={14} className="sm:size-[16px] shrink-0" />
             <span className="text-[12px] sm:text-sm truncate">{getTimeLabel(true)}</span>
-            <HugeiconsIcon icon={ArrowDown01Icon} size={12} className="text-neutral-500 shrink-0" />
+            <HugeiconsIcon icon={ArrowDown01Icon} size={12} className="text-muted-foreground shrink-0" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent
           align="end"
-          className="w-44 sm:w-48 bg-[#1a1a1a] border-neutral-800 text-white shadow-2xl rounded-xl"
+          className="w-44 sm:w-48 bg-popover border-border text-popover-foreground shadow-2xl rounded-xl"
         >
-          <DropdownMenuLabel className="text-neutral-500 text-[10px] uppercase tracking-widest">
+          <DropdownMenuLabel className="text-muted-foreground text-[10px] uppercase tracking-widest">
             Time Range
           </DropdownMenuLabel>
-          <DropdownMenuSeparator className="bg-neutral-800" />
+          <DropdownMenuSeparator className="bg-border" />
           {([
             { val: "all",      label: "All Time" },
             { val: "today",    label: "Today" },
@@ -166,7 +166,7 @@ export function ApiLogsDropDown({
               key={val}
               checked={timeFilter === val}
               onCheckedChange={() => setTimeFilter(val)}
-              className="cursor-pointer focus:bg-[#252525] focus:text-white py-2"
+              className="cursor-pointer focus:bg-accent focus:text-accent-foreground py-2"
             >
               {label}
             </DropdownMenuCheckboxItem>

@@ -15,18 +15,18 @@ export function FilterDomainDropDown({ value, onChange }: FilterDomainDropDownPr
     
   return (
     <Select value={value} onValueChange={(val) => onChange(val as DomainFilterType)}>
-      <SelectTrigger className="w-[200px] bg-[#111111] border-neutral-800 text-white rounded-lg outline-none cursor-pointer">
+      <SelectTrigger className="w-[200px] bg-background border-border text-foreground rounded-lg outline-none cursor-pointer">
         <SelectValue placeholder="Filter Domains" />
       </SelectTrigger>
       <SelectContent
         position="popper"
         sideOffset={5}
-        className="bg-[#1a1a1a] border-neutral-800 text-white rounded-lg w-[200px]"
+        className="bg-popover border-border text-popover-foreground rounded-lg w-[200px]"
       >
-        <SelectItem value="all" className="cursor-pointer hover:bg-neutral-800">All Domains</SelectItem>
-        <div className="h-[1px] bg-neutral-800 my-1 mx-2" />
-        <SelectItem value="verified" className="cursor-pointer hover:bg-neutral-800">Verified</SelectItem>
-        <SelectItem value="unverified" className="cursor-pointer hover:bg-neutral-800">Non-Verified</SelectItem>
+        <SelectItem value="all" className="cursor-pointer hover:bg-accent hover:text-accent-foreground">All Domains</SelectItem>
+        <div className="h-[1px] bg-border my-1 mx-2" />
+        <SelectItem value="verified" className="cursor-pointer hover:bg-accent hover:text-accent-foreground">Verified</SelectItem>
+        <SelectItem value="unverified" className="cursor-pointer hover:bg-accent hover:text-accent-foreground">Non-Verified</SelectItem>
       </SelectContent>
     </Select>
   );

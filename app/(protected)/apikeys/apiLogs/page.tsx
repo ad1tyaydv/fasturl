@@ -83,18 +83,18 @@ export default function LogsTab() {
 
   const getMethodColor = (method: string) => {
     switch (method.toUpperCase()) {
-      case "GET":    return "text-blue-400";
-      case "POST":   return "text-green-400";
-      case "PUT":    return "text-yellow-400";
-      case "DELETE": return "text-red-400";
-      default:       return "text-neutral-400";
+      case "GET":    return "text-blue-600 dark:text-blue-400";
+      case "POST":   return "text-emerald-600 dark:text-emerald-400";
+      case "PUT":    return "text-amber-600 dark:text-amber-400";
+      case "DELETE": return "text-red-600 dark:text-red-400";
+      default:       return "text-muted-foreground";
     }
   };
 
   const getStatusDot = (status: number) => {
-    if (status >= 200 && status < 300) return "bg-green-500";
+    if (status >= 200 && status < 300) return "bg-emerald-500";
     if (status >= 400) return "bg-red-500";
-    return "bg-yellow-500";
+    return "bg-amber-500";
   };
 
   const getPageNumbers = () => {
@@ -114,10 +114,9 @@ export default function LogsTab() {
   return (
     <div className="animate-in fade-in duration-300 font-one">
       <div className="flex items-start justify-between mb-6">
-        {/* Hidden on mobile, shown from sm breakpoint up */}
         <div className="hidden sm:block">
-          <h2 className="text-lg font-semibold text-white">API Logs</h2>
-          <p className="text-neutral-500 text-sm mt-0.5">
+          <h2 className="text-xl font-bold text-foreground">API Logs</h2>
+          <p className="text-muted-foreground text-sm mt-0.5">
             Full request history across all your API keys.
           </p>
         </div>
@@ -135,74 +134,74 @@ export default function LogsTab() {
       </div>
 
       {isLoading ? (
-        <div className="flex items-center gap-2 text-neutral-500 py-10">
-          <Loader2 className="w-4 h-4 animate-spin text-[#1D9BF0]" />
+        <div className="flex items-center gap-2 text-muted-foreground py-10">
+          <Loader2 className="w-4 h-4 animate-spin text-primary" />
           <span className="text-sm">Loading...</span>
         </div>
       ) : filteredLogs.length === 0 ? (
-        <div className="border border-neutral-800 flex flex-col items-center justify-center py-16 text-center rounded-md">
-          <Clock className="w-8 h-8 text-neutral-700 mb-3" />
-          <p className="text-neutral-400 text-sm font-medium">No logs found</p>
-          <p className="text-neutral-600 text-xs mt-1">Try adjusting your filters.</p>
+        <div className="border border-border flex flex-col items-center justify-center py-16 text-center rounded-xl bg-secondary/30">
+          <Clock className="w-8 h-8 text-muted-foreground/40 mb-3" />
+          <p className="text-muted-foreground font-medium">No logs found</p>
+          <p className="text-muted-foreground/60 text-xs mt-1">Try adjusting your filters.</p>
         </div>
       ) : (
         <>
-          <div className="rounded-md border border-neutral-800 overflow-hidden overflow-x-auto">
+          <div className="rounded-xl border border-border overflow-hidden overflow-x-auto bg-background shadow-sm">
             <table className="w-full text-sm min-w-[900px]">
               <thead>
-                <tr className="border-b border-neutral-800 bg-neutral-900/80">
+                <tr className="border-b border-border bg-secondary/50">
                   {["Endpoint", "Method", "Status", "Success", "Error", "Device", "IP Address", "Created"].map((col) => (
-                    <th key={col} className="text-left text-xs font-medium text-neutral-500 px-4 py-3 uppercase tracking-wide whitespace-nowrap">
+                    <th key={col} className="text-left text-xs font-medium text-muted-foreground px-5 py-3 uppercase tracking-wider text-[10px] whitespace-nowrap">
                       {col}
                     </th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-neutral-800/60">
+              <tbody className="divide-y divide-border">
                 {pagedLogs.map((log) => (
-                  <tr key={log.id} className="hover:bg-neutral-900/50 transition-colors">
-                    <td className="px-4 py-4">
-                      <span className="text-neutral-300 font-mono text-xs">{log.endpoint}</span>
+                  <tr key={log.id} className="hover:bg-accent/30 transition-colors">
+                    <td className="px-5 py-4">
+                      <span className="text-foreground font-mono text-xs font-medium">{log.endpoint}</span>
                     </td>
-                    <td className="px-4 py-4">
-                      <span className={`text-xs font-semibold font-mono ${getMethodColor(log.method)}`}>
+                    <td className="px-5 py-4">
+                      <span className={`text-xs font-bold font-mono ${getMethodColor(log.method)}`}>
                         {log.method.toUpperCase()}
                       </span>
                     </td>
-                    <td className="px-4 py-4">
+                    <td className="px-5 py-4">
                       <div className="flex items-center gap-2">
                         <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${getStatusDot(log.status)}`} />
-                        <span className="text-neutral-300 text-xs font-mono">{log.status}</span>
+                        <span className="text-foreground text-xs font-mono">{log.status}</span>
                       </div>
                     </td>
-                    <td className="px-4 py-4">
+                    <td className="px-5 py-4">
                       {log.success ? (
                         <div className="flex items-center gap-1.5">
-                          <CheckCircle2 className="w-4 h-4 text-green-500" />
-                          <span className="text-green-500 text-xs font-bold">Yes</span>
+                          <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                          <span className="text-emerald-600 dark:text-emerald-500 text-xs font-bold">Yes</span>
                         </div>
                       ) : (
                         <div className="flex items-center gap-1.5">
-                          <HugeiconsIcon icon={CancelCircleIcon} className="w-4 h-4 text-red-500" />
-                          <span className="text-red-500 text-xs font-bold">No</span>
+                          <HugeiconsIcon icon={CancelCircleIcon} className="w-4 h-4 text-destructive" />
+                          <span className="text-destructive text-xs font-bold">No</span>
                         </div>
                       )}
                     </td>
-                    <td className="px-4 py-4 max-w-[160px]">
+                    <td className="px-5 py-4 max-w-[160px]">
                       {log.error ? (
-                        <span className="text-red-400 text-xs truncate block" title={log.error}>{log.error}</span>
+                        <span className="text-destructive text-xs truncate block" title={log.error}>{log.error}</span>
                       ) : (
-                        <span className="text-neutral-700 text-xs">—</span>
+                        <span className="text-muted-foreground/30 text-xs">—</span>
                       )}
                     </td>
-                    <td className="px-4 py-4 max-w-[140px]">
-                      <span className="text-neutral-400 text-xs truncate block" title={log.device ?? ""}>{log.device ?? "—"}</span>
+                    <td className="px-5 py-4 max-w-[140px]">
+                      <span className="text-muted-foreground text-xs truncate block" title={log.device ?? ""}>{log.device ?? "—"}</span>
                     </td>
-                    <td className="px-4 py-4">
-                      <span className="text-neutral-400 text-xs font-mono">{log.ipAddress ?? "—"}</span>
+                    <td className="px-5 py-4">
+                      <span className="text-muted-foreground text-xs font-mono">{log.ipAddress ?? "—"}</span>
                     </td>
-                    <td className="px-4 py-4">
-                      <span className="text-neutral-500 text-xs whitespace-nowrap">
+                    <td className="px-5 py-4">
+                      <span className="text-muted-foreground text-xs whitespace-nowrap">
                         {new Date(log.createdAt).toLocaleString("en-IN", {
                           month: "short", day: "numeric", hour: "2-digit", minute: "2-digit",
                         })}
@@ -216,14 +215,14 @@ export default function LogsTab() {
 
           {totalPages > 1 && (
             <div className="flex flex-col sm:flex-row items-center justify-between mt-6 gap-4">
-              <p className="text-neutral-600 text-xs">
+              <p className="text-muted-foreground text-xs">
                 Showing {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filteredLogs.length)} of {filteredLogs.length}
               </p>
               <div className="flex items-center gap-1">
                 <button
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page === 1}
-                  className="p-2 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                  className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer border border-border"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
@@ -231,15 +230,15 @@ export default function LogsTab() {
                 <div className="flex items-center gap-1">
                   {getPageNumbers().map((p, i) =>
                     p === "..." ? (
-                      <span key={`dot-${i}`} className="px-1.5 text-neutral-600 text-xs">…</span>
+                      <span key={`dot-${i}`} className="px-1.5 text-muted-foreground text-xs">…</span>
                     ) : (
                       <button
                         key={p}
                         onClick={() => setPage(p as number)}
                         className={`w-8 h-8 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                           page === p
-                            ? "bg-[#1D9BF0] text-white shadow-lg shadow-blue-500/20"
-                            : "text-neutral-400 hover:text-white hover:bg-neutral-800"
+                            ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
+                            : "text-muted-foreground hover:text-foreground hover:bg-secondary border border-border"
                         }`}
                       >
                         {p}
@@ -251,7 +250,7 @@ export default function LogsTab() {
                 <button
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   disabled={page === totalPages}
-                  className="p-2 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                  className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer border border-border"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>

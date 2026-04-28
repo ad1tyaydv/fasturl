@@ -64,16 +64,16 @@ export default function LocationAnalytics({ data = [], days = 7 }: CountryAnalyt
     return code ? (
       <ReactCountryFlag countryCode={code} svg style={{ width: "18px", height: "18px" }} />
     ) : (
-      <HugeiconsIcon icon={EarthIcon} size={22} className="text-neutral-400" />
+      <HugeiconsIcon icon={EarthIcon} size={22} className="text-muted-foreground" />
     )
   }
 
   return (
     <>
-      <Card className="bg-transparent text-white w-full h-full flex flex-col border-none shadow-none">
+      <Card className="bg-transparent text-foreground w-full h-full flex flex-col border-none shadow-none">
         <CardContent className="px-6 flex-1 flex flex-col">
           <div className="flex flex-col gap-6">
-            <div className="flex justify-between text-[15px] uppercase tracking-[0.15em] font-three">
+            <div className="flex justify-between text-[15px] uppercase tracking-[0.15em] font-three text-muted-foreground">
               <span>Location</span>
               <span>Visitors</span>
             </div>
@@ -84,21 +84,21 @@ export default function LocationAnalytics({ data = [], days = 7 }: CountryAnalyt
                   <div key={index} className="group flex flex-col gap-2">
                     <div className="flex items-center justify-between transition-transform">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 flex items-center justify-center bg-neutral-900 rounded-lg">
+                        <div className="w-8 h-8 flex items-center justify-center bg-secondary rounded-lg">
                           <FlagIcon country={item.country} />
                         </div>
-                        <span className="text-sm font-medium text-neutral-300 group-hover:text-white transition-colors">
+                        <span className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors">
                           {item.country}
                         </span>
                       </div>
-                      <span className="text-sm font-bold tabular-nums text-white">
+                      <span className="text-sm font-bold tabular-nums text-foreground">
                         {item.count.toLocaleString()}
                       </span>
                     </div>
                   </div>
                 ))
               ) : (
-                <div className="h-[200px] flex items-center justify-center text-sm text-neutral-600 italic">
+                <div className="h-[200px] flex items-center justify-center text-sm text-muted-foreground italic">
                   No data found
                 </div>
               )}
@@ -108,7 +108,7 @@ export default function LocationAnalytics({ data = [], days = 7 }: CountryAnalyt
           <div className="mt-auto pt-8">
             <button
               onClick={() => setShowModal(true)}
-              className="w-full py-2.5 text-[11px] font-semibold uppercase tracking-widest hover:bg-white/5 rounded-xl transition-all border border-neutral-800/50 cursor-pointer"
+              className="w-full py-2.5 text-[11px] font-semibold uppercase tracking-widest hover:bg-accent rounded-xl transition-all border border-border/50 cursor-pointer text-foreground"
             >
               View all
             </button>
@@ -118,30 +118,30 @@ export default function LocationAnalytics({ data = [], days = 7 }: CountryAnalyt
 
       {showModal && (
         <div
-          className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+          className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-background/60 backdrop-blur-sm"
           onClick={() => setShowModal(false)}
         >
           <div
-            className="bg-[#1c1c1c] border border-neutral-800 rounded-3xl w-full max-w-xl shadow-2xl relative overflow-hidden animate-in fade-in zoom-in duration-200"
+            className="bg-card border border-border rounded-3xl w-full max-w-xl shadow-2xl relative overflow-hidden animate-in fade-in zoom-in duration-200"
             onClick={(e) => e.stopPropagation()}
           >
             <button 
               onClick={() => setShowModal(false)}
-              className="absolute right-6 top-6 text-neutral-500 hover:text-white transition-colors cursor-pointer z-10"
+              className="absolute right-6 top-6 text-muted-foreground hover:text-foreground transition-colors cursor-pointer z-10"
             >
               <X size={24} />
             </button>
 
             <div className="px-8 pt-8 pb-6">
-              <h2 className="text-2xl font-one font-bold text-white mb-1">
+              <h2 className="text-2xl font-one font-bold text-foreground mb-1">
                 Locations
               </h2>
-              <p className="text-neutral-500 text-xs font-three uppercase tracking-widest">
+              <p className="text-muted-foreground text-xs font-three uppercase tracking-widest">
                 Full breakdown of visitor locations
               </p>
             </div>
 
-            <div className="px-8 py-4 border-y border-neutral-800/50 flex justify-between text-[11px] font-bold uppercase tracking-widest text-neutral-500 font-three">
+            <div className="px-8 py-4 border-y border-border/50 flex justify-between text-[11px] font-bold uppercase tracking-widest text-muted-foreground font-three">
               <span>Country</span>
               <div className="flex gap-10">
                 <span>Visitors</span>
@@ -155,26 +155,26 @@ export default function LocationAnalytics({ data = [], days = 7 }: CountryAnalyt
                 return (
                   <div
                     key={index}
-                    className="flex items-center justify-between py-3 px-4 rounded-2xl hover:bg-white/5 transition-colors group"
+                    className="flex items-center justify-between py-3 px-4 rounded-2xl hover:bg-accent transition-colors group"
                   >
                     <div className="flex items-center gap-4 flex-1">
-                      <div className="w-8 h-8 flex items-center justify-center bg-neutral-900 rounded-lg flex-shrink-0">
+                      <div className="w-8 h-8 flex items-center justify-center bg-secondary rounded-lg flex-shrink-0">
                         <FlagIcon country={item.country} />
                       </div>
-                      <span className="text-sm font-medium text-neutral-300 group-hover:text-white transition-colors">{item.country}</span>
+                      <span className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors">{item.country}</span>
                     </div>
                     <div className="flex items-center gap-10 text-sm tabular-nums font-three">
-                      <span className="text-white font-bold">{item.count.toLocaleString()}</span>
-                      <span className="text-neutral-500 w-10 text-right">{pct}%</span>
+                      <span className="text-foreground font-bold">{item.count.toLocaleString()}</span>
+                      <span className="text-muted-foreground w-10 text-right">{pct}%</span>
                     </div>
                   </div>
                 )
               })}
             </div>
 
-            <div className="p-6 bg-neutral-900/30 border-t border-neutral-800 flex justify-between items-center text-[11px] text-neutral-500 font-three uppercase tracking-widest">
+            <div className="p-6 bg-secondary/30 border-t border-border flex justify-between items-center text-[11px] text-muted-foreground font-three uppercase tracking-widest">
                <span>Total Analytics</span>
-               <span className="text-white font-bold">{total.toLocaleString()} visitors</span>
+               <span className="text-foreground font-bold">{total.toLocaleString()} visitors</span>
             </div>
           </div>
           <style jsx global>{`
@@ -185,7 +185,7 @@ export default function LocationAnalytics({ data = [], days = 7 }: CountryAnalyt
               background: transparent;
             }
             .custom-scrollbar::-webkit-scrollbar-thumb {
-              background: #262626;
+              background: hsl(var(--muted-foreground) / 0.3);
               border-radius: 10px;
             }
           `}</style>

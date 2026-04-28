@@ -99,12 +99,12 @@ export default function ApiLinks() {
         <div className="flex items-center gap-3 self-start">
           <button 
             onClick={() => router.push('/apikeys?type=allkeys')}
-            className="flex items-center gap-2 px-4 py-1.5 bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 rounded-lg text-sm transition-all text-white cursor-pointer"
+            className="flex items-center gap-2 px-4 py-1.5 bg-secondary hover:bg-accent border border-border rounded-lg text-sm transition-all text-foreground cursor-pointer"
           >
             <HugeiconsIcon icon={Settings02Icon} size={16} />
             Manage API Keys
           </button>
-          <span className="px-4 py-1.5 font-bold bg-[#1c1c1c] border border-neutral-800 rounded-lg text-xs uppercase tracking-widest text-neutral-400">
+          <span className="px-4 py-1.5 font-bold bg-background border border-border rounded-lg text-xs uppercase tracking-widest text-muted-foreground">
             Total - {filteredRows.length}
           </span>
         </div>
@@ -121,40 +121,40 @@ export default function ApiLinks() {
       </div>
 
       {isLoading ? (
-        <div className="flex items-center gap-2 text-neutral-500 py-20 justify-center">
+        <div className="flex items-center gap-2 text-muted-foreground py-20 justify-center">
           <Loader2 className="w-5 h-5 animate-spin text-blue-500" />
           <span className="text-sm">Fetching API links...</span>
         </div>
       ) : filteredRows.length === 0 ? (
-        <div className="border border-neutral-800 flex flex-col items-center justify-center py-16 text-center rounded-xl bg-neutral-900/20">
-          <Clock className="w-8 h-8 text-neutral-700 mb-3" />
-          <p className="text-neutral-400 text-sm font-medium">No API links found</p>
+        <div className="border border-border flex flex-col items-center justify-center py-16 text-center rounded-xl bg-secondary/20">
+          <Clock className="w-8 h-8 text-muted-foreground mb-3" />
+          <p className="text-muted-foreground text-sm font-medium">No API links found</p>
         </div>
       ) : (
         <>
-          <div className="rounded-xl border border-neutral-800/60 overflow-x-auto bg-[#111111]">
-            <table className="w-full min-w-[600px] text-sm text-neutral-300">
+          <div className="rounded-xl border border-border/60 overflow-x-auto bg-background">
+            <table className="w-full min-w-[600px] text-sm text-foreground">
               <thead>
-                <tr className="border-b border-neutral-800 bg-neutral-900/50">
-                  <th className="text-left text-xs font-medium text-neutral-500 px-6 py-4 uppercase whitespace-nowrap">Short URL</th>
-                  <th className="text-left text-xs font-medium text-neutral-500 px-6 py-4 uppercase whitespace-nowrap">API Key</th>
-                  <th className="text-left text-xs font-medium text-neutral-500 px-6 py-4 uppercase whitespace-nowrap">Protected</th>
-                  <th className="text-left text-xs font-medium text-neutral-500 px-6 py-4 uppercase whitespace-nowrap">Created</th>
+                <tr className="border-b border-border bg-secondary/50">
+                  <th className="text-left text-xs font-medium text-muted-foreground px-6 py-4 uppercase whitespace-nowrap">Short URL</th>
+                  <th className="text-left text-xs font-medium text-muted-foreground px-6 py-4 uppercase whitespace-nowrap">API Key</th>
+                  <th className="text-left text-xs font-medium text-muted-foreground px-6 py-4 uppercase whitespace-nowrap">Protected</th>
+                  <th className="text-left text-xs font-medium text-muted-foreground px-6 py-4 uppercase whitespace-nowrap">Created</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-neutral-800/40">
+              <tbody className="divide-y divide-border/40">
                 {pagedRows.map((row, i) => (
-                  <tr key={i} className="hover:bg-neutral-800/30 transition-colors">
-                    <td className="px-6 py-4 font-mono text-xs text-blue-400 whitespace-nowrap">{row.shorturl}</td>
-                    <td className="px-6 py-4 text-neutral-400 whitespace-nowrap">{row.keyName}</td>
+                  <tr key={i} className="hover:bg-accent/30 transition-colors">
+                    <td className="px-6 py-4 font-mono text-xs text-blue-500 whitespace-nowrap">{row.shorturl}</td>
+                    <td className="px-6 py-4 text-muted-foreground whitespace-nowrap">{row.keyName}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {row.isProtected ? (
                         <div className="flex items-center gap-1.5 text-green-500"><ShieldCheck size={14}/> <span>Yes</span></div>
                       ) : (
-                        <div className="flex items-center gap-1.5 text-neutral-600"><ShieldOff size={14}/> <span>No</span></div>
+                        <div className="flex items-center gap-1.5 text-muted-foreground"><ShieldOff size={14}/> <span>No</span></div>
                       )}
                     </td>
-                    <td className="px-6 py-4 text-neutral-500 text-xs whitespace-nowrap">
+                    <td className="px-6 py-4 text-muted-foreground text-xs whitespace-nowrap">
                       {new Date(row.createdAt).toLocaleDateString("en-IN", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
                     </td>
                   </tr>
@@ -165,19 +165,19 @@ export default function ApiLinks() {
 
           {totalPages > 1 && (
             <div className="flex items-center justify-between mt-6">
-              <p className="text-neutral-600 text-xs">Page {page} of {totalPages}</p>
+              <p className="text-muted-foreground text-xs">Page {page} of {totalPages}</p>
               <div className="flex items-center gap-2">
                 <button 
                   onClick={() => setPage(p => Math.max(1, p - 1))} 
                   disabled={page === 1}
-                  className="p-2 border border-neutral-800 rounded-lg hover:bg-neutral-800 disabled:opacity-30 cursor-pointer"
+                  className="p-2 border border-border rounded-lg hover:bg-accent disabled:opacity-30 cursor-pointer"
                 >
                   <ChevronLeft size={18} />
                 </button>
                 <button 
                   onClick={() => setPage(p => Math.min(totalPages, p + 1))} 
                   disabled={page === totalPages}
-                  className="p-2 border border-neutral-800 rounded-lg hover:bg-neutral-800 disabled:opacity-30 cursor-pointer"
+                  className="p-2 border border-border rounded-lg hover:bg-accent disabled:opacity-30 cursor-pointer"
                 >
                   <ChevronRight size={18} />
                 </button>

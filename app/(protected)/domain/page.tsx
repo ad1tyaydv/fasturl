@@ -168,22 +168,22 @@ export default function DomainsPage() {
   const paginatedData = filteredDomains.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   return (
-    <div className="min-h-screen bg-[#141414] text-white">
+    <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
       <Toaster position="bottom-center" />
       <Navbar />
 
       <main className="w-full max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8 border-b border-neutral-800 pb-4 sm:pb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8 border-b border-border pb-4 sm:pb-6">
           <div className="text-2xl sm:text-4xl font-one tracking-tight">Custom Domains</div>
           <div className="flex items-center gap-3">
             {domains.length > 0 && (
-              <span className="hidden sm:block px-4 py-1.5 font-three bg-[#1c1c1c] border border-neutral-700 rounded-lg text-xs">
+              <span className="hidden sm:block px-4 py-1.5 font-three bg-secondary border border-border rounded-lg text-xs text-muted-foreground">
                 TOTAL - {domains.length}
               </span>
             )}
             <Button
               onClick={handleConnectClick}
-              className="w-full sm:w-auto bg-white text-black hover:bg-neutral-200 font-three py-4 rounded-lg cursor-pointer"
+              className="w-full sm:w-auto bg-primary text-primary-foreground hover:opacity-90 font-three py-4 rounded-lg cursor-pointer shadow-md"
             >
               <HugeiconsIcon icon={PlusSignIcon} /> Connect Domain
             </Button>
@@ -200,10 +200,10 @@ export default function DomainsPage() {
         {domains.length > 0 && (
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mb-6 sm:mb-8">
             <div className="relative w-full sm:w-[400px]">
-              <HugeiconsIcon icon={Search01Icon} className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-500" />
+              <HugeiconsIcon icon={Search01Icon} className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
               <Input
                 placeholder="Search by domain or subdomain..."
-                className="bg-[#1c1c1c] font-one border-neutral-800 pl-10 h-11 w-full"
+                className="bg-background font-one border-border pl-10 h-11 w-full focus-visible:ring-1 focus-visible:ring-ring"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -217,17 +217,17 @@ export default function DomainsPage() {
         {loading ? (
           <SkeletonLoader />
         ) : domains.length === 0 ? (
-          <div className="w-full py-20 px-4 flex flex-col items-center justify-center border-2 border-dashed border-neutral-800 rounded-3xl bg-[#1c1c1c]/30">
-            <div className="p-4 bg-neutral-900 rounded-2xl border border-neutral-800 mb-6">
-              <HugeiconsIcon icon={Globe02Icon} className="w-10 h-10 text-neutral-500" />
+          <div className="w-full py-20 px-4 flex flex-col items-center justify-center border-2 border-dashed border-border rounded-3xl bg-secondary/30">
+            <div className="p-4 bg-secondary rounded-2xl border border-border mb-6">
+              <HugeiconsIcon icon={Globe02Icon} className="w-10 h-10 text-muted-foreground" />
             </div>
-            <h2 className="text-xl sm:text-2xl font-one mb-2">Connect your first custom domain</h2>
-            <p className="text-neutral-500 font-three text-sm mb-8 text-center max-w-md">
+            <h2 className="text-xl sm:text-2xl font-one mb-2 text-foreground">Connect your first custom domain</h2>
+            <p className="text-muted-foreground font-three text-sm mb-8 text-center max-w-md leading-relaxed">
               Build brand authority and trust by using your own domain name for your links and projects.
             </p>
             <Button
               onClick={handleConnectClick}
-              className="bg-white text-black hover:bg-neutral-200 font-three px-8 py-6 rounded-xl flex items-center gap-2 cursor-pointer"
+              className="bg-primary text-primary-foreground hover:opacity-90 font-three px-8 py-6 rounded-xl flex items-center gap-2 cursor-pointer shadow-lg"
             >
               <HugeiconsIcon icon={PlusSignIcon} className="w-5 h-5" /> Add Domain
             </Button>
@@ -240,43 +240,43 @@ export default function DomainsPage() {
               const fullDomain = item.subDomain ? `${item.subDomain}.${item.domain}` : item.domain;
 
               return (
-                <div key={index} className={`overflow-hidden rounded-2xl bg-[#1c1c1c] border transition-all duration-300 ${isExpanded ? 'border-neutral-500 shadow-lg' : 'border-neutral-800 hover:border-neutral-700'}`}>
-                  <div onClick={() => setExpandedId(isExpanded ? null : item.id)} className="flex items-center font-three justify-between p-4 sm:p-5 cursor-pointer">
+                <div key={index} className={`overflow-hidden rounded-2xl bg-secondary/50 border transition-all duration-300 ${isExpanded ? 'border-primary shadow-lg' : 'border-border hover:border-muted-foreground/30'}`}>
+                  <div onClick={() => setExpandedId(isExpanded ? null : item.id)} className="flex items-center font-three justify-between p-4 sm:p-5 cursor-pointer hover:bg-accent/50 transition-colors">
                     <div className="flex items-start sm:items-center gap-3 sm:gap-4 flex-1 min-w-0 pr-2">
-                      <div className="p-2.5 sm:p-3.5 rounded-xl bg-[#141414] border border-neutral-800 group-hover:border-neutral-700 shrink-0 mt-1 sm:mt-0">
-                        <HugeiconsIcon icon={Globe02Icon} className={`w-5 h-5 sm:w-6 sm:h-6 transition-colors ${isExpanded ? 'text-white' : 'text-neutral-400'}`} />
+                      <div className="p-2.5 sm:p-3.5 rounded-xl bg-background border border-border shrink-0 mt-1 sm:mt-0">
+                        <HugeiconsIcon icon={Globe02Icon} className={`w-5 h-5 sm:w-6 sm:h-6 transition-colors ${isExpanded ? 'text-primary' : 'text-muted-foreground'}`} />
                       </div>
                       <div className="flex flex-col min-w-0 w-full">
                         <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 min-w-0">
-                          <h3 className="font-one text-base sm:text-lg truncate">{fullDomain}</h3>
+                          <h3 className="font-one text-base sm:text-lg truncate text-foreground">{fullDomain}</h3>
                           {item.isActive ? (
-                            <span className="w-max flex items-center gap-1 text-[10px] bg-emerald-500/10 text-emerald-500 px-2 py-0.5 rounded-full border border-emerald-500/20 font-bold uppercase shrink-0">
+                            <span className="w-max flex items-center gap-1 text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-500 px-2 py-0.5 rounded-full border border-emerald-500/20 font-bold uppercase shrink-0">
                               <ShieldCheck className="w-3 h-3" /> Verified
                             </span>
                           ) : (
                             <div className="flex items-center gap-2 shrink-0">
-                              <span className="flex items-center gap-1 text-[10px] bg-amber-500/10 text-amber-500 px-2 py-0.5 rounded-full border border-amber-500/20 font-three uppercase">
+                              <span className="flex items-center gap-1 text-[10px] bg-amber-500/10 text-amber-600 dark:text-amber-500 px-2 py-0.5 rounded-full border border-amber-500/20 font-three uppercase">
                                 <ShieldAlert className="w-3 h-3" /> Pending
                               </span>
                               <Button
                                 size="sm"
                                 disabled={isVerifying}
                                 onClick={(e) => handleVerify(e, fullDomain)}
-                                className="h-7 px-3 text-[12px] bg-white text-black hover:bg-neutral-200 font-three rounded-md cursor-pointer"
+                                className="h-7 px-3 text-[12px] bg-primary text-primary-foreground hover:opacity-90 font-three rounded-md cursor-pointer"
                               >
                                 {isVerifying ? <Loader2 className="w-3 h-3 animate-spin" /> : "Verify Now"}
                               </Button>
                             </div>
                           )}
                         </div>
-                        <p className="text-[11px] sm:text-xs text-neutral-400 font-three mt-1">{new Date(item.createdAt).toLocaleDateString()}</p>
+                        <p className="text-[11px] sm:text-xs text-muted-foreground font-three mt-1">{new Date(item.createdAt).toLocaleDateString()}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-1 sm:gap-2 shrink-0 pl-2">
-                      <HugeiconsIcon icon={ArrowDown01Icon} className={`text-neutral-500 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                      <HugeiconsIcon icon={ArrowDown01Icon} className={`text-muted-foreground transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
                       <Button
                         variant="ghost" size="icon"
-                        className="text-neutral-500 hover:text-red-500 ml-0 sm:ml-2 cursor-pointer h-8 w-8 sm:h-10 sm:w-10"
+                        className="text-muted-foreground hover:text-destructive ml-0 sm:ml-2 cursor-pointer h-8 w-8 sm:h-10 sm:w-10"
                         onClick={(e) => { e.stopPropagation(); handleDeleteDomain(item.id) }}
                       >
                         <HugeiconsIcon icon={Delete02Icon} />
@@ -284,50 +284,50 @@ export default function DomainsPage() {
                     </div>
                   </div>
 
-                  <div className={`px-4 sm:px-5 transition-all duration-300 ease-in-out ${isExpanded ? 'max-h-[1000px] pb-6 opacity-100 border-t border-neutral-800/50 pt-6' : 'max-h-0 opacity-0 pointer-events-none'}`}>
+                  <div className={`px-4 sm:px-5 transition-all duration-300 ease-in-out ${isExpanded ? 'max-h-[1000px] pb-6 opacity-100 border-t border-border pt-6 bg-background/50' : 'max-h-0 opacity-0 pointer-events-none'}`}>
                     <div className="space-y-6">
                       <div className="space-y-2">
-                        <label className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">Verification (TXT Record)</label>
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Verification (TXT Record)</label>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                          <div onClick={() => handleCopy(item.txtName, "TXT Host")} className="flex items-center justify-between bg-[#141414] p-3 rounded-lg border border-neutral-800 cursor-pointer hover:bg-neutral-900 group/item">
+                          <div onClick={() => handleCopy(item.txtName, "TXT Host")} className="flex items-center justify-between bg-secondary/50 p-3 rounded-lg border border-border cursor-pointer hover:bg-accent group/item transition-colors">
                             <div className="flex flex-col min-w-0 pr-4">
-                              <span className="text-[9px] text-neutral-500 uppercase font-bold">Type / Host</span>
-                              <span className="text-sm font-three text-neutral-300 truncate">TXT / {item.txtName || "N/A"}</span>
+                              <span className="text-[9px] text-muted-foreground uppercase font-bold">Type / Host</span>
+                              <span className="text-sm font-three text-foreground truncate">TXT / {item.txtName || "N/A"}</span>
                             </div>
-                            {copiedField === "TXT Host" ? <HugeiconsIcon icon={CopyCheckIcon} className="text-emerald-500 w-4 h-4 shrink-0" /> : <HugeiconsIcon icon={CopyIcon} className="w-4 h-4 text-neutral-600 shrink-0" />}
+                            {copiedField === "TXT Host" ? <HugeiconsIcon icon={CopyCheckIcon} className="text-emerald-500 w-4 h-4 shrink-0" /> : <HugeiconsIcon icon={CopyIcon} className="w-4 h-4 text-muted-foreground shrink-0" />}
                           </div>
-                          <div onClick={() => handleCopy(item.txtValue, "TXT Value")} className="flex items-center justify-between bg-[#141414] p-3 rounded-lg border border-neutral-800 cursor-pointer hover:bg-neutral-900 group/item">
+                          <div onClick={() => handleCopy(item.txtValue, "TXT Value")} className="flex items-center justify-between bg-secondary/50 p-3 rounded-lg border border-border cursor-pointer hover:bg-accent group/item transition-colors">
                             <div className="flex flex-col min-w-0 pr-4">
-                              <span className="text-[9px] text-neutral-500 uppercase font-bold">Value</span>
-                              <span className="text-sm font-three text-neutral-300 truncate">{item.txtValue || "N/A"}</span>
+                              <span className="text-[9px] text-muted-foreground uppercase font-bold">Value</span>
+                              <span className="text-sm font-three text-foreground truncate">{item.txtValue || "N/A"}</span>
                             </div>
-                            {copiedField === "TXT Value" ? <HugeiconsIcon icon={CopyCheckIcon} className="text-emerald-500 w-4 h-4 shrink-0" /> : <HugeiconsIcon icon={CopyIcon} className="w-4 h-4 text-neutral-600 shrink-0" />}
+                            {copiedField === "TXT Value" ? <HugeiconsIcon icon={CopyCheckIcon} className="text-emerald-500 w-4 h-4 shrink-0" /> : <HugeiconsIcon icon={CopyIcon} className="w-4 h-4 text-muted-foreground shrink-0" />}
                           </div>
                         </div>
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest">Routing (CNAME Record)</label>
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Routing (CNAME Record)</label>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                          <div onClick={() => handleCopy(item.subDomain, "CNAME Host")} className="flex items-center justify-between bg-[#141414] p-3 rounded-lg border border-neutral-800 cursor-pointer hover:bg-neutral-900 group/item">
+                          <div onClick={() => handleCopy(item.subDomain, "CNAME Host")} className="flex items-center justify-between bg-secondary/50 p-3 rounded-lg border border-border cursor-pointer hover:bg-accent group/item transition-colors">
                             <div className="flex flex-col min-w-0 pr-4">
-                              <span className="text-[9px] text-neutral-500 uppercase font-bold">Type / Host</span>
-                              <span className="text-sm font-three text-neutral-300 truncate">CNAME / {item.subDomain}</span>
+                              <span className="text-[9px] text-muted-foreground uppercase font-bold">Type / Host</span>
+                              <span className="text-sm font-three text-foreground truncate">CNAME / {item.subDomain}</span>
                             </div>
-                            {copiedField === "CNAME Host" ? <HugeiconsIcon icon={CopyCheckIcon} className="text-emerald-500 w-4 h-4 shrink-0" /> : <HugeiconsIcon icon={CopyIcon} className="w-4 h-4 text-neutral-600 shrink-0" />}
+                            {copiedField === "CNAME Host" ? <HugeiconsIcon icon={CopyCheckIcon} className="text-emerald-500 w-4 h-4 shrink-0" /> : <HugeiconsIcon icon={CopyIcon} className="w-4 h-4 text-muted-foreground shrink-0" />}
                           </div>
-                          <div onClick={() => handleCopy(item.cnameTarget, "CNAME Target")} className="flex items-center justify-between bg-[#141414] p-3 rounded-lg border border-neutral-800 cursor-pointer hover:bg-neutral-900 group/item">
+                          <div onClick={() => handleCopy(item.cnameTarget, "CNAME Target")} className="flex items-center justify-between bg-secondary/50 p-3 rounded-lg border border-border cursor-pointer hover:bg-accent group/item transition-colors">
                             <div className="flex flex-col min-w-0 pr-4">
-                              <span className="text-[9px] text-neutral-500 uppercase font-bold">Value / Target</span>
-                              <span className="text-sm font-three text-neutral-300 truncate">{item.cnameTarget || "N/A"}</span>
+                              <span className="text-[9px] text-muted-foreground uppercase font-bold">Value / Target</span>
+                              <span className="text-sm font-three text-foreground truncate">{item.cnameTarget || "N/A"}</span>
                             </div>
-                            {copiedField === "CNAME Target" ? <HugeiconsIcon icon={CopyCheckIcon} className="text-emerald-500 w-4 h-4 shrink-0" /> : <HugeiconsIcon icon={CopyIcon} className="w-4 h-4 text-neutral-600 shrink-0" />}
+                            {copiedField === "CNAME Target" ? <HugeiconsIcon icon={CopyCheckIcon} className="text-emerald-500 w-4 h-4 shrink-0" /> : <HugeiconsIcon icon={CopyIcon} className="w-4 h-4 text-muted-foreground shrink-0" />}
                           </div>
                         </div>
                       </div>
 
-                      <p className="text-[11px] italic font-three text-neutral-500 mt-4 leading-relaxed bg-neutral-900/50 p-3 rounded-lg border border-neutral-800/50">
-                        <span className="text-neutral-300 font-bold not-italic">Pro Tip:</span> Add these records in your DNS settings. TXT is for ownership verification, and CNAME points your domain traffic to our servers.
+                      <p className="text-[11px] italic font-three text-muted-foreground mt-4 leading-relaxed bg-secondary/30 p-3 rounded-lg border border-border/50">
+                        <span className="text-foreground font-bold not-italic">Pro Tip:</span> Add these records in your DNS settings. TXT is for ownership verification, and CNAME points your domain traffic to our servers.
                       </p>
                     </div>
                   </div>
@@ -338,10 +338,10 @@ export default function DomainsPage() {
         )}
 
         {domains.length > 0 && totalPages > 1 && (
-          <div className="flex justify-center items-center gap-4 mt-12">
-            <Button variant="outline" size="icon" disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)} className="bg-neutral-800 border-neutral-700 disabled:opacity-30"><ChevronLeft size={18} /></Button>
-            <span className="text-sm font-bold text-neutral-400">{currentPage} / {totalPages}</span>
-            <Button variant="outline" size="icon" disabled={currentPage === totalPages} onClick={() => setCurrentPage(p => p + 1)} className="bg-neutral-800 border-neutral-700 disabled:opacity-30"><ChevronRight size={18} /></Button>
+          <div className="flex justify-center items-center gap-4 mt-12 pb-10">
+            <Button variant="outline" size="icon" disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)} className="bg-secondary border-border disabled:opacity-30 cursor-pointer"><ChevronLeft size={18} /></Button>
+            <span className="text-sm font-bold text-muted-foreground">{currentPage} / {totalPages}</span>
+            <Button variant="outline" size="icon" disabled={currentPage === totalPages} onClick={() => setCurrentPage(p => p + 1)} className="bg-secondary border-border disabled:opacity-30 cursor-pointer"><ChevronRight size={18} /></Button>
           </div>
         )}
       </main>

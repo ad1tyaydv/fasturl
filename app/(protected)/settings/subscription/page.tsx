@@ -44,8 +44,8 @@ export default function SubscriptionPage() {
   }, [router]);
 
   return (
-    <div className="animate-in fade-in duration-300">
-      <h2 className="text-2xl font-bold text-neutral-200 mb-6">
+    <div className="animate-in fade-in duration-300 font-one">
+      <h2 className="text-2xl font-bold text-foreground mb-6">
         Subscription & Usage
       </h2>
 
@@ -53,21 +53,21 @@ export default function SubscriptionPage() {
         <div className="flex items-center gap-4 text-base sm:text-lg min-h-[40px]">
           {loading ? (
             <div className="flex items-center gap-4 w-full">
-              <Skeleton className="h-6 w-32 bg-zinc-800" />
-              <Skeleton className="h-8 w-24 bg-zinc-800 rounded-lg" />
+              <Skeleton className="h-6 w-32 bg-secondary" />
+              <Skeleton className="h-8 w-24 bg-secondary rounded-lg" />
             </div>
           ) : (
             <>
               <div>
-                <span className="text-neutral-400">Current Plan: </span>
-                <span className={`font-bold ${plan === "FREE" ? "text-white" : "text-[#1D9BF0]"}`}>
+                <span className="text-muted-foreground">Current Plan: </span>
+                <span className={`font-bold ${plan === "FREE" ? "text-foreground" : "text-primary"}`}>
                   {plan}
                 </span>
               </div>
               {plan === "FREE" && (
                 <Button 
                     onClick={() => router.push("/premium")}
-                    className="bg-white h-8 text-black hover:bg-gray-200 font-bold px-4 text-sm cursor-pointer rounded-lg"
+                    className="bg-primary text-primary-foreground hover:opacity-90 font-bold px-4 h-8 text-sm cursor-pointer rounded-lg transition-all"
                 >
                   Upgrade
                 </Button>
@@ -78,50 +78,50 @@ export default function SubscriptionPage() {
 
         {loading ? (
           <div className="space-y-4">
-            <Skeleton className="h-5 w-48 bg-zinc-800" />
-            <Skeleton className="h-5 w-56 bg-zinc-800" />
+            <Skeleton className="h-5 w-48 bg-secondary" />
+            <Skeleton className="h-5 w-56 bg-secondary" />
           </div>
         ) : (
           (plan === "PRO" || plan === "ESSENTIAL") && (
             <div className="space-y-3">
               <div className="text-base sm:text-lg">
-                <span className="text-neutral-400">Plan Started: </span>
-                <span className="font-bold text-white">{planStartedAt}</span>
+                <span className="text-muted-foreground">Plan Started: </span>
+                <span className="font-bold text-foreground">{planStartedAt}</span>
               </div>
               <div className="text-base sm:text-lg">
-                <span className="text-neutral-400">Plan Expires: </span>
-                <span className="font-bold text-white">{planExpiresAt}</span>
+                <span className="text-muted-foreground">Plan Expires: </span>
+                <span className="font-bold text-foreground">{planExpiresAt}</span>
               </div>
             </div>
           )
         )}
       </div>
 
-      <div className="w-full h-px bg-neutral-800 my-8 max-w-2xl"></div>
+      <div className="w-full h-px bg-border my-8 max-w-2xl"></div>
 
-      <h3 className="text-xl font-bold text-neutral-200 mb-4">Usage Statistics</h3>
+      <h3 className="text-xl font-bold text-foreground mb-4">Usage Statistics</h3>
       
       <div className="flex flex-col gap-4 w-full max-w-lg mt-2">
         {loading ? (
           Array.from({ length: 3 }).map((_, i) => (
             <div key={i} className="flex items-center gap-3">
-               <Skeleton className="h-5 w-28 bg-zinc-800" />
-               <Skeleton className="h-5 w-12 bg-zinc-800" />
+               <Skeleton className="h-5 w-28 bg-secondary" />
+               <Skeleton className="h-5 w-12 bg-secondary" />
             </div>
           ))
         ) : (
           <>
             <div className="text-base sm:text-lg">
-              <span className="text-neutral-400">Total Links: </span>
-              <span className="font-bold text-white">{totalLinks}</span>
+              <span className="text-muted-foreground">Total Links: </span>
+              <span className="font-bold text-foreground">{totalLinks}</span>
             </div>
             <div className="text-base sm:text-lg">
-              <span className="text-neutral-400">Bulk Links: </span>
-              <span className="font-bold text-white">{bulkLinks}</span>
+              <span className="text-muted-foreground">Bulk Links: </span>
+              <span className="font-bold text-foreground">{bulkLinks}</span>
             </div>
             <div className="text-base sm:text-lg">
-              <span className="text-neutral-400">Total QR Codes: </span>
-              <span className="font-bold text-white">{totalQrCodes}</span>
+              <span className="text-muted-foreground">Total QR Codes: </span>
+              <span className="font-bold text-foreground">{totalQrCodes}</span>
             </div>
           </>
         )}

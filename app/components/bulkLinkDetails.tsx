@@ -105,14 +105,14 @@ function BulkLinkItem({
   };
 
   return (
-    <div className="relative flex items-center justify-between py-5 px-4 border-b border-neutral-800/60 hover:bg-[#1a1a1a] group transition-colors">
+    <div className="relative flex items-center justify-between py-5 px-4 border-b border-border/60 hover:bg-accent group transition-colors">
       
       <div className="flex items-start gap-4 w-[65%] md:w-[40%] min-w-0 pr-4">
-        <div className="mt-1 w-8 h-8 rounded-full bg-neutral-800 flex items-center justify-center overflow-hidden shrink-0">
+        <div className="mt-1 w-8 h-8 rounded-full bg-secondary flex items-center justify-center overflow-hidden shrink-0">
           {link.original ? (
             <img src={getLogo(link.original)} alt="logo" className="w-full h-full object-cover" onError={(e) => (e.currentTarget.style.display = "none")} />
           ) : (
-            <HugeiconsIcon icon={Link04Icon} />
+            <HugeiconsIcon icon={Link04Icon} className="text-foreground" />
           )}
         </div>
         <div className="flex flex-col min-w-0 w-full">
@@ -120,20 +120,20 @@ function BulkLinkItem({
             <div className="flex items-center gap-2">
               <input
                 autoFocus
-                className="bg-[#111111] border border-neutral-700 rounded px-2 py-1 text-white w-full outline-none"
+                className="bg-background border border-border rounded px-2 py-1 text-foreground w-full outline-none focus:ring-1 focus:ring-ring"
                 value={tempName}
                 onChange={(e) => setTempName(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && !isSavingName && saveName()}
                 disabled={isSavingName}
               />
-              <button onClick={saveName} disabled={isSavingName} className="text-green-500 shrink-0">
-                {isSavingName ? <div className="w-[22px] h-[22px] border-2 border-t-transparent rounded-full animate-spin" /> : <HugeiconsIcon icon={Tick02Icon} />}
+              <button onClick={saveName} disabled={isSavingName} className="text-green-500 shrink-0 cursor-pointer">
+                {isSavingName ? <div className="w-[22px] h-[22px] border-2 border-t-transparent border-green-500 rounded-full animate-spin" /> : <HugeiconsIcon icon={Tick02Icon} />}
               </button>
             </div>
           ) : (
-            <span className="text-white font-one text-xl truncate tracking-wide">{link.linkName || "Untitled Link"}</span>
+            <span className="text-foreground font-one text-xl truncate tracking-wide">{link.linkName || "Untitled Link"}</span>
           )}
-          <span className="text-neutral-500 font-three text-base truncate">{domain}/{shortUrl}</span>
+          <span className="text-muted-foreground font-three text-base truncate">{domain}/{shortUrl}</span>
         </div>
       </div>
 
@@ -147,34 +147,34 @@ function BulkLinkItem({
       </div>
 
       <div className="w-[20%] md:w-[10%] flex flex-col items-end md:items-start">
-        <span className="text-white font-semibold text-sm md:text-base">{link.clicks || 0} clicks</span>
+        <span className="text-foreground font-semibold text-sm md:text-base">{link.clicks || 0} clicks</span>
       </div>
 
-      <div className="hidden md:flex items-center justify-end gap-3 text-neutral-400 w-[30%] opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity">
-        <button onClick={() => { if(onOpenPassword) onOpenPassword(link); }} className={`p-2 rounded-md cursor-pointer transition-colors ${link.password ? 'text-blue-500' : 'hover:text-white'}`}>
+      <div className="hidden md:flex items-center justify-end gap-3 text-muted-foreground w-[30%] opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity">
+        <button onClick={() => { if(onOpenPassword) onOpenPassword(link); }} className={`p-2 rounded-md cursor-pointer transition-colors ${link.password ? 'text-blue-500' : 'hover:text-foreground'}`}>
           {link.password ? <HugeiconsIcon icon={CircleLock01Icon} /> : <HugeiconsIcon icon={CircleUnlock01Icon} />}
         </button>
-        <button onClick={() => { if(onOpenCustom) onOpenCustom(link); }} className="hover:text-white p-2 cursor-pointer"><HugeiconsIcon icon={MagicWand01Icon} /></button>
-        <button onClick={() => window.open(`${domain}/${shortUrl}`, '_blank')} className="hover:text-white p-2 cursor-pointer"><HugeiconsIcon icon={Share05Icon} /></button>
-        <button onClick={copyToClipboard} className={`p-2 cursor-pointer ${copied ? "text-green-500" : "hover:text-white"}`}>
+        <button onClick={() => { if(onOpenCustom) onOpenCustom(link); }} className="hover:text-foreground p-2 cursor-pointer"><HugeiconsIcon icon={MagicWand01Icon} /></button>
+        <button onClick={() => window.open(`${domain}/${shortUrl}`, '_blank')} className="hover:text-foreground p-2 cursor-pointer"><HugeiconsIcon icon={Share05Icon} /></button>
+        <button onClick={copyToClipboard} className={`p-2 cursor-pointer ${copied ? "text-green-500" : "hover:text-foreground"}`}>
           {copied ? <HugeiconsIcon icon={CopyCheckIcon} /> : <HugeiconsIcon icon={CopyIcon} />}
         </button>
-        <button onClick={() => { if(onOpenQr) onOpenQr(link); }} className="hover:text-white p-2 cursor-pointer"><HugeiconsIcon icon={QrCodeIcon} /></button>
-        <button onClick={() => router.push(`/analytics?link=${shortUrl}`)} className="hover:text-white p-2 cursor-pointer"><HugeiconsIcon icon={Analytics01Icon} /></button>
-        <button onClick={() => { setIsEditing(true); setTempName(link.linkName || ""); }} className="hover:text-white p-2 cursor-pointer"><HugeiconsIcon icon={Edit03Icon} /></button>
+        <button onClick={() => { if(onOpenQr) onOpenQr(link); }} className="hover:text-foreground p-2 cursor-pointer"><HugeiconsIcon icon={QrCodeIcon} /></button>
+        <button onClick={() => router.push(`/analytics?link=${shortUrl}`)} className="hover:text-foreground p-2 cursor-pointer"><HugeiconsIcon icon={Analytics01Icon} /></button>
+        <button onClick={() => { setIsEditing(true); setTempName(link.linkName || ""); }} className="hover:text-foreground p-2 cursor-pointer"><HugeiconsIcon icon={Edit03Icon} /></button>
         <button onClick={handleDelete} disabled={isDeleting} className="p-2 hover:text-red-500 cursor-pointer">
           {isDeleting ? <div className="w-[20px] h-[20px] border-2 border-red-500 border-t-transparent rounded-full animate-spin" /> : <HugeiconsIcon icon={Delete02Icon} />}
         </button>
       </div>
 
-      <div className="hidden md:block w-[10%] text-right text-neutral-500 text-sm font-medium">
+      <div className="hidden md:block w-[10%] text-right text-muted-foreground text-sm font-medium">
         {getRelativeTime(link.createdAt)}
       </div>
 
       <div className="md:hidden flex justify-end w-[15%]" ref={menuRef}>
         <button 
           onClick={() => setShowMobileMenu(!showMobileMenu)} 
-          className="p-2 text-neutral-400 hover:text-white"
+          className="p-2 text-muted-foreground hover:text-foreground"
         >
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="12" cy="12" r="1" />
@@ -184,33 +184,33 @@ function BulkLinkItem({
         </button>
 
         {showMobileMenu && (
-          <div className="absolute right-4 top-16 mt-1 w-48 bg-[#111111] border border-neutral-800 rounded-lg shadow-xl z-50 flex flex-col py-2 overflow-hidden">
-            <button onClick={() => { if(onOpenPassword) onOpenPassword(link); setShowMobileMenu(false); }} className={`flex items-center gap-3 px-4 py-2 text-sm text-left ${link.password ? 'text-blue-500' : 'text-neutral-300 hover:bg-neutral-800'}`}>
+          <div className="absolute right-4 top-16 mt-1 w-48 bg-popover border border-border rounded-lg shadow-xl z-50 flex flex-col py-2 overflow-hidden">
+            <button onClick={() => { if(onOpenPassword) onOpenPassword(link); setShowMobileMenu(false); }} className={`flex items-center gap-3 px-4 py-2 text-sm text-left ${link.password ? 'text-blue-500' : 'text-popover-foreground hover:bg-accent'}`}>
               {link.password ? <HugeiconsIcon icon={CircleLock01Icon} size={18} /> : <HugeiconsIcon icon={CircleUnlock01Icon} size={18} />}
               {link.password ? 'Protected' : 'Add Password'}
             </button>
-            <button onClick={() => { if(onOpenCustom) onOpenCustom(link); setShowMobileMenu(false); }} className="flex items-center gap-3 px-4 py-2 text-sm text-neutral-300 hover:bg-neutral-800 text-left">
+            <button onClick={() => { if(onOpenCustom) onOpenCustom(link); setShowMobileMenu(false); }} className="flex items-center gap-3 px-4 py-2 text-sm text-popover-foreground hover:bg-accent text-left">
               <HugeiconsIcon icon={MagicWand01Icon} size={18} /> Custom Link
             </button>
-            <button onClick={() => { window.open(`${domain}/${shortUrl}`, '_blank'); setShowMobileMenu(false); }} className="flex items-center gap-3 px-4 py-2 text-sm text-neutral-300 hover:bg-neutral-800 text-left">
+            <button onClick={() => { window.open(`${domain}/${shortUrl}`, '_blank'); setShowMobileMenu(false); }} className="flex items-center gap-3 px-4 py-2 text-sm text-popover-foreground hover:bg-accent text-left">
               <HugeiconsIcon icon={Share05Icon} size={18} /> Open Link
             </button>
-            <button onClick={copyToClipboard} className={`flex items-center gap-3 px-4 py-2 text-sm text-left ${copied ? 'text-green-500' : 'text-neutral-300 hover:bg-neutral-800'}`}>
+            <button onClick={copyToClipboard} className={`flex items-center gap-3 px-4 py-2 text-sm text-left ${copied ? 'text-green-500' : 'text-popover-foreground hover:bg-accent'}`}>
               {copied ? <HugeiconsIcon icon={CopyCheckIcon} size={18} /> : <HugeiconsIcon icon={CopyIcon} size={18} />} Copy Link
             </button>
-            <button onClick={() => { if(onOpenQr) onOpenQr(link); setShowMobileMenu(false); }} className="flex items-center gap-3 px-4 py-2 text-sm text-neutral-300 hover:bg-neutral-800 text-left">
+            <button onClick={() => { if(onOpenQr) onOpenQr(link); setShowMobileMenu(false); }} className="flex items-center gap-3 px-4 py-2 text-sm text-popover-foreground hover:bg-accent text-left">
               <HugeiconsIcon icon={QrCodeIcon} size={18} /> QR Code
             </button>
-            <button onClick={() => { router.push(`/analytics?link=${shortUrl}`); setShowMobileMenu(false); }} className="flex items-center gap-3 px-4 py-2 text-sm text-neutral-300 hover:bg-neutral-800 text-left">
+            <button onClick={() => { router.push(`/analytics?link=${shortUrl}`); setShowMobileMenu(false); }} className="flex items-center gap-3 px-4 py-2 text-sm text-popover-foreground hover:bg-accent text-left">
               <HugeiconsIcon icon={Analytics01Icon} size={18} /> Analytics
             </button>
-            <button onClick={() => { setIsEditing(true); setTempName(link.linkName || ""); setShowMobileMenu(false); }} className="flex items-center gap-3 px-4 py-2 text-sm text-neutral-300 hover:bg-neutral-800 text-left">
+            <button onClick={() => { setIsEditing(true); setTempName(link.linkName || ""); setShowMobileMenu(false); }} className="flex items-center gap-3 px-4 py-2 text-sm text-popover-foreground hover:bg-accent text-left">
               <HugeiconsIcon icon={Edit03Icon} size={18} /> Edit Name
             </button>
             
-            <div className="h-px bg-neutral-800 my-1 mx-2" />
+            <div className="h-px bg-border my-1 mx-2" />
             
-            <button onClick={handleDelete} disabled={isDeleting} className="flex items-center gap-3 px-4 py-2 text-sm text-red-500 hover:bg-red-500/10 text-left">
+            <button onClick={handleDelete} disabled={isDeleting} className="flex items-center gap-3 px-4 py-2 text-sm text-red-500 hover:bg-red-500/10 text-left cursor-pointer">
               {isDeleting ? <div className="w-[18px] h-[18px] border-2 border-red-500 border-t-transparent rounded-full animate-spin" /> : <HugeiconsIcon icon={Delete02Icon} size={18} />} Delete
             </button>
           </div>
@@ -259,26 +259,26 @@ export default function BulkLinkDetails({
 
   return (
     <div className="flex flex-col w-full animate-in fade-in duration-300">
-      <div className="flex items-center gap-4 mb-6 border-b border-neutral-800 pb-6">
+      <div className="flex items-center gap-4 mb-6 border-b border-border pb-6">
         <button 
           onClick={onBack}
-          className="p-2 hover:bg-[#1c1c1c] rounded-full text-neutral-400 hover:text-white transition-colors cursor-pointer"
+          className="p-2 hover:bg-secondary rounded-full text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
         >
           <HugeiconsIcon icon={ArrowLeft01Icon} size={22} />
         </button>
         <div>
-          <h2 className="text-xl md:text-2xl font-one text-white tracking-wide">{batch.name || "Bulk link"}</h2>
-          <p className="text-neutral-500 font-three text-xs md:text-sm">{filteredLinks.length} total items</p>
+          <h2 className="text-xl md:text-2xl font-one text-foreground tracking-wide">{batch.name || "Bulk link"}</h2>
+          <p className="text-muted-foreground font-three text-xs md:text-sm">{filteredLinks.length} total items</p>
         </div>
       </div>
 
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-6 fade-in">
         <div className="relative w-full sm:max-w-[450px] flex-1">
-          <HugeiconsIcon icon={Search02Icon} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-500 w-5 h-5" />
+          <HugeiconsIcon icon={Search02Icon} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground w-5 h-5" />
           <input
             type="text"
             placeholder="Search within folder..."
-            className="w-full pl-11 pr-4 py-3 bg-[#111111] border border-neutral-800 rounded-xl text-white text-sm outline-none focus:border-neutral-600 transition-all shadow-sm"
+            className="w-full pl-11 pr-4 py-3 bg-background border border-border rounded-xl text-foreground text-sm outline-none focus:ring-1 focus:ring-ring transition-all shadow-sm"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -304,7 +304,7 @@ export default function BulkLinkDetails({
             />
           ))
         ) : (
-          <div className="text-center py-16 text-neutral-600 font-three italic">No links match your search.</div>
+          <div className="text-center py-16 text-muted-foreground font-three italic">No links match your search.</div>
         )}
       </div>
 
@@ -313,21 +313,21 @@ export default function BulkLinkDetails({
           <button 
             onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
             disabled={currentPage === 1}
-            className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center border border-neutral-700 rounded-full disabled:opacity-20 hover:bg-neutral-800 transition-colors cursor-pointer disabled:cursor-not-allowed"
+            className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center border border-border rounded-full disabled:opacity-20 hover:bg-accent transition-colors cursor-pointer disabled:cursor-not-allowed"
           >
-            <HugeiconsIcon icon={ArrowLeft01Icon} size={20} className="text-white" />
+            <HugeiconsIcon icon={ArrowLeft01Icon} size={20} className="text-foreground" />
           </button>
           
-          <div className="text-neutral-400 font-one text-base md:text-lg">
-            Page <span className="text-white font-bold">{currentPage}</span> of {totalPages}
+          <div className="text-muted-foreground font-one text-base md:text-lg">
+            Page <span className="text-foreground font-bold">{currentPage}</span> of {totalPages}
           </div>
 
           <button 
             onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
             disabled={currentPage === totalPages}
-            className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center border border-neutral-700 rounded-full disabled:opacity-20 hover:bg-neutral-800 transition-colors cursor-pointer disabled:cursor-not-allowed"
+            className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center border border-border rounded-full disabled:opacity-20 hover:bg-accent transition-colors cursor-pointer disabled:cursor-not-allowed"
           >
-            <HugeiconsIcon icon={ArrowRight01Icon} size={20} className="text-white" />
+            <HugeiconsIcon icon={ArrowRight01Icon} size={20} className="text-foreground" />
           </button>
         </div>
       )}

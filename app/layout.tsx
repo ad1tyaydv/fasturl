@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { UserProvider } from "./components/userContext";
 import { Toaster } from "sonner";
 import "./globals.css";
+import { ThemeProvider } from "./components/theme-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,11 +34,18 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <UserProvider>
-          {children}
-          <Toaster theme="light" />
-        </UserProvider>
-        <Analytics/>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="light"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <UserProvider>
+            {children}
+            <Toaster />
+          </UserProvider>
+          <Analytics />
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -111,10 +111,10 @@ export default function TwoFactorPage() {
   
   return (
     <div className="animate-in fade-in duration-300 font-one">
-      <h2 className="text-2xl font-bold text-white mb-4">
+      <h2 className="text-2xl font-bold text-foreground mb-4">
         Two-Factor Authentication
       </h2>
-      <p className="text-neutral-400 mb-8 max-w-2xl leading-relaxed">
+      <p className="text-muted-foreground mb-8 max-w-2xl leading-relaxed">
         Protect your account with an extra layer of security. Once configured,
         you'll be required to enter both your password and an authentication
         code from your mobile phone in order to sign in.
@@ -122,13 +122,13 @@ export default function TwoFactorPage() {
 
       <div className="min-h-[44px] flex items-center">
         {loading ? (
-          <div className="flex items-center gap-3 text-neutral-500">
-            <Loader2 className="w-5 h-5 animate-spin text-[#1D9BF0]" />
+          <div className="flex items-center gap-3 text-muted-foreground">
+            <Loader2 className="w-5 h-5 animate-spin text-primary" />
             <span className="text-sm font-medium">Checking security status...</span>
           </div>
         ) : isEnabled ? (
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-            <div className="flex items-center gap-2 px-4 py-2 bg-green-500/10 border border-green-500/20 rounded-lg text-green-500 text-sm font-bold">
+            <div className="flex items-center gap-2 px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-emerald-600 dark:text-emerald-500 text-sm font-bold">
               <ShieldCheck size={18} />
               2FA IS ACTIVE
             </div>
@@ -136,7 +136,7 @@ export default function TwoFactorPage() {
               onClick={handleDisable}
               disabled={isDisabling}
               variant="outline"
-              className="border-neutral-800 text-red-500 hover:bg-red-500/10 hover:border-red-500 font-bold px-8 py-2.5 cursor-pointer rounded-xl transition-all"
+              className="border-border text-destructive hover:bg-destructive/10 hover:border-destructive font-bold px-8 py-2.5 cursor-pointer rounded-xl transition-all"
             >
               {isDisabling ? <Loader2 className="w-4 h-4 animate-spin" /> : "Disable 2FA"}
             </Button>
@@ -144,7 +144,7 @@ export default function TwoFactorPage() {
         ) : (
           <Button
             onClick={() => setIsModalOpen(true)}
-            className="bg-white text-black hover:bg-neutral-200 font-bold px-10 py-6 text-base cursor-pointer rounded-xl transition-all shadow-lg"
+            className="bg-primary text-primary-foreground hover:opacity-90 font-bold px-10 py-6 text-base cursor-pointer rounded-xl transition-all shadow-lg"
           >
             Enable 2FA Now
           </Button>
@@ -153,45 +153,45 @@ export default function TwoFactorPage() {
 
       {isModalOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4 animate-in fade-in duration-200"
           onClick={() => setIsModalOpen(false)}
         >
           <div
-            className="relative z-50 w-full max-w-lg bg-[#0F0F0F] border border-zinc-800 p-6 sm:p-10 rounded-2xl shadow-2xl animate-in zoom-in-95"
+            className="relative z-50 w-full max-w-lg bg-popover border border-border p-6 sm:p-10 rounded-2xl shadow-2xl animate-in zoom-in-95"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-6">
               <button 
                 onClick={() => setIsModalOpen(false)}
-                className="flex items-center gap-2 text-neutral-400 hover:text-white transition-colors sm:hidden cursor-pointer"
+                className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors sm:hidden cursor-pointer"
               >
                 <ArrowLeft size={20} />
                 <span className="text-sm font-bold">Back</span>
               </button>
-              <h3 className="hidden sm:block text-white text-xl font-bold">
+              <h3 className="hidden sm:block text-foreground text-xl font-bold">
                 Setup 2FA
               </h3>
               <button 
                 onClick={() => setIsModalOpen(false)}
-                className="hidden sm:block text-neutral-500 hover:text-white transition-colors cursor-pointer"
+                className="hidden sm:block text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
               >
                 <X size={24} />
               </button>
             </div>
 
             <div className="text-center sm:text-left mb-8">
-              <p className="text-neutral-400 text-sm leading-relaxed">
+              <p className="text-muted-foreground text-sm leading-relaxed">
                 Scan this QR code with Google Authenticator or Authy, then enter the code below.
               </p>
             </div>
 
             <div className="flex justify-center mb-10">
               {isLoading ? (
-                <div className="w-48 h-48 sm:w-52 sm:h-52 bg-zinc-900 border border-zinc-800 flex items-center justify-center rounded-2xl">
-                  <Loader2 className="w-8 h-8 animate-spin text-[#1D9BF0]" />
+                <div className="w-48 h-48 sm:w-52 sm:h-52 bg-secondary border border-border flex items-center justify-center rounded-2xl">
+                  <Loader2 className="w-8 h-8 animate-spin text-primary" />
                 </div>
               ) : qrCode ? (
-                <div className="bg-white p-3 rounded-2xl shadow-xl shadow-white/5">
+                <div className="bg-white p-3 rounded-2xl shadow-xl border border-border">
                    <img
                     src={qrCode}
                     alt="2FA QR Code"
@@ -202,14 +202,14 @@ export default function TwoFactorPage() {
             </div>
 
             {error && (
-              <div className="bg-red-500/10 border border-red-500/20 text-red-500 px-4 py-3 text-sm mb-6 rounded-lg text-center font-medium">
+              <div className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 text-sm mb-6 rounded-lg text-center font-medium">
                 {error}
               </div>
             )}
 
             <div className="space-y-8">
               <div className="flex flex-col items-center">
-                <label className="block text-[11px] font-bold text-neutral-500 uppercase tracking-widest mb-4">
+                <label className="block text-[11px] font-bold text-muted-foreground uppercase tracking-widest mb-4">
                   6-Digit Verification Code
                 </label>
                 
@@ -224,9 +224,9 @@ export default function TwoFactorPage() {
                       <React.Fragment key={i}>
                         <InputOTPSlot 
                           index={i} 
-                          className="w-12 h-14 sm:w-14 sm:h-16 rounded-xl border-zinc-800 bg-zinc-900/50 text-2xl font-bold focus:border-[#1D9BF0] focus:ring-4 focus:ring-[#1D9BF0]/10 transition-all text-white" 
+                          className="w-12 h-14 sm:w-14 sm:h-16 rounded-xl border-border bg-secondary/50 text-2xl font-bold focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all text-foreground" 
                         />
-                        {i === 2 && <InputOTPSeparator className="text-zinc-700 mx-1" />}
+                        {i === 2 && <InputOTPSeparator className="text-muted-foreground mx-1" />}
                       </React.Fragment>
                     ))}
                   </InputOTPGroup>
@@ -236,7 +236,7 @@ export default function TwoFactorPage() {
               <Button
                 onClick={handleVerify}
                 disabled={isVerifying || otp.length < 6}
-                className="bg-[#1D9BF0] hover:bg-blue-600 text-white font-bold w-full py-7 text-lg rounded-xl transition-all shadow-lg shadow-blue-500/10 cursor-pointer "
+                className="bg-primary text-primary-foreground hover:opacity-90 font-bold w-full py-7 text-lg rounded-xl transition-all shadow-lg shadow-primary/10 cursor-pointer "
               >
                 {isVerifying ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : "Verify & Enable"}
               </Button>

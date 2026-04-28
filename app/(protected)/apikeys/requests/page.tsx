@@ -115,11 +115,11 @@ export default function RequestsTab() {
   };
 
   return (
-    <div className="animate-in fade-in duration-300">
+    <div className="animate-in fade-in duration-300 font-one">
       <div className="flex items-start justify-between mb-6">
         <div className="hidden sm:block">
-          <h2 className="text-lg font-semibold text-white">Request Links</h2>
-          <p className="text-neutral-500 text-sm mt-0.5">
+          <h2 className="text-xl font-bold text-foreground">Request Links</h2>
+          <p className="text-muted-foreground text-sm mt-0.5">
             Short links associated with your API keys.
           </p>
         </div>
@@ -136,64 +136,64 @@ export default function RequestsTab() {
       </div>
 
       {isLoading ? (
-        <div className="flex items-center gap-2 text-neutral-500 py-10">
-          <Loader2 className="w-4 h-4 animate-spin text-[#1D9BF0]" />
+        <div className="flex items-center gap-2 text-muted-foreground py-10">
+          <Loader2 className="w-4 h-4 animate-spin text-primary" />
           <span className="text-sm">Loading...</span>
         </div>
       ) : filteredRows.length === 0 ? (
-        <div className="border border-neutral-800 flex flex-col items-center justify-center py-16 text-center rounded-md">
-          <Clock className="w-8 h-8 text-neutral-700 mb-3" />
-          <p className="text-neutral-400 text-sm font-medium">No links found</p>
-          <p className="text-neutral-600 text-xs mt-1">
+        <div className="border border-border flex flex-col items-center justify-center py-16 text-center rounded-xl bg-secondary/30">
+          <Clock className="w-8 h-8 text-muted-foreground/40 mb-3" />
+          <p className="text-muted-foreground font-medium">No links found</p>
+          <p className="text-muted-foreground/60 text-xs mt-1">
             Try adjusting your filters.
           </p>
         </div>
       ) : (
         <>
-          <div className="rounded-md border border-neutral-800 overflow-hidden overflow-x-auto">
+          <div className="rounded-xl border border-border overflow-hidden overflow-x-auto bg-background shadow-sm">
             <table className="w-full text-sm min-w-[600px] sm:min-w-full">
               <thead>
-                <tr className="border-b border-neutral-800 bg-neutral-900/80">
-                  <th className="text-left text-xs font-medium text-neutral-500 px-4 py-3 uppercase tracking-wide">
+                <tr className="border-b border-border bg-secondary/50">
+                  <th className="text-left text-xs font-medium text-muted-foreground px-5 py-3 uppercase tracking-wider text-[10px]">
                     Short URL
                   </th>
-                  <th className="text-left text-xs font-medium text-neutral-500 px-4 py-3 uppercase tracking-wide">
+                  <th className="text-left text-xs font-medium text-muted-foreground px-5 py-3 uppercase tracking-wider text-[10px]">
                     API Key
                   </th>
-                  <th className="text-left text-xs font-medium text-neutral-500 px-4 py-3 uppercase tracking-wide">
+                  <th className="text-left text-xs font-medium text-muted-foreground px-5 py-3 uppercase tracking-wider text-[10px]">
                     Protected
                   </th>
-                  <th className="text-left text-xs font-medium text-neutral-500 px-4 py-3 uppercase tracking-wide">
+                  <th className="text-left text-xs font-medium text-muted-foreground px-5 py-3 uppercase tracking-wider text-[10px]">
                     Created
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-neutral-800/60">
+              <tbody className="divide-y divide-border">
                 {pagedRows.map((row, i) => (
-                  <tr key={i} className="hover:bg-neutral-900/50 transition-colors">
-                    <td className="px-4 py-4">
-                      <span className="text-neutral-300 font-mono text-xs">
+                  <tr key={i} className="hover:bg-accent/30 transition-colors">
+                    <td className="px-5 py-4">
+                      <span className="text-primary font-mono text-xs font-medium">
                         {row.shorturl}
                       </span>
                     </td>
-                    <td className="px-4 py-4">
-                      <span className="text-neutral-400 text-xs font-medium">{row.keyName}</span>
+                    <td className="px-5 py-4">
+                      <span className="text-foreground text-xs font-medium">{row.keyName}</span>
                     </td>
-                    <td className="px-4 py-4">
+                    <td className="px-5 py-4">
                       {row.isProtected ? (
                         <div className="flex items-center gap-1.5">
-                          <ShieldCheck className="w-4 h-4 text-green-500" />
-                          <span className="text-green-500 text-xs font-bold">Yes</span>
+                          <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                          <span className="text-emerald-600 dark:text-emerald-500 text-xs font-bold">Yes</span>
                         </div>
                       ) : (
                         <div className="flex items-center gap-1.5">
-                          <ShieldOff className="w-4 h-4 text-neutral-600" />
-                          <span className="text-neutral-600 text-xs">No</span>
+                          <ShieldOff className="w-4 h-4 text-muted-foreground" />
+                          <span className="text-muted-foreground text-xs">No</span>
                         </div>
                       )}
                     </td>
-                    <td className="px-4 py-4">
-                      <span className="text-neutral-500 text-xs">
+                    <td className="px-5 py-4">
+                      <span className="text-muted-foreground text-xs">
                         {new Date(row.createdAt).toLocaleString("en-IN", {
                           month: "short",
                           day: "numeric",
@@ -210,14 +210,14 @@ export default function RequestsTab() {
 
           {totalPages > 1 && (
             <div className="flex flex-col sm:flex-row items-center justify-between mt-6 gap-4">
-              <p className="text-neutral-600 text-xs">
+              <p className="text-muted-foreground text-xs">
                 Showing {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filteredRows.length)} of {filteredRows.length}
               </p>
               <div className="flex items-center gap-1">
                 <button
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page === 1}
-                  className="p-2 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                  className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer border border-border"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
@@ -225,7 +225,7 @@ export default function RequestsTab() {
                 <div className="flex items-center gap-1">
                   {getPageNumbers().map((p, i) =>
                     p === "..." ? (
-                      <span key={`dot-${i}`} className="px-1.5 text-neutral-600 text-xs">
+                      <span key={`dot-${i}`} className="px-1.5 text-muted-foreground text-xs">
                         …
                       </span>
                     ) : (
@@ -234,8 +234,8 @@ export default function RequestsTab() {
                         onClick={() => setPage(p as number)}
                         className={`w-8 h-8 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                           page === p
-                            ? "bg-[#1D9BF0] text-white shadow-lg shadow-blue-500/20"
-                            : "text-neutral-400 hover:text-white hover:bg-neutral-800"
+                            ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
+                            : "text-muted-foreground hover:text-foreground hover:bg-secondary border border-border"
                         }`}
                       >
                         {p}
@@ -247,7 +247,7 @@ export default function RequestsTab() {
                 <button
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   disabled={page === totalPages}
-                  className="p-2 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                  className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer border border-border"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>

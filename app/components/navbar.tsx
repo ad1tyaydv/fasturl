@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useUser } from "./userContext";
 import { NavbarDropDown } from "../dropDown/navbarDropDown";
@@ -17,9 +17,12 @@ import {
   Settings,
   Bell,
   LucideIcon,
+  Moon,
+  Sun,
 } from "lucide-react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Logout05Icon, User02Icon } from "@hugeicons/core-free-icons";
+import { useTheme } from "next-themes";
 
 interface MenuItem {
   name: string;
@@ -30,10 +33,16 @@ interface MenuItem {
 
 export default function Navbar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const router = useRouter();
+  const { theme, setTheme } = useTheme();
 
   const { user, logout, loading } = useUser();
   const pathname = usePathname();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const menuItems: MenuItem[] = [
     { name: "Dashboard", path: "/", icon: LayoutDashboard },
@@ -62,10 +71,10 @@ export default function Navbar() {
     }
   };
 
-  
+
   return (
     <>
-      <nav className="flex items-center justify-between px-6 sm:px-10 py-6 border-b border-neutral-800 z-30 shrink-0 bg-[#141414] text-white sticky top-0 shadow-sm">
+      <nav className="flex items-center justify-between px-6 sm:px-10 py-6 border-b border-border z-30 shrink-0 bg-background text-foreground sticky top-0 shadow-sm">
         <div className="flex items-center gap-10">
           <Link
             href="/"
@@ -95,7 +104,7 @@ export default function Navbar() {
                   href={item.path}
                   className={`px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 shrink-0 ${isActive
                     ? "bg-[#1D9BF0] text-white shadow-sm"
-                    : "text-neutral-400 hover:bg-[#222222] hover:text-white"
+                    : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                     }`}
                 >
                   {item.name}
@@ -108,18 +117,18 @@ export default function Navbar() {
         <div className="flex items-center gap-4 sm:gap-6 lg:mr-16">
           {loading ? (
             <div className="flex items-center gap-4 sm:gap-6">
-              <div className="hidden sm:block w-20 h-8 bg-neutral-800 animate-pulse rounded-lg border border-neutral-700" />
-              <div className="w-9 h-9 rounded-full bg-neutral-800 animate-pulse border border-white/10" />
+              <div className="hidden sm:block w-20 h-8 bg-muted animate-pulse rounded-lg border border-border" />
+              <div className="w-9 h-9 rounded-full bg-muted animate-pulse border border-white/10" />
             </div>
           ) : user ? (
             <>
               <Link
                 href="/notification"
-                className="p-2 hover:bg-[#222222] rounded-full transition-colors relative group"
+                className="p-2 hover:bg-accent rounded-full transition-colors relative group"
               >
-                <Bell className="w-6 h-6 text-neutral-400 group-hover:text-white" />
+                <Bell className="w-6 h-6 text-muted-foreground group-hover:text-foreground" />
                 {user?.unreadNotifications > 0 && (
-                  <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-red-500 text-white text-[10px] font-bold flex items-center justify-center rounded-full border-2 border-[#141414]">
+                  <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-red-500 text-white text-[10px] font-bold flex items-center justify-center rounded-full border-2 border-background">
                     {user.unreadNotifications > 9 ? "9+" : user.unreadNotifications}
                   </span>
                 )}
@@ -130,7 +139,7 @@ export default function Navbar() {
                 className={`hidden sm:block border font-three px-5 py-2 rounded-lg font-bold text-xs uppercase transition-all duration-500 shadow-sm
                   ${isPaid
                     ? "bg-linear-to-r from-amber-400 via-yellow-200 to-amber-500 text-black border-amber-500 shadow-[0_0_15px_rgba(251,191,36,0.3)]"
-                    : "bg-[#222222] text-white border-neutral-700 hover:bg-[#333333]"
+                    : "bg-secondary text-secondary-foreground border-border hover:bg-accent"
                   }`}
               >
                 {tier}
@@ -141,7 +150,7 @@ export default function Navbar() {
                   user={user}
                   onLogout={handleLogout}
                   trigger={
-                    <div className="w-9 h-9 rounded-full overflow-hidden bg-[#1e1e1e] border border-white/10 flex items-center justify-center cursor-pointer hover:ring-2 hover:ring-white/20 transition-all">
+                    <div className="w-9 h-9 rounded-full overflow-hidden bg-secondary border border-border flex items-center justify-center cursor-pointer hover:ring-2 hover:ring-ring/20 transition-all">
                       {avatarUrl ? (
                         <img
                           src={avatarUrl}
@@ -149,7 +158,7 @@ export default function Navbar() {
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <span className="text-white/40 text-xs font-bold">
+                        <span className="text-muted-foreground text-xs font-bold">
                           {user?.userName?.[0]?.toUpperCase() ?? "?"}
                         </span>
                       )}
@@ -162,7 +171,7 @@ export default function Navbar() {
                 className="lg:hidden block cursor-pointer"
                 onClick={() => setIsSidebarOpen(true)}
               >
-                <div className="w-9 h-9 rounded-full overflow-hidden bg-[#1e1e1e] border border-white/10 flex items-center justify-center active:scale-95 transition-all">
+                <div className="w-9 h-9 rounded-full overflow-hidden bg-secondary border border-border flex items-center justify-center active:scale-95 transition-all">
                   {avatarUrl ? (
                     <img
                       src={avatarUrl}
@@ -170,7 +179,7 @@ export default function Navbar() {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <span className="text-white/40 text-xs font-bold">
+                    <span className="text-muted-foreground text-xs font-bold">
                       {user?.userName?.[0]?.toUpperCase() ?? "?"}
                     </span>
                   )}
@@ -178,12 +187,22 @@ export default function Navbar() {
               </div>
             </>
           ) : (
-            <Link
-              href="/auth/signin"
-              className="bg-white text-black hover:bg-gray-200 px-6 sm:px-8 py-2.5 rounded-lg transition-all font-three text-sm font-semibold shadow-sm"
-            >
-              Login
-            </Link>
+            <div className="flex items-center gap-4">
+               {mounted && (
+                <button
+                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                  className="p-2 hover:bg-accent rounded-full transition-colors"
+                >
+                  {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                </button>
+              )}
+              <Link
+                href="/auth/signin"
+                className="bg-primary text-primary-foreground hover:opacity-90 px-6 sm:px-8 py-2.5 rounded-lg transition-all font-three text-sm font-semibold shadow-sm"
+              >
+                Login
+              </Link>
+            </div>
           )}
         </div>
       </nav>
@@ -195,21 +214,31 @@ export default function Navbar() {
       />
 
       <div
-        className={`fixed top-0 right-0 h-full w-full sm:w-[420px] bg-[#141414] z-[101] shadow-2xl transform transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] lg:hidden border-l border-neutral-800 ${isSidebarOpen ? "translate-x-0" : "translate-x-full"
+        className={`fixed top-0 right-0 h-full w-full sm:w-[420px] bg-background z-[101] shadow-2xl transform transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] lg:hidden border-l border-border ${isSidebarOpen ? "translate-x-0" : "translate-x-full"
           }`}
       >
         <div className="flex flex-col h-full">
           <div className="flex items-center justify-between px-8 py-8 mb-4">
-            <h1 className="text-2xl font-three font-bold tracking-tighter text-white">
+            <h1 className="text-2xl font-three font-bold tracking-tighter text-foreground">
               FASTURL
             </h1>
 
-            <button
-              onClick={() => setIsSidebarOpen(false)}
-              className="p-3 bg-[#1e1e1e] hover:bg-[#282828] text-neutral-400 hover:text-white rounded-full transition-all duration-200 border border-white/5 active:scale-90"
-            >
-              <X className="w-6 h-6" />
-            </button>
+            <div className="flex items-center gap-2">
+              {mounted && (
+                <button
+                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                  className="p-3 bg-secondary hover:bg-accent text-muted-foreground hover:text-foreground rounded-full transition-all duration-200 border border-border active:scale-90"
+                >
+                  {theme === "dark" ? <Sun className="w-6 h-6" /> : <Moon className="w-6 h-6" />}
+                </button>
+              )}
+              <button
+                onClick={() => setIsSidebarOpen(false)}
+                className="p-3 bg-secondary hover:bg-accent text-muted-foreground hover:text-foreground rounded-full transition-all duration-200 border border-border active:scale-90"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
           </div>
 
           <div className="flex-1 px-6 space-y-1 overflow-y-auto pb-10">
@@ -227,7 +256,7 @@ export default function Navbar() {
                   onClick={() => setIsSidebarOpen(false)}
                   className={`flex items-center gap-4 px-5 py-4 rounded-xl font-three font-medium text-lg transition-all ${isActive
                     ? "bg-[#1D9BF0] text-white shadow-lg shadow-[#1D9BF0]/20"
-                    : "text-neutral-400 hover:bg-[#1e1e1e] hover:text-white"
+                    : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                     }`}
                 >
                   <Icon
@@ -238,14 +267,14 @@ export default function Navbar() {
                 </Link>
               );
             })}
-            
+
             {user && (
               <Link
                 href="/notification"
                 onClick={() => setIsSidebarOpen(false)}
                 className={`flex items-center gap-4 px-5 py-4 rounded-xl font-three font-medium text-lg transition-all ${pathname === "/notification"
                   ? "bg-[#1D9BF0] text-white shadow-lg shadow-[#1D9BF0]/20"
-                  : "text-neutral-400 hover:bg-[#1e1e1e] hover:text-white"
+                  : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                   }`}
               >
                 <Bell
@@ -258,11 +287,11 @@ export default function Navbar() {
           </div>
 
           {user ? (
-            <div className="mt-auto p-6 bg-[#181818]/50 border-t border-neutral-800 flex flex-col gap-2 pb-10">
+            <div className="mt-auto p-6 bg-secondary/50 border-t border-border flex flex-col gap-2 pb-10">
               <Link
                 href="/settings/profile"
                 onClick={() => setIsSidebarOpen(false)}
-                className="flex items-center gap-4 px-5 py-4 rounded-xl font-three font-medium text-lg text-neutral-300 hover:bg-[#222222] transition-all"
+                className="flex items-center gap-4 px-5 py-4 rounded-xl font-three font-medium text-lg text-foreground hover:bg-accent transition-all"
               >
                 <HugeiconsIcon icon={User02Icon} />
                 Manage Account
@@ -270,18 +299,18 @@ export default function Navbar() {
 
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-4 px-5 py-4 rounded-xl font-three font-medium text-lg text-red-400 hover:bg-red-500/10 transition-all text-left"
+                className="flex items-center gap-4 px-5 py-4 rounded-xl font-three font-medium text-lg text-destructive hover:bg-destructive/10 transition-all text-left"
               >
                 <HugeiconsIcon icon={Logout05Icon} />
                 Logout
               </button>
             </div>
           ) : (
-            <div className="mt-auto p-6 border-t border-neutral-800">
+            <div className="mt-auto p-6 border-t border-border">
               <Link 
                 href="/auth/signin" 
                 onClick={() => setIsSidebarOpen(false)}
-                className="block w-full py-3 bg-white text-black rounded-xl font-bold hover:bg-gray-200 transition-all text-center"
+                className="block w-full py-3 bg-primary text-primary-foreground rounded-xl font-bold hover:opacity-90 transition-all text-center"
               >
                 Login
               </Link>

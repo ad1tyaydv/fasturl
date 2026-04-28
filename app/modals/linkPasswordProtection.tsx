@@ -57,7 +57,11 @@ export default function LinkPasswordProtectionModal({ isOpen, onClose, selectedU
       });
 
       toast.success(selectedUrl.password ? "Protection updated!" : "Protection added!", {
-        style: { background: '#1c1c1c', color: '#fff', border: '1px solid #333' },
+        style: {
+          background: 'hsl(var(--popover))',
+          color: 'hsl(var(--popover-foreground))',
+          border: '1px solid hsl(var(--border))'
+        },
       });
 
       onSuccess();
@@ -81,7 +85,11 @@ export default function LinkPasswordProtectionModal({ isOpen, onClose, selectedU
       });
 
       toast.success("Password removed!", {
-        style: { background: '#1c1c1c', color: '#fff', border: '1px solid #333' },
+        style: {
+          background: 'hsl(var(--popover))',
+          color: 'hsl(var(--popover-foreground))',
+          border: '1px solid hsl(var(--border))'
+        },
       });
 
       onSuccess();
@@ -101,23 +109,23 @@ export default function LinkPasswordProtectionModal({ isOpen, onClose, selectedU
 
   return (
   <div
-    className="fixed inset-0 z-[110] flex items-center justify-center bg-black/50 p-4 transition-opacity"
+    className="fixed inset-0 z-[110] flex items-center justify-center bg-background/50 backdrop-blur-sm p-4 transition-opacity"
     onClick={() => !(isUpdating || isRemoving) && onClose()}
   >
     <div
-      className="bg-[#1c1c1c] shadow-2xl w-full max-w-lg p-6 sm:p-10 rounded"
+      className="bg-background shadow-2xl w-full max-w-lg p-6 sm:p-10 rounded-xl border border-border"
       onClick={(e) => e.stopPropagation()}
     >
-      <h3 className="text-xl sm:text-2xl font-three mb-8 text-center text-white">
+      <h3 className="text-xl sm:text-2xl font-three mb-8 text-center text-foreground">
         Link Protection
       </h3>
 
       <div className="space-y-6 mb-8">
         <div className="space-y-2">
           <div className="flex justify-between items-center">
-            <label className="text-xl font-one text-white">
+            <label className="text-xl font-one text-foreground">
               Password{" "}
-              <span className="text-sm text-neutral-500 font-three font-normal">
+              <span className="text-sm text-muted-foreground font-three font-normal">
                 (Optional)
               </span>
             </label>
@@ -137,23 +145,23 @@ export default function LinkPasswordProtectionModal({ isOpen, onClose, selectedU
           </div>
 
           {!isEditingPassword && selectedUrl.password ? (
-            <div className="w-full p-3 border border-dashed border-neutral-700 bg-[#1a1a1a] text-neutral-400 font-three italic rounded-lg">
+            <div className="w-full p-3 border border-dashed border-border bg-secondary text-muted-foreground font-three italic rounded-lg">
               Password configured
             </div>
           ) : (
-            <div className="relative flex items-center border border-neutral-700 bg-[#111111] rounded-lg overflow-hidden">
+            <div className="relative flex items-center border border-border bg-background focus-within:ring-1 focus-within:ring-ring rounded-lg overflow-hidden transition-colors">
               <input
                 type={showPassword ? "text" : "password"}
                 placeholder="Enter password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full p-3 bg-transparent text-white font-three focus:outline-none"
+                className="w-full p-3 bg-transparent text-foreground font-three focus:outline-none"
               />
 
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="px-4 text-neutral-500 hover:text-white cursor-pointer"
+                className="px-4 text-muted-foreground hover:text-foreground cursor-pointer"
               >
                 {showPassword ? (
                   <HugeiconsIcon icon={ViewOffSlashIcon} />
@@ -166,7 +174,7 @@ export default function LinkPasswordProtectionModal({ isOpen, onClose, selectedU
         </div>
 
         <div className="space-y-2">
-          <label className="text-xl font-one text-white">
+          <label className="text-xl font-one text-foreground">
             Set Expiry Date
           </label>
 
@@ -174,16 +182,16 @@ export default function LinkPasswordProtectionModal({ isOpen, onClose, selectedU
             <button
               onClick={() => setShowCalendar(!showCalendar)}
               disabled={isUpdating || isRemoving}
-              className="w-full p-3 border border-neutral-700 bg-[#111111] text-white font-three rounded-lg flex justify-between items-center cursor-pointer"
+              className="w-full p-3 border border-border bg-background text-foreground font-three rounded-lg flex justify-between items-center cursor-pointer hover:bg-accent transition-colors"
             >
               {expiryDate ? format(expiryDate, "PPP") : "Pick expiry date"}
               <HugeiconsIcon icon={Calendar03Icon} />
             </button>
 
             {showCalendar && (
-              <div className="absolute z-50 mt-2 bg-[#1c1c1c] border border-neutral-700 rounded-lg p-3 shadow-lg">
+              <div className="absolute z-50 mt-2 bg-popover border border-border rounded-lg p-3 shadow-lg">
                 <DayPicker
-                  className="bg-[#1c1c1c] text-white"
+                  className="text-popover-foreground"
                   mode="single"
                   selected={expiryDate}
                   onSelect={(date) => {
@@ -203,7 +211,7 @@ export default function LinkPasswordProtectionModal({ isOpen, onClose, selectedU
             <Button
               onClick={handleRemoveProtection}
               disabled={isUpdating || isRemoving}
-              className="bg-white h-10 text-black hover:text-red-700 hover:bg-gray-200 font-bold px-4 cursor-pointer"
+              className="bg-primary h-10 text-primary-foreground hover:bg-destructive hover:text-destructive-foreground font-bold px-4 cursor-pointer"
             >
               {isRemoving ? (
                 <Loader2 className="h-5 w-5 animate-spin mx-auto" />
@@ -219,7 +227,7 @@ export default function LinkPasswordProtectionModal({ isOpen, onClose, selectedU
             variant="outline"
             onClick={onClose}
             disabled={isUpdating || isRemoving}
-            className="font-three text-sm bg-transparent h-10 w-22 text-white border-neutral-700 hover:bg-[#2a2a2a] hover:text-white transition-colors cursor-pointer"
+            className="font-three text-sm bg-transparent h-10 w-22 text-foreground border-border hover:bg-accent transition-colors cursor-pointer"
           >
             Cancel
           </Button>
@@ -227,7 +235,7 @@ export default function LinkPasswordProtectionModal({ isOpen, onClose, selectedU
           <Button
             onClick={handleUpdate}
             disabled={isUpdating || isRemoving}
-            className="bg-white h-10 text-black hover:bg-gray-200 font-bold min-w-[120px] cursor-pointer"
+            className="bg-primary h-10 text-primary-foreground hover:bg-primary/90 font-bold min-w-[120px] cursor-pointer"
           >
             {isUpdating ? (
               <Loader2 className="h-5 w-5 animate-spin mx-auto" />

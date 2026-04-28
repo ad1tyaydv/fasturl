@@ -31,7 +31,7 @@ export function AnalyticsTypeToggle({ value, onChange }: AnalyticsTypeToggleProp
       <DropdownMenuTrigger asChild>
         <Button 
           variant="outline" 
-          className="bg-[#1a1a1a] border-neutral-800 text-white hover:bg-[#252525] hover:text-white rounded-lg flex items-center gap-2 h-10 outline-none focus:ring-1 focus:ring-neutral-700 cursor-pointer px-4"
+          className="bg-background border-border text-foreground hover:bg-accent hover:text-accent-foreground rounded-lg flex items-center gap-2 h-10 outline-none focus:ring-1 focus:ring-ring cursor-pointer px-4"
         >
           <HugeiconsIcon 
             icon={value === "links" ? Link04Icon : File02Icon} 
@@ -41,20 +41,20 @@ export function AnalyticsTypeToggle({ value, onChange }: AnalyticsTypeToggleProp
           <span className="text-sm font-bold capitalize">
             {value === "links" ? "Link Analytics" : "Bulk Analytics"}
           </span>
-          <HugeiconsIcon icon={ArrowDown01Icon} size={16} className="text-neutral-500" />
+          <HugeiconsIcon icon={ArrowDown01Icon} size={16} className="text-muted-foreground" />
         </Button>
       </DropdownMenuTrigger>
 
       <DropdownMenuContent 
         align="start"
-        className="w-56 bg-[#1a1a1a] border-neutral-800 text-white shadow-2xl rounded-xl p-1.5"
+        className="w-56 bg-popover border-border text-popover-foreground shadow-2xl rounded-xl p-1.5"
       >
-        <DropdownMenuSeparator className="bg-neutral-800 mx-1" />
+        <DropdownMenuSeparator className="bg-border mx-1" />
         
         <DropdownMenuCheckboxItem
           checked={value === "links"}
           onCheckedChange={() => onChange("links")}
-          className="cursor-pointer focus:bg-white focus:text-white py-3 rounded-lg flex items-center gap-2"
+          className="cursor-pointer focus:bg-accent focus:text-accent-foreground py-3 rounded-lg flex items-center gap-2"
         >
           <HugeiconsIcon icon={Link04Icon} className="text-blue-500" />
           <span className="font-medium">Link Analytics</span>
@@ -63,7 +63,7 @@ export function AnalyticsTypeToggle({ value, onChange }: AnalyticsTypeToggleProp
         <DropdownMenuCheckboxItem
           checked={value === "bulk"}
           onCheckedChange={() => onChange("bulk")}
-          className="cursor-pointer focus:bg-white focus:text-white py-3 rounded-lg flex items-center gap-2"
+          className="cursor-pointer focus:bg-accent focus:text-accent-foreground py-3 rounded-lg flex items-center gap-2"
         >
           <HugeiconsIcon icon={File02Icon} className="text-amber-500" />
           <span className="font-medium">Bulk Analytics</span>

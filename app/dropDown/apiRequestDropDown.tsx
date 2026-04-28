@@ -46,7 +46,7 @@ export function ApiRequestsFilter({
         <DropdownMenuTrigger asChild>
           <Button
             variant="outline"
-            className="bg-[#1a1a1a] border-neutral-800 text-white hover:bg-[#252525] hover:text-white rounded-lg flex items-center gap-2 h-9 outline-none focus:ring-1 focus:ring-neutral-700 cursor-pointer"
+            className="bg-background border-border text-foreground hover:bg-accent hover:text-accent-foreground rounded-lg flex items-center gap-2 h-9 outline-none focus:ring-1 focus:ring-ring cursor-pointer"
           >
             <HugeiconsIcon icon={Key01Icon} />
             <span className="text-sm">
@@ -57,16 +57,16 @@ export function ApiRequestsFilter({
         </DropdownMenuTrigger>
         <DropdownMenuContent
           align="end"
-          className="w-56 bg-[#1a1a1a] border-neutral-800 text-white shadow-2xl rounded-lg"
+          className="w-56 bg-popover border-border text-popover-foreground shadow-2xl rounded-lg"
         >
-          <DropdownMenuLabel className="text-neutral-500 text-[10px] uppercase tracking-widest">
+          <DropdownMenuLabel className="text-muted-foreground text-[10px] uppercase tracking-widest">
             API Key
           </DropdownMenuLabel>
-          <DropdownMenuSeparator className="bg-neutral-800" />
+          <DropdownMenuSeparator className="bg-border" />
           <DropdownMenuCheckboxItem
             checked={selectedKey === "all"}
             onCheckedChange={() => setSelectedKey("all")}
-            className="cursor-pointer focus:bg-[#252525] focus:text-white py-2"
+            className="cursor-pointer focus:bg-accent focus:text-accent-foreground py-2"
           >
             All Keys
           </DropdownMenuCheckboxItem>
@@ -75,7 +75,7 @@ export function ApiRequestsFilter({
               key={name}
               checked={selectedKey === name}
               onCheckedChange={() => setSelectedKey(name)}
-              className="cursor-pointer focus:bg-[#252525] focus:text-white py-2 font-mono text-xs"
+              className="cursor-pointer focus:bg-accent focus:text-accent-foreground py-2 font-mono text-xs"
             >
               {name}
             </DropdownMenuCheckboxItem>
@@ -87,7 +87,7 @@ export function ApiRequestsFilter({
         <DropdownMenuTrigger asChild>
           <Button
             variant="outline"
-            className="bg-[#1a1a1a] border-neutral-800 text-white hover:bg-[#252525] hover:text-white rounded-lg flex items-center cursor-pointer gap-2 h-9 outline-none focus:ring-1 focus:ring-neutral-700"
+            className="bg-background border-border text-foreground hover:bg-accent hover:text-accent-foreground rounded-lg flex items-center cursor-pointer gap-2 h-9 outline-none focus:ring-1 focus:ring-ring"
           >
             <HugeiconsIcon icon={Clock01Icon} />
             <span className="text-sm">{getTimeLabel()}</span>
@@ -96,18 +96,18 @@ export function ApiRequestsFilter({
         </DropdownMenuTrigger>
         <DropdownMenuContent
           align="end"
-          className="w-48 bg-[#1a1a1a] border-neutral-800 text-white shadow-2xl rounded-lg"
+          className="w-48 bg-popover border-border text-popover-foreground shadow-2xl rounded-lg"
         >
-          <DropdownMenuLabel className="text-neutral-500 text-[10px] uppercase tracking-widest">
+          <DropdownMenuLabel className="text-muted-foreground text-[10px] uppercase tracking-widest">
             Time Range
           </DropdownMenuLabel>
-          <DropdownMenuSeparator className="bg-neutral-800" />
+          <DropdownMenuSeparator className="bg-border" />
           {(["all", "today", "7days", "28days"] as ApiTimeFilter[]).map((val) => (
             <DropdownMenuCheckboxItem
               key={val}
               checked={timeFilter === val}
               onCheckedChange={() => setTimeFilter(val)}
-              className="cursor-pointer focus:bg-[#252525] focus:text-white py-2"
+              className="cursor-pointer focus:bg-accent focus:text-accent-foreground py-2"
             >
               {val === "all"
                 ? "All Time"

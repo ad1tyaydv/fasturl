@@ -14,12 +14,12 @@ export default function LegalLayout({ children }: { children: React.ReactNode;})
   const pathname = usePathname();
 
   return (
-    <div className="min-h-screen bg-[#141414] text-white">
+    <div className="min-h-screen bg-background text-foreground">
       
       <Navbar />
 
       <div className="flex">
-        <div className="w-64 border-r border-neutral-800 p-6 min-h-[calc(100vh-64px)]">
+        <div className="w-64 border-r border-border p-6 min-h-[calc(100vh-64px)]">
 
           <div className="flex flex-col gap-2">
             {links.map((link) => (
@@ -28,8 +28,8 @@ export default function LegalLayout({ children }: { children: React.ReactNode;})
                 onClick={() => router.push(link.path)}
                 className={`text-left px-3 py-2 rounded-lg text-sm transition cursor-pointer ${
                   pathname === link.path
-                    ? "bg-white text-black font-semibold"
-                    : "text-neutral-400 hover:text-white hover:bg-[#1c1c1c]"
+                    ? "bg-primary text-primary-foreground font-semibold"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent"
                 }`}
               >
                 {link.name}

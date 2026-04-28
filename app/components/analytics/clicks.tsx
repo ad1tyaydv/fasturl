@@ -58,13 +58,13 @@ export default function ClicksAnalytics({ data = [], days = 7 }: ClicksAnalytics
   )
 
   return (
-    <Card className="bg-black text-white overflow-hidden border-none shadow-none">
-      <CardHeader className="flex flex-col items-stretch border-b border-neutral-800 p-0 sm:flex-row">
+    <Card className="bg-card text-foreground overflow-hidden border-none shadow-none">
+      <CardHeader className="flex flex-col items-stretch border-b border-border p-0 sm:flex-row">
         <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-4 sm:py-6">
           <CardTitle className="text-xl font-three">Total Clicks</CardTitle>
         </div>
         
-        <div className="flex border-t border-neutral-800 sm:border-t-0">
+        <div className="flex border-t border-border sm:border-t-0">
           <div className="relative z-30 flex flex-1 flex-col justify-center gap-1 px-6 py-4 text-left sm:px-8 sm:py-6">
             <span className="text-lg font-bold sm:text-3xl font-two">
               {totalClicksCount.toLocaleString()}
@@ -78,7 +78,7 @@ export default function ClicksAnalytics({ data = [], days = 7 }: ClicksAnalytics
           <BarChart data={chartData} margin={{ top: 10 }} barCategoryGap="25%" className="focus:outline-none">
             <CartesianGrid 
               vertical={false} 
-              stroke="#262626" 
+              stroke="hsl(var(--border))" 
               strokeDasharray="4 4" 
               opacity={0.5} 
             />
@@ -88,7 +88,7 @@ export default function ClicksAnalytics({ data = [], days = 7 }: ClicksAnalytics
               axisLine={false}
               tickMargin={12}
               minTickGap={32}
-              style={{ fontSize: '11px', fill: '#737373' }}
+              style={{ fontSize: '11px', fill: 'hsl(var(--muted-foreground))' }}
               tickFormatter={(val) => {
                 const date = new Date(val)
                 return date.toLocaleDateString("en-US", { month: "short", day: "numeric" })
@@ -98,12 +98,12 @@ export default function ClicksAnalytics({ data = [], days = 7 }: ClicksAnalytics
               cursor={false} 
               content={
                 <ChartTooltipContent 
-                  className="bg-black border-neutral-800 text-white min-w-[120px]"
+                  className="bg-card border-border text-foreground min-w-[120px]"
                   indicator="dot"
                   formatter={(value) => (
                     <div className="flex items-center gap-3">
-                      <span className="text-neutral-500 font-three">Total</span>
-                      <span className="text-white font-medium ml-auto">
+                      <span className="text-muted-foreground font-three">Total</span>
+                      <span className="text-foreground font-medium ml-auto">
                         {(value ?? 0).toLocaleString()}
                       </span>
                     </div>

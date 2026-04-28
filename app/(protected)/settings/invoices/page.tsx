@@ -44,78 +44,78 @@ export default function BillingPage() {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
-        <div className="w-8 h-8 border-2 border-[#1D9BF0] border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="w-full">
+    <div className="w-full font-one animate-in fade-in duration-300">
       <div className="mb-8">
-        <h1 className="text-3xl font-three font-bold tracking-tight text-white">Billing History</h1>
-        <p className="text-neutral-400 mt-1">Manage your subscriptions and download invoices.</p>
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">Billing History</h1>
+        <p className="text-muted-foreground mt-1">Manage your subscriptions and download invoices.</p>
       </div>
 
-      <div className="w-full overflow-hidden rounded-2xl border border-neutral-800 bg-[#141414]">
+      <div className="w-full overflow-hidden rounded-2xl border border-border bg-background shadow-sm">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="border-b border-neutral-800 bg-[#1e1e1e]/50">
-              <th className="px-6 py-4 text-sm font-semibold text-neutral-300">Upgraded to</th>
-              <th className="px-6 py-4 text-sm font-semibold text-neutral-300">Amount</th>
-              <th className="px-6 py-4 text-sm font-semibold text-neutral-300">Status</th>
-              <th className="px-6 py-4 text-sm font-semibold text-neutral-300">Method</th>
-              <th className="px-6 py-4 text-sm font-semibold text-neutral-300">Plan Type</th>
-              <th className="px-6 py-4 text-sm font-semibold text-neutral-300">Upgraded at</th>
-              <th className="px-6 py-4 text-sm font-semibold text-neutral-300 text-right">Invoice</th>
+            <tr className="border-b border-border bg-secondary/50">
+              <th className="px-6 py-4 text-sm font-semibold text-muted-foreground">Upgraded to</th>
+              <th className="px-6 py-4 text-sm font-semibold text-muted-foreground">Amount</th>
+              <th className="px-6 py-4 text-sm font-semibold text-muted-foreground">Status</th>
+              <th className="px-6 py-4 text-sm font-semibold text-muted-foreground">Method</th>
+              <th className="px-6 py-4 text-sm font-semibold text-muted-foreground">Plan Type</th>
+              <th className="px-6 py-4 text-sm font-semibold text-muted-foreground">Upgraded at</th>
+              <th className="px-6 py-4 text-sm font-semibold text-muted-foreground text-right">Invoice</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-neutral-800">
+          <tbody className="divide-y divide-border">
             {payments.length > 0 ? (
               payments.map((p) => (
-                <tr key={p.id} className="hover:bg-[#1e1e1e]/30 transition-colors group">
+                <tr key={p.id} className="hover:bg-accent/30 transition-colors group">
                   <td className="px-6 py-4">
-                    <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 text-amber-500 text-xs font-bold border border-amber-500/20">
+                    <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-500 text-xs font-bold border border-amber-500/20">
                       {getPlanName(p.amount)}
                     </span>
                   </td>
 
-                  <td className="px-6 py-4 text-white font-medium">
+                  <td className="px-6 py-4 text-foreground font-medium">
                     {p.currency.toUpperCase()} {p.amount.toLocaleString()}
                   </td>
 
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
                       {p.status === "succeeded" ? (
-                        <CheckCircle2 className="w-4 h-4 text-green-500" />
+                        <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                       ) : p.status === "failed" ? (
-                        <XCircle className="w-4 h-4 text-red-500" />
+                        <XCircle className="w-4 h-4 text-destructive" />
                       ) : (
-                        <Clock className="w-4 h-4 text-yellow-500" />
+                        <Clock className="w-4 h-4 text-amber-500" />
                       )}
                       <span className={`text-sm capitalize ${
-                        p.status === "succeeded" ? "text-green-500" : 
-                        p.status === "failed" ? "text-red-500" : "text-yellow-500"
+                        p.status === "succeeded" ? "text-emerald-600 dark:text-emerald-500" : 
+                        p.status === "failed" ? "text-destructive" : "text-amber-600 dark:text-amber-500"
                       }`}>
                         {p.status}
                       </span>
                     </div>
                   </td>
 
-                  <td className="px-6 py-4 text-neutral-400 text-sm">
+                  <td className="px-6 py-4 text-muted-foreground text-sm">
                     <div className="flex items-center gap-2">
-                      <CreditCard className="w-4 h-4 text-neutral-500" />
+                      <CreditCard className="w-4 h-4 text-muted-foreground/60" />
                       {p.method || "Standard"}
                     </div>
                   </td>
 
-                  <td className="px-6 py-4 text-neutral-400 text-sm">
+                  <td className="px-6 py-4 text-muted-foreground text-sm">
                     <div className="flex items-center gap-2">
-                      <CreditCard className="w-4 h-4 text-neutral-500" />
+                      <CreditCard className="w-4 h-4 text-muted-foreground/60" />
                       {p.planType || "Standard"}
                     </div>
                   </td>
 
-                  <td className="px-6 py-4 text-neutral-400 text-sm">
+                  <td className="px-6 py-4 text-muted-foreground text-sm">
                     {new Date(p.createdAt).toLocaleDateString('en-GB', {
                       day: 'numeric',
                       month: 'short',
@@ -128,7 +128,7 @@ export default function BillingPage() {
                       href={`https://test.dodopayments.com/invoices/payments/${p.paymentId}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center p-2 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-300 hover:text-white transition-all border border-neutral-700"
+                      className="inline-flex items-center justify-center p-2 rounded-lg bg-secondary hover:bg-accent border border-border text-muted-foreground hover:text-foreground transition-all"
                     >
                       <Download className="w-4 h-4" />
                     </a>
@@ -137,7 +137,7 @@ export default function BillingPage() {
               ))
             ) : (
               <tr>
-                <td colSpan={6} className="px-6 py-20 text-center text-neutral-500">
+                <td colSpan={7} className="px-6 py-20 text-center text-muted-foreground">
                   No payment history found.
                 </td>
               </tr>

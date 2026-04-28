@@ -89,28 +89,28 @@ export default function BulkDownloadModal({ isOpen, onClose, batchName, links }:
   return (
     <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
       {/* Dark Overlay */}
-      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={onClose} />
       
       {/* Modal Container - Increased Width and Padding */}
-      <div className="relative bg-[#0F0F0F] border border-zinc-800 w-full max-w-[500px] min-h-[320px] rounded-2xl p-8 shadow-2xl animate-in zoom-in-95 duration-200">
+      <div className="relative bg-background border border-border w-full max-w-[500px] min-h-[320px] rounded-2xl p-8 shadow-2xl animate-in zoom-in-95 duration-200">
         
         {/* Close Button - Top Right */}
         <button 
           onClick={onClose} 
-          className="absolute top-6 right-6 text-zinc-500 hover:text-white transition-colors cursor-pointer p-1"
+          className="absolute top-6 right-6 text-muted-foreground hover:text-foreground transition-colors cursor-pointer p-1"
         >
           <HugeiconsIcon icon={Cancel01Icon} size={24} />
         </button>
 
         <div className="mb-8">
-          <h3 className="text-white text-2xl font-bold mb-2">Export Data</h3>
-          <p className="text-zinc-500 text-sm">Choose your preferred format to download the batch <span className="text-zinc-300 font-bold">"{batchName}"</span>.</p>
+          <h3 className="text-foreground text-2xl font-bold mb-2">Export Data</h3>
+          <p className="text-muted-foreground text-sm">Choose your preferred format to download the batch <span className="text-foreground font-bold">"{batchName}"</span>.</p>
         </div>
 
         <div className="flex flex-col gap-4">
           <button 
             onClick={downloadPDF}
-            className="group flex items-center justify-between p-5 rounded-xl bg-zinc-900/50 border border-zinc-800 hover:border-zinc-500 hover:bg-zinc-900 text-white transition-all cursor-pointer"
+            className="group flex items-center justify-between p-5 rounded-xl bg-secondary/50 border border-border hover:border-foreground/50 hover:bg-secondary text-foreground transition-all cursor-pointer"
           >
             <div className="flex items-center gap-4">
               <div className="p-3 bg-red-500/10 rounded-lg text-red-500 group-hover:scale-110 transition-transform">
@@ -118,15 +118,15 @@ export default function BulkDownloadModal({ isOpen, onClose, batchName, links }:
               </div>
               <div className="text-left">
                 <span className="block text-base font-bold">Document Report</span>
-                <span className="text-xs text-zinc-500 uppercase tracking-widest font-bold">PDF Format</span>
+                <span className="text-xs text-muted-foreground uppercase tracking-widest font-bold">PDF Format</span>
               </div>
             </div>
-            <HugeiconsIcon icon={Download01Icon} size={20} className="text-zinc-600 group-hover:text-white" />
+            <HugeiconsIcon icon={Download01Icon} size={20} className="text-muted-foreground group-hover:text-foreground" />
           </button>
 
           <button 
             onClick={downloadCSV}
-            className="group flex items-center justify-between p-5 rounded-xl bg-zinc-900/50 border border-zinc-800 hover:border-zinc-500 hover:bg-zinc-900 text-white transition-all cursor-pointer"
+            className="group flex items-center justify-between p-5 rounded-xl bg-secondary/50 border border-border hover:border-foreground/50 hover:bg-secondary text-foreground transition-all cursor-pointer"
           >
             <div className="flex items-center gap-4">
               <div className="p-3 bg-green-500/10 rounded-lg text-green-500 group-hover:scale-110 transition-transform">
@@ -134,10 +134,10 @@ export default function BulkDownloadModal({ isOpen, onClose, batchName, links }:
               </div>
               <div className="text-left">
                 <span className="block text-base font-bold">Spreadsheet Data</span>
-                <span className="text-xs text-zinc-500 uppercase tracking-widest font-bold">CSV Format</span>
+                <span className="text-xs text-muted-foreground uppercase tracking-widest font-bold">CSV Format</span>
               </div>
             </div>
-            <HugeiconsIcon icon={Download01Icon} size={20} className="text-zinc-600 group-hover:text-white" />
+            <HugeiconsIcon icon={Download01Icon} size={20} className="text-muted-foreground group-hover:text-foreground" />
           </button>
         </div>
       </div>

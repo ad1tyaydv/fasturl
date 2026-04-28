@@ -128,10 +128,10 @@ export default function Links({
 
   return (
     <>
-      <div className="relative flex items-center justify-between py-5 px-4 border-b border-neutral-800/60 hover:bg-[#1a1a1a] group transition-colors">
+      <div className="relative flex items-center justify-between py-5 px-4 border-b border-border/60 hover:bg-accent group transition-colors">
 
         <div className="flex items-start gap-4 w-[65%] md:w-[35%] min-w-0 pr-4">
-          <div className="mt-1 w-8 h-8 rounded-full bg-neutral-800 flex items-center justify-center overflow-hidden shrink-0">
+          <div className="mt-1 w-8 h-8 rounded-full bg-secondary flex items-center justify-center overflow-hidden shrink-0">
             {url.original ? (
               <img
                 src={getLogo(url.original)}
@@ -140,7 +140,7 @@ export default function Links({
                 onError={(e) => (e.currentTarget.style.display = "none")}
               />
             ) : (
-              <HugeiconsIcon icon={Link04Icon} />
+              <HugeiconsIcon icon={Link04Icon} className="text-foreground" />
             )}
           </div>
 
@@ -149,26 +149,26 @@ export default function Links({
               <div className="flex items-center gap-2">
                 <input
                   autoFocus
-                  className="bg-[#111111] border border-neutral-700 rounded px-2 py-1 text-white w-full outline-none"
+                  className="bg-background border border-border rounded px-2 py-1 text-foreground w-full outline-none focus:ring-1 focus:ring-ring"
                   value={tempName}
                   onChange={(e) => setTempName(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && !isSavingName && saveName()}
                   disabled={isSavingName}
                 />
-                <button onClick={saveName} disabled={isSavingName} className="text-green-500 shrink-0">
+                <button onClick={saveName} disabled={isSavingName} className="text-green-500 shrink-0 cursor-pointer">
                   {isSavingName ? (
-                    <div className="w-[22px] h-[22px] border-2 border-t-transparent rounded-full animate-spin" />
+                    <div className="w-[22px] h-[22px] border-2 border-t-transparent border-green-500 rounded-full animate-spin" />
                   ) : (
                     <HugeiconsIcon icon={Tick02Icon} />
                   )}
                 </button>
               </div>
             ) : (
-              <span className="text-white font-one text-xl truncate tracking-wide">
+              <span className="text-foreground font-one text-xl truncate tracking-wide">
                 {url.linkName || "Untitled Link"}
               </span>
             )}
-            <span className="text-neutral-500 font-three text-base truncate">
+            <span className="text-muted-foreground font-three text-base truncate">
               {getShortLink()}
             </span>
           </div>
@@ -184,14 +184,14 @@ export default function Links({
         </div>
 
         <div className="w-[20%] md:w-[20%] flex flex-col items-end md:items-start">
-          <span className="text-white font-semibold text-sm md:text-base">{url.clicks || 0} clicks</span>
+          <span className="text-foreground font-semibold text-sm md:text-base">{url.clicks || 0} clicks</span>
         </div>
 
-        <div className="hidden md:flex items-center justify-end gap-3 text-neutral-400 w-[30%] opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity">
+        <div className="hidden md:flex items-center justify-end gap-3 text-muted-foreground w-[30%] opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity">
 
           <button
             onClick={() => handleRestrictedAction(() => onOpenPassword(url))}
-            className={`p-2 rounded-md cursor-pointer transition-colors ${url.password ? 'text-blue-500' : 'hover:text-white'}`}
+            className={`p-2 rounded-md cursor-pointer transition-colors ${url.password ? 'text-blue-500' : 'hover:text-foreground'}`}
             title="Password Protect"
           >
             {url.password ? <HugeiconsIcon icon={CircleLock01Icon} /> : <HugeiconsIcon icon={CircleUnlock01Icon} />}
@@ -199,7 +199,7 @@ export default function Links({
 
           <button
             onClick={() => handleRestrictedAction(() => onOpenCustom(url))}
-            className="hover:text-white p-2 cursor-pointer"
+            className="hover:text-foreground p-2 cursor-pointer"
             title="Custom Styling"
           >
             <HugeiconsIcon icon={MagicWand01Icon} />
@@ -207,7 +207,7 @@ export default function Links({
 
           <button
             onClick={() => window.open(`https://${getShortLink()}`, '_blank')}
-            className="hover:text-white p-2 cursor-pointer"
+            className="hover:text-foreground p-2 cursor-pointer"
             title="Open Link"
           >
             <HugeiconsIcon icon={Share05Icon} />
@@ -215,7 +215,7 @@ export default function Links({
 
           <button
             onClick={copyToClipboard}
-            className={`p-2 cursor-pointer ${copied ? "text-green-500" : "hover:text-white"}`}
+            className={`p-2 cursor-pointer ${copied ? "text-green-500" : "hover:text-foreground"}`}
             title="Copy Link"
           >
             {copied ? <HugeiconsIcon icon={CopyCheckIcon} /> : <HugeiconsIcon icon={CopyIcon} />}
@@ -223,7 +223,7 @@ export default function Links({
 
           <button
             onClick={handleOpenQr}
-            className="hover:text-white p-2 cursor-pointer"
+            className="hover:text-foreground p-2 cursor-pointer"
             title="Generate QR Code"
           >
             <HugeiconsIcon icon={QrCodeIcon} />
@@ -231,7 +231,7 @@ export default function Links({
 
           <button
             onClick={() => setIsRedirectModalOpen(true)}
-            className={`p-2 cursor-pointer transition-colors ${url.redirectTo ? 'text-blue-500' : 'hover:text-white'}`}
+            className={`p-2 cursor-pointer transition-colors ${url.redirectTo ? 'text-blue-500' : 'hover:text-foreground'}`}
             title="Target URL Settings"
           >
             <HugeiconsIcon icon={SentIcon} />
@@ -239,7 +239,7 @@ export default function Links({
 
           <button
             onClick={() => router.push(`/analytics?link=${url.shorturl}`)}
-            className="hover:text-white p-2 cursor-pointer"
+            className="hover:text-foreground p-2 cursor-pointer"
             title="View Analytics"
           >
             <HugeiconsIcon icon={Analytics01Icon} />
@@ -247,7 +247,7 @@ export default function Links({
 
           <button
             onClick={() => { setIsEditing(true); setTempName(url.linkName || ""); }}
-            className="hover:text-white p-2 cursor-pointer"
+            className="hover:text-foreground p-2 cursor-pointer"
             title="Edit Name"
           >
             <HugeiconsIcon icon={Edit03Icon} />
@@ -267,7 +267,7 @@ export default function Links({
           </button>
         </div>
 
-        <div className="hidden md:block w-[10%] text-right text-neutral-500 text-sm font-medium">
+        <div className="hidden md:block w-[10%] text-right text-muted-foreground text-sm font-medium">
           {getRelativeTime(url.createdAt)}
         </div>
       </div>

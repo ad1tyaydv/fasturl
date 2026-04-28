@@ -72,9 +72,9 @@ export default function BulkPasswordProtectionModal({
 
       toast.success("Batch protection updated!", {
         style: {
-          background: "#1c1c1c",
-          color: "#fff",
-          border: "1px solid #333",
+          background: "hsl(var(--popover))",
+          color: "hsl(var(--popover-foreground))",
+          border: "1px solid hsl(var(--border))",
         },
       });
 
@@ -92,21 +92,21 @@ export default function BulkPasswordProtectionModal({
 
   return (
     <div
-      className="fixed inset-0 z-[110] flex items-center justify-center bg-black/80 p-4"
+      className="fixed inset-0 z-[110] flex items-center justify-center bg-background/80 backdrop-blur-sm p-4"
       onClick={() => !isLoading && onClose()}
     >
       <div
-        className="bg-[#1c1c1c] shadow-2xl w-full max-w-lg p-6 sm:p-10 border border-neutral-800 rounded-xl"
+        className="bg-background shadow-2xl w-full max-w-lg p-6 sm:p-10 border border-border rounded-xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <h3 className="text-xl sm:text-2xl font-three mb-8 text-center text-white">
+        <h3 className="text-xl sm:text-2xl font-three mb-8 text-center text-foreground">
           Protect Bulk Batch
         </h3>
 
         <div className="space-y-6 mb-8">
           <div className="space-y-2">
             <div className="flex justify-between items-center">
-              <label className="text-xl font-one text-white">
+              <label className="text-xl font-one text-foreground">
                 Batch Password
               </label>
 
@@ -124,23 +124,23 @@ export default function BulkPasswordProtectionModal({
             </div>
 
             {!isEditingPassword && selectedBatch.password ? (
-              <div className="w-full p-3 border border-dashed border-neutral-700 bg-[#1a1a1a] text-neutral-400 font-three italic rounded-lg">
+              <div className="w-full p-3 border border-dashed border-border bg-secondary text-muted-foreground font-three italic rounded-lg">
                 Password is already configured
               </div>
             ) : (
-              <div className="relative flex items-center border border-neutral-700 bg-[#111111] focus-within:border-blue-500 rounded-lg overflow-hidden transition-colors">
+              <div className="relative flex items-center border border-border bg-background focus-within:ring-1 focus-within:ring-ring rounded-lg overflow-hidden transition-colors">
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter new password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full p-3 bg-transparent text-white font-three focus:outline-none"
+                  className="w-full p-3 bg-transparent text-foreground font-three focus:outline-none"
                 />
 
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="px-4 text-neutral-500 hover:text-white cursor-pointer"
+                  className="px-4 text-muted-foreground hover:text-foreground cursor-pointer"
                 >
                   {showPassword ? (
                     <IoEyeOffOutline size={20} />
@@ -154,7 +154,7 @@ export default function BulkPasswordProtectionModal({
 
           <div className="space-y-2 relative">
             <div className="flex justify-between items-center">
-              <label className="text-xl font-one text-white">
+              <label className="text-xl font-one text-foreground">
                 Batch Expiry
               </label>
 
@@ -172,7 +172,7 @@ export default function BulkPasswordProtectionModal({
             </div>
 
             {!isEditingExpiry && selectedBatch.expiresAt ? (
-              <div className="w-full p-3 border border-dashed border-neutral-700 bg-[#1a1a1a] text-neutral-400 font-three rounded-lg">
+              <div className="w-full p-3 border border-dashed border-border bg-secondary text-muted-foreground font-three rounded-lg">
                 Expires on{" "}
                 {new Date(selectedBatch.expiresAt).toLocaleDateString()}
               </div>
@@ -180,9 +180,9 @@ export default function BulkPasswordProtectionModal({
               <div className="relative">
                 <button
                   onClick={() => setShowCalendar(!showCalendar)}
-                  className="w-full p-3 border border-neutral-700 bg-[#111111] 
-                  text-white font-three rounded-lg flex justify-between items-center
-                  hover:border-blue-500 transition-colors"
+                  className="w-full p-3 border border-border bg-background 
+                  text-foreground font-three rounded-lg flex justify-between items-center
+                  hover:bg-accent transition-colors"
                 >
                   {expiryDate
                     ? expiryDate.toLocaleDateString()
@@ -190,12 +190,12 @@ export default function BulkPasswordProtectionModal({
 
                   <IoCalendarOutline
                     size={20}
-                    className="text-neutral-500"
+                    className="text-muted-foreground"
                   />
                 </button>
 
                 {showCalendar && (
-                  <div className="absolute z-50 mt-2 bg-[#1c1c1c] border border-neutral-800 rounded-xl p-3 shadow-xl">
+                  <div className="absolute z-50 mt-2 bg-popover border border-border rounded-xl p-3 shadow-xl">
                     <DayPicker
                       mode="single"
                       selected={expiryDate}
@@ -203,7 +203,7 @@ export default function BulkPasswordProtectionModal({
                         setExpiryDate(date);
                         setShowCalendar(false);
                       }}
-                      className="text-white"
+                      className="text-popover-foreground"
                     />
                   </div>
                 )}
@@ -217,7 +217,7 @@ export default function BulkPasswordProtectionModal({
             variant="outline"
             onClick={onClose}
             disabled={isLoading}
-            className="bg-transparent h-10 px-6 text-white border-neutral-700 hover:bg-[#2a2a2a] cursor-pointer"
+            className="bg-transparent h-10 px-6 text-foreground border-border hover:bg-accent cursor-pointer"
           >
             Cancel
           </Button>
@@ -225,7 +225,7 @@ export default function BulkPasswordProtectionModal({
           <Button
             onClick={handleBulkUpdate}
             disabled={isLoading}
-            className="bg-white h-10 text-black hover:bg-gray-200 font-bold min-w-[120px] cursor-pointer"
+            className="bg-primary h-10 text-primary-foreground hover:bg-primary/90 font-bold min-w-[120px] cursor-pointer"
           >
             {isLoading ? (
               <Loader2 className="h-5 w-5 animate-spin mx-auto" />

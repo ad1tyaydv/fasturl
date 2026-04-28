@@ -109,14 +109,14 @@ export default function FaqSection() {
 
   
   return (
-    <section className="py-24 px-4 bg-[#141414] transition-colors duration-300">
+    <section className="py-24 px-4 bg-background transition-colors duration-300">
       <div className="max-w-7xl mx-auto">
         
         <div className="text-center mb-20">
-          <h2 className="text-4xl md:text-5xl font-three font-bold text-white tracking-tight">
+          <h2 className="text-4xl md:text-5xl font-three font-bold text-foreground tracking-tight">
             Frequently Asked Questions
           </h2>
-          <p className="mt-6 text-neutral-400 font-one text-lg max-w-2xl mx-auto">
+          <p className="mt-6 text-muted-foreground font-one text-lg max-w-2xl mx-auto">
             Have questions about Fasturl? We've got answers. If you can't find what you're looking for, feel free to contact our support team.
           </p>
         </div>
@@ -131,17 +131,17 @@ export default function FaqSection() {
               return (
                 <div 
                   key={key} 
-                  className="border-b border-neutral-800 transition-all duration-200"
+                  className="border-b border-border transition-all duration-200"
                 >
                   <button
                     onClick={() => toggleFaq('left', index)}
                     className="w-full py-6 flex items-center justify-between text-left group cursor-pointer"
                   >
-                    <span className={`text-lg font-three font-bold transition-colors ${isOpen ? 'text-blue-500' : 'text-white group-hover:text-blue-500'}`}>
+                    <span className={`text-lg font-three font-bold transition-colors ${isOpen ? 'text-blue-500' : 'text-foreground group-hover:text-blue-500'}`}>
                       {faq.question}
                     </span>
                     <HugeiconsIcon icon={ArrowDown01Icon}
-                      className={`text-neutral-400 transition-transform duration-300 ${isOpen ? 'rotate-180 text-blue-500' : ''}`} 
+                      className={`text-muted-foreground transition-transform duration-300 ${isOpen ? 'rotate-180 text-blue-500' : ''}`} 
                     />
                   </button>
                   
@@ -150,7 +150,7 @@ export default function FaqSection() {
                       isOpen ? 'max-h-96 opacity-100 pb-6' : 'max-h-0 opacity-0'
                     }`}
                   >
-                    <p className="text-neutral-400 font-one leading-relaxed">
+                    <p className="text-muted-foreground font-one leading-relaxed">
                       {faq.answer}
                     </p>
                   </div>
@@ -167,17 +167,17 @@ export default function FaqSection() {
               return (
                 <div 
                   key={key} 
-                  className="border-b border-neutral-800 transition-all duration-200"
+                  className="border-b border-border transition-all duration-200"
                 >
                   <button
                     onClick={() => toggleFaq('right', index)}
                     className="w-full py-6 flex items-center justify-between text-left group cursor-pointer"
                   >
-                    <span className={`text-lg font-three font-bold transition-colors ${isOpen ? 'text-blue-500' : 'text-white group-hover:text-blue-500'}`}>
+                    <span className={`text-lg font-three font-bold transition-colors ${isOpen ? 'text-blue-500' : 'text-foreground group-hover:text-blue-500'}`}>
                       {faq.question}
                     </span>
                     <HugeiconsIcon icon={ArrowDown01Icon}
-                      className={`text-neutral-400 transition-transform duration-300 ${isOpen ? 'rotate-180 text-blue-500' : ''}`} 
+                      className={`text-muted-foreground transition-transform duration-300 ${isOpen ? 'rotate-180 text-blue-500' : ''}`} 
                     />
                   </button>
                   
@@ -186,7 +186,7 @@ export default function FaqSection() {
                       isOpen ? 'max-h-96 opacity-100 pb-6' : 'max-h-0 opacity-0'
                     }`}
                   >
-                    <p className="text-neutral-400 font-one leading-relaxed">
+                    <p className="text-muted-foreground font-one leading-relaxed">
                       {faq.answer}
                     </p>
                   </div>

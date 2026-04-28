@@ -107,19 +107,19 @@ export default function AllKeysTab() {
   };
 
   return (
-    <div className="animate-in fade-in duration-300">
+    <div className="animate-in fade-in duration-300 font-one">
       {/* Header */}
       <div className="flex items-start justify-between mb-8 gap-4 flex-wrap">
         <div>
-          <h2 className="text-2xl font-bold text-white mb-1">API Keys</h2>
-          <p className="text-neutral-400 max-w-2xl text-sm">
+          <h2 className="text-2xl font-bold text-foreground mb-1">API Keys</h2>
+          <p className="text-muted-foreground max-w-2xl text-sm">
             Manage your API keys. Keep them secret — anyone with a key can access the API on your behalf.
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <Button
             onClick={() => setIsModalOpen(true)}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-2.5 rounded-none gap-2 cursor-pointer transition-all"
+            className="bg-primary text-primary-foreground hover:opacity-90 font-bold px-6 py-2.5 rounded-lg gap-2 cursor-pointer transition-all shadow-md"
           >
             <Plus className="w-4 h-4" />
             Generate Key
@@ -129,77 +129,75 @@ export default function AllKeysTab() {
 
       {/* Keys Table */}
       {isLoading ? (
-        <div className="flex items-center gap-3 text-neutral-400 py-10">
-          <Loader2 className="w-5 h-5 animate-spin text-blue-500" />
+        <div className="flex items-center gap-3 text-muted-foreground py-10">
+          <Loader2 className="w-5 h-5 animate-spin text-primary" />
           <span className="text-sm font-medium">Loading API keys...</span>
         </div>
       ) : apiKeys.length === 0 ? (
-        <div className="border border-dashed border-neutral-700 flex flex-col items-center justify-center py-16 text-center">
-          <Key className="w-10 h-10 text-neutral-600 mb-4" />
-          <p className="text-neutral-400 font-medium">No API keys yet</p>
-          <p className="text-neutral-600 text-sm mt-1">
+        <div className="border border-dashed border-border flex flex-col items-center justify-center py-16 text-center rounded-xl bg-secondary/30">
+          <Key className="w-10 h-10 text-muted-foreground/40 mb-4" />
+          <p className="text-muted-foreground font-medium">No API keys yet</p>
+          <p className="text-muted-foreground/60 text-sm mt-1">
             Click &quot;Generate Key&quot; to create your first key.
           </p>
         </div>
       ) : (
-        <div className="border border-neutral-800 overflow-x-auto">
+        <div className="border border-border overflow-x-auto rounded-xl bg-background shadow-sm">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-neutral-800 bg-neutral-900/60">
-                <th className="text-left text-neutral-400 font-semibold px-5 py-3">Name</th>
-                <th className="text-left text-neutral-400 font-semibold px-5 py-3">Key</th>
-                <th className="text-left text-neutral-400 font-semibold px-5 py-3">Created</th>
-                <th className="text-left text-neutral-400 font-semibold px-5 py-3">Usage</th>
-                <th className="text-left text-neutral-400 font-semibold px-5 py-3">Status</th>
-                <th className="text-left text-neutral-400 font-semibold px-5 py-3">Actions</th>
+              <tr className="border-b border-border bg-secondary/50">
+                <th className="text-left text-muted-foreground font-semibold px-5 py-3 uppercase tracking-wider text-[10px]">Name</th>
+                <th className="text-left text-muted-foreground font-semibold px-5 py-3 uppercase tracking-wider text-[10px]">Key</th>
+                <th className="text-left text-muted-foreground font-semibold px-5 py-3 uppercase tracking-wider text-[10px]">Created</th>
+                <th className="text-left text-muted-foreground font-semibold px-5 py-3 uppercase tracking-wider text-[10px]">Usage</th>
+                <th className="text-left text-muted-foreground font-semibold px-5 py-3 uppercase tracking-wider text-[10px]">Status</th>
+                <th className="text-left text-muted-foreground font-semibold px-5 py-3 uppercase tracking-wider text-[10px]">Actions</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-border">
               {apiKeys.map((apiKey, i) => (
                 <tr
                   key={apiKey.id ?? apiKey.key}
-                  className={`border-b border-neutral-800 last:border-b-0 transition-colors hover:bg-neutral-900/40 ${
-                    i % 2 === 0 ? "bg-transparent" : "bg-neutral-900/20"
-                  }`}
+                  className="transition-colors hover:bg-accent/30"
                 >
-                  <td className="px-5 py-4 text-white font-medium">{apiKey.name ?? "—"}</td>
+                  <td className="px-5 py-4 text-foreground font-medium">{apiKey.name ?? "—"}</td>
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-2">
-                      <code className="text-neutral-400 font-mono text-xs bg-neutral-900 border border-neutral-800 px-3 py-1.5 select-none">
+                      <code className="text-muted-foreground font-mono text-xs bg-secondary/50 border border-border px-3 py-1.5 rounded select-none">
                         {maskKey(apiKey.key)}
                       </code>
                       <button
                         onClick={() => handleCopy(apiKey.key)}
-                        className="text-neutral-500 hover:text-white transition-colors cursor-pointer"
+                        className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                         title="Copy key"
                       >
                         <Copy className="w-4 h-4" />
                       </button>
                     </div>
                   </td>
-                  <td className="px-5 py-4 text-neutral-400">
+                  <td className="px-5 py-4 text-muted-foreground">
                     {new Date(apiKey.createdAt).toLocaleDateString("en-IN", {
                       year: "numeric",
                       month: "short",
                       day: "numeric",
                     })}
                   </td>
-                  <td className="px-5 py-4 text-neutral-400">
+                  <td className="px-5 py-4 text-muted-foreground">
                     {apiKey.usageCount ?? 0} / {apiKey.usageLimit ?? "∞"}
                   </td>
                   <td className="px-5 py-4">
                     <button
                       onClick={() => handleToggle(apiKey.id ?? apiKey.key, apiKey.isActive)}
                       disabled={togglingId === apiKey.id}
-                      className="flex items-center gap-2 cursor-pointer disabled:opacity-60"
+                      className="flex items-center gap-2 cursor-pointer group disabled:opacity-60"
                       title={apiKey.isActive ? "Click to deactivate" : "Click to activate"}
                     >
                       {togglingId === (apiKey.id ?? apiKey.key) ? (
-                        <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
+                        <Loader2 className="w-4 h-4 animate-spin text-primary" />
                       ) : (
                         <div
                           className={`relative w-10 h-5 rounded-full transition-colors duration-200 ${
-                            apiKey.isActive ? "bg-blue-600" : "bg-neutral-700"
+                            apiKey.isActive ? "bg-emerald-500" : "bg-muted"
                           }`}
                         >
                           <span
@@ -211,7 +209,7 @@ export default function AllKeysTab() {
                       )}
                       <span
                         className={`text-xs font-semibold ${
-                          apiKey.isActive ? "text-blue-400" : "text-neutral-500"
+                          apiKey.isActive ? "text-emerald-600 dark:text-emerald-500" : "text-muted-foreground"
                         }`}
                       >
                         {apiKey.isActive ? "Active" : "Inactive"}
@@ -222,7 +220,7 @@ export default function AllKeysTab() {
                     <button
                       onClick={() => handleDelete(apiKey.id ?? apiKey.key)}
                       disabled={deletingId === (apiKey.id ?? apiKey.key)}
-                      className="text-neutral-500 hover:text-red-400 transition-colors cursor-pointer disabled:opacity-60"
+                      className="text-muted-foreground hover:text-destructive transition-colors cursor-pointer disabled:opacity-60 p-2 hover:bg-destructive/10 rounded-lg"
                       title="Delete key"
                     >
                       {deletingId === (apiKey.id ?? apiKey.key) ? (
@@ -242,20 +240,20 @@ export default function AllKeysTab() {
       {/* Generate Modal */}
       {isModalOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4 animate-in fade-in duration-200"
           onClick={handleCloseModal}
         >
           <div
-            className="relative z-50 w-full max-w-md bg-neutral-950 border border-neutral-800 p-8"
+            className="relative z-50 w-full max-w-md bg-popover border border-border p-8 rounded-2xl shadow-2xl animate-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
             {!generatedKey ? (
               <>
-                <h3 className="text-white text-xl font-bold mb-1">Generate API Key</h3>
-                <p className="text-neutral-400 text-sm mb-6">
+                <h3 className="text-foreground text-xl font-bold mb-1">Generate API Key</h3>
+                <p className="text-muted-foreground text-sm mb-6">
                   Give this key a name so you can identify it later.
                 </p>
-                <label className="block text-sm font-medium text-neutral-300 mb-2">Key Name</label>
+                <label className="block text-sm font-medium text-muted-foreground mb-2">Key Name</label>
                 <Input
                   type="text"
                   placeholder="e.g. Production Server"
@@ -263,20 +261,20 @@ export default function AllKeysTab() {
                   onChange={(e) => setKeyName(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleGenerate()}
                   disabled={isGenerating}
-                  className="bg-neutral-900 border border-neutral-700 text-white placeholder-neutral-600 rounded-none mb-5"
+                  className="bg-background border-border text-foreground placeholder:text-muted-foreground/50 rounded-lg mb-5"
                 />
                 <div className="flex gap-3">
                   <Button
                     onClick={handleCloseModal}
                     variant="outline"
-                    className="flex-1 rounded-none border-neutral-700 text-neutral-300 hover:text-white hover:bg-neutral-800 cursor-pointer"
+                    className="flex-1 border-border text-muted-foreground hover:bg-secondary hover:text-foreground cursor-pointer rounded-lg"
                   >
                     Cancel
                   </Button>
                   <Button
                     onClick={handleGenerate}
                     disabled={isGenerating || !keyName.trim()}
-                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-none gap-2 cursor-pointer"
+                    className="flex-1 bg-primary text-primary-foreground font-bold rounded-lg gap-2 cursor-pointer transition-all hover:opacity-90"
                   >
                     {isGenerating && <Loader2 className="w-4 h-4 animate-spin" />}
                     {isGenerating ? "Generating..." : "Generate"}
@@ -285,17 +283,17 @@ export default function AllKeysTab() {
               </>
             ) : (
               <>
-                <h3 className="text-white text-xl font-bold mb-1">Key Generated</h3>
-                <p className="text-neutral-400 text-sm mb-6">
+                <h3 className="text-foreground text-xl font-bold mb-1">Key Generated</h3>
+                <p className="text-muted-foreground text-sm mb-6">
                   Copy your API key now — it won't be shown again.
                 </p>
-                <div className="flex items-center gap-2 bg-neutral-900 border border-neutral-700 px-4 py-3 mb-6">
-                  <code className="text-green-400 font-mono text-sm flex-1 break-all select-all">
+                <div className="flex items-center gap-2 bg-secondary/50 border border-border px-4 py-3 mb-6 rounded-lg">
+                  <code className="text-emerald-600 dark:text-emerald-500 font-mono text-sm flex-1 break-all select-all">
                     {generatedKey}
                   </code>
                   <button
                     onClick={() => handleCopy(generatedKey)}
-                    className="text-neutral-400 hover:text-white transition-colors cursor-pointer shrink-0"
+                    className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer shrink-0 p-2 hover:bg-accent rounded-lg"
                     title="Copy"
                   >
                     <Copy className="w-4 h-4" />
@@ -303,7 +301,7 @@ export default function AllKeysTab() {
                 </div>
                 <Button
                   onClick={handleCloseModal}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-none cursor-pointer"
+                  className="w-full bg-primary text-primary-foreground font-bold rounded-lg cursor-pointer transition-all hover:opacity-90"
                 >
                   Done
                 </Button>

@@ -35,48 +35,48 @@ import { QrFilterDropDown, QrFilterType } from "@/app/dropDown/qrLinksDropDown";
 const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN;
 
 const LinksSkeleton = () => (
-  <div className="relative flex items-center justify-between py-5 px-4 border-b border-neutral-800/60 animate-pulse">
+  <div className="relative flex items-center justify-between py-5 px-4 border-b border-border/60 animate-pulse">
     <div className="flex items-start gap-4 w-[65%] md:w-[35%] min-w-0 pr-4">
-      <div className="mt-1 w-8 h-8 rounded-full bg-neutral-800 shrink-0" />
+      <div className="mt-1 w-8 h-8 rounded-full bg-secondary shrink-0" />
       <div className="flex flex-col gap-2.5 w-full">
-        <div className="h-5 w-[140px] bg-neutral-800 rounded-md" />
-        <div className="h-4 w-[200px] bg-neutral-800/50 rounded-md" />
+        <div className="h-5 w-[140px] bg-secondary rounded-md" />
+        <div className="h-4 w-[200px] bg-secondary/50 rounded-md" />
       </div>
     </div>
     <div className="hidden md:flex w-[15%] shrink-0 pr-4">
-      <div className="h-6 w-20 bg-neutral-800/30 rounded-md" />
+      <div className="h-6 w-20 bg-secondary/30 rounded-md" />
     </div>
     <div className="w-[20%] md:w-[20%] flex flex-col items-end md:items-start">
-      <div className="h-5 w-12 bg-neutral-800/60 rounded" />
+      <div className="h-5 w-12 bg-secondary/60 rounded" />
     </div>
     <div className="hidden md:block w-[10%] text-right">
-      <div className="h-4 w-14 bg-neutral-800/40 rounded ml-auto" />
+      <div className="h-4 w-14 bg-secondary/40 rounded ml-auto" />
     </div>
   </div>
 );
 
 const QrSkeleton = () => (
-  <div className="flex items-center py-8 px-5 border-b border-neutral-800/60 animate-pulse">
-    <div className="shrink-0 mr-6 w-16 h-16 bg-neutral-800" />
+  <div className="flex items-center py-8 px-5 border-b border-border/60 animate-pulse">
+    <div className="shrink-0 mr-6 w-16 h-16 bg-secondary" />
     <div className="flex-1 flex flex-col gap-3">
-      <div className="h-6 w-1/3 bg-neutral-800 rounded" />
-      <div className="h-4 w-1/2 bg-neutral-800 rounded opacity-50" />
+      <div className="h-6 w-1/3 bg-secondary rounded" />
+      <div className="h-4 w-1/2 bg-secondary rounded opacity-50" />
     </div>
-    <div className="h-10 w-24 bg-neutral-800 rounded-xl mr-8" />
-    <div className="h-4 w-16 bg-neutral-800 rounded" />
+    <div className="h-10 w-24 bg-secondary rounded-xl mr-8" />
+    <div className="h-4 w-16 bg-secondary rounded" />
   </div>
 );
 
 const BulkSkeleton = () => (
-  <div className="flex items-center py-5 px-4 border-b border-neutral-800/60 animate-pulse">
+  <div className="flex items-center py-5 px-4 border-b border-border/60 animate-pulse">
     <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-500 shrink-0 mr-4">
       <HugeiconsIcon icon={File02Icon} />
     </div>
     <div className="flex-1 flex flex-col gap-2">
-      <div className="h-5 w-1/4 bg-neutral-800 rounded" />
-      <div className="h-4 w-1/3 bg-neutral-800 rounded opacity-50" />
+      <div className="h-5 w-1/4 bg-secondary rounded" />
+      <div className="h-4 w-1/3 bg-secondary rounded opacity-50" />
     </div>
-    <div className="h-4 w-16 bg-neutral-800 rounded ml-auto" />
+    <div className="h-4 w-16 bg-secondary rounded ml-auto" />
   </div>
 );
 
@@ -250,7 +250,7 @@ function AllLinks() {
 
 
   return (
-    <div className="h-screen bg-[#141414] text-white flex flex-col overflow-hidden">
+    <div className="h-screen bg-background text-foreground flex flex-col overflow-hidden transition-colors duration-300">
       <Toaster position="bottom-center" />
       <Navbar />
 
@@ -258,19 +258,19 @@ function AllLinks() {
         <UrlsPageSidebar view={view} onViewChange={handleViewChange} />
 
         <main className="flex-1 w-full px-4 py-6 sm:px-10 sm:py-10 min-w-0 overflow-y-auto">
-          <div className="hidden sm:flex sm:items-center justify-between gap-4 mb-8 border-b border-neutral-800 pb-6">
+          <div className="hidden sm:flex sm:items-center justify-between gap-4 mb-8 border-b border-border pb-6">
             <div>
               <h1 className="text-4xl font-one tracking-tight">
                 {view === "links" ? "My Links" : view === "bulk" ? "Bulk Links" : view === "qr" ? "QR Codes" : "API Requests"}
               </h1>
-              <p className="text-neutral-500 text-sm mt-1">
+              <p className="text-muted-foreground text-sm mt-1">
                 {view === "api" ? "Links generated via your API keys." : "Track and manage your shortened URLs and assets."}
               </p>
             </div>
 
             {view !== "api" && (data.length > 0 || loading) && (
               <div className="flex items-center gap-3">
-                <span className="px-4 py-2 font-bold bg-neutral-900 border border-neutral-800 rounded-lg text-xs uppercase tracking-widest text-neutral-400">
+                <span className="px-4 py-2 font-bold bg-secondary border border-border rounded-lg text-xs uppercase tracking-widest text-muted-foreground">
                   {loading ? "Loading..." : `Total - ${filteredData.length}`}
                 </span>
               </div>
@@ -287,12 +287,12 @@ function AllLinks() {
                     <ButtonGroup className="w-full shadow-sm">
                       <Input
                         placeholder={`Search ${view}...`}
-                        className="bg-[#111111] border-neutral-800 text-white focus-visible:ring-0 focus-visible:border-neutral-600 h-11"
+                        className="bg-background border-border text-foreground focus-visible:ring-1 focus-visible:ring-ring h-11"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                       />
-                      <Button variant="outline" className="bg-neutral-900 border-neutral-800 hover:bg-neutral-800 hover:text-white h-11 px-4">
-                        <SearchIcon className="w-4 h-4 text-neutral-400" />
+                      <Button variant="outline" className="bg-secondary border-border hover:bg-accent hover:text-accent-foreground h-11 px-4 cursor-pointer">
+                        <SearchIcon className="w-4 h-4 text-muted-foreground" />
                       </Button>
                     </ButtonGroup>
                   </div>
@@ -328,17 +328,17 @@ function AllLinks() {
                   ))}
                 </div>
               ) : data.length === 0 ? (
-                <div className="w-full py-24 px-4 flex flex-col items-center justify-center border-2 border-dashed border-neutral-800 rounded-3xl bg-[#1c1c1c]/30 mt-4 fade-in">
-                  <div className="p-5 bg-neutral-900 rounded-2xl border border-neutral-800 mb-6">
+                <div className="w-full py-24 px-4 flex flex-col items-center justify-center border-2 border-dashed border-border rounded-3xl bg-secondary/30 mt-4 fade-in">
+                  <div className="p-5 bg-secondary rounded-2xl border border-border mb-6">
                     <HugeiconsIcon
                       icon={view === "links" ? Link04Icon : view === "qr" ? QrCode01Icon : File02Icon}
-                      className="w-12 h-12 text-neutral-500"
+                      className="w-12 h-12 text-muted-foreground"
                     />
                   </div>
-                  <h2 className="text-2xl sm:text-3xl font-one mb-3 text-white text-center">
+                  <h2 className="text-2xl sm:text-3xl font-one mb-3 text-foreground text-center">
                     {view === "links" ? "Create your first link" : view === "qr" ? "No QR codes found" : "No bulk batches discovered"}
                   </h2>
-                  <p className="text-neutral-500 font-three text-sm mb-10 text-center max-w-sm leading-relaxed">
+                  <p className="text-muted-foreground font-three text-sm mb-10 text-center max-w-sm leading-relaxed">
                     {view === "links"
                       ? "Shorten your long URLs and track their performance with detailed analytics."
                       : view === "qr"
@@ -347,7 +347,7 @@ function AllLinks() {
                   </p>
                   <Button
                     onClick={() => router.push(view === "links" || view === "qr" ? "/" : "/bulk-create")}
-                    className="bg-white text-black hover:bg-neutral-200 font-three px-6 py-4 rounded-xl flex items-center gap-2 text-lg transition-all"
+                    className="bg-primary text-primary-foreground hover:bg-primary/90 font-three px-6 py-4 rounded-xl flex items-center gap-2 text-lg transition-all shadow-md cursor-pointer"
                   >
                     <HugeiconsIcon icon={PlusSignIcon} className="w-6 h-6" />
                     {view === "links" || view === "qr" ? "Create Now" : "Create Bulk Links"}
@@ -415,7 +415,7 @@ export default function AllLinksPage() {
   return (
     <Suspense 
       fallback={
-        <div className="h-screen bg-[#141414] text-white flex flex-col overflow-hidden">
+        <div className="h-screen bg-background text-foreground flex flex-col overflow-hidden">
           <Navbar />
           <div className="flex flex-col w-full p-10">
             <LinksSkeleton />

@@ -54,27 +54,27 @@ export default function QrDownloadModal({ isOpen, onClose, qrData }: QrDownloadM
 
   return (
     <div
-      className="fixed inset-0 z-[150] flex items-center justify-center bg-black/80 p-4"
+      className="fixed inset-0 z-[150] flex items-center justify-center bg-background/80 backdrop-blur-sm p-4"
       onClick={onClose}
     >
       <div
-        className="bg-[#1c1c1c] w-full max-w-2xl p-6 sm:p-10 border border-neutral-800 rounded-2xl relative animate-in fade-in zoom-in duration-200"
+        className="bg-background w-full max-w-2xl p-6 sm:p-10 border border-border rounded-2xl relative animate-in fade-in zoom-in duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 text-neutral-500 hover:text-white transition-colors cursor-pointer"
+          className="absolute right-4 top-4 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
         >
           <X size={24} />
         </button>
 
-        <h3 className="text-xl sm:text-2xl font-one mb-6 text-center text-white">
+        <h3 className="text-xl sm:text-2xl font-one mb-6 text-center text-foreground">
           Download QR Code
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-4">
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
-            <p style={{ color: "#a3a3a3", fontSize: "14px", marginBottom: "12px", alignSelf: "flex-start" }}>Preview</p>
+          <div className="flex flex-col items-center w-full">
+            <p className="text-muted-foreground text-sm mb-3 self-start">Preview</p>
             <div
               ref={previewRef}
               style={{
@@ -131,15 +131,15 @@ export default function QrDownloadModal({ isOpen, onClose, qrData }: QrDownloadM
 
           <div className="flex flex-col gap-6 justify-center h-full">
             <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 bg-neutral-900/50 border border-neutral-800 rounded-xl">
+              <div className="flex items-center justify-between p-4 bg-secondary/50 border border-border rounded-xl">
                 <div>
-                  <p className="text-white font-medium">Show Short URL</p>
-                  <p className="text-neutral-500 text-xs">Include short URL in download</p>
+                  <p className="text-foreground font-medium">Show Short URL</p>
+                  <p className="text-muted-foreground text-xs">Include short URL in download</p>
                 </div>
                 <button
                   onClick={() => setShowShortUrl(!showShortUrl)}
                   className={`w-12 h-6 rounded-full transition-colors relative ${
-                    showShortUrl ? "bg-blue-500" : "bg-neutral-700"
+                    showShortUrl ? "bg-blue-500" : "bg-muted"
                   }`}
                 >
                   <div
@@ -150,15 +150,15 @@ export default function QrDownloadModal({ isOpen, onClose, qrData }: QrDownloadM
                 </button>
               </div>
 
-              <div className="flex items-center justify-between p-4 bg-neutral-900/50 border border-neutral-800 rounded-xl">
+              <div className="flex items-center justify-between p-4 bg-secondary/50 border border-border rounded-xl">
                 <div>
-                  <p className="text-white font-medium">Show Original URL</p>
-                  <p className="text-neutral-500 text-xs">Include original URL in download</p>
+                  <p className="text-foreground font-medium">Show Original URL</p>
+                  <p className="text-muted-foreground text-xs">Include original URL in download</p>
                 </div>
                 <button
                   onClick={() => {setShowLongUrl(!showLongUrl); console.log("Toggled showLongUrl:", !showLongUrl)}}
                   className={`w-12 h-6 rounded-full transition-colors relative ${
-                    showLongUrl ? "bg-blue-500" : "bg-neutral-700"
+                    showLongUrl ? "bg-blue-500" : "bg-muted"
                   }`}
                 >
                   <div
@@ -173,14 +173,14 @@ export default function QrDownloadModal({ isOpen, onClose, qrData }: QrDownloadM
             <div className="mt-8 space-y-3">
               <Button
                 onClick={handleDownload}
-                className="w-full bg-white text-black hover:bg-neutral-200 font-bold h-12 text-lg rounded-xl transition-all active:scale-95"
+                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-bold h-12 text-lg rounded-xl transition-all active:scale-95"
               >
                 <Download className="mr-2 h-5 w-5" /> Download PNG
               </Button>
               <Button
                 variant="outline"
                 onClick={onClose}
-                className="w-full bg-transparent text-neutral-400 border-neutral-800 hover:bg-neutral-900 hover:text-white h-12 rounded-xl"
+                className="w-full bg-transparent text-muted-foreground border-border hover:bg-accent hover:text-accent-foreground h-12 rounded-xl"
               >
                 Cancel
               </Button>

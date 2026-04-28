@@ -9,8 +9,8 @@ const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899"
 const CustomTooltip = ({ active, payload }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-[#1c1c1c] border border-neutral-800 p-3 rounded-none shadow-xl text-white z-50">
-        <p className="font-bold text-xs uppercase tracking-widest font-one text-neutral-400">
+      <div className="bg-popover border border-border p-3 rounded-none shadow-xl text-popover-foreground z-50">
+        <p className="font-bold text-xs uppercase tracking-widest font-one text-muted-foreground">
           {payload[0].name}
         </p>
         <p className="text-sm text-blue-500 font-bold mt-1 font-three">
@@ -41,14 +41,14 @@ export const BulkAnalyticsCardItem = ({
 }: BulkAnalyticsCardItemProps) => {
   
   return (
-    <div className="bg-[#1a1a1a] border border-neutral-800 rounded-none shadow-sm flex flex-col h-full hover:border-neutral-700 transition-all group">
+    <div className="bg-background border border-border rounded-none shadow-sm flex flex-col h-full hover:border-muted-foreground/30 transition-all group">
       <div className="p-6 pb-2 flex flex-row items-center justify-between">
-        <h3 className="text-sm font-bold flex items-center gap-3 text-white font-one uppercase tracking-widest">
+        <h3 className="text-sm font-bold flex items-center gap-3 text-foreground font-one uppercase tracking-widest">
           <span className="text-blue-500">{icon}</span> {title}
         </h3>
         <button
           onClick={onExpand}
-          className="p-1.5 rounded-none text-neutral-500 hover:bg-[#2a2a2a] hover:text-white transition-all cursor-pointer border border-transparent hover:border-neutral-700"
+          className="p-1.5 rounded-none text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-all cursor-pointer border border-transparent hover:border-border"
         >
           <IoArrowForwardOutline size={18} />
         </button>
@@ -89,24 +89,24 @@ export const BulkAnalyticsCardItem = ({
                 {data.slice(0, 4).map((item: any, index: number) => (
                   <div
                     key={`${item[nameKey]}-${index}`}
-                    className="flex justify-between items-center text-xs border-b border-neutral-800/50 pb-2 group-hover:border-neutral-800 transition-colors last:border-0"
+                    className="flex justify-between items-center text-xs border-b border-border transition-colors last:border-0 pb-2"
                   >
                     <div className="flex items-center gap-2 truncate mr-2">
                       <div 
                         className="w-2 h-2 shrink-0" 
                         style={{ backgroundColor: COLORS[(index + colorOffset) % COLORS.length] }}
                       />
-                      <span className="truncate font-medium text-neutral-400 font-three uppercase tracking-tight">
+                      <span className="truncate font-medium text-muted-foreground font-three uppercase tracking-tight">
                         {item[nameKey] || "Unknown"}
                       </span>
                     </div>
-                    <span className="font-bold text-white font-two tabular-nums">
+                    <span className="font-bold text-foreground font-two tabular-nums">
                       {item.count}
                     </span>
                   </div>
                 ))}
                 {data.length > 4 && (
-                  <p className="text-[10px] text-neutral-600 font-three italic text-right">
+                  <p className="text-[10px] text-muted-foreground font-three italic text-right">
                     + {data.length - 4} more
                   </p>
                 )}
@@ -115,10 +115,10 @@ export const BulkAnalyticsCardItem = ({
           ) : (
             /* Empty State */
             <div className="flex flex-col items-center justify-center w-full h-full space-y-3 py-10">
-              <div className="w-12 h-12 rounded-none bg-[#242424] flex items-center justify-center text-neutral-700 border border-neutral-800">
+              <div className="w-12 h-12 rounded-none bg-secondary flex items-center justify-center text-muted-foreground border border-border">
                 {icon}
               </div>
-              <p className="text-neutral-600 font-three text-sm italic tracking-tight">
+              <p className="text-muted-foreground font-three text-sm italic tracking-tight">
                 No data recorded
               </p>
             </div>

@@ -283,14 +283,14 @@ export default function BulkCreateLinks() {
   const topFiveLinks = pastBulkLinks.slice(0, 5);
 
   return (
-    <div className="min-h-screen bg-[#141414] text-white transition-colors duration-300">
+    <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
       <Navbar />
 
       <div className="flex flex-col items-center justify-center text-center py-12 px-6">
-        <h1 className="text-3xl font-one sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 text-white leading-tight">
+        <h1 className="text-3xl font-one sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 text-foreground leading-tight">
           Generate <span className="text-red-500">Thousands</span> of Links Instantly
         </h1>
-        <p className="max-w-2xl font-one sm:text-lg text-neutral-400">
+        <p className="max-w-2xl font-one sm:text-lg text-muted-foreground">
           Transform your bulk data into high-quality, shareable short links and QR codes instantly.
         </p>
       </div>
@@ -298,12 +298,12 @@ export default function BulkCreateLinks() {
       <main className="w-full max-w-[1600px] mx-auto px-6 sm:px-12 lg:px-20 py-5">
         <div className="flex flex-col lg:flex-row items-stretch gap-8 lg:h-[540px]">
 
-          <div className="w-full lg:w-[60%] xl:w-[65%] p-6 sm:p-8 border border-neutral-800 rounded-2xl shadow-sm relative text-white flex flex-col h-full">
+          <div className="w-full lg:w-[60%] xl:w-[65%] p-6 sm:p-8 border border-border rounded-2xl shadow-sm relative text-foreground flex flex-col h-full">
             <div className="mb-6 shrink-0 flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-white">Bulk Shorten Links</h2>
+              <h2 className="text-2xl font-bold text-foreground">Bulk Shorten Links</h2>
               <button 
                 onClick={() => setShowHelpModal(true)}
-                className="text-neutral-500 hover:text-white transition-colors cursor-pointer p-1"
+                className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer p-1"
               >
                 <IoHelpCircleOutline size={20} />
               </button>
@@ -318,7 +318,7 @@ export default function BulkCreateLinks() {
                     }
                   }}
                   className={`border-2 border-dashed rounded-xl p-6 flex-1 flex flex-col items-center justify-center transition-all duration-200 relative
-                      ${createdLinks.length > 0 ? 'border-neutral-800 bg-[#1a1a1a] cursor-default' : file ? 'border-blue-500 bg-blue-500/10 cursor-pointer' : 'border-neutral-700 hover:border-blue-500 cursor-pointer'}`}
+                      ${createdLinks.length > 0 ? 'border-border bg-secondary cursor-default' : file ? 'border-blue-500 bg-blue-500/10 cursor-pointer' : 'border-border hover:border-blue-500 cursor-pointer'}`}
                 >
                   <input type="file" accept=".csv" hidden ref={fileInputRef} onChange={handleFileChange} disabled={createdLinks.length > 0} className="cursor-pointer" />
 
@@ -327,12 +327,12 @@ export default function BulkCreateLinks() {
                       <div className="flex items-center gap-4">
                         <HugeiconsIcon icon={File02Icon} size={30} className="text-blue-500" />
                         <div className="text-left">
-                          <p className="font-semibold truncate max-w-[150px] sm:max-w-[200px] text-white text-lg">{file.name}</p>
-                          <p className="text-sm text-neutral-400">{(file.size / 1024).toFixed(2)} KB</p>
+                          <p className="font-semibold truncate max-w-[150px] sm:max-w-[200px] text-foreground text-lg">{file.name}</p>
+                          <p className="text-sm text-muted-foreground">{(file.size / 1024).toFixed(2)} KB</p>
                         </div>
                       </div>
                       {!loading && (
-                        <button onClick={(e) => { e.stopPropagation(); setFile(null); }} className="p-2 hover:bg-red-500/20 rounded-full text-red-500 cursor-pointer transition-colors">
+                        <button onClick={(e) => { e.stopPropagation(); setFile(null); }} className="p-2 hover:bg-destructive/20 rounded-full text-destructive cursor-pointer transition-colors">
                           <HugeiconsIcon icon={Cancel01Icon} />
                         </button>
                       )}
@@ -344,9 +344,9 @@ export default function BulkCreateLinks() {
                     </div>
                   ) : (
                     <>
-                      <HugeiconsIcon icon={CloudUploadIcon} size={35} className="mb-4" />
-                      <p className="text-center font-medium text-white">Click to upload your CSV</p>
-                      <p className="text-center text-xs text-neutral-500 mt-1">Make sure it contains a column for URLs</p>
+                      <HugeiconsIcon icon={CloudUploadIcon} size={35} className="mb-4 text-muted-foreground" />
+                      <p className="text-center font-medium text-foreground">Click to upload your CSV</p>
+                      <p className="text-center text-xs text-muted-foreground mt-1">Make sure it contains a column for URLs</p>
                     </>
                   )}
                 </div>
@@ -354,10 +354,10 @@ export default function BulkCreateLinks() {
 
               <div className="shrink-0 mt-6 space-y-6">
                 {file && !createdLinks.length && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 animate-in fade-in duration-300 border-t border-neutral-800 pt-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 animate-in fade-in duration-300 border-t border-border pt-6">
                     <div className="space-y-2">
                       <label className="text-sm font-three flex items-center gap-1">
-                        Password <span className="text-neutral-500 font-three">(Optional)</span>
+                        Password <span className="text-muted-foreground font-three">(Optional)</span>
                       </label>
                       <div className="relative group">
                         <input
@@ -365,12 +365,12 @@ export default function BulkCreateLinks() {
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
                           placeholder="Enter password"
-                          className="w-full p-3 bg-[#111111] font-three border border-neutral-700 rounded-lg outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all pr-12 text-white"
+                          className="w-full p-3 bg-background font-three border border-border rounded-lg outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all pr-12 text-foreground"
                         />
                         <button
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-white transition-colors cursor-pointer"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                         >
                           {showPassword ? <HugeiconsIcon icon={ViewOffSlashIcon} /> : <HugeiconsIcon icon={ViewIcon} />}
                         </button>
@@ -379,16 +379,16 @@ export default function BulkCreateLinks() {
 
                     <div className="space-y-2">
                       <label className="text-sm font-three flex items-center gap-1">
-                        Set Expiry Date <span className="text-neutral-500 font-three">(Optional)</span>
+                        Set Expiry Date <span className="text-muted-foreground font-three">(Optional)</span>
                       </label>
                       <div className="relative group">
                         <input
                           type="date"
                           value={expiryDate}
                           onChange={(e) => setExpiryDate(e.target.value)}
-                          className="w-full p-3 bg-[#111111] border border-neutral-700 rounded-lg outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all pr-12 text-white appearance-none cursor-pointer [color-scheme:dark]"
+                          className="w-full p-3 bg-background border border-border rounded-lg outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all pr-12 text-foreground appearance-none cursor-pointer"
                         />
-                        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 pointer-events-none">
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
                           <HugeiconsIcon icon={Calendar03Icon} />
                         </div>
                       </div>
@@ -411,7 +411,7 @@ export default function BulkCreateLinks() {
                     onClick={handleUpload}
                     disabled={!file || loading}
                     className={`w-full py-4 rounded-xl font-bold transition-all flex flex-col items-center justify-center cursor-pointer
-                        ${!file || loading ? 'bg-[#2a2a2a] text-neutral-500 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 hover:shadow-lg active:scale-[0.98] text-white'}`}
+                        ${!file || loading ? 'bg-secondary text-muted-foreground cursor-not-allowed' : 'bg-primary text-primary-foreground hover:opacity-90 hover:shadow-lg active:scale-[0.98]'}`}
                   >
                     {loading ? (
                       <>
@@ -429,7 +429,7 @@ export default function BulkCreateLinks() {
                   <div className="flex flex-col gap-3">
                     <button
                       onClick={handleGenerateMore}
-                      className="w-full flex items-center justify-center gap-2 py-3 text-sm font-bold text-neutral-400 hover:text-white hover:bg-neutral-800/50 rounded-xl transition-all border border-neutral-800 cursor-pointer"
+                      className="w-full flex items-center justify-center gap-2 py-3 text-sm font-bold text-muted-foreground hover:text-foreground hover:bg-secondary rounded-xl transition-all border border-border cursor-pointer"
                     >
                       <IoRefreshOutline size={18} />
                       Generate more links
@@ -440,10 +440,10 @@ export default function BulkCreateLinks() {
             </div>
           </div>
 
-          <div className="w-full lg:w-[40%] xl:w-[35%] p-6 sm:p-8 border border-neutral-800 rounded-2xl shadow-sm relative text-white flex flex-col h-full">
+          <div className="w-full lg:w-[40%] xl:w-[35%] p-6 sm:p-8 border border-border rounded-2xl shadow-sm relative text-foreground flex flex-col h-full">
             <div className="mb-6 flex items-center justify-between shrink-0">
               <div>
-                <h2 className="text-2xl font-one mb-2 text-white">Recent Bulk Links</h2>
+                <h2 className="text-2xl font-one mb-2 text-foreground">Recent Bulk Links</h2>
               </div>
             </div>
 
@@ -454,10 +454,10 @@ export default function BulkCreateLinks() {
                     {topFiveLinks.map((link) => (
                       <div
                         key={link.id}
-                        className="flex items-center justify-between py-3 px-4 border border-neutral-800/60 hover:bg-[#1a1a1a] transition-colors group w-full rounded-xl gap-2"
+                        className="flex items-center justify-between py-3 px-4 border border-border/60 hover:bg-accent transition-colors group w-full rounded-xl gap-2"
                       >
                         <div className="flex items-center gap-4 flex-1 min-w-0">
-                          <div className="w-9 h-9 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 shrink-0">
+                          <div className="w-9 h-9 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500 shrink-0">
                             <HugeiconsIcon icon={File02Icon} />
                           </div>
                           <div className="flex flex-col min-w-0 w-full">
@@ -465,7 +465,7 @@ export default function BulkCreateLinks() {
                               <div className="flex items-center gap-2 w-full max-w-[200px]" onClick={(e) => e.stopPropagation()}>
                                 <input
                                   autoFocus
-                                  className="bg-[#111111] border border-neutral-700 rounded px-2 py-0.5 text-sm font-semibold text-white focus:outline-none w-full"
+                                  className="bg-background border border-border rounded px-2 py-0.5 text-sm font-semibold text-foreground focus:outline-none w-full"
                                   value={tempName}
                                   onChange={(e) => setTempName(e.target.value)}
                                   onKeyDown={(e) => {
@@ -475,23 +475,23 @@ export default function BulkCreateLinks() {
                                 />
                                 <button
                                   onClick={() => handleUpdateName(link.id, tempName)}
-                                  className="text-green-500 hover:text-green-400 shrink-0 p-1 cursor-pointer"
+                                  className="text-green-500 hover:text-green-600 shrink-0 p-1 cursor-pointer"
                                 >
                                   <HugeiconsIcon icon={Tick02Icon} />
                                 </button>
                               </div>
                             ) : (
-                              <span className="text-white font-three text-base truncate tracking-wide">
+                              <span className="text-foreground font-three text-base truncate tracking-wide">
                                 {link.name || "Bulk Link"}
                               </span>
                             )}
-                            <span className="text-neutral-500 font-one text-xs mt-0.5">
+                            <span className="text-muted-foreground font-one text-xs mt-0.5">
                               {getRelativeTime(link.createdAt)}
                             </span>
                           </div>
                         </div>
 
-                        <div className="flex items-center justify-end gap-1 text-neutral-300 shrink-0 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                        <div className="flex items-center justify-end gap-1 text-muted-foreground shrink-0 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                           <button
                             onClick={() => {
                               if (!checkPlanAccess()) return;
@@ -500,7 +500,7 @@ export default function BulkCreateLinks() {
                               setIsEditingPassword(!link.password);
                               setIsEditingExpiry(!link.expiresAt);
                             }}
-                            className={`p-1.5 rounded-md transition-colors cursor-pointer hover:text-white hover:bg-neutral-800`}
+                            className={`p-1.5 rounded-md transition-colors cursor-pointer hover:text-foreground hover:bg-secondary`}
                             title="Password Protection"
                           >
                             {link.password ? (
@@ -516,7 +516,7 @@ export default function BulkCreateLinks() {
                               setEditingId(link.id);
                               setTempName(link.name || "Bulk Link");
                             }}
-                            className="hover:text-white hover:bg-neutral-800 p-1.5 rounded-md transition-colors cursor-pointer"
+                            className="hover:text-foreground hover:bg-secondary p-1.5 rounded-md transition-colors cursor-pointer"
                             title="Edit Name"
                           >
                             <HugeiconsIcon icon={Edit03Icon} />
@@ -525,11 +525,11 @@ export default function BulkCreateLinks() {
                           <button
                             onClick={() => handleDelete(link.id)}
                             disabled={deletingId === link.id}
-                            className="hover:text-red-500 hover:bg-red-500/10 p-1.5 rounded-md transition-colors cursor-pointer flex items-center justify-center min-w-[32px]"
+                            className="hover:text-destructive hover:bg-destructive/10 p-1.5 rounded-md transition-colors cursor-pointer flex items-center justify-center min-w-[32px]"
                             title="Delete Bulk Job"
                           >
                             {deletingId === link.id ? (
-                              <Loader2 className="w-4 h-4 animate-spin text-red-500" />
+                              <Loader2 className="w-4 h-4 animate-spin text-destructive" />
                             ) : (
                               <HugeiconsIcon icon={Delete02Icon} />
                             )}
@@ -539,24 +539,24 @@ export default function BulkCreateLinks() {
                     ))}
                   </div>
 
-                  <div className="mt-4 pt-4 border-t border-neutral-800 shrink-0">
+                  <div className="mt-4 pt-4 border-t border-border shrink-0">
                     <button
                       onClick={() => router.push('/links?types=bulk')}
-                      className="w-full flex items-center justify-between px-4 py-3 bg-[#1c1c1c] hover:bg-[#252525] border border-neutral-800 rounded-xl transition-all group cursor-pointer"
+                      className="w-full flex items-center justify-between px-4 py-3 bg-secondary hover:bg-accent border border-border rounded-xl transition-all group cursor-pointer"
                     >
-                      <span className="font-semibold text-sm text-neutral-300 group-hover:text-white">Manage all links</span>
+                      <span className="font-semibold text-sm text-foreground/80 group-hover:text-foreground">Manage all links</span>
                       <HugeiconsIcon
                         icon={ArrowRight01Icon}
-                        className="text-neutral-500 group-hover:text-white group-hover:translate-x-1 transition-all"
+                        className="text-muted-foreground group-hover:text-foreground group-hover:translate-x-1 transition-all"
                       />
                     </button>
                   </div>
                 </>
               ) : (
-                <div className="flex flex-col items-center justify-center h-full flex-1 border-2 border-dashed border-neutral-800 rounded-xl py-20 text-neutral-500 bg-[#1a1a1a]/50">
-                  <IoFileTrayFullOutline size={48} className="mb-4 text-neutral-700" />
-                  <p className="font-medium text-lg text-neutral-400">No links generated yet.</p>
-                  <p className="text-sm text-neutral-600 mt-1">Upload a CSV file to see results here.</p>
+                <div className="flex flex-col items-center justify-center h-full flex-1 border-2 border-dashed border-border rounded-xl py-20 text-muted-foreground bg-secondary/30">
+                  <IoFileTrayFullOutline size={48} className="mb-4 opacity-50" />
+                  <p className="font-medium text-lg">No links generated yet.</p>
+                  <p className="text-sm opacity-70 mt-1">Upload a CSV file to see results here.</p>
                 </div>
               )}
             </div>
@@ -567,26 +567,23 @@ export default function BulkCreateLinks() {
 
       {showDownloadModal && (
         <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
-          {/* Backdrop with blur */}
           <div
-            className="absolute inset-0 bg-black/80 backdrop-blur-sm cursor-pointer"
+            className="absolute inset-0 bg-background/80 backdrop-blur-sm cursor-pointer"
             onClick={() => setShowDownloadModal(false)}
           />
 
-          {/* Modal Container: Increased size to max-w-[500px] and min-h */}
-          <div className="relative bg-[#0F0F0F] border border-neutral-800 w-full max-w-[500px] min-h-[350px] rounded-2xl p-8 shadow-2xl animate-in zoom-in-95 duration-200">
+          <div className="relative bg-background border border-border w-full max-w-[500px] min-h-[350px] rounded-2xl p-8 shadow-2xl animate-in zoom-in-95 duration-200">
 
-            {/* Top Right Close Button */}
             <button
               onClick={() => setShowDownloadModal(false)}
-              className="absolute top-6 right-6 text-neutral-500 hover:text-white transition-colors cursor-pointer p-1"
+              className="absolute top-6 right-6 text-muted-foreground hover:text-foreground transition-colors cursor-pointer p-1"
             >
               <HugeiconsIcon icon={Cancel01Icon} size={24} />
             </button>
 
             <div className="mb-10">
-              <h3 className="text-white text-2xl font-bold mb-2">Export Results</h3>
-              <p className="text-neutral-500 text-sm font-three">
+              <h3 className="text-foreground text-2xl font-bold mb-2">Export Results</h3>
+              <p className="text-muted-foreground text-sm font-three">
                 Your bulk links have been processed. Choose a format to save your data.
               </p>
             </div>
@@ -594,34 +591,34 @@ export default function BulkCreateLinks() {
             <div className="flex flex-col gap-4">
               <button
                 onClick={() => { exportPDF(); setShowDownloadModal(false); }}
-                className="group flex items-center justify-between p-5 rounded-xl bg-zinc-900/50 border border-zinc-800 hover:border-red-500/50 hover:bg-zinc-900 transition-all cursor-pointer"
+                className="group flex items-center justify-between p-5 rounded-xl bg-secondary/50 border border-border hover:border-destructive/50 hover:bg-secondary transition-all cursor-pointer"
               >
                 <div className="flex items-center gap-4">
-                  <div className="p-3 bg-red-500/10 rounded-lg text-red-500 group-hover:scale-110 transition-transform">
+                  <div className="p-3 bg-destructive/10 rounded-lg text-destructive group-hover:scale-110 transition-transform">
                     <HugeiconsIcon icon={Pdf02Icon} size={28} />
                   </div>
                   <div className="text-left">
-                    <span className="block text-white text-lg font-bold">PDF Document</span>
-                    <span className="text-xs text-neutral-500 uppercase tracking-widest font-bold">Professional Report</span>
+                    <span className="block text-foreground text-lg font-bold">PDF Document</span>
+                    <span className="text-xs text-muted-foreground uppercase tracking-widest font-bold">Professional Report</span>
                   </div>
                 </div>
-                <HugeiconsIcon icon={ArrowRight01Icon} size={20} className="text-neutral-600 group-hover:text-white group-hover:translate-x-1 transition-all" />
+                <HugeiconsIcon icon={ArrowRight01Icon} size={20} className="text-muted-foreground group-hover:text-foreground group-hover:translate-x-1 transition-all" />
               </button>
 
               <button
                 onClick={() => { exportCSV(); setShowDownloadModal(false); }}
-                className="group flex items-center justify-between p-5 rounded-xl bg-zinc-900/50 border border-zinc-800 hover:border-green-500/50 hover:bg-zinc-900 transition-all cursor-pointer"
+                className="group flex items-center justify-between p-5 rounded-xl bg-secondary/50 border border-border hover:border-green-500/50 hover:bg-secondary transition-all cursor-pointer"
               >
                 <div className="flex items-center gap-4">
                   <div className="p-3 bg-green-500/10 rounded-lg text-green-500 group-hover:scale-110 transition-transform">
                     <HugeiconsIcon icon={Csv02Icon} size={28} />
                   </div>
                   <div className="text-left">
-                    <span className="block text-white text-lg font-bold">CSV Spreadsheet</span>
-                    <span className="text-xs text-neutral-500 uppercase tracking-widest font-bold">Excel Compatible</span>
+                    <span className="block text-foreground text-lg font-bold">CSV Spreadsheet</span>
+                    <span className="text-xs text-muted-foreground uppercase tracking-widest font-bold">Excel Compatible</span>
                   </div>
                 </div>
-                <HugeiconsIcon icon={ArrowRight01Icon} size={20} className="text-neutral-600 group-hover:text-white group-hover:translate-x-1 transition-all" />
+                <HugeiconsIcon icon={ArrowRight01Icon} size={20} className="text-muted-foreground group-hover:text-foreground group-hover:translate-x-1 transition-all" />
               </button>
             </div>
           </div>
@@ -630,27 +627,27 @@ export default function BulkCreateLinks() {
 
       {isPasswordModalOpen && selectedUrl && (
         <div
-          className="fixed inset-0 z-[110] flex items-center justify-center bg-black/80 p-4"
+          className="fixed inset-0 z-[110] flex items-center justify-center bg-background/80 backdrop-blur-sm p-4"
           onClick={closeAllModals}
         >
           <div
-            className="bg-[#1c1c1c] shadow-2xl w-full max-w-lg p-6 sm:p-10 border border-neutral-800 rounded-xl"
+            className="bg-background shadow-2xl w-full max-w-lg p-6 sm:p-10 border border-border rounded-xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="text-xl sm:text-2xl font-three mb-8 text-center text-white">
+            <h3 className="text-xl sm:text-2xl font-three mb-8 text-center text-foreground">
               Add Link Protection
             </h3>
 
             <div className="space-y-6 mb-8">
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
-                  <label className="text-xl font-one text-white">
-                    Password <span className="text-sm text-neutral-500 font-normal">(Optional)</span>
+                  <label className="text-xl font-one text-foreground">
+                    Password <span className="text-sm text-muted-foreground font-normal">(Optional)</span>
                   </label>
                   {!isEditingPassword && selectedUrl.password && (
                     <button
                       onClick={() => { setIsEditingPassword(true); setPassword(""); }}
-                      className="text-blue-500 hover:text-blue-400 cursor-pointer"
+                      className="text-blue-500 hover:text-blue-600 cursor-pointer"
                     >
                       <HugeiconsIcon icon={Edit03Icon} />
                     </button>
@@ -658,22 +655,22 @@ export default function BulkCreateLinks() {
                 </div>
 
                 {!isEditingPassword && selectedUrl.password ? (
-                  <div className="w-full p-3 border border-dashed border-neutral-700 bg-[#1a1a1a] text-neutral-400 font-three italic rounded-lg text-sm">
+                  <div className="w-full p-3 border border-dashed border-border bg-secondary text-muted-foreground font-three italic rounded-lg text-sm">
                     Password is already configured
                   </div>
                 ) : (
-                  <div className="relative flex items-center border border-neutral-700 bg-[#111111] focus-within:border-blue-500 transition-colors rounded-lg overflow-hidden">
+                  <div className="relative flex items-center border border-border bg-background focus-within:ring-1 focus-within:ring-blue-500 transition-colors rounded-lg overflow-hidden">
                     <input
                       type={showPassword ? "text" : "password"}
                       placeholder="Enter password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full p-3 bg-transparent text-white font-three focus:outline-none"
+                      className="w-full p-3 bg-transparent text-foreground font-three focus:outline-none"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="px-4 text-neutral-500 hover:text-white cursor-pointer"
+                      className="px-4 text-muted-foreground hover:text-foreground cursor-pointer"
                     >
                       {showPassword ? <HugeiconsIcon icon={ViewOffSlashIcon} /> : <HugeiconsIcon icon={ViewIcon} />}
                     </button>
@@ -683,11 +680,11 @@ export default function BulkCreateLinks() {
 
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
-                  <label className="text-xl font-one text-white">Set Expiry Date</label>
+                  <label className="text-xl font-one text-foreground">Set Expiry Date</label>
                   {!isEditingExpiry && selectedUrl.expiresAt && (
                     <button
                       onClick={() => { setIsEditingExpiry(true); setExpiryDate(""); }}
-                      className="text-blue-500 hover:text-blue-400 cursor-pointer"
+                      className="text-blue-500 hover:text-blue-600 cursor-pointer"
                     >
                       <HugeiconsIcon icon={Edit03Icon} />
                     </button>
@@ -695,7 +692,7 @@ export default function BulkCreateLinks() {
                 </div>
 
                 {!isEditingExpiry && selectedUrl.expiresAt ? (
-                  <div className="w-full p-3 border border-dashed border-neutral-700 bg-[#1a1a1a] text-neutral-400 font-three rounded-lg text-sm">
+                  <div className="w-full p-3 border border-dashed border-border bg-secondary text-muted-foreground font-three rounded-lg text-sm">
                     Expires on {new Date(selectedUrl.expiresAt).toLocaleDateString()}
                   </div>
                 ) : (
@@ -704,9 +701,9 @@ export default function BulkCreateLinks() {
                       type="date"
                       value={expiryDate}
                       onChange={(e) => setExpiryDate(e.target.value)}
-                      className="w-full p-3 border border-neutral-700 bg-[#111111] text-white font-three focus:outline-none focus:border-blue-500 transition-colors rounded-lg cursor-pointer [color-scheme:dark] pr-12 appearance-none"
+                      className="w-full p-3 border border-border bg-background text-foreground font-three focus:outline-none focus:border-blue-500 transition-colors rounded-lg cursor-pointer pr-12 appearance-none"
                     />
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-500 pointer-events-none">
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
                       <IoCalendarOutline size={20} />
                     </div>
                   </div>
@@ -717,13 +714,13 @@ export default function BulkCreateLinks() {
             <div className="flex justify-end gap-3">
               <button
                 onClick={closeAllModals}
-                className="cursor-pointer px-6 py-2.5 font-three text-sm bg-transparent text-white border border-neutral-700 hover:bg-[#2a2a2a] rounded-lg"
+                className="cursor-pointer px-6 py-2.5 font-three text-sm bg-transparent text-foreground border border-border hover:bg-secondary rounded-lg"
               >
                 Cancel
               </button>
               <button
                 onClick={handleAddPassword}
-                className="bg-white text-black px-6 py-2.5 font-three text-sm hover:bg-gray-200 rounded-lg cursor-pointer active:scale-95 font-bold"
+                className="bg-primary text-primary-foreground px-6 py-2.5 font-three text-sm hover:opacity-90 rounded-lg cursor-pointer active:scale-95 font-bold"
               >
                 Update
               </button>
@@ -734,27 +731,27 @@ export default function BulkCreateLinks() {
 
       {showLimitModal && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/80 cursor-pointer" onClick={() => setShowLimitModal(false)} />
-          <div className="relative bg-[#1c1c1c] border border-neutral-800 w-full max-w-[450px] rounded-2xl p-8 shadow-2xl flex flex-col items-center text-center">
-            <div className="w-16 h-16 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mb-4">
+          <div className="absolute inset-0 bg-background/80 backdrop-blur-sm cursor-pointer" onClick={() => setShowLimitModal(false)} />
+          <div className="relative bg-background border border-border w-full max-w-[450px] rounded-2xl p-8 shadow-2xl animate-in zoom-in-95 duration-200 flex flex-col items-center text-center">
+            <div className="w-16 h-16 bg-destructive/10 text-destructive rounded-full flex items-center justify-center mb-4">
               <IoAlertCircleOutline size={40} />
             </div>
-            <h3 className="text-2xl font-bold mb-2 text-white">Limit Reached!</h3>
-            <p className="text-neutral-400 mb-8 text-sm">
+            <h3 className="text-2xl font-bold mb-2 text-foreground">Limit Reached!</h3>
+            <p className="text-muted-foreground mb-8 text-sm">
               You have reached your link generation limit for this month.
               Upgrade your plan to continue generating more short links.
             </p>
             <div className="flex flex-col w-full gap-3">
               <button
                 onClick={() => router.push('/premium')}
-                className="w-full py-4 bg-blue-600 text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-blue-700 cursor-pointer"
+                className="w-full py-4 bg-blue-600 text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-blue-700 cursor-pointer shadow-md"
               >
                 <IoRocketOutline size={20} />
                 Upgrade Now
               </button>
               <button
                 onClick={() => setShowLimitModal(false)}
-                className="w-full py-3 bg-[#2a2a2a] text-white rounded-xl font-bold cursor-pointer hover:bg-[#333333]"
+                className="w-full py-3 bg-secondary text-foreground rounded-xl font-bold cursor-pointer hover:bg-accent transition-colors"
               >
                 Maybe Later
               </button>
@@ -765,18 +762,18 @@ export default function BulkCreateLinks() {
 
       {showHelpModal && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/80 cursor-pointer" onClick={() => setShowHelpModal(false)} />
-          <div className="relative bg-[#1c1c1c] border border-neutral-800 w-full max-w-[400px] rounded-2xl p-6 shadow-2xl flex flex-col items-center text-center">
+          <div className="absolute inset-0 bg-background/80 backdrop-blur-sm cursor-pointer" onClick={() => setShowHelpModal(false)} />
+          <div className="relative bg-background border border-border w-full max-w-[400px] rounded-2xl p-6 shadow-2xl animate-in zoom-in-95 duration-200 flex flex-col items-center text-center">
             <div className="w-12 h-12 bg-blue-500/10 text-blue-500 rounded-full flex items-center justify-center mb-4">
               <IoHelpCircleOutline size={30} />
             </div>
-            <h3 className="text-xl font-bold mb-2 text-white">Bulk Shortening Instructions</h3>
-            <p className="text-neutral-400 mb-6 text-sm">
+            <h3 className="text-xl font-bold mb-2 text-foreground">Bulk Shortening Instructions</h3>
+            <p className="text-muted-foreground mb-6 text-sm">
               Upload your CSV file to generate shortened links instantly.
             </p>
             <button
               onClick={() => setShowHelpModal(false)}
-              className="w-full py-3 bg-blue-600 text-white rounded-xl font-bold cursor-pointer hover:bg-blue-700 transition-colors"
+              className="w-full py-3 bg-blue-600 text-white rounded-xl font-bold cursor-pointer hover:bg-blue-700 transition-colors shadow-md"
             >
               Got it
             </button>
@@ -785,7 +782,7 @@ export default function BulkCreateLinks() {
       )}
 
       <Features isLoggedIn={!!user} userPlan={user?.plan || "FREE"} />
-      <div className="w-full h-px bg-neutral-800/50 my-12 shadow-sm"></div>
+      <div className="w-full h-px bg-border my-12 shadow-sm"></div>
       <FaqSection />
       <TotalData />
       <Footer />

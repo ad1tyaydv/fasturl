@@ -84,27 +84,27 @@ export default function QrDownloadModal({ isOpen, onClose, qrData, selectedUrl }
 
   return (
     <div
-      className="fixed inset-0 z-[150] flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-[150] flex items-center justify-center bg-background/80 backdrop-blur-sm p-4"
       onClick={onClose}
     >
       <div
-        className="bg-[#1c1c1c] w-full max-w-2xl p-6 sm:p-10 border border-neutral-800 rounded-2xl relative animate-in fade-in zoom-in duration-200"
+        className="bg-background w-full max-w-2xl p-6 sm:p-10 border border-border rounded-2xl relative animate-in fade-in zoom-in duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 text-neutral-500 hover:text-white transition-colors cursor-pointer"
+          className="absolute right-4 top-4 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
         >
           <X size={24} />
         </button>
 
-        <h3 className="text-xl sm:text-2xl font-semibold mb-6 text-center text-white">
+        <h3 className="text-xl sm:text-2xl font-semibold mb-6 text-center text-foreground">
           Download QR Code
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-4">
           <div className="flex flex-col items-center w-full">
-            <p className="text-neutral-400 text-sm mb-3 self-start">Preview</p>
+            <p className="text-muted-foreground text-sm mb-3 self-start">Preview</p>
             <div
               ref={previewRef}
               style={{
@@ -189,14 +189,14 @@ export default function QrDownloadModal({ isOpen, onClose, qrData, selectedUrl }
                 { label: "Short URL", sub: "Show link", state: showShortUrl, setter: setShowShortUrl },
                 { label: "Original URL", sub: "Show destination", state: showLongUrl, setter: setShowLongUrl }
               ].map((item) => (
-                <div key={item.label} className="flex items-center justify-between p-3 bg-neutral-900/50 border border-neutral-800 rounded-xl">
+                <div key={item.label} className="flex items-center justify-between p-3 bg-secondary/50 border border-border rounded-xl">
                   <div>
-                    <p className="text-white text-sm font-medium">{item.label}</p>
-                    <p className="text-neutral-500 text-[10px]">{item.sub}</p>
+                    <p className="text-foreground text-sm font-medium">{item.label}</p>
+                    <p className="text-muted-foreground text-[10px]">{item.sub}</p>
                   </div>
                   <button
                     onClick={() => item.setter(!item.state)}
-                    className={`w-10 h-5 rounded-full transition-colors relative ${item.state ? "bg-blue-500" : "bg-neutral-700"}`}
+                    className={`w-10 h-5 rounded-full transition-colors relative ${item.state ? "bg-blue-500" : "bg-muted"}`}
                   >
                     <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all ${item.state ? "right-1" : "left-1"}`} />
                   </button>
@@ -208,7 +208,7 @@ export default function QrDownloadModal({ isOpen, onClose, qrData, selectedUrl }
               <Button
                 onClick={handleDownload}
                 disabled={isImageLoading}
-                className="w-full bg-white text-black hover:bg-neutral-200 font-bold h-12 rounded-xl transition-all"
+                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-bold h-12 rounded-xl transition-all"
               >
                 {isImageLoading ? <Loader2 className="animate-spin mr-2" /> : <Download className="mr-2 h-5 w-5" />}
                 Download PNG
@@ -216,7 +216,7 @@ export default function QrDownloadModal({ isOpen, onClose, qrData, selectedUrl }
               <Button
                 variant="outline"
                 onClick={onClose}
-                className="w-full bg-transparent text-neutral-400 border-neutral-800 hover:bg-neutral-900 h-12 rounded-xl"
+                className="w-full bg-transparent text-muted-foreground border-border hover:bg-accent h-12 rounded-xl"
               >
                 Cancel
               </Button>

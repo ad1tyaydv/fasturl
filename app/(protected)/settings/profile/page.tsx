@@ -22,7 +22,7 @@ const AVATAR_LIST = [
 
 function Skeleton({ className }: { className?: string }) {
   return (
-    <div className={`animate-pulse bg-white/8 rounded-lg ${className}`} />
+    <div className={`animate-pulse bg-secondary rounded-lg ${className}`} />
   );
 }
 
@@ -154,7 +154,7 @@ export default function Profile() {
           </div>
         </div>
 
-        <div className="space-y-6 pr-96">
+        <div className="space-y-6 pr-0 sm:pr-96">
           <div className="space-y-2">
             <Skeleton className="h-3 w-16" />
             <div className="flex gap-3">
@@ -176,30 +176,30 @@ export default function Profile() {
 
   return (
     <div className="pl-6 font-one">
-      <h1 className="text-2xl font-bold mb-8 text-white">Profile Settings</h1>
+      <h1 className="text-2xl font-bold mb-8 text-foreground">Profile Settings</h1>
 
       <div className="flex items-center gap-5 mb-10">
         <div className="relative">
-          <div className="w-24 h-24 rounded-full overflow-hidden ring-2 ring-white/10 bg-[#1e1e1e]">
+          <div className="w-24 h-24 rounded-full overflow-hidden ring-2 ring-border bg-secondary">
             <img src={selectedAvatar} alt="Profile" className="w-full h-full object-cover" />
           </div>
         </div>
 
         <div>
-          <p className="font-semibold text-white text-base">{userName}</p>
-          <p className="text-sm text-white/40 mb-3">{email}</p>
+          <p className="font-semibold text-foreground text-base">{userName}</p>
+          <p className="text-sm text-muted-foreground mb-3">{email}</p>
           <button
             onClick={openAvatarModal}
-            className="px-4 py-1.5 text-xs font-medium rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-colors cursor-pointer"
+            className="px-4 py-1.5 text-xs font-medium rounded-lg border border-border bg-secondary hover:bg-accent text-foreground transition-colors cursor-pointer"
           >
             Update Emoji
           </button>
         </div>
       </div>
 
-      <div className="space-y-6 pr-96">
+      <div className="space-y-6 pr-0 sm:pr-96">
         <div className="space-y-2">
-          <label className="block text-sm font-semibold text-neutral-300">Name</label>
+          <label className="block text-sm font-semibold text-muted-foreground">Name</label>
           <div className="flex gap-3">
             <input
               type="text"
@@ -207,12 +207,12 @@ export default function Profile() {
               onChange={(e) => setUpdateUserName(e.target.value)}
               onKeyPress={(e) => handleKeyPress(e, handleUpdateUserName)}
               placeholder="Enter your username"
-              className="flex-1 bg-white text-black px-3 py-2 text-sm rounded border border-gray-300 focus:outline-none focus:border-blue-500"
+              className="flex-1 bg-background text-foreground px-3 py-2 text-sm rounded border border-border focus:outline-none focus:ring-1 focus:ring-ring"
             />
             <button
               onClick={handleUpdateUserName}
               disabled={updateUserNameLoader}
-              className="px-5 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium rounded transition-colors flex items-center justify-center gap-2 whitespace-nowrap text-sm cursor-pointer"
+              className="px-5 py-2 bg-primary text-primary-foreground hover:opacity-90 disabled:opacity-50 font-medium rounded transition-all flex items-center justify-center gap-2 whitespace-nowrap text-sm cursor-pointer"
             >
               {updateUserNameLoader ? <Loader2 className="w-3 h-3 animate-spin" /> : "Update"}
             </button>
@@ -220,7 +220,7 @@ export default function Profile() {
         </div>
 
         <div className="space-y-2">
-          <label className="block text-sm font-semibold text-neutral-300">Email Address</label>
+          <label className="block text-sm font-semibold text-muted-foreground">Email Address</label>
           <div className="flex gap-3">
             <input
               type="email"
@@ -228,12 +228,12 @@ export default function Profile() {
               onChange={(e) => setUpdateEmail(e.target.value)}
               onKeyPress={(e) => handleKeyPress(e, handleUpdateEmail)}
               placeholder="Enter your email"
-              className="flex-1 bg-white text-black px-3 py-2 text-sm rounded border border-gray-300 focus:outline-none focus:border-blue-500"
+              className="flex-1 bg-background text-foreground px-3 py-2 text-sm rounded border border-border focus:outline-none focus:ring-1 focus:ring-ring"
             />
             <button
               onClick={handleUpdateEmail}
               disabled={updateEmailLoader}
-              className="px-5 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium rounded transition-colors flex items-center justify-center gap-2 whitespace-nowrap text-sm cursor-pointer"
+              className="px-5 py-2 bg-primary text-primary-foreground hover:opacity-90 disabled:opacity-50 font-medium rounded transition-all flex items-center justify-center gap-2 whitespace-nowrap text-sm cursor-pointer"
             >
               {updateEmailLoader ? <Loader2 className="w-3 h-3 animate-spin" /> : "Update"}
             </button>
@@ -242,13 +242,13 @@ export default function Profile() {
       </div>
 
       {showAvatarModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="bg-[#1a1a1a] border border-white/10 rounded-2xl p-6 w-full max-w-sm shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4">
+          <div className="bg-popover border border-border rounded-2xl p-6 w-full max-w-sm shadow-2xl animate-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between mb-5">
-              <h2 className="text-base font-semibold text-white">Choose Emoji</h2>
+              <h2 className="text-base font-semibold text-foreground">Choose Emoji</h2>
               <button
                 onClick={() => setShowAvatarModal(false)}
-                className="text-white/40 hover:text-white transition-colors cursor-pointer"
+                className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -261,8 +261,8 @@ export default function Profile() {
                   onClick={() => setTempAvatar(url)}
                   className={`w-full aspect-square rounded-xl overflow-hidden border-2 transition-all cursor-pointer ${
                     tempAvatar === url
-                      ? "border-blue-500 scale-105"
-                      : "border-white/10 hover:border-white/30"
+                      ? "border-primary scale-105"
+                      : "border-border hover:border-muted-foreground/30"
                   }`}
                 >
                   <img src={url} alt={`avatar-${i}`} className="w-full h-full object-cover" />
@@ -273,7 +273,7 @@ export default function Profile() {
             <button
               onClick={handleAvatarUpdate}
               disabled={updateImageLoader}
-              className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold rounded-xl transition-colors text-sm flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full py-2.5 bg-primary text-primary-foreground hover:opacity-90 disabled:opacity-50 font-semibold rounded-xl transition-all text-sm flex items-center justify-center gap-2 cursor-pointer"
             >
               {updateImageLoader ? <Loader2 className="w-4 h-4 animate-spin" /> : "Update"}
             </button>

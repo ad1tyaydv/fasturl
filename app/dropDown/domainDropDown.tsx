@@ -45,21 +45,21 @@ export function DomainDropdown({ selectedDomain, onSelect, defaultDomain }: Doma
 
 
   const displayDomain = (selectedDomain ?? "").replace(/^https?:\/\//, "");
-  const itemClasses = "flex items-center justify-between text-white focus:text-white cursor-pointer transition-colors duration-200";
+  const itemClasses = "flex items-center justify-between text-foreground focus:bg-accent focus:text-accent-foreground cursor-pointer transition-colors duration-200 rounded-md mx-1";
 
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="flex items-center gap-2 px-4 py-2 bg-neutral-900 border border-neutral-800 text-neutral-300 text-sm font-medium rounded-lg hover:border-neutral-600 transition-all outline-none focus:ring-0">
+        <button className="flex items-center gap-2 px-4 py-2 bg-background border border-border text-foreground text-sm font-medium rounded-lg hover:bg-accent hover:text-accent-foreground transition-all outline-none focus:ring-1 focus:ring-ring">
           <Globe size={16} className="text-blue-500" />
           <span className="truncate max-w-[180px]">{displayDomain}</span>
-          <ChevronDown size={14} className="text-neutral-500" />
+          <ChevronDown size={14} className="text-muted-foreground" />
         </button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent className="w-64 bg-[#1c1c1c] border-neutral-800 text-white shadow-2xl">
-        <DropdownMenuLabel className="text-neutral-500 text-[10px] uppercase tracking-widest px-2 py-1.5">
+      <DropdownMenuContent className="w-64 bg-popover border-border text-popover-foreground shadow-2xl rounded-lg p-1">
+        <DropdownMenuLabel className="text-muted-foreground text-[10px] uppercase tracking-widest px-2 py-1.5">
           Select Domain
         </DropdownMenuLabel>
 
@@ -70,7 +70,7 @@ export function DomainDropdown({ selectedDomain, onSelect, defaultDomain }: Doma
           <span className="truncate">
             {defaultDomain.replace(/^https?:\/\//, "")} (Default)
           </span>
-          {selectedDomain === defaultDomain && <Check size={14} className="text-blue-400 ml-2 shrink-0" />}
+          {selectedDomain === defaultDomain && <Check size={14} className="text-blue-500 ml-2 shrink-0" />}
         </DropdownMenuItem>
 
         {domains.map((d) => {
@@ -91,17 +91,17 @@ export function DomainDropdown({ selectedDomain, onSelect, defaultDomain }: Doma
               </span>
 
               {selectedDomain === fullDomain && (
-                <Check size={14} className="text-white ml-2 shrink-0" />
+                <Check size={14} className="text-blue-500 ml-2 shrink-0" />
               )}
             </DropdownMenuItem>
           );
         })}
 
-        <DropdownMenuSeparator className="bg-neutral-800" />
+        <DropdownMenuSeparator className="bg-border" />
 
         <DropdownMenuItem
           onClick={() => router.push("/domain")}
-          className="flex items-center gap-2 text-neutral-400 focus:text-white cursor-pointer transition-colors"
+          className="flex items-center gap-2 text-muted-foreground focus:bg-accent focus:text-accent-foreground cursor-pointer transition-colors mx-1 rounded-md"
         >
           <Plus size={14} />
           <span>Manage Domains</span>

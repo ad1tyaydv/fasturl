@@ -96,10 +96,10 @@ export default function QrCodes({
           qrCodes.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((qr: any) => (
             <div
               key={qr.id}
-              className="relative flex items-center py-8 px-5 border-b border-neutral-800/60 hover:bg-[#1a1a1a] group transition-all"
+              className="relative flex items-center py-8 px-5 border-b border-border hover:bg-accent group transition-all"
             >
               <div className="shrink-0 mr-6">
-                <div className="w-16 h-16 bg-white flex items-center justify-center overflow-hidden shadow-lg border border-white/10">
+                <div className="w-16 h-16 bg-white flex items-center justify-center overflow-hidden shadow-lg border border-border/10">
                   <img 
                     src={qr.qrImage} 
                     alt="QR Preview" 
@@ -114,7 +114,7 @@ export default function QrCodes({
                     <input
                       autoFocus
                       disabled={savingId === qr.id}
-                      className="bg-[#111111] border border-neutral-700 rounded-lg px-3 py-1.5 text-white w-full outline-none focus:border-blue-500 transition-colors text-lg font-one disabled:opacity-50"
+                      className="bg-background border border-border rounded-lg px-3 py-1.5 text-foreground w-full outline-none focus:ring-1 focus:ring-ring transition-colors text-lg font-one disabled:opacity-50"
                       value={tempName}
                       onChange={(e) => setTempName(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && saveName(qr.id)}
@@ -122,7 +122,7 @@ export default function QrCodes({
                     <button
                       onClick={() => saveName(qr.id)}
                       disabled={savingId === qr.id}
-                      className="p-2 text-green-500 hover:bg-green-500/10 rounded-lg transition-colors disabled:opacity-50 shrink-0"
+                      className="p-2 text-green-500 hover:bg-green-500/10 rounded-lg transition-colors disabled:opacity-50 shrink-0 cursor-pointer"
                     >
                       {savingId === qr.id ? (
                         <Loader2 className="w-5 h-5 animate-spin text-blue-500" />
@@ -132,11 +132,11 @@ export default function QrCodes({
                     </button>
                   </div>
                 ) : (
-                  <h3 className="text-white font-one text-xl md:text-2xl truncate tracking-wide mb-1">
+                  <h3 className="text-foreground font-one text-xl md:text-2xl truncate tracking-wide mb-1">
                     {qr.qrName || "Untitled QR"}
                   </h3>
                 )}
-                <p className="text-neutral-500 font-three text-sm truncate opacity-80 mt-1">
+                <p className="text-muted-foreground font-three text-sm truncate opacity-80 mt-1">
                   {qr.longUrl}
                 </p>
               </div>
@@ -147,7 +147,7 @@ export default function QrCodes({
                     setEditingId(qr.id);
                     setTempName(qr.name || "");
                   }}
-                  className={`p-3 hover:text-white hover:bg-neutral-800 rounded-xl transition-colors cursor-pointer text-neutral-400 ${editingId === qr.id ? 'hidden' : 'flex'}`}
+                  className={`p-3 hover:text-foreground hover:bg-accent rounded-xl transition-colors cursor-pointer text-muted-foreground ${editingId === qr.id ? 'hidden' : 'flex'}`}
                   title="Edit Name"
                 >
                   <HugeiconsIcon icon={Edit03Icon} />
@@ -155,37 +155,37 @@ export default function QrCodes({
 
                 <button
                   onClick={() => handleDownloadClick(qr)}
-                  className="p-3 hover:text-white hover:bg-neutral-800 rounded-xl transition-colors cursor-pointer text-neutral-400"
+                  className="p-3 hover:text-foreground hover:bg-accent rounded-xl transition-colors cursor-pointer text-muted-foreground"
                   title="Download"
                 >
                   <HugeiconsIcon icon={Download01Icon} />
                 </button>
                 <button
                   onClick={() => handleDeleteQr(qr.id)}
-                  className="p-3 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-colors cursor-pointer text-neutral-400"
+                  className="p-3 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-colors cursor-pointer text-muted-foreground"
                   title="Delete"
                 >
                   <HugeiconsIcon icon={Delete02Icon} />
                 </button>
               </div>
 
-              <div className="shrink-0 text-right text-neutral-500 font-medium text-sm whitespace-nowrap min-w-[90px]">
+              <div className="shrink-0 text-right text-muted-foreground font-medium text-sm whitespace-nowrap min-w-[90px]">
                 {getRelativeTime(qr.createdAt)}
               </div>
             </div>
           ))
         ) : (
-          <div className="w-full py-20 px-4 flex flex-col items-center justify-center border-2 border-dashed border-neutral-800 rounded-3xl bg-[#1c1c1c]/30 mt-4">
-            <div className="p-4 bg-neutral-900 rounded-2xl border border-neutral-800 mb-6">
-                <HugeiconsIcon icon={QrCodeIcon} className="w-10 h-10 text-neutral-500" />
+          <div className="w-full py-20 px-4 flex flex-col items-center justify-center border-2 border-dashed border-border rounded-3xl bg-secondary/30 mt-4">
+            <div className="p-4 bg-secondary rounded-2xl border border-border mb-6">
+                <HugeiconsIcon icon={QrCodeIcon} className="w-10 h-10 text-muted-foreground" />
             </div>
-            <h2 className="text-xl sm:text-2xl font-one mb-2 text-white">No QR Codes discovered</h2>
-            <p className="text-neutral-500 font-three text-sm mb-8 text-center max-w-md">
+            <h2 className="text-xl sm:text-2xl font-one mb-2 text-foreground">No QR Codes discovered</h2>
+            <p className="text-muted-foreground font-three text-sm mb-8 text-center max-w-md">
                 Generate custom QR codes for your links to use them in the physical world.
             </p>
             <button 
               onClick={() => router.push('/')} 
-              className="bg-white text-black hover:bg-neutral-200 font-three px-8 py-3 rounded-xl flex items-center gap-2 transition-colors cursor-pointer"
+              className="bg-foreground text-background hover:opacity-90 font-three px-8 py-3 rounded-xl flex items-center gap-2 transition-colors cursor-pointer"
             >
               <HugeiconsIcon icon={PlusSignIcon} className="w-5 h-5" /> Create QR Code
             </button>
@@ -198,17 +198,17 @@ export default function QrCodes({
           <button
             disabled={currentPage === 1}
             onClick={() => setCurrentPage((prev) => prev - 1)}
-            className="p-3 bg-neutral-900 border border-neutral-800 rounded-xl disabled:opacity-30 cursor-pointer hover:bg-neutral-800 transition-colors"
+            className="p-3 bg-secondary border border-border rounded-xl disabled:opacity-30 cursor-pointer hover:bg-accent transition-colors"
           >
             <HugeiconsIcon icon={ArrowLeft01Icon} size={20} />
           </button>
-          <span className="text-sm text-neutral-400 font-one mx-4">
+          <span className="text-sm text-muted-foreground font-one mx-4">
              Page {currentPage} of {totalPages}
           </span>
           <button
             disabled={currentPage === totalPages}
             onClick={() => setCurrentPage((prev) => prev + 1)}
-            className="p-3 bg-neutral-900 border border-neutral-800 rounded-xl disabled:opacity-30 cursor-pointer hover:bg-neutral-800 transition-colors"
+            className="p-3 bg-secondary border border-border rounded-xl disabled:opacity-30 cursor-pointer hover:bg-accent transition-colors"
           >
             <HugeiconsIcon icon={ArrowRight01Icon} size={20} />
           </button>

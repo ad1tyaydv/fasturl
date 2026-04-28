@@ -83,7 +83,7 @@ export default function TotalData() {
 
 
   return (
-    <section className="w-full bg-[#141414] py-20 border-t border-neutral-800">
+    <section className="w-full bg-background py-20 border-t border-border">
       <div className="max-w-7xl mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-4">
           {statItems.map((item, index) => (
@@ -99,7 +99,7 @@ export default function TotalData() {
                 {item.value.toLocaleString()} +
               </h3>
 
-              <p className="text-white text-lg md:text-xl font-one">
+              <p className="text-foreground text-lg md:text-xl font-one">
                 {item.bottomLabel}
               </p>
             </div>

@@ -24,24 +24,24 @@ export default function UrlsPageSidebar({ view, onViewChange }: SidebarProps) {
   ];
 
   return (
-    <aside className="w-full sm:w-64 p-4 sm:p-6 sm:border-r border-neutral-800/60 flex flex-row sm:flex-col gap-4 overflow-x-auto sm:overflow-hidden border-b sm:border-b-0 shrink-0">
+    <aside className="w-full sm:w-64 p-4 sm:p-6 sm:border-r border-border/60 flex flex-row sm:flex-col gap-4 overflow-x-auto sm:overflow-hidden border-b sm:border-b-0 shrink-0">
       {menuItems.map((item) => (
         <button
           key={item.id}
           onClick={() => onViewChange(item.id as ViewType)}
           className={`
             flex items-center gap-4 px-4 py-3.5 rounded-xl font-three transition-all duration-200 
-            cursor-pointer text-base sm:text-lg group w-full text-left
+            cursor-pointer text-base sm:text-lg group w-full text-left outline-none focus:ring-1 focus:ring-ring
             ${view === item.id
-              ? "bg-neutral-800/80 text-white shadow-sm shadow-black/20"
-              : "text-neutral-500 hover:text-neutral-200 hover:bg-neutral-800/40"
+              ? "bg-accent text-accent-foreground shadow-sm"
+              : "text-muted-foreground hover:text-accent-foreground hover:bg-accent/50"
             }
           `}
         >
           <HugeiconsIcon 
             icon={item.icon} 
             size={22} 
-            className={`${view === item.id ? "text-blue-500" : "text-neutral-500 group-hover:text-neutral-300"}`} 
+            className={`${view === item.id ? "text-blue-500" : "text-muted-foreground group-hover:text-foreground"}`} 
           />
           <span className="whitespace-nowrap font-medium">{item.label}</span>
         </button>

@@ -126,7 +126,7 @@ export default function BulkLinks({
           bulkLinks.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((url: any) => (
             <div
               key={url.id} onClick={() => setSelectedBatchDetails(url)}
-              className="relative flex items-center justify-between py-5 px-4 border-b border-neutral-800/60 hover:bg-[#1a1a1a] group transition-colors cursor-pointer"
+              className="relative flex items-center justify-between py-5 px-4 border-b border-border/60 hover:bg-accent group transition-colors cursor-pointer"
             >
               <div className="flex items-start gap-3 md:gap-4 w-[85%] md:w-[40%] min-w-0 pr-2 md:pr-4">
                 <div className="mt-1 w-9 h-9 md:w-10 md:h-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-500 shrink-0">
@@ -138,7 +138,7 @@ export default function BulkLinks({
                       <input
                         autoFocus
                         disabled={savingId === url.id}
-                        className="bg-[#111111] border border-neutral-700 rounded px-2 py-1 text-white w-full outline-none disabled:opacity-50"
+                        className="bg-background border border-border rounded px-2 py-1 text-foreground w-full outline-none disabled:opacity-50"
                         value={tempName} onChange={(e) => setTempName(e.target.value)}
                         onKeyDown={(e) => e.key === "Enter" && saveName(e as any, url.id)}
                       />
@@ -155,9 +155,9 @@ export default function BulkLinks({
                       </button>
                     </div>
                   ) : (
-                    <span className="text-white font-one text-lg md:text-xl truncate tracking-wide">{url.name || "Bulk link"}</span>
+                    <span className="text-foreground font-one text-lg md:text-xl truncate tracking-wide">{url.name || "Bulk link"}</span>
                   )}
-                  <span className="text-neutral-500 font-three text-xs md:text-sm truncate">{url.links?.length || 0} items in this batch</span>
+                  <span className="text-muted-foreground font-three text-xs md:text-sm truncate">{url.links?.length || 0} items in this batch</span>
                 </div>
               </div>
 
@@ -170,22 +170,22 @@ export default function BulkLinks({
                 )}
               </div>
 
-              <div className="hidden md:flex items-center justify-end gap-2 text-neutral-400 w-[30%] opacity-0 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0">
+              <div className="hidden md:flex items-center justify-end gap-2 text-muted-foreground w-[30%] opacity-0 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0">
                 <button
                   onClick={(e) => { e.stopPropagation(); handleProtectedAction(() => { setSelectedBatch(url); setIsPasswordModalOpen(true); }); }}
-                  className={`p-2 rounded-lg transition-colors cursor-pointer hover:bg-neutral-800 ${url.password ? 'text-blue-500' : 'hover:text-white'}`}
+                  className={`p-2 rounded-lg transition-colors cursor-pointer hover:bg-accent ${url.password ? 'text-blue-500' : 'hover:text-foreground'}`}
                 >
                   <HugeiconsIcon icon={url.password ? CircleLock01Icon : CircleUnlock01Icon} />
                 </button>
                 <button
                   onClick={(e) => { e.stopPropagation(); handleProtectedAction(() => { setEditingId(url.id); setTempName(url.name || ""); }); }}
-                  className="p-2 hover:text-white hover:bg-neutral-800 rounded-lg transition-colors cursor-pointer"
+                  className="p-2 hover:text-foreground hover:bg-accent rounded-lg transition-colors cursor-pointer"
                 >
                   <HugeiconsIcon icon={Edit03Icon} />
                 </button>
                 <button
                   onClick={(e) => { e.stopPropagation(); handleProtectedAction(() => { setSelectedBatch(url); setShowDownloadModal(true); }); }}
-                  className="p-2 hover:text-white hover:bg-neutral-800 rounded-lg transition-colors cursor-pointer"
+                  className="p-2 hover:text-foreground hover:bg-accent rounded-lg transition-colors cursor-pointer"
                 >
                   <HugeiconsIcon icon={Download01Icon} />
                 </button>
@@ -197,27 +197,27 @@ export default function BulkLinks({
                 </button>
               </div>
 
-              <div className="hidden md:block w-[15%] text-right text-neutral-500 font-medium text-sm whitespace-nowrap">
+              <div className="hidden md:block w-[15%] text-right text-muted-foreground font-medium text-sm whitespace-nowrap">
                 {getRelativeTime(url.createdAt)}
               </div>
 
               {/* Mobile Menu */}
               <div className="md:hidden flex justify-end w-[15%] shrink-0">
-                <button onClick={(e) => { e.stopPropagation(); setActiveMenuId(activeMenuId === url.id ? null : url.id); }} className="p-2 text-neutral-400">
+                <button onClick={(e) => { e.stopPropagation(); setActiveMenuId(activeMenuId === url.id ? null : url.id); }} className="p-2 text-muted-foreground">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="1" /><circle cx="12" cy="5" r="1" /><circle cx="12" cy="19" r="1" /></svg>
                 </button>
                 {activeMenuId === url.id && (
-                  <div onClick={(e) => e.stopPropagation()} className="absolute right-4 top-14 mt-1 w-48 bg-[#111111] border border-neutral-800 rounded-lg shadow-xl z-50 flex flex-col py-2">
-                    <button onClick={() => handleProtectedAction(() => { setSelectedBatch(url); setIsPasswordModalOpen(true); setActiveMenuId(null); })} className={`flex items-center gap-3 px-4 py-2 text-sm ${url.password ? 'text-blue-500' : 'text-neutral-300'}`}>
+                  <div onClick={(e) => e.stopPropagation()} className="absolute right-4 top-14 mt-1 w-48 bg-popover border border-border rounded-lg shadow-xl z-50 flex flex-col py-2">
+                    <button onClick={() => handleProtectedAction(() => { setSelectedBatch(url); setIsPasswordModalOpen(true); setActiveMenuId(null); })} className={`flex items-center gap-3 px-4 py-2 text-sm ${url.password ? 'text-blue-500' : 'text-popover-foreground'}`}>
                       <HugeiconsIcon icon={url.password ? CircleLock01Icon : CircleUnlock01Icon} size={18} /> {url.password ? 'Protected' : 'Add Password'}
                     </button>
-                    <button onClick={() => handleProtectedAction(() => { setEditingId(url.id); setTempName(url.name || ""); setActiveMenuId(null); })} className="flex items-center gap-3 px-4 py-2 text-sm text-neutral-300">
+                    <button onClick={() => handleProtectedAction(() => { setEditingId(url.id); setTempName(url.name || ""); setActiveMenuId(null); })} className="flex items-center gap-3 px-4 py-2 text-sm text-popover-foreground">
                       <HugeiconsIcon icon={Edit03Icon} size={18} /> Edit Name
                     </button>
-                    <button onClick={() => handleProtectedAction(() => { setSelectedBatch(url); setShowDownloadModal(true); setActiveMenuId(null); })} className="flex items-center gap-3 px-4 py-2 text-sm text-neutral-300">
+                    <button onClick={() => handleProtectedAction(() => { setSelectedBatch(url); setShowDownloadModal(true); setActiveMenuId(null); })} className="flex items-center gap-3 px-4 py-2 text-sm text-popover-foreground">
                       <HugeiconsIcon icon={Download01Icon} size={18} /> Download
                     </button>
-                    <div className="h-px bg-neutral-800 my-1 mx-2" />
+                    <div className="h-px bg-border my-1 mx-2" />
                     <button onClick={() => { handleDeleteBatch(url.id); setActiveMenuId(null); }} className="flex items-center gap-3 px-4 py-2 text-sm text-red-500">
                       <HugeiconsIcon icon={Delete02Icon} size={18} /> Delete
                     </button>
@@ -228,17 +228,17 @@ export default function BulkLinks({
           ))
         ) : (
           /* EMPTY STATE */
-          <div className="w-full py-20 px-4 flex flex-col items-center justify-center border-2 border-dashed border-neutral-800 rounded-3xl bg-[#1c1c1c]/30 mt-4">
-            <div className="p-4 bg-neutral-900 rounded-2xl border border-neutral-800 mb-6">
-                <HugeiconsIcon icon={File02Icon} className="w-10 h-10 text-neutral-500" />
+          <div className="w-full py-20 px-4 flex flex-col items-center justify-center border-2 border-dashed border-border rounded-3xl bg-secondary/30 mt-4">
+            <div className="p-4 bg-secondary rounded-2xl border border-border mb-6">
+                <HugeiconsIcon icon={File02Icon} className="w-10 h-10 text-muted-foreground" />
             </div>
-            <h2 className="text-xl sm:text-2xl font-one mb-2 text-white">No bulk batches discovered</h2>
-            <p className="text-neutral-500 font-three text-sm mb-8 text-center max-w-md">
+            <h2 className="text-xl sm:text-2xl font-one mb-2 text-foreground">No bulk batches discovered</h2>
+            <p className="text-muted-foreground font-three text-sm mb-8 text-center max-w-md">
                 Create your first batch of links to manage them efficiently. Premium users can password protect and bulk download these batches.
             </p>
             <button 
               onClick={() => handleProtectedAction(() => router.push('/bulklinks'))} 
-              className="bg-white text-black hover:bg-neutral-200 font-three px-8 py-3 rounded-xl flex items-center gap-2 transition-colors cursor-pointer"
+              className="bg-foreground text-background hover:opacity-90 font-three px-8 py-3 rounded-xl flex items-center gap-2 transition-colors cursor-pointer"
             >
               <HugeiconsIcon icon={PlusSignIcon} className="w-5 h-5" /> Create Bulk links
             </button>
@@ -252,7 +252,7 @@ export default function BulkLinks({
           <button
             disabled={currentPage === 1}
             onClick={() => setCurrentPage((prev) => prev - 1)}
-            className="btn btn-outline bg-neutral-900 border-neutral-700 text-white hover:bg-neutral-800 disabled:opacity-40 px-4 py-2 rounded-lg flex items-center gap-2"
+            className="btn btn-outline bg-background border-border text-foreground hover:bg-accent disabled:opacity-40 px-4 py-2 rounded-lg flex items-center gap-2 cursor-pointer"
           >
             <HugeiconsIcon icon={ArrowLeft01Icon} /> Prev
           </button>
@@ -268,12 +268,12 @@ export default function BulkLinks({
             }
             return pages.map((page, index) =>
               page === "..." ? (
-                <span key={index} className="px-2 text-neutral-500">...</span>
+                <span key={index} className="px-2 text-muted-foreground">...</span>
               ) : (
                 <button
                   key={page}
                   onClick={() => setCurrentPage(Number(page))}
-                  className={`w-10 h-10 rounded-lg border font-one transition-colors ${currentPage === page ? "bg-white text-black border-white" : "bg-neutral-900 border-neutral-700 text-white hover:bg-neutral-800"}`}
+                  className={`w-10 h-10 rounded-lg border font-one transition-colors cursor-pointer ${currentPage === page ? "bg-primary text-primary-foreground border-primary" : "bg-background border-border text-foreground hover:bg-accent"}`}
                 >
                   {page}
                 </button>
@@ -284,7 +284,7 @@ export default function BulkLinks({
           <button
             disabled={currentPage === totalPages}
             onClick={() => setCurrentPage((prev) => prev + 1)}
-            className="btn btn-outline bg-neutral-900 border-neutral-700 text-white hover:bg-neutral-800 disabled:opacity-40 px-4 py-2 rounded-lg flex items-center gap-2"
+            className="btn btn-outline bg-background border-border text-foreground hover:bg-accent disabled:opacity-40 px-4 py-2 rounded-lg flex items-center gap-2 cursor-pointer"
           >
             Next <HugeiconsIcon icon={ArrowRight01Icon} />
           </button>

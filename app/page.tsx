@@ -203,19 +203,19 @@ export default function Dashboard() {
 
 
   return (
-    <div className="min-h-screen bg-[#141414] text-white relative transition-colors duration-300 overflow-x-hidden selection:bg-blue-500/30">
+    <div className="min-h-screen bg-background text-foreground relative transition-colors duration-300 overflow-x-hidden selection:bg-blue-500/30">
       <Navbar />
 
       {modalConfig.show && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm transition-opacity duration-150 cursor-pointer" onClick={() => setModalConfig({ ...modalConfig, show: false })}>
-          <div className="bg-[#1c1c1c] border border-neutral-800 rounded-2xl shadow-2xl relative p-8 max-w-sm w-full cursor-default" onClick={(e) => e.stopPropagation()}>
-            <button onClick={() => setModalConfig({ ...modalConfig, show: false })} className="absolute top-5 right-5 p-2 text-neutral-400 hover:text-white transition-colors cursor-pointer bg-transparent">
+          <div className="bg-card border border-border rounded-2xl shadow-2xl relative p-8 max-w-sm w-full cursor-default" onClick={(e) => e.stopPropagation()}>
+            <button onClick={() => setModalConfig({ ...modalConfig, show: false })} className="absolute top-5 right-5 p-2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer bg-transparent">
               <IoCloseOutline size={24} />
             </button>
             <div className="text-center">
-              <h2 className="text-2xl font-one font-bold mb-2 text-white">{modalConfig.title}</h2>
-              <p className="text-neutral-400 mb-6 font-one text-sm">{modalConfig.description}</p>
-              <button onClick={modalConfig.action} className="w-full py-3 bg-white text-black font-bold cursor-pointer hover:bg-gray-200 transition-colors rounded-xl">
+              <h2 className="text-2xl font-one font-bold mb-2 text-foreground">{modalConfig.title}</h2>
+              <p className="text-muted-foreground mb-6 font-one text-sm">{modalConfig.description}</p>
+              <button onClick={modalConfig.action} className="w-full py-3 bg-primary text-primary-foreground font-bold cursor-pointer hover:opacity-90 transition-colors rounded-xl">
                 {modalConfig.buttonText}
               </button>
             </div>
@@ -227,15 +227,15 @@ export default function Dashboard() {
         <div className="flex flex-col lg:flex-row items-start justify-between gap-12 lg:gap-20">
 
           <div className="flex-1 text-center lg:text-left lg:pt-6">
-            <h1 className="text-3xl sm:text-3xl md:text-5xl font-bold mb-6 text-white leading-tight font-one tracking-tight">
+            <h1 className="text-3xl sm:text-3xl md:text-5xl font-bold mb-6 text-foreground leading-tight font-one tracking-tight">
               The Best <span className="text-red-500">URL Shortener</span> for Branded Links
             </h1>
 
-            <p className="font-one text-lg text-neutral-400 max-w-lg mx-auto lg:mx-0 mb-4 px-2 sm:px-0">
+            <p className="font-one text-lg text-muted-foreground max-w-lg mx-auto lg:mx-0 mb-4 px-2 sm:px-0">
               Transform long URLs into custom short links with advanced link performance analytics, branded url shortener features, and instant QR code generation.
             </p>
 
-            <p className="hidden lg:block font-one text-lg text-neutral-400 max-w-lg mx-auto lg:mx-0 mb-8">
+            <p className="hidden lg:block font-one text-lg text-muted-foreground max-w-lg mx-auto lg:mx-0 mb-8">
               FastURL is your all-in-one link management platform for digital marketing links, affiliate link shortener needs, and real time click tracking.
             </p>
 
@@ -250,23 +250,23 @@ export default function Dashboard() {
               />
             </div>
 
-            <div className={`flex flex-col sm:flex-row gap-3 rounded-2xl p-1 sm:p-1 transition-all bg-[#1a1a1a]`}>
+            <div className={`flex flex-col sm:flex-row gap-3 rounded-2xl p-1 sm:p-1 transition-all bg-secondary`}>
               <input
                 type="text"
                 placeholder="Paste your long URL here..."
-                className="flex-1 w-full outline-none font-one px-3 sm:px-4 py-3 bg-transparent text-white text-base sm:text-lg placeholder:text-neutral-600"
+                className="flex-1 w-full outline-none font-one px-3 sm:px-4 py-3 bg-transparent text-foreground text-base sm:text-lg placeholder:text-muted-foreground/60"
                 value={url}
                 onChange={(e) => { setUrl(e.target.value); if (shortUrl) setShortUrl(""); }}
                 onKeyDown={(e) => e.key === "Enter" && !shortUrl && handleShortUrl(url)}
               />
               {shortUrl ? (
                 <div className="flex gap-2 w-full sm:w-auto">
-                  <button onClick={handleGenerateQr} className={`px-4 sm:px-5 py-3 bg-[#2a2a2a] rounded-xl flex items-center justify-center cursor-pointer transition-colors ${showQr ? 'text-white shadow-lg' : 'bg-[#2a2a2a] text-white hover:bg-[#333333]'}`}>
+                  <button onClick={handleGenerateQr} className={`px-4 sm:px-5 py-3 bg-accent rounded-xl flex items-center justify-center cursor-pointer transition-colors ${showQr ? 'text-foreground shadow-lg' : 'bg-accent text-foreground hover:bg-accent/80'}`}>
                     <HugeiconsIcon icon={QrCodeIcon} />
                   </button>
                   <button
                     onClick={copyToClipboard}
-                    className={`flex-1 sm:flex-none px-4 sm:px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 cursor-pointer transition-all duration-300 ${copied ? "bg-green-600 text-white" : "bg-[#2a2a2a] text-white hover:bg-[#333333]"
+                    className={`flex-1 sm:flex-none px-4 sm:px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 cursor-pointer transition-all duration-300 ${copied ? "bg-green-600 text-white" : "bg-accent text-foreground hover:bg-accent/80"
                       }`}
                   >
                     {copied ? (
@@ -279,7 +279,7 @@ export default function Dashboard() {
                       </>
                     )}
                   </button>
-                  <button onClick={handleReset} className="px-4 sm:px-5 py-3 rounded-xl bg-[#2a2a2a] text-white flex items-center justify-center cursor-pointer">
+                  <button onClick={handleReset} className="px-4 sm:px-5 py-3 rounded-xl bg-accent text-foreground flex items-center justify-center cursor-pointer hover:bg-accent/80">
                     <HugeiconsIcon icon={Refresh04Icon} />
                   </button>
                 </div>
@@ -287,9 +287,9 @@ export default function Dashboard() {
                 <button
                   onClick={() => handleShortUrl(url)}
                   disabled={loading || !url}
-                  className="w-full sm:w-auto px-6 sm:px-10 py-3 bg-white text-black disabled:opacity-50 font-bold text-lg cursor-pointer hover:bg-gray-200 transition-all rounded-xl shadow-lg shadow-white/5"
+                  className="w-full sm:w-auto px-6 sm:px-10 py-3 bg-primary text-primary-foreground disabled:opacity-50 font-bold text-lg cursor-pointer hover:opacity-90 transition-all rounded-xl shadow-lg shadow-primary/5"
                 >
-                  {loading ? <div className="w-6 h-6 border-2 border-black border-t-transparent rounded-full animate-spin mx-auto"></div> : "Shorten"}
+                  {loading ? <div className="w-6 h-6 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin mx-auto"></div> : "Shorten"}
                 </button>
               )}
             </div>
@@ -297,13 +297,13 @@ export default function Dashboard() {
             <div className="flex flex-col items-center mt-6 min-h-[280px] w-full">
               {(isLoggedIn || authLoading) && (
                 <div className="mb-4">
-                  <span className="px-3 py-1.5 bg-[#1c1c1c] border border-neutral-800 text-sm font-medium text-neutral-400 inline-flex items-center gap-1.5 rounded-lg shadow-sm">
+                  <span className="px-3 py-1.5 bg-card border border-border text-sm font-medium text-muted-foreground inline-flex items-center gap-1.5 rounded-lg shadow-sm">
                     You have
                     <span className="inline-flex items-center justify-center min-w-[20px]">
                       {linksLeft === null ? (
-                        <div className="w-3 h-3 border-2 border-neutral-600 border-t-white rounded-full animate-spin"></div>
+                        <div className="w-3 h-3 border-2 border-muted-foreground border-t-foreground rounded-full animate-spin"></div>
                       ) : (
-                        <strong className="text-white">{linksLeft}</strong>
+                        <strong className="text-foreground">{linksLeft}</strong>
                       )}
                     </span>
                     links left this month
@@ -315,7 +315,7 @@ export default function Dashboard() {
                 {isLoadingQr ? (
                   <div className="flex flex-col items-center justify-center h-[200px]">
                     <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                    <p className="mt-4 text-sm font-medium text-neutral-400 animate-pulse font-one">
+                    <p className="mt-4 text-sm font-medium text-muted-foreground animate-pulse font-one">
                       Generating your QR...
                     </p>
                   </div>
@@ -332,7 +332,7 @@ export default function Dashboard() {
 
                     <button
                       onClick={() => setIsDownloadModalOpen(true)}
-                      className="mt-6 flex items-center gap-2 px-6 py-2.5 bg-white rounded-md text-black text-xs font-bold hover:bg-gray-200 transition-all font-one cursor-pointer"
+                      className="mt-6 flex items-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground rounded-md text-xs font-bold hover:opacity-90 transition-all font-one cursor-pointer"
                     >
                       <HugeiconsIcon icon={Download01Icon} size={16} />
                       DOWNLOAD
@@ -345,9 +345,9 @@ export default function Dashboard() {
               </div>
 
               {!authLoading && !isLoggedIn && (
-                <div className="mt-4 font-one text-lg text-neutral-500 text-center">
+                <div className="mt-4 font-one text-lg text-muted-foreground text-center">
                   <p>Guest limit: 1 link/day</p>
-                  <button onClick={() => router.push("/auth/signin")} className="mt-1 underline cursor-pointer text-white hover:text-blue-400 transition-colors">
+                  <button onClick={() => router.push("/auth/signin")} className="mt-1 underline cursor-pointer text-foreground hover:text-blue-400 transition-colors">
                     Login for custom domains & much more
                   </button>
                 </div>
@@ -357,10 +357,10 @@ export default function Dashboard() {
         </div>
 
         <div className="mt-12 flex flex-col items-center justify-center gap-4 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300">
-          <div className="flex items-center gap-4 px-6 py-3 rounded-full bg-white/5 border border-white/10 backdrop-blur-md shadow-2xl">
+          <div className="flex items-center gap-4 px-6 py-3 rounded-full bg-secondary border border-border backdrop-blur-md shadow-2xl">
             <div className="flex -space-x-3">
               {[1, 2, 3, 4, 5].map((i) => (
-                <div key={i} className="w-10 h-10 rounded-full border-2 border-[#141414] bg-neutral-800 flex items-center justify-center overflow-hidden">
+                <div key={i} className="w-10 h-10 rounded-full border-2 border-background bg-muted flex items-center justify-center overflow-hidden">
                   <img
                     src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${i + 42}`}
                     alt="User"
@@ -368,17 +368,17 @@ export default function Dashboard() {
                   />
                 </div>
               ))}
-              <div className="w-10 h-10 rounded-full border-2 border-[#141414] bg-blue-600 flex items-center justify-center text-[10px] font-bold text-white shadow-lg shadow-blue-500/20">
+              <div className="w-10 h-10 rounded-full border-2 border-background bg-blue-600 flex items-center justify-center text-[10px] font-bold text-white shadow-lg shadow-blue-500/20">
                 500+
               </div>
             </div>
-            <div className="h-6 w-px bg-white/10 mx-1"></div>
-            <p className="text-neutral-300 font-one text-sm sm:text-base flex items-center gap-3">
+            <div className="h-6 w-px bg-border mx-1"></div>
+            <p className="text-muted-foreground font-one text-sm sm:text-base flex items-center gap-3">
               <span className="relative flex h-3 w-3">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
               </span>
-              Trusted by <span className="text-white font-bold underline decoration-blue-500/50 underline-offset-4">500+ global users</span>
+              Trusted by <span className="text-foreground font-bold underline decoration-blue-500/50 underline-offset-4">500+ global users</span>
             </p>
           </div>
         </div>
@@ -386,12 +386,12 @@ export default function Dashboard() {
 
 
       <Features isLoggedIn={isLoggedIn} userPlan={userPlan} />
-      <div className="w-full h-px bg-neutral-800/50 my-12 shadow-sm"></div>
+      <div className="w-full h-px bg-border my-12 shadow-sm"></div>
 
       {user?.plan === "FREE" && (
         <div ref={pricingRef}>
           <PricingSection />
-          <div className="w-full h-px bg-neutral-800/50 my-12 shadow-sm"></div>
+          <div className="w-full h-px bg-border my-12 shadow-sm"></div>
         </div>
       )}
       <FaqSection />

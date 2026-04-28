@@ -51,7 +51,7 @@ export default function RedirectToModal({ isOpen, onClose, selectedUrl, onSucces
       });
 
       toast.success("Redirect updated successfully!", {
-        style: { background: '#1c1c1c', color: '#fff', border: '1px solid #333' },
+        style: { background: 'hsl(var(--card))', color: 'hsl(var(--foreground))', border: '1px solid hsl(var(--border))' },
       });
 
       onSuccess();
@@ -69,7 +69,7 @@ export default function RedirectToModal({ isOpen, onClose, selectedUrl, onSucces
       await axios.post(`/api/shortUrl/redirectTo/removeRedirectTo/${selectedUrl?.id}`);
 
       toast.success("Redirect removed!", {
-        style: { background: '#1c1c1c', color: '#fff', border: '1px solid #333' },
+        style: { background: 'hsl(var(--card))', color: 'hsl(var(--foreground))', border: '1px solid hsl(var(--border))' },
       });
 
       onSuccess();
@@ -83,35 +83,35 @@ export default function RedirectToModal({ isOpen, onClose, selectedUrl, onSucces
 
   return (
     <div
-      className="fixed inset-0 z-[110] flex items-center justify-center bg-black/50 p-4 transition-opacity"
+      className="fixed inset-0 z-[110] flex items-center justify-center bg-background/50 backdrop-blur-sm p-4 transition-opacity"
       onClick={() => !(isUpdating || isRemoving) && onClose()}
     >
       <div
-        className="bg-[#1c1c1c] shadow-2xl w-full max-w-lg p-6 sm:p-10 rounded"
+        className="bg-card shadow-2xl w-full max-w-lg p-6 sm:p-10 rounded-xl border border-border"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex flex-col items-center text-center mb-8">
           <div className="w-16 h-16 bg-blue-500/10 rounded-full flex items-center justify-center text-blue-500 mb-4">
             <HugeiconsIcon icon={Link04Icon} size={32} />
           </div>
-          <h3 className="text-xl sm:text-2xl font-three text-white">
+          <h3 className="text-xl sm:text-2xl font-three text-foreground">
             Redirect Destination
           </h3>
-          <p className="text-neutral-500 font-three text-sm mt-2">
+          <p className="text-muted-foreground font-three text-sm mt-2">
             Let the user know where this link will redirect To
           </p>
         </div>
 
         <div className="space-y-6 mb-8">
           <div className="space-y-2">
-            <label className="text-xl font-one text-white">Destination URL</label>
-            <div className="relative flex items-center border border-neutral-700 bg-[#111111] rounded-lg overflow-hidden">
+            <label className="text-xl font-one text-foreground">Destination URL</label>
+            <div className="relative flex items-center border border-border bg-secondary rounded-lg overflow-hidden">
               <input
                 type="url"
                 placeholder="Add a destination URL"
                 value={destinationUrl}
                 onChange={(e) => setDestinationUrl(e.target.value)}
-                className="w-full p-3 bg-transparent text-white font-three focus:outline-none"
+                className="w-full p-3 bg-transparent text-foreground font-three focus:outline-none"
               />
             </div>
           </div>
@@ -123,7 +123,7 @@ export default function RedirectToModal({ isOpen, onClose, selectedUrl, onSucces
               <Button
                 onClick={handleRemoveRedirect}
                 disabled={isUpdating || isRemoving}
-                className="bg-white h-10 text-black hover:text-red-700 hover:bg-gray-200 font-bold px-4 cursor-pointer"
+                className="bg-primary h-10 text-primary-foreground hover:bg-primary/90 font-bold px-4 cursor-pointer"
               >
                 {isRemoving ? (
                   <Loader2 className="h-5 w-5 animate-spin mx-auto" />
@@ -139,7 +139,7 @@ export default function RedirectToModal({ isOpen, onClose, selectedUrl, onSucces
               variant="outline"
               onClick={onClose}
               disabled={isUpdating || isRemoving}
-              className="font-three text-sm bg-transparent h-10 w-22 text-white border-neutral-700 hover:bg-[#2a2a2a] hover:text-white transition-colors cursor-pointer"
+              className="font-three text-sm bg-transparent h-10 w-22 text-foreground border-border hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
             >
               Cancel
             </Button>
@@ -147,7 +147,7 @@ export default function RedirectToModal({ isOpen, onClose, selectedUrl, onSucces
             <Button
               onClick={handleUpdate}
               disabled={isUpdating || isRemoving}
-              className="bg-white h-10 text-black hover:bg-gray-200 font-bold min-w-[120px] cursor-pointer"
+              className="bg-primary h-10 text-primary-foreground hover:bg-primary/90 font-bold min-w-[120px] cursor-pointer"
             >
               {isUpdating ? (
                 <Loader2 className="h-5 w-5 animate-spin mx-auto" />
