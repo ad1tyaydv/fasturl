@@ -20,6 +20,7 @@ import { DomainDropdown } from "./dropDown/domainDropDown";
 import { toast } from "sonner";
 import { UpgradeAlert } from "./modals/upgradeAlert";
 import { useUser } from "./components/userContext";
+import QrDownloadModal from "./modals/qrDownloadModal";
 
 
 const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN!;
@@ -31,6 +32,7 @@ export default function Dashboard() {
 
 
   const [url, setUrl] = useState("");
+  const [longUrl, setLongUrl] = useState("");
   const [shortUrl, setShortUrl] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userPlan, setUserPlan] = useState("FREE");
@@ -40,6 +42,7 @@ export default function Dashboard() {
   const [copied, setCopied] = useState(false);
   const [showQr, setShowQr] = useState<string | boolean>(false);
   const [upgradeMsg, setUpgradeMsg] = useState(false);
+  const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
 
   const [authLoading, setAuthLoading] = useState(true);
   const [isLoadingQr, setIsLoadingQr] = useState(false);
@@ -110,6 +113,7 @@ export default function Dashboard() {
     }
     try {
       setLoading(true);
+      setLongUrl(originalUrl);
       const res = await axios.post("/api/shortUrl", {
         url: originalUrl,
         customDomain: selectedDomain !== NEXT_DOMAIN ? selectedDomain : null
@@ -162,7 +166,6 @@ export default function Dashboard() {
     }
 
     if (typeof showQr === "string") {
-      setShowQr(false);
       return;
     }
 
@@ -178,7 +181,6 @@ export default function Dashboard() {
 
     } catch (error: any) {
       if (error.response?.status === 429) setUpgradeMsg(true);
-
     } finally {
       setIsLoadingQr(false);
     }
@@ -296,7 +298,7 @@ export default function Dashboard() {
               {(isLoggedIn || authLoading) && (
                 <div className="mb-4">
                   <span className="px-3 py-1.5 bg-[#1c1c1c] border border-neutral-800 text-sm font-medium text-neutral-400 inline-flex items-center gap-1.5 rounded-lg shadow-sm">
-                    You have 
+                    You have
                     <span className="inline-flex items-center justify-center min-w-[20px]">
                       {linksLeft === null ? (
                         <div className="w-3 h-3 border-2 border-neutral-600 border-t-white rounded-full animate-spin"></div>
@@ -329,16 +331,11 @@ export default function Dashboard() {
                     </div>
 
                     <button
-                      onClick={() => {
-                        const link = document.createElement("a");
-                        link.href = showQr;
-                        link.download = `qrcode-${shortUrl}.png`;
-                        link.click();
-                      }}
-                      className="mt-6 flex items-center gap-2 px-6 py-2.5 bg-white rounded-md text-black text-xs font-bold hover:bg-gray-200 transition-all font-one"
+                      onClick={() => setIsDownloadModalOpen(true)}
+                      className="mt-6 flex items-center gap-2 px-6 py-2.5 bg-white rounded-md text-black text-xs font-bold hover:bg-gray-200 transition-all font-one cursor-pointer"
                     >
                       <HugeiconsIcon icon={Download01Icon} size={16} />
-                      DOWNLOAD QR
+                      DOWNLOAD
                     </button>
 
                   </div>
@@ -359,15 +356,14 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Trusted By Section */}
         <div className="mt-12 flex flex-col items-center justify-center gap-4 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300">
           <div className="flex items-center gap-4 px-6 py-3 rounded-full bg-white/5 border border-white/10 backdrop-blur-md shadow-2xl">
             <div className="flex -space-x-3">
               {[1, 2, 3, 4, 5].map((i) => (
                 <div key={i} className="w-10 h-10 rounded-full border-2 border-[#141414] bg-neutral-800 flex items-center justify-center overflow-hidden">
-                  <img 
-                    src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${i + 42}`} 
-                    alt="User" 
+                  <img
+                    src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${i + 42}`}
+                    alt="User"
                     className="w-full h-full object-cover"
                   />
                 </div>
@@ -420,6 +416,17 @@ export default function Dashboard() {
           setUpgradeMsg(false);
           pricingRef.current?.scrollIntoView({ behavior: "smooth" });
         }}
+      />
+
+      <QrDownloadModal
+        isOpen={isDownloadModalOpen}
+        onClose={() => setIsDownloadModalOpen(false)}
+        qrData={showQr ? {
+          qrImage: showQr as string,
+          shortUrl: `${selectedDomain}/${shortUrl}`, // Full short URL
+          longUrl: url, // Original long URL
+          qrName: `qr-${shortUrl}`
+        } : null}
       />
 
       <TotalData />

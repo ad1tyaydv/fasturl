@@ -1,7 +1,6 @@
 "use client";
 
 import Navbar from "@/app/components/navbar";
-import Footer from "@/app/components/footer";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { 
   Notification01Icon, 
@@ -19,6 +18,8 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Loader2, Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import axios from "axios";
 
 interface Notification {
@@ -37,14 +38,29 @@ export default function NotificationPage() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [fetching, setFetching] = useState(true);
 
+  const [processingRead, setProcessingRead] = useState<string | null>(null);
+  const [processingDelete, setProcessingDelete] = useState<string | null>(null);
+  const [isClearingAll, setIsClearingAll] = useState(false);
+  const [isMarkingAll, setIsMarkingAll] = useState(false);
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filter, setFilter] = useState<"all" | "read" | "unread">("all");
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+
   const fetchNotifications = async () => {
     try {
       const res = await axios.get("/api/notification/fetch");
       if (res.status === 200) {
-        setNotifications(res.data);
+        setNotifications(res.data.notifications);
       }
+
     } catch (error) {
-      console.error("Failed to fetch notifications", error);
+      console.error("Failed to fetch notifications");
+      toast.error("Failed to load notifications");
+
     } finally {
       setFetching(false);
     }
@@ -53,42 +69,59 @@ export default function NotificationPage() {
   useEffect(() => {
     if (!loading && !user) {
       router.push("/auth/signin");
+
     } else if (user) {
       fetchNotifications();
     }
+
   }, [user, loading, router]);
 
+
   const markAsRead = async (id: string) => {
+    setProcessingRead(id);
+
     try {
       const res = await axios.post("/api/notification/markRead", { id });
-
       if (res.status === 200) {
         setNotifications((prev) =>
           prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
         );
+
         toast.success("Notification marked as read");
         refreshUser();
       }
+
     } catch (error) {
       toast.error("Failed to update notification");
+
+    } finally {
+      setProcessingRead(null);
     }
   };
 
+
   const markAllAsRead = async () => {
+    setIsMarkingAll(true);
+
     try {
       const res = await axios.post("/api/notification/markRead", { markAllAsRead: true });
-
       if (res.status === 200) {
         setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
         toast.success("All notifications marked as read");
         refreshUser();
       }
+
     } catch (error) {
       toast.error("Failed to update notifications");
+
+    } finally {
+      setIsMarkingAll(false);
     }
   };
 
+
   const deleteNotification = async (id: string) => {
+    setProcessingDelete(id);
     try {
       const res = await axios.post("/api/notification/delete", { id });
 
@@ -97,24 +130,33 @@ export default function NotificationPage() {
         toast.success("Notification deleted");
         refreshUser();
       }
+
     } catch (error) {
       toast.error("Failed to delete notification");
+
+    } finally {
+      setProcessingDelete(null);
     }
   };
 
+
   const deleteAllNotifications = async () => {
     if (!confirm("Are you sure you want to delete all notifications?")) return;
-
+    setIsClearingAll(true);
+    
     try {
       const res = await axios.post("/api/notification/delete", { deleteAll: true });
-
       if (res.status === 200) {
         setNotifications([]);
         toast.success("All notifications deleted");
         refreshUser();
       }
+
     } catch (error) {
       toast.error("Failed to delete notifications");
+
+    } finally {
+      setIsClearingAll(false);
     }
   };
 
@@ -134,6 +176,23 @@ export default function NotificationPage() {
     if (t.includes("welcome")) return Mail01Icon;
     return Notification01Icon;
   };
+
+  const filteredNotifications = notifications.filter((n) => {
+    const matchesSearch = n.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          n.message.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesFilter = filter === "all" ? true : filter === "read" ? n.isRead : !n.isRead;
+    return matchesSearch && matchesFilter;
+  });
+
+  const totalPages = Math.ceil(filteredNotifications.length / itemsPerPage);
+  const paginatedNotifications = filteredNotifications.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, filter]);
 
   return (
     <div className="min-h-screen bg-[#141414] text-white flex flex-col font-three">
@@ -157,21 +216,51 @@ export default function NotificationPage() {
             <div className="flex items-center gap-3">
               <Button 
                 onClick={markAllAsRead}
+                disabled={isMarkingAll}
                 className="bg-white text-black hover:bg-neutral-200 rounded-xl font-bold text-xs h-10 px-5 cursor-pointer transition-all"
               >
-                <HugeiconsIcon icon={Tick02Icon} className="w-5 h-5 mr-2" />
+                {isMarkingAll ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <HugeiconsIcon icon={Tick02Icon} className="w-5 h-5 mr-2" />}
                 Mark all read
               </Button>
               <Button 
                 variant="destructive"
                 onClick={deleteAllNotifications}
+                disabled={isClearingAll}
                 className="rounded-xl text-white font-bold text-xs h-10 px-5 cursor-pointer transition-all border bg-red-500 hover:bg-red-600"
               >
-                <HugeiconsIcon icon={Delete02Icon} className="w-4 h-4 mr-2 text-white" />
+                {isClearingAll ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <HugeiconsIcon icon={Delete02Icon} className="w-4 h-4 mr-2 text-white" />}
                 Clear all
               </Button>
             </div>
           )}
+        </div>
+
+        {/* Filter and Search Bar */}
+        <div className="flex flex-col md:flex-row items-center gap-4 mb-8 bg-[#1c1c1c]/50 p-4 rounded-2xl border border-white/5">
+          <div className="relative w-full md:w-96">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500" />
+            <Input
+              placeholder="Search notifications..."
+              className="pl-10 bg-white/5 border-white/10 text-white rounded-xl h-11 focus-visible:ring-0 focus-visible:border-white/20"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          <div className="flex items-center gap-2 bg-white/5 p-1 rounded-xl border border-white/10 w-full md:w-auto">
+            {(["all", "read", "unread"] as const).map((f) => (
+              <button
+                key={f}
+                onClick={() => setFilter(f)}
+                className={`flex-1 md:flex-none px-6 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  filter === f
+                    ? "bg-white text-black shadow-lg shadow-white/5"
+                    : "text-neutral-400 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                {f.charAt(0).toUpperCase() + f.slice(1)}
+              </button>
+            ))}
+          </div>
         </div>
 
         <div className="bg-[#1c1c1c]/50 rounded-3xl border border-white/5 overflow-hidden shadow-2xl">
@@ -195,9 +284,9 @@ export default function NotificationPage() {
                 </div>
               ))}
             </div>
-          ) : notifications.length > 0 ? (
+          ) : paginatedNotifications.length > 0 ? (
             <div className="divide-y divide-white/5">
-              {notifications.map((notification) => (
+              {paginatedNotifications.map((notification) => (
                 <div 
                   key={notification.id}
                   className={`flex items-center px-8 py-6 group ${
@@ -243,21 +332,31 @@ export default function NotificationPage() {
                       <Button 
                         size="icon"
                         variant="ghost"
+                        disabled={processingRead === notification.id}
                         onClick={() => markAsRead(notification.id)}
                         className="w-9 h-9 bg-white text-black hover:bg-neutral-200 rounded-lg cursor-pointer border border-white transition-all shadow-lg shadow-white/5"
                         title="Mark as read"
                       >
-                        <HugeiconsIcon icon={Tick02Icon} className="w-4 h-4" />
+                        {processingRead === notification.id ? (
+                          <Loader2 className="w-4 h-4 animate-spin text-black" />
+                        ) : (
+                          <HugeiconsIcon icon={Tick02Icon} className="w-4 h-4" />
+                        )}
                       </Button>
                     )}
                     <Button 
                       size="icon"
                       variant="ghost"
+                      disabled={processingDelete === notification.id}
                       onClick={() => deleteNotification(notification.id)}
                       className="w-9 h-9 bg-neutral-900 text-neutral-400 hover:text-white hover:bg-neutral-800 rounded-lg cursor-pointer border border-white/5 transition-all"
                       title="Delete"
                     >
-                      <HugeiconsIcon icon={Delete02Icon} className="w-4 h-4" />
+                      {processingDelete === notification.id ? (
+                        <Loader2 className="w-4 h-4 animate-spin text-white" />
+                      ) : (
+                        <HugeiconsIcon icon={Delete02Icon} className="w-4 h-4" />
+                      )}
                     </Button>
                   </div>
                 </div>
@@ -268,13 +367,50 @@ export default function NotificationPage() {
               <div className="w-20 h-20 bg-neutral-900 rounded-3xl border border-white/5 flex items-center justify-center mb-6">
                 <HugeiconsIcon icon={Notification01Icon} className="w-10 h-10 text-neutral-700" />
               </div>
-              <h2 className="text-2xl font-one font-bold mb-2 text-white">All caught up!</h2>
+              <h2 className="text-2xl font-one font-bold mb-2 text-white">
+                {searchQuery || filter !== "all" ? "No matches found" : "All caught up!"}
+              </h2>
               <p className="text-neutral-500 text-sm text-center max-w-xs px-6">
-                No new notifications at the moment. We'll alert you when something important happens.
+                {searchQuery || filter !== "all" 
+                  ? "Try adjusting your search or filters to find what you're looking for." 
+                  : "No new notifications at the moment. We'll alert you when something important happens."}
               </p>
+              {(searchQuery || filter !== "all") && (
+                <Button 
+                  onClick={() => {setSearchQuery(""); setFilter("all");}}
+                  variant="link" 
+                  className="text-blue-500 mt-4 h-auto p-0 cursor-pointer"
+                >
+                  Clear all filters
+                </Button>
+              )}
             </div>
           )}
         </div>
+
+        {totalPages > 1 && (
+          <div className="flex justify-center mt-12">
+            <div className="join bg-[#1c1c1c] border border-white/5 rounded-xl overflow-hidden flex items-center">
+              <button 
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="join-item px-4 py-2 hover:bg-white/5 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed border-r border-white/5 h-10 flex items-center justify-center font-bold text-lg"
+              >
+                «
+              </button>
+              <button className="join-item px-6 py-2 bg-white/5 text-white h-10 flex items-center justify-center font-bold text-xs uppercase tracking-widest cursor-pointer">
+                Page {currentPage}
+              </button>
+              <button 
+                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                className="join-item px-4 py-2 hover:bg-white/5 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed border-l border-white/5 h-10 flex items-center justify-center font-bold text-lg"
+              >
+                »
+              </button>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );

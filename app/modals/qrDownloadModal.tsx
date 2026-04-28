@@ -20,6 +20,7 @@ interface QrDownloadModalProps {
 export default function QrDownloadModal({ isOpen, onClose, qrData }: QrDownloadModalProps) {
   const [showShortUrl, setShowShortUrl] = useState(true);
   const [showLongUrl, setShowLongUrl] = useState(true);
+  const [qrOnly, setQrOnly] = useState(false);
   const previewRef = useRef<HTMLDivElement>(null);
 
   if (!isOpen || !qrData) return null;
@@ -44,6 +45,7 @@ export default function QrDownloadModal({ isOpen, onClose, qrData }: QrDownloadM
       link.download = `${qrData.qrName || "qrcode"}.png`;
       link.click();
       toast.success("QR Code downloaded successfully");
+
     } catch (error) {
       console.error("Download error:", error);
       toast.error("Failed to download QR code");
@@ -154,7 +156,7 @@ export default function QrDownloadModal({ isOpen, onClose, qrData }: QrDownloadM
                   <p className="text-neutral-500 text-xs">Include original URL in download</p>
                 </div>
                 <button
-                  onClick={() => setShowLongUrl(!showLongUrl)}
+                  onClick={() => {setShowLongUrl(!showLongUrl); console.log("Toggled showLongUrl:", !showLongUrl)}}
                   className={`w-12 h-6 rounded-full transition-colors relative ${
                     showLongUrl ? "bg-blue-500" : "bg-neutral-700"
                   }`}

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { prisma } from "@/lib/dbConfig";
+import { redis } from "@/lib/redis";
 
 const JWT_SECRET = process.env.NEXTAUTH_SECRET!;
 
@@ -43,9 +44,12 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    const cachedKey = `notifications:${decoded.userId}`;
+    await redis.del(cachedKey);
+
     return NextResponse.json({ message: "Notification deleted" });
+
   } catch (error) {
-    console.error("Error deleting notification:", error);
     return NextResponse.json(
       { message: "Internal server error" },
       { status: 500 }
