@@ -2,35 +2,62 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { X, Download, Loader2 } from "lucide-react"; // Added Loader2
+import { X, Download, Loader2 } from "lucide-react";
 import html2canvas from "html2canvas";
 import { toast } from "sonner";
 
 interface QrDownloadModalProps {
   isOpen: boolean;
   onClose: () => void;
-  qrData: {
+  qrData?: {
     qrImage: string;
     shortUrl: string;
     longUrl: string;
     qrName?: string;
   } | null;
+  selectedUrl?: any;
 }
 
-export default function QrDownloadModal({ isOpen, onClose, qrData }: QrDownloadModalProps) {
+export default function QrDownloadModal({ isOpen, onClose, qrData, selectedUrl }: QrDownloadModalProps) {
   const [showShortUrl, setShowShortUrl] = useState(true);
   const [showLongUrl, setShowLongUrl] = useState(true);
   const [qrOnly, setQrOnly] = useState(false);
   const [isImageLoading, setIsImageLoading] = useState(true);
   const previewRef = useRef<HTMLDivElement>(null);
 
+  const [effectiveQrData, setEffectiveQrData] = useState<any>(null);
+
+  useEffect(() => {
+    if (qrData) {
+      setEffectiveQrData(qrData);
+    } else if (selectedUrl) {
+      const nextDomain = process.env.NEXT_PUBLIC_DOMAIN;
+      const getShortLink = () => {
+        if (selectedUrl.domain && selectedUrl.subdomain) {
+          return `${selectedUrl.subdomain}.${selectedUrl.domain}/${selectedUrl.shorturl}`;
+        }
+        return `${nextDomain}/${selectedUrl.shorturl}`;
+      };
+      const shortLink = getShortLink();
+      
+      setEffectiveQrData({
+        qrImage: `https://api.qrserver.com/v1/create-qr-code/?size=1000x1000&data=${encodeURIComponent('https://' + shortLink)}`,
+        shortUrl: shortLink,
+        longUrl: selectedUrl.original,
+        qrName: selectedUrl.linkName || "qr-code"
+      });
+    } else {
+      setEffectiveQrData(null);
+    }
+  }, [qrData, selectedUrl, isOpen]);
+
   useEffect(() => {
     if (isOpen) {
       setIsImageLoading(true);
     }
-  }, [isOpen, qrData?.qrImage]);
+  }, [isOpen, effectiveQrData?.qrImage]);
 
-  if (!isOpen || !qrData) return null;
+  if (!isOpen || !effectiveQrData) return null;
 
 
   const handleDownload = async () => {
@@ -45,7 +72,7 @@ export default function QrDownloadModal({ isOpen, onClose, qrData }: QrDownloadM
       });
       const link = document.createElement("a");
       link.href = canvas.toDataURL("image/png");
-      link.download = `${qrData.qrName || "qrcode"}.png`;
+      link.download = `${effectiveQrData.qrName || "qrcode"}.png`;
       link.click();
       toast.success("QR Code downloaded successfully");
 
@@ -120,7 +147,7 @@ export default function QrDownloadModal({ isOpen, onClose, qrData }: QrDownloadM
                 )}
                 
                 <img
-                  src={qrData.qrImage}
+                  src={effectiveQrData.qrImage}
                   alt="QR Code"
                   onLoad={() => setIsImageLoading(false)}
                   style={{ 
@@ -138,7 +165,7 @@ export default function QrDownloadModal({ isOpen, onClose, qrData }: QrDownloadM
                     <div style={{ width: "100%" }}>
                       <span style={{ fontWeight: "bold", color: "#888888", fontSize: "10px", textTransform: "uppercase" }}>Short URL</span>
                       <div style={{ color: "#2563eb", fontSize: "12px", wordBreak: "break-all", fontWeight: "500" }}>
-                        {qrData.shortUrl}
+                        {effectiveQrData.shortUrl}
                       </div>
                     </div>
                   )}
@@ -146,7 +173,7 @@ export default function QrDownloadModal({ isOpen, onClose, qrData }: QrDownloadM
                     <div style={{ width: "100%" }}>
                       <span style={{ fontWeight: "bold", color: "#888888", fontSize: "10px", textTransform: "uppercase" }}>Original URL</span>
                       <div style={{ color: "#444444", fontSize: "11px", wordBreak: "break-all" }}>
-                        {qrData.longUrl}
+                        {effectiveQrData.longUrl}
                       </div>
                     </div>
                   )}
