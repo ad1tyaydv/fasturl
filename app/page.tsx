@@ -2,12 +2,13 @@
 
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useEffect, useState, useRef } from "react";
 import { IoCloseOutline } from "react-icons/io5";
 
 import { HugeiconsIcon } from '@hugeicons/react';
 import {
-  QrCodeIcon, CopyIcon, Refresh04Icon, Download01Icon, CopyCheckIcon, ArrowRightDoubleIcon
+  QrCodeIcon, CopyIcon, Refresh04Icon, Download01Icon, CopyCheckIcon
 } from '@hugeicons/core-free-icons';
 
 import Navbar from "./components/navbar";

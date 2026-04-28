@@ -195,40 +195,40 @@ export default function NotificationPage() {
   }, [searchQuery, filter]);
 
   return (
-    <div className="min-h-screen bg-[#141414] text-white flex flex-col font-three">
+    <div className="min-h-screen bg-background text-foreground flex flex-col font-three overflow-x-hidden">
       <Navbar />
       
-      <main className="flex-1 max-w-6xl w-full mx-auto px-6 py-12">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
-          <div className="flex items-center gap-5">
-            <div className="p-4 bg-white/5 rounded-2xl border border-white/10">
-              <HugeiconsIcon icon={Notification01Icon} className="text-white w-8 h-8" />
+      <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-8 md:py-12">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 md:mb-12">
+          <div className="flex items-center gap-3 sm:gap-5">
+            <div className="p-3 sm:p-4 bg-muted rounded-xl sm:rounded-2xl border border-border shrink-0">
+              <HugeiconsIcon icon={Notification01Icon} className="text-foreground w-6 h-6 sm:w-8 sm:h-8" />
             </div>
             <div>
-              <h1 className="text-4xl font-one font-bold tracking-tight text-white">Notifications</h1>
-              <p className="text-neutral-400 text-sm mt-1">
+              <h1 className="text-2xl sm:text-4xl font-one font-bold tracking-tight text-foreground">Notifications</h1>
+              <p className="text-muted-foreground text-xs sm:text-sm mt-1">
                 Manage your account activity and latest updates.
               </p>
             </div>
           </div>
 
           {notifications.length > 0 && (
-            <div className="flex items-center gap-3">
+            <div className="grid grid-cols-2 sm:flex items-center gap-2 sm:gap-3">
               <Button 
                 onClick={markAllAsRead}
                 disabled={isMarkingAll}
-                className="bg-white text-black hover:bg-neutral-200 rounded-xl font-bold text-xs h-10 px-5 cursor-pointer transition-all"
+                className="bg-primary text-primary-foreground hover:opacity-90 rounded-lg sm:rounded-xl font-bold text-[10px] sm:text-xs h-10 px-2 sm:px-5 cursor-pointer transition-all w-full sm:w-auto"
               >
-                {isMarkingAll ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <HugeiconsIcon icon={Tick02Icon} className="w-5 h-5 mr-2" />}
+                {isMarkingAll ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <HugeiconsIcon icon={Tick02Icon} className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" />}
                 Mark all read
               </Button>
               <Button 
                 variant="destructive"
                 onClick={deleteAllNotifications}
                 disabled={isClearingAll}
-                className="rounded-xl text-white font-bold text-xs h-10 px-5 cursor-pointer transition-all border bg-red-500 hover:bg-red-600"
+                className="rounded-lg sm:rounded-xl text-destructive-foreground font-bold text-[10px] sm:text-xs h-10 px-2 sm:px-5 cursor-pointer transition-all border bg-destructive hover:bg-destructive/90 w-full sm:w-auto"
               >
-                {isClearingAll ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <HugeiconsIcon icon={Delete02Icon} className="w-4 h-4 mr-2 text-white" />}
+                {isClearingAll ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <HugeiconsIcon icon={Delete02Icon} className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 sm:mr-2 text-current" />}
                 Clear all
               </Button>
             </div>
@@ -236,25 +236,25 @@ export default function NotificationPage() {
         </div>
 
         {/* Filter and Search Bar */}
-        <div className="flex flex-col md:flex-row items-center gap-4 mb-8 bg-[#1c1c1c]/50 p-4 rounded-2xl border border-white/5">
+        <div className="flex flex-col md:flex-row items-center gap-4 mb-8 bg-card p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-border shadow-sm">
           <div className="relative w-full md:w-96">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               placeholder="Search notifications..."
-              className="pl-10 bg-white/5 border-white/10 text-white rounded-xl h-11 focus-visible:ring-0 focus-visible:border-white/20"
+              className="pl-10 bg-muted/50 border-border text-foreground rounded-lg sm:rounded-xl h-11 focus-visible:ring-1 focus-visible:ring-ring"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          <div className="flex items-center gap-2 bg-white/5 p-1 rounded-xl border border-white/10 w-full md:w-auto">
+          <div className="flex items-center gap-2 bg-muted p-1 rounded-lg sm:rounded-xl border border-border w-full md:w-auto">
             {(["all", "read", "unread"] as const).map((f) => (
               <button
                 key={f}
                 onClick={() => setFilter(f)}
-                className={`flex-1 md:flex-none px-6 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                className={`flex-1 md:flex-none px-3 sm:px-6 py-2 rounded-md sm:rounded-lg text-[10px] sm:text-xs font-bold transition-all cursor-pointer ${
                   filter === f
-                    ? "bg-white text-black shadow-lg shadow-white/5"
-                    : "text-neutral-400 hover:text-white hover:bg-white/5"
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground hover:bg-background/50"
                 }`}
               >
                 {f.charAt(0).toUpperCase() + f.slice(1)}
@@ -263,84 +263,84 @@ export default function NotificationPage() {
           </div>
         </div>
 
-        <div className="bg-[#1c1c1c]/50 rounded-3xl border border-white/5 overflow-hidden shadow-2xl">
-          <div className="flex items-center px-8 py-4 bg-white/5 border-b border-white/5 text-xs font-bold uppercase tracking-widest text-white">
-            <div className="w-12">Status</div>
-            <div className="flex-1 px-4">Notification</div>
+        <div className="bg-card rounded-2xl sm:rounded-3xl border border-border overflow-hidden shadow-xl">
+          <div className="flex items-center px-4 sm:px-8 py-4 bg-muted/50 border-b border-border text-[10px] sm:text-xs font-bold uppercase tracking-widest text-muted-foreground">
+            <div className="w-10 sm:w-12 shrink-0">Status</div>
+            <div className="flex-1 px-2 sm:px-4">Notification</div>
             <div className="w-48 px-4 hidden md:block">Date</div>
-            <div className="w-32 text-right">Actions</div>
+            <div className="w-24 sm:w-32 text-right shrink-0">Actions</div>
           </div>
 
           {fetching ? (
-            <div className="divide-y divide-white/5">
+            <div className="divide-y divide-border">
               {[1, 2, 3, 4, 5].map((i) => (
-                <div key={i} className="flex items-center px-8 py-6">
-                  <Skeleton className="w-10 h-10 rounded-xl bg-white/5" />
-                  <div className="flex-1 px-6 space-y-2">
-                    <Skeleton className="h-4 w-1/4 bg-white/5" />
-                    <Skeleton className="h-3 w-1/2 bg-white/5" />
+                <div key={i} className="flex items-center px-4 sm:px-8 py-6">
+                  <Skeleton className="w-10 h-10 rounded-xl" />
+                  <div className="flex-1 px-4 sm:px-6 space-y-2">
+                    <Skeleton className="h-4 w-1/4" />
+                    <Skeleton className="h-3 w-1/2" />
                   </div>
-                  <Skeleton className="w-32 h-8 rounded-lg bg-white/5" />
+                  <Skeleton className="w-24 sm:w-32 h-8 rounded-lg" />
                 </div>
               ))}
             </div>
           ) : paginatedNotifications.length > 0 ? (
-            <div className="divide-y divide-white/5">
+            <div className="divide-y divide-border">
               {paginatedNotifications.map((notification) => (
                 <div 
                   key={notification.id}
-                  className={`flex items-center px-8 py-6 group ${
-                    notification.isRead ? "opacity-60" : "bg-blue-500/[0.02]"
+                  className={`flex items-center px-4 sm:px-8 py-5 sm:py-6 group transition-colors hover:bg-muted/30 ${
+                    notification.isRead ? "opacity-60" : "bg-primary/[0.03]"
                   }`}
                 >
-                  <div className="w-12 flex-shrink-0">
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center border transition-all ${
+                  <div className="w-10 sm:w-12 flex-shrink-0">
+                    <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center border transition-all ${
                       notification.isRead 
-                        ? "bg-neutral-900 border-white/5 text-neutral-500" 
-                        : "bg-white text-black border-white"
+                        ? "bg-muted border-border text-muted-foreground" 
+                        : "bg-primary text-primary-foreground border-primary"
                     }`}>
-                      <HugeiconsIcon icon={getIcon(notification.title)} className="w-5 h-5" />
+                      <HugeiconsIcon icon={getIcon(notification.title)} className="w-4 h-4 sm:w-5 sm:h-5" />
                     </div>
                   </div>
 
-                  <div className="flex-1 px-4 min-w-0">
-                    <div className="flex items-center gap-3 mb-1">
-                      <h3 className={`font-one font-bold text-lg truncate ${notification.isRead ? "text-neutral-400" : "text-white"}`}>
+                  <div className="flex-1 px-2 sm:px-4 min-w-0">
+                    <div className="flex items-center gap-2 sm:gap-3 mb-1">
+                      <h3 className={`font-one font-bold text-sm sm:text-lg truncate ${notification.isRead ? "text-muted-foreground" : "text-foreground"}`}>
                         {notification.title}
                       </h3>
                       {!notification.isRead && (
-                        <span className="flex-shrink-0 w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+                        <span className="flex-shrink-0 w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-primary animate-pulse"></span>
                       )}
                     </div>
-                    <p className={`text-sm leading-relaxed ${notification.isRead ? "text-neutral-500" : "text-neutral-300"}`}>
+                    <p className={`text-xs sm:text-sm leading-relaxed line-clamp-2 sm:line-clamp-none ${notification.isRead ? "text-muted-foreground" : "text-foreground/80"}`}>
                       {notification.message}
                     </p>
-                    <div className="md:hidden flex items-center gap-2 mt-2 text-[10px] text-neutral-600 font-bold uppercase tracking-tighter">
-                      <HugeiconsIcon icon={Calendar03Icon} className="w-3 h-3" />
+                    <div className="md:hidden flex items-center gap-1.5 mt-2 text-[8px] sm:text-[10px] text-muted-foreground font-bold uppercase tracking-tighter">
+                      <HugeiconsIcon icon={Calendar03Icon} className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                       {formatDate(notification.createdAt)}
                     </div>
                   </div>
 
                   <div className="w-48 px-4 hidden md:block flex-shrink-0">
-                    <div className="text-sm font-medium text-neutral-500">
+                    <div className="text-sm font-medium text-muted-foreground">
                       {formatDate(notification.createdAt)}
                     </div>
                   </div>
 
-                  <div className="w-32 flex-shrink-0 flex items-center justify-end gap-2">
+                  <div className="w-24 sm:w-32 flex-shrink-0 flex items-center justify-end gap-1.5 sm:gap-2">
                     {!notification.isRead && (
                       <Button 
                         size="icon"
-                        variant="ghost"
+                        variant="outline"
                         disabled={processingRead === notification.id}
                         onClick={() => markAsRead(notification.id)}
-                        className="w-9 h-9 bg-white text-black hover:bg-neutral-200 rounded-lg cursor-pointer border border-white transition-all shadow-lg shadow-white/5"
+                        className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg cursor-pointer transition-all shadow-sm"
                         title="Mark as read"
                       >
                         {processingRead === notification.id ? (
-                          <Loader2 className="w-4 h-4 animate-spin text-black" />
+                          <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin" />
                         ) : (
-                          <HugeiconsIcon icon={Tick02Icon} className="w-4 h-4" />
+                          <HugeiconsIcon icon={Tick02Icon} className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                         )}
                       </Button>
                     )}
@@ -349,13 +349,13 @@ export default function NotificationPage() {
                       variant="ghost"
                       disabled={processingDelete === notification.id}
                       onClick={() => deleteNotification(notification.id)}
-                      className="w-9 h-9 bg-neutral-900 text-neutral-400 hover:text-white hover:bg-neutral-800 rounded-lg cursor-pointer border border-white/5 transition-all"
+                      className="w-8 h-8 sm:w-9 sm:h-9 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg cursor-pointer border border-transparent transition-all"
                       title="Delete"
                     >
                       {processingDelete === notification.id ? (
-                        <Loader2 className="w-4 h-4 animate-spin text-white" />
+                        <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin" />
                       ) : (
-                        <HugeiconsIcon icon={Delete02Icon} className="w-4 h-4" />
+                        <HugeiconsIcon icon={Delete02Icon} className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                       )}
                     </Button>
                   </div>
@@ -363,14 +363,14 @@ export default function NotificationPage() {
               ))}
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center py-32 bg-white/[0.01]">
-              <div className="w-20 h-20 bg-neutral-900 rounded-3xl border border-white/5 flex items-center justify-center mb-6">
-                <HugeiconsIcon icon={Notification01Icon} className="w-10 h-10 text-neutral-700" />
+            <div className="flex flex-col items-center justify-center py-20 sm:py-32 bg-muted/10">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-muted rounded-2xl sm:rounded-3xl border border-border flex items-center justify-center mb-6">
+                <HugeiconsIcon icon={Notification01Icon} className="w-8 h-8 sm:w-10 sm:h-10 text-muted-foreground/40" />
               </div>
-              <h2 className="text-2xl font-one font-bold mb-2 text-white">
+              <h2 className="text-xl sm:text-2xl font-one font-bold mb-2 text-foreground">
                 {searchQuery || filter !== "all" ? "No matches found" : "All caught up!"}
               </h2>
-              <p className="text-neutral-500 text-sm text-center max-w-xs px-6">
+              <p className="text-muted-foreground text-xs sm:text-sm text-center max-w-xs px-6">
                 {searchQuery || filter !== "all" 
                   ? "Try adjusting your search or filters to find what you're looking for." 
                   : "No new notifications at the moment. We'll alert you when something important happens."}
@@ -379,7 +379,7 @@ export default function NotificationPage() {
                 <Button 
                   onClick={() => {setSearchQuery(""); setFilter("all");}}
                   variant="link" 
-                  className="text-blue-500 mt-4 h-auto p-0 cursor-pointer"
+                  className="text-primary mt-4 h-auto p-0 cursor-pointer text-xs"
                 >
                   Clear all filters
                 </Button>
@@ -389,22 +389,22 @@ export default function NotificationPage() {
         </div>
 
         {totalPages > 1 && (
-          <div className="flex justify-center mt-12">
-            <div className="join bg-[#1c1c1c] border border-white/5 rounded-xl overflow-hidden flex items-center">
+          <div className="flex justify-center mt-8 md:mt-12">
+            <div className="flex items-center gap-1 bg-muted p-1 rounded-xl border border-border overflow-hidden">
               <button 
                 onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                 disabled={currentPage === 1}
-                className="join-item px-4 py-2 hover:bg-white/5 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed border-r border-white/5 h-10 flex items-center justify-center font-bold text-lg"
+                className="px-3 sm:px-4 py-2 hover:bg-background rounded-lg transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed h-10 flex items-center justify-center font-bold text-lg"
               >
                 «
               </button>
-              <button className="join-item px-6 py-2 bg-white/5 text-white h-10 flex items-center justify-center font-bold text-xs uppercase tracking-widest cursor-pointer">
-                Page {currentPage}
-              </button>
+              <div className="px-4 sm:px-6 py-2 bg-background text-foreground rounded-lg shadow-sm h-10 flex items-center justify-center font-bold text-[10px] sm:text-xs uppercase tracking-widest">
+                Page {currentPage} of {totalPages}
+              </div>
               <button 
                 onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                 disabled={currentPage === totalPages}
-                className="join-item px-4 py-2 hover:bg-white/5 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed border-l border-white/5 h-10 flex items-center justify-center font-bold text-lg"
+                className="px-3 sm:px-4 py-2 hover:bg-background rounded-lg transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed h-10 flex items-center justify-center font-bold text-lg"
               >
                 »
               </button>

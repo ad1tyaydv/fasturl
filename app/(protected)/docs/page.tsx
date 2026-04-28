@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { Search, FileText, ChevronDown, ChevronRight } from 'lucide-react';
+import { Search, FileText, ChevronDown, ChevronRight, Menu, X } from 'lucide-react';
 import Navbar from '@/app/components/navbar';
 
 interface DocSection {
@@ -117,6 +117,7 @@ const docsData: Record<string, Doc> = {
 export default function App() {
   const [activeDocId, setActiveDocId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [openCategories, setOpenCategories] = useState<Record<string, boolean>>({ 
     basics: true, 
     features: true,
@@ -147,7 +148,13 @@ export default function App() {
     setActiveDocId(id);
     const newUrl = `?docs=${id}`;
     window.history.pushState({ path: newUrl }, '', newUrl);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setIsSidebarOpen(false);
+    
+    // Smooth scroll to top
+    const mainElement = document.getElementById('docs-content');
+    if (mainElement) {
+      mainElement.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   const toggleCategory = (category: string) => {
@@ -170,14 +177,34 @@ export default function App() {
   ];
 
   return (
-    <div className="min-h-screen bg-background font-sans text-foreground transition-colors duration-300">
-      <div className="fixed top-0 left-0 right-0 z-50">
+    <div className="min-h-screen bg-background font-sans text-foreground transition-colors duration-300 flex flex-col h-screen overflow-hidden">
+      <div className="shrink-0 z-[60]">
         <Navbar />
       </div>
       
-      <div className="flex pt-16 h-screen overflow-hidden"> 
-        <aside className="w-72 border-r border-border flex flex-col fixed top-16 bottom-0 left-0 bg-background z-40">
-          <div className="p-6 border-b border-border">
+      <div className="flex flex-1 pt-2 h-full overflow-hidden relative"> 
+        {/* Mobile Sidebar Overlay */}
+        {isSidebarOpen && (
+          <div 
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[45] lg:hidden transition-opacity"
+            onClick={() => setIsSidebarOpen(false)}
+          />
+        )}
+
+        {/* Sidebar Toggle (Mobile) */}
+        <button 
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          className="lg:hidden fixed bottom-8 right-8 z-[55] p-4 bg-primary text-primary-foreground rounded-full shadow-2xl active:scale-95 transition-all border border-primary-foreground/10"
+        >
+          {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
+
+        {/* Sidebar */}
+        <aside className={`
+          fixed top-[88px] bottom-0 left-0 z-50 w-72 bg-background border-r border-border flex flex-col transition-transform duration-300 lg:translate-x-0 lg:static lg:h-full
+          ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+        `}>
+          <div className="p-5 border-b border-border">
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground">
                 <Search size={16} />
@@ -187,7 +214,7 @@ export default function App() {
                 placeholder="Search documentation..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-secondary border border-border py-2.5 pl-10 pr-3 rounded-xl outline-none focus:border-primary transition-colors placeholder:text-muted-foreground/50 text-sm text-foreground font-one"
+                className="w-full bg-secondary border border-border py-2.5 pl-10 pr-3 rounded-xl outline-none focus:ring-1 focus:ring-primary/30 transition-all placeholder:text-muted-foreground/50 text-sm text-foreground font-one"
               />
             </div>
           </div>
@@ -200,7 +227,7 @@ export default function App() {
                 const catDocs = filteredDocs.filter(doc => doc.category === category.id);
                 if (catDocs.length === 0) return null;
                 return (
-                  <div key={category.id} className="mb-6">
+                  <div key={category.id} className="mb-6 last:mb-20 lg:last:mb-6">
                     <button 
                       onClick={() => toggleCategory(category.id)}
                       className="w-full flex items-center justify-between text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-3 px-2 hover:text-foreground transition-colors cursor-pointer"
@@ -214,7 +241,7 @@ export default function App() {
                           <li key={doc.id}>
                             <button
                               onClick={() => handleNavigation(doc.id)}
-                              className={`w-full text-left px-3 py-2 flex items-center gap-2 text-sm rounded-lg transition-all cursor-pointer ${
+                              className={`w-full text-left px-3 py-2.5 flex items-center gap-2 text-sm rounded-lg transition-all cursor-pointer ${
                                 activeDocId === doc.id 
                                   ? 'bg-primary/10 text-primary font-semibold' 
                                   : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
@@ -234,45 +261,46 @@ export default function App() {
           </nav>
         </aside>
 
-        <main className="flex-1 ml-72 p-8 lg:p-16 max-w-5xl overflow-y-auto custom-scrollbar bg-background">
+        {/* Main Content */}
+        <main id="docs-content" className="flex-1 overflow-y-auto custom-scrollbar bg-background p-6 sm:p-10 md:p-12 lg:p-16">
           {activeDoc ? (
-            <article className="animate-in fade-in duration-500 max-w-3xl">
-              <div className="text-xs text-muted-foreground mb-8 flex items-center gap-2 uppercase tracking-wider font-semibold">
+            <article className="animate-in fade-in slide-in-from-bottom-2 duration-500 max-w-4xl mx-auto pb-20">
+              <div className="text-[10px] sm:text-xs text-muted-foreground mb-6 sm:mb-8 flex items-center gap-2 uppercase tracking-wider font-semibold">
                 <span>Docs</span>
                 <ChevronRight size={12} />
                 <span className="text-primary">{activeDoc.category}</span>
               </div>
 
-              <h1 className="text-4xl lg:text-5xl font-bold tracking-tight text-foreground mb-6 font-one">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-foreground mb-6 font-one leading-[1.1]">
                 {activeDoc.title}
               </h1>
               
-              <p className="text-lg text-muted-foreground leading-relaxed mb-12 pb-8 border-b border-border font-three">
+              <p className="text-base sm:text-lg text-muted-foreground leading-relaxed mb-10 sm:mb-12 pb-8 border-b border-border font-three">
                 {activeDoc.description}
               </p>
 
-              <div className="space-y-12">
+              <div className="space-y-10 sm:space-y-12">
                 {activeDoc.sections.map((section, idx) => (
                   <section key={idx} className="group">
-                    <h2 className="text-2xl font-bold text-foreground mb-4 font-one group-hover:text-primary transition-colors">
+                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-4 font-one group-hover:text-primary transition-colors">
                       {section.subtitle}
                     </h2>
-                    <p className="text-base text-muted-foreground leading-relaxed font-three">
+                    <p className="text-sm sm:text-base text-muted-foreground leading-relaxed font-three">
                       {section.text}
                     </p>
                   </section>
                 ))}
               </div>
 
-              <div className="mt-24 pt-8 border-t border-border flex justify-between text-xs text-muted-foreground font-semibold uppercase tracking-widest">
+              <div className="mt-20 sm:mt-24 pt-8 border-t border-border flex flex-col sm:flex-row justify-between items-center gap-4 text-[10px] sm:text-xs text-muted-foreground font-semibold uppercase tracking-widest">
                 <span>FastURL Documentation</span>
                 <span>Last updated: Today</span>
               </div>
             </article>
           ) : (
-            <div className="flex flex-col items-center justify-center h-full text-muted-foreground gap-4">
-              <div className="p-4 bg-secondary rounded-full border border-border">
-                <FileText size={32} />
+            <div className="flex flex-col items-center justify-center h-full text-muted-foreground gap-4 text-center px-6">
+              <div className="p-4 bg-secondary rounded-2xl border border-border shadow-sm">
+                <FileText size={40} />
               </div>
               <p className="font-one text-lg">Select a document from the sidebar to start reading.</p>
             </div>

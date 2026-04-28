@@ -195,6 +195,15 @@ export default function AnalyticsPage() {
 
   const isFree = tier === "FREE";
 
+  const getDomain = (urlStr: string) => {
+    try { return new URL(urlStr).hostname.replace("www.", ""); } catch { return ""; }
+  };
+
+  const getLogo = (urlStr: string) => {
+    const domain = getDomain(urlStr);
+    return `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
+  };
+
   return (
     <div className="flex flex-col h-screen bg-background text-foreground font-sans selection:bg-blue-500/30 overflow-hidden">
       <Navbar />
@@ -247,7 +256,11 @@ export default function AnalyticsPage() {
                   >
                     <div className="flex items-center gap-3">
                       <div className={`p-2 rounded-md ${selectedId === item.id ? "bg-white/20" : "bg-secondary"}`}>
-                        <HugeiconsIcon icon={analyticsType === "links" ? Link04Icon : File02Icon} size={14} />
+                        {analyticsType === "links" ? (
+                          <img src={getLogo(item.original)} alt="logo" className="w-4 h-4 rounded-full" />
+                        ) : (
+                          <HugeiconsIcon icon={File02Icon} size={14} />
+                        )}
                       </div>
                       <span className="truncate text-sm font-medium">
                         {analyticsType === "links" ? `${DOMAIN}/${item.shorturl}` : (item.name || "Untitled Batch")}
