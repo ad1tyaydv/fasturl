@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { useUser } from "./userContext";
-import { set } from "date-fns";
+import { Loader2 } from "lucide-react";
 
 function CheckIcon({ className }: { className?: string }) {
   return (
@@ -26,10 +26,13 @@ function CheckIcon({ className }: { className?: string }) {
 
 export default function Premium() {
   const router = useRouter();
-  const { user, logout, loading } = useUser();
+  const { user, logout, loading: userLoading } = useUser();
+  const [isAnnual, setIsAnnual] = useState(true);
+  const [loading, setLoading] = useState<string | null>(null);
 
   const handleUpgrade = async (plan: string) => {
     try {
+      setLoading(plan);
       const res = await axios.get("/api/auth/me");
 
       if (!res.data.authenticated) {
@@ -37,10 +40,25 @@ export default function Premium() {
         return;
       }
 
-      router.push(`/premium/checkout?plan=${plan}`);
+      const checkoutRes = await fetch("/api/billing/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ 
+          plan: plan === "ESSENTIALS" ? "ESSENTIAL" : plan,
+          billingPeriod: isAnnual ? "ANNUALLY" : "MONTHLY"
+        }),
+      });
+
+      const data = await checkoutRes.json();
+      if (!checkoutRes.ok) throw new Error(data.error);
+      window.location.href = data.checkout_url;
 
     } catch (error) {
-      router.push("/auth/signin");
+      console.error(error);
+      alert("Unable to start checkout. Please try again.");
+    } finally {
+      setLoading(null);
     }
   };
 
@@ -48,13 +66,41 @@ export default function Premium() {
     <div className="min-h-screen bg-[#141414] text-white">
       <main className="max-w-6xl mx-auto px-4 py-12">
 
-        <div className="text-center mb-12">
+        <div className="text-center mb-8">
           <h1 className="text-3xl font-bold mb-2">
             The Best URL Shortener with Analytics & Branded Links
           </h1>
           <p className="text-white/40 text-sm max-w-xl mx-auto">
             Stop guessing and start tracking with our professional link management platform. Unlock deep insights with real-time click tracking and geo-targeted redirects.
           </p>
+        </div>
+
+        <div className="flex flex-col items-center gap-4 mb-12">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 mr-2">
+              <span className="text-[10px] font-bold bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full uppercase tracking-wider">
+                Save upto 38%
+              </span>
+              <span className={`text-sm font-medium transition-colors ${isAnnual ? "text-white" : "text-white/40"}`}>
+                Annually
+              </span>
+            </div>
+            
+            <button
+              onClick={() => setIsAnnual(!isAnnual)}
+              className="relative w-12 h-6 rounded-full bg-white/10 transition-colors duration-200 focus:outline-none cursor-pointer"
+            >
+              <div
+                className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-blue-500 transition-transform duration-200 ease-in-out ${
+                  !isAnnual ? "translate-x-6" : ""
+                }`}
+              />
+            </button>
+            
+            <span className={`text-sm font-medium transition-colors ${!isAnnual ? "text-white" : "text-white/40"}`}>
+              Monthly
+            </span>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -110,12 +156,12 @@ export default function Premium() {
 
             <div className="flex items-baseline gap-2 mb-0.5">
               <span className="text-sm line-through text-white/25">
-                ₹1,200
+                {isAnnual ? "₹14,400" : "₹1,200"}
               </span>
               <span className="text-3xl font-bold">
-                ₹300
+                ₹{isAnnual ? "2,299" : "300"}
                 <span className="text-base font-normal text-white/40">
-                  /mo
+                  {isAnnual ? "/yr" : "/mo"}
                 </span>
               </span>
             </div>
@@ -148,9 +194,10 @@ export default function Premium() {
 
             <button
               onClick={() => handleUpgrade("ESSENTIALS")}
-              className="w-full py-2.5 rounded-xl bg-blue-500 hover:bg-blue-400 text-white text-sm font-semibold transition-colors cursor-pointer"
+              disabled={loading !== null}
+              className="w-full py-2.5 rounded-xl bg-blue-500 hover:bg-blue-400 text-white text-sm font-semibold transition-colors cursor-pointer flex items-center justify-center gap-2 disabled:opacity-70"
             >
-              Upgrade to Essentials
+              {loading === "ESSENTIALS" ? <Loader2 className="w-4 h-4 animate-spin" /> : "Upgrade to Essentials"}
             </button>
           </div>
 
@@ -166,12 +213,12 @@ export default function Premium() {
 
             <div className="flex items-baseline gap-2 mb-0.5">
               <span className="text-sm line-through text-white/25">
-                ₹5,600
+                {isAnnual ? "₹67,200" : "₹5,600"}
               </span>
               <span className="text-3xl font-bold">
-                ₹1,200
+                ₹{isAnnual ? "8,999" : "1,200"}
                 <span className="text-base font-normal text-white/40">
-                  /mo
+                  {isAnnual ? "/yr" : "/mo"}
                 </span>
               </span>
             </div>
@@ -204,9 +251,10 @@ export default function Premium() {
 
             <button
               onClick={() => handleUpgrade("PRO")}
-              className="w-full py-2.5 rounded-xl bg-yellow-500 hover:bg-yellow-400 text-black text-sm font-semibold transition-colors cursor-pointer"
+              disabled={loading !== null}
+              className="w-full py-2.5 rounded-xl bg-yellow-500 hover:bg-yellow-400 text-black text-sm font-semibold transition-colors cursor-pointer flex items-center justify-center gap-2 disabled:opacity-70"
             >
-              Upgrade to Pro
+              {loading === "PRO" ? <Loader2 className="w-4 h-4 animate-spin" /> : "Upgrade to Pro"}
             </button>
           </div>
 

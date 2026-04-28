@@ -1,5 +1,8 @@
 import DodoPayments from "dodopayments";
 
+type Plan = "ESSENTIAL" | "PRO";
+type BillingCycle = "MONTHLY" | "ANNUALLY";
+
 type DodoEnv = "test_mode" | "live_mode";
 
 export function getDodoClient() {
@@ -17,24 +20,60 @@ export function getDodoClient() {
   });
 }
 
-export function getProductIdForPlan(plan: "ESSENTIAL" | "PRO") {
-  const map: Record<"ESSENTIAL" | "PRO", string | undefined> = {
-    ESSENTIAL: process.env.DODO_PRODUCT_ESSENTIALS_ID,
-    PRO: process.env.DODO_PRODUCT_PRO_ID,
+export function getProductIdForPlan(plan: Plan, cycle: BillingCycle) {
+  const map: Record<Plan, Record<BillingCycle, string | undefined>> = {
+    ESSENTIAL: {
+      MONTHLY: process.env.DODO_PRODUCT_ESSENTIALS_ID_MONTHLY,
+      ANNUALLY: process.env.DODO_PRODUCT_ESSENTIALS_ID_ANNUALLY,
+    },
+    PRO: {
+      MONTHLY: process.env.DODO_PRODUCT_PRO_ID_MONTHLY,
+      ANNUALLY: process.env.DODO_PRODUCT_PRO_ID_ANNUALLY,
+    },
   };
 
-  const id = map[plan];
+  const id = map[plan][cycle];
 
-  if(!id) {
-    throw new Error(`Missing product id for plan ${plan}. Set DODO_PRODUCT_ESSENTIALS_ID and DODO_PRODUCT_PRO_ID`);
+  if (!id) {
+    throw new Error(`Missing product id for ${plan} (${cycle})`);
   }
+
   return id;
 }
 
-export function resolvePlanByProductId(productId: string): "ESSENTIAL" | "PRO" | null {
-  const essentials = process.env.DODO_PRODUCT_ESSENTIALS_ID;
-  const pro = process.env.DODO_PRODUCT_PRO_ID;
-  if (essentials && productId === essentials) return "ESSENTIAL";
-  if (pro && productId === pro) return "PRO";
-  return null;
+export function resolvePlanByProductId(productId: string): {
+  plan: Plan;
+  cycle: BillingCycle;
+} | null {
+  const mapping = [
+    {
+      productId: process.env.DODO_PRODUCT_ESSENTIALS_ID_MONTHLY,
+      plan: "ESSENTIAL",
+      cycle: "MONTHLY",
+    },
+    {
+      productId: process.env.DODO_PRODUCT_ESSENTIALS_ID_ANNUALLY,
+      plan: "ESSENTIAL",
+      cycle: "ANNUALLY",
+    },
+    {
+      productId: process.env.DODO_PRODUCT_PRO_ID_MONTHLY,
+      plan: "PRO",
+      cycle: "MONTHLY",
+    },
+    {
+      productId: process.env.DODO_PRODUCT_PRO_ID_ANNUALLY,
+      plan: "PRO",
+      cycle: "ANNUALLY",
+    },
+  ];
+
+  const found = mapping.find((item) => item.productId === productId);
+
+  if (!found) return null;
+
+  return {
+    plan: found.plan as Plan,
+    cycle: found.cycle as BillingCycle,
+  };
 }

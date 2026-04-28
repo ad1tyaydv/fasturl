@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import { getDodoClient, getProductIdForPlan } from "@/lib/dodo";
 
 type Plan = "ESSENTIAL" | "PRO";
+type BillingCycle = "MONTHLY" | "ANNUALLY";
 
 function getOrigin(req: NextRequest) {
     const proto = req.headers.get("x-forwarded-proto") ?? "http";
@@ -30,6 +31,14 @@ export async function POST(req: NextRequest) {
 
         const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
         const plan = body?.plan as Plan | undefined;
+        const billingPeriod = body?.billingPeriod as BillingCycle | undefined;
+
+        if (billingPeriod !== "MONTHLY" && billingPeriod !== "ANNUALLY") {
+            return NextResponse.json(
+                { error: "Invalid billing period" },
+                { status: 400 }
+            );
+        }
 
         if (plan !== "ESSENTIAL" && plan !== "PRO") {
             return NextResponse.json(
@@ -38,7 +47,7 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        const productId = getProductIdForPlan(plan);
+        const productId = getProductIdForPlan(plan, billingPeriod);
         const client = getDodoClient();
 
         const origin = getOrigin(req);
@@ -54,7 +63,8 @@ export async function POST(req: NextRequest) {
             return_url: returnUrl,
             metadata: {
                 user_id: decoded.userId,
-                plan,
+                plan: plan,
+                planType: billingPeriod || "",
                 source: "nextjs_premium_page",
             },
         });
@@ -67,5 +77,5 @@ export async function POST(req: NextRequest) {
     } catch (error) {
         console.error("Checkout error:", error);
         return NextResponse.json({ message: "Internal error" }, { status: 500 });
-    } 
+    }
 }

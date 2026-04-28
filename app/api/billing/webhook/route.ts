@@ -3,6 +3,7 @@ import { prisma } from "@/lib/dbConfig";
 import { redis } from "@/lib/redis";
 
 type Plan = "FREE" | "ESSENTIAL" | "PRO";
+type BillingCycle = "MONTHLY" | "ANNUALLY";
 
 const PLAN_LIMITS = {
   FREE: { links: 100, qr: 30 },
@@ -19,6 +20,8 @@ const PLAN_PRIORITY: Record<Plan, number> = {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
+
+    console.log("WEBHOOK HIT");
 
     const event = body?.type;
     const data = body?.data;
@@ -38,6 +41,10 @@ export async function POST(req: NextRequest) {
 
     const userId = metadata.user_id;
     const plan = metadata.plan as Plan;
+    if (!["FREE", "ESSENTIAL", "PRO"].includes(plan)) {
+      return NextResponse.json({ received: true });
+    }
+    const planType = (metadata.planType as "MONTHLY" | "ANNUALLY") || "MONTHLY";
 
     if (!userId) {
       return NextResponse.json({ received: true });
@@ -63,14 +70,19 @@ export async function POST(req: NextRequest) {
 
       const startDate = new Date();
       const expiryDate = new Date();
-      expiryDate.setMonth(expiryDate.getMonth() + 1);
+      if (planType === "ANNUALLY") {
+        expiryDate.setFullYear(expiryDate.getFullYear() + 1);
+      } else {
+        expiryDate.setMonth(expiryDate.getMonth() + 1);
+      }
 
       await prisma.user.update({
         where: {
           id: userId
         },
         data: {
-          plan,
+          plan: plan,
+          planType: planType,
           totalLinks: limits.links,
           linksUsed: 0,
           totalQr: limits.qr,
@@ -87,8 +99,8 @@ export async function POST(req: NextRequest) {
         data: {
           userId,
           title: "Plan Upgraded!",
-          message: `Your plan has been successfully upgraded to ${plan}. Enjoy your new limits!`,
-          metadata: { plan, event: "upgrade" },
+          message: `Your plan has been successfully upgraded to ${plan} (${planType}). Enjoy your new limits!`,
+          metadata: { plan, planType, event: "upgrade" },
           actionUrl: "/premium"
         }
       });
@@ -118,6 +130,7 @@ export async function POST(req: NextRequest) {
           },
           update: {
             plan,
+            planType: planType,
             status: "active",
             planStartedAt: startDate,
             planEndedAt: expiryDate,
@@ -129,6 +142,7 @@ export async function POST(req: NextRequest) {
               }
             },
             plan,
+            planType,
             status: "active",
             subscriptionId,
             customerId,
@@ -261,7 +275,11 @@ export async function POST(req: NextRequest) {
 
     if (event === "subscription.renewed") {
       const expiryDate = new Date();
-      expiryDate.setMonth(expiryDate.getMonth() + 1);
+      if (user.planType === "ANNUALLY") {
+        expiryDate.setFullYear(expiryDate.getFullYear() + 1);
+      } else {
+        expiryDate.setMonth(expiryDate.getMonth() + 1);
+      }
 
       await prisma.user.update({
         where: { id: userId },
@@ -359,6 +377,10 @@ export async function POST(req: NextRequest) {
         }
       });
     }
+
+    console.log("EVENT:", event);
+    console.log("PAYMENT ID:", data?.payment_id);
+    console.log("SUBSCRIPTION ID:", data?.subscription_id);
 
     return NextResponse.json({ received: true });
 

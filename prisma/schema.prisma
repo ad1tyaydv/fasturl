@@ -36,6 +36,7 @@ model User {
   totalQrCreated     Int?       @default(0)
 
   plan              Plan      @default(FREE)
+  planType          String?   @default("")
   planStartedAt     DateTime?
   planExpiresAt     DateTime?
 
@@ -246,6 +247,7 @@ model Subscription {
   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   plan            String
+  planType        String   @default("")
   status          String
 
   subscriptionId  String   @unique
@@ -274,6 +276,7 @@ model Payment {
 
   status        String
   method        String?
+  planType      String?   @default("")
 
   createdAt     DateTime @default(now())
 }

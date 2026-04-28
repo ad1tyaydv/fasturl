@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Analytics01Icon, ArrowRightDoubleIcon } from "@hugeicons/core-free-icons";
+import { Analytics01Icon, ArrowRightDoubleIcon, CheckmarkCircle02Icon } from "@hugeicons/core-free-icons";
 
 
 type CellValue = true | false | string;
@@ -142,11 +142,11 @@ function UsageStat({ label, used, limit, colorClass }: { label: string; used: nu
   const percentage = Math.min((used / limit) * 100, 100);
 
   return (
-    <div className="bg-white/5 border border-white/10 rounded-2xl p-5">
+    <div className="bg-white/5 border border-white/10 rounded-2xl p-5 group hover:border-white/20 transition-all duration-300">
       <div className="flex justify-between items-end mb-3">
         <div>
-          <p className="text-white/40 text-[10px] uppercase tracking-widest font-bold mb-1">{label}</p>
-          <p className="text-2xl font-bold text-white">{used.toLocaleString()}</p>
+          <p className="text-white/40 text-[10px] uppercase tracking-widest font-bold mb-1 group-hover:text-white/60 transition-colors">{label}</p>
+          <p className="text-2xl font-bold text-white tracking-tight">{used.toLocaleString()}</p>
         </div>
         <div className="text-right">
           <p className="text-white/30 text-xs mb-1">Limit</p>
@@ -155,7 +155,7 @@ function UsageStat({ label, used, limit, colorClass }: { label: string; used: nu
       </div>
       <div className="w-full bg-white/5 rounded-full h-1.5 overflow-hidden">
         <div
-          className={`h-full rounded-full transition-all duration-700 ease-out ${colorClass}`}
+          className={`h-full rounded-full transition-all duration-1000 ease-out ${colorClass}`}
           style={{ width: `${percentage}%` }}
         />
       </div>
@@ -169,8 +169,10 @@ export default function Premium() {
   
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [loading, setLoading] = useState<"ESSENTIAL" | "PRO" | null>(null);
+  const [isAnnual, setIsAnnual] = useState(true);
   
   const [plan, setPlan] = useState("FREE"); 
+  const [planType, setPlanType] = useState("monthly");
   const [planStartedAt, setPlanStartedAt] = useState("");
   const [planExpiresAt, setPlanExpiresAt] = useState("");
   const [totalLinksUsed, setTotalLinksUsed] = useState(0);
@@ -186,6 +188,7 @@ export default function Premium() {
         }
 
         setPlan(res.data.plan || "FREE");
+        setPlanType(res.data.planType || "monthly");
         setPlanStartedAt(res.data.planStartedAt || "");
         setPlanExpiresAt(res.data.planExpiresAt || "");
         setTotalLinksUsed(res.data.linksUsed || 0);
@@ -208,7 +211,10 @@ export default function Premium() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ plan: targetPlan }),
+        body: JSON.stringify({ 
+          plan: targetPlan,
+          billingPeriod: isAnnual ? "ANNUALLY" : "MONTHLY"
+        }),
       });
 
       const data = await res.json();
@@ -251,47 +257,47 @@ export default function Premium() {
         <Navbar />
         <main className="max-w-5xl mx-auto px-6 py-16">
           
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 animate-in fade-in slide-in-from-top-4 duration-700">
             <div>
               <div className="flex items-center gap-3 mb-2">
                 <h1 className="text-4xl font-black tracking-tight">Premium Dashboard</h1>
-                <span className="px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20 text-green-400 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5">
+                <span className="px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20 text-green-400 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-[0_0_15px_rgba(34,197,94,0.1)]">
                   <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
                   Active
                 </span>
               </div>
-              <p className="text-neutral-500 text-lg">Manage your elite link shortening infrastructure.</p>
+              <p className="text-neutral-500 text-lg font-medium">Manage your elite link shortening infrastructure.</p>
             </div>
             <div className="flex items-center gap-4">
               <button 
                 onClick={() => window.open("mailto:fasturl@tutamail.com")}
-                className="px-5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm font-semibold hover:bg-white/10 transition-all cursor-pointer"
+                className="px-5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm font-semibold hover:bg-white/10 hover:border-white/20 transition-all cursor-pointer shadow-sm active:scale-95"
               >
-                Priority Support
+                Support
               </button>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
             
-            <div className={`lg:col-span-1 rounded-3xl border ${planBorder} ${planBg} p-8 relative overflow-hidden flex flex-col justify-between group`}>
-              <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${planColor} opacity-10 blur-3xl -mr-10 -mt-10 group-hover:opacity-20 transition-opacity`} />
+            <div className={`lg:col-span-1 rounded-3xl border ${planBorder} ${planBg} p-8 relative overflow-hidden flex flex-col justify-between group transition-all duration-500 hover:shadow-2xl hover:shadow-black/20`}>
+              <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${planColor} opacity-10 blur-3xl -mr-10 -mt-10 group-hover:opacity-20 transition-opacity duration-700`} />
               
-              <div>
-                <p className="text-white/40 text-xs font-bold uppercase tracking-[0.2em] mb-6">Current Tier</p>
-                <h2 className={`text-6xl font-black mb-2 bg-gradient-to-r ${planColor} bg-clip-text text-transparent italic`}>
+              <div className="relative z-10">
+                <p className="text-white/40 text-[15px] font-bold uppercase tracking-[0.25em] mb-6">Current Tier</p>
+                <h2 className={`text-3xl sm:text-4xl lg:text-4xl font-black mb-2 bg-gradient-to-r ${planColor} bg-clip-text text-transparent italic break-words leading-tight tracking-tighter`}>
                   {plan}
                 </h2>
-                <div className="flex items-center gap-2 text-white/60 text-sm mb-8">
-                  <span className="font-medium">Monthly Cycle</span>
+                <div className="flex items-center gap-2 text-white/60 text-sm mb-8 font-medium">
+                  <span className="capitalize">{planType} Cycle</span>
                   <span className="w-1 h-1 rounded-full bg-white/20" />
                   <span className="text-white/40">Renews in {planExpiresAt ? Math.ceil((new Date(planExpiresAt).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) : 0} days</span>
                 </div>
 
-                <div className="space-y-4 mb-8">
+                <div className="space-y-4">
                   <div className="flex justify-between items-center text-sm">
                     <span className="text-white/40">Billing Period</span>
-                    <span className="text-white/80 font-mono">Monthly</span>
+                    <span className="text-white/80 font-mono capitalize">{planType}</span>
                   </div>
                   <div className="flex justify-between items-center text-sm">
                     <span className="text-white/40">Next Invoice</span>
@@ -300,21 +306,14 @@ export default function Premium() {
                 </div>
               </div>
 
-              <div className="pt-6 border-t border-white/5">
-                {!isPro && (
-                  <button 
-                    onClick={() => handleCheckout("PRO")}
-                    className="w-full py-4 rounded-2xl bg-white text-black font-bold text-sm hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-white/5 flex items-center justify-center gap-2 group/btn cursor-pointer"
-                  >
-                    Upgrade to PRO <HugeiconsIcon icon={ArrowRightDoubleIcon} size={18} className="group-hover/btn:translate-x-1 transition-transform" />
-                  </button>
-                )}
-                {isPro && (
-                  <div className="p-4 rounded-2xl bg-white/5 border border-white/5 text-center">
-                    <p className="text-white/60 text-xs font-medium">You are on the highest tier.</p>
+              {isPro && (
+                <div className="relative z-10 pt-6 border-t border-white/5 mt-6">
+                  <div className="p-4 rounded-2xl bg-white/5 border border-white/5 text-center flex items-center gap-3">
+                    <HugeiconsIcon icon={CheckmarkCircle02Icon} size={18} className="text-yellow-500" />
+                    <p className="text-white/60 text-[10px] font-bold uppercase tracking-wider">Maximum Tier Unlocked</p>
                   </div>
-                )}
-              </div>
+                </div>
+              )}
             </div>
 
             <div className="lg:col-span-2 space-y-6">
@@ -333,12 +332,12 @@ export default function Premium() {
                 />
               </div>
 
-              <div className="bg-white/5 border border-white/10 rounded-3xl p-8">
-                <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
-                  <HugeiconsIcon icon={Analytics01Icon} size={20} className="text-blue-400" />
+              <div className="bg-white/5 border border-white/10 rounded-3xl p-8 group hover:border-white/20 transition-all duration-500">
+                <h3 className="text-xl font-bold mb-6 flex items-center gap-2 tracking-tight">
+                  <HugeiconsIcon icon={Analytics01Icon} size={20} className={isPro ? "text-yellow-400" : "text-blue-400"} />
                   Unlocked Capabilities
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-12">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-y-5 gap-x-12">
                   {[
                     "Detailed Click Analytics",
                     "Advanced Geo-Tracking",
@@ -346,51 +345,123 @@ export default function Premium() {
                     "Custom Branded Slugs",
                     "High-Speed Redirection",
                     isPro ? "Full Developer API Access" : "4 Custom Domains",
-                    isPro ? "10 Custom Domains" : "Priority Support",
+                    isPro ? "10 Custom Domains" : "Support",
                     "Device & Browser Insights"
                   ].map((feat, i) => (
-                    <div key={i} className="flex items-center gap-3 text-sm text-white/70">
-                      <div className={`w-5 h-5 rounded-full flex items-center justify-center ${isPro ? 'bg-yellow-500/10 text-yellow-500' : 'bg-blue-500/10 text-blue-500'}`}>
+                    <div key={i} className="flex items-center gap-3 text-sm text-white/70 group/item">
+                      <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-transform duration-300 group-hover/item:scale-110 ${isPro ? 'bg-yellow-500/10 text-yellow-500' : 'bg-blue-500/10 text-blue-500'}`}>
                         <CheckIcon className="w-3 h-3" />
                       </div>
-                      {feat}
+                      <span className="group-hover/item:text-white transition-colors">{feat}</span>
                     </div>
                   ))}
                 </div>
               </div>
             </div>
-
           </div>
 
-          <div className="mt-16 text-center">
+          {!isPro && (
+            <div className="mt-12 p-8 rounded-3xl bg-white/[0.02] border border-white/10 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
+              <div className="max-w-xl mx-auto flex flex-col items-center text-center">
+                <h3 className="text-2xl font-black mb-2 tracking-tight italic">Want To Level Up?</h3>
+                <p className="text-white/40 text-sm mb-8">Switch to the Pro tier for maximum limits and full API access.</p>
+
+                <div className="w-full flex flex-col gap-6">
+                  <div className="flex flex-col gap-3">
+                    <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-widest text-white/30 px-1">
+                      <span>Select Upgrade Cycle</span>
+                      <span className="text-green-400 bg-green-500/10 px-2 py-0.5 rounded-full animate-pulse">Save upto 38%</span>
+                    </div>
+                    <div className="relative grid grid-cols-2 gap-1 p-1.5 bg-white/5 rounded-2xl border border-white/5">
+                      <button
+                        onClick={() => setIsAnnual(false)}
+                        className={`relative z-10 py-3 text-[15px] font-black rounded-xl transition-all duration-300 ${!isAnnual ? 'text-black' : 'text-white/40 hover:text-white'} cursor-pointer`}
+                      >
+                        MONTHLY
+                      </button>
+                      <button
+                        onClick={() => setIsAnnual(true)}
+                        className={`relative z-10 py-3 text-[15px] font-black rounded-xl transition-all duration-300 ${isAnnual ? 'text-black' : 'text-white/40 hover:text-white'} cursor-pointer`}
+                      >
+                        ANNUALLY
+                      </button>
+                      <div 
+                        className={`absolute top-1.5 left-1.5 bottom-1.5 w-[calc(50%-6px)] bg-white rounded-xl transition-all duration-300 ease-out shadow-lg ${isAnnual ? 'translate-x-full' : 'translate-x-0'}`}
+                      />
+                    </div>
+                  </div>
+
+                  <button 
+                    onClick={() => handleCheckout("PRO")}
+                    disabled={loading === "PRO"}
+                    className="w-full py-5 rounded-2xl bg-white text-black font-bold text-sm hover:scale-[1.01] active:scale-[0.99] transition-all shadow-xl shadow-white/5 flex flex-col items-center justify-center gap-0.5 group/btn cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
+                  >
+                    <span className="flex items-center gap-2">
+                      {loading === "PRO" ? <Loader2 className="w-4 h-4 animate-spin" /> : <>Upgrade to PRO <HugeiconsIcon icon={ArrowRightDoubleIcon} size={18} className="group-hover/btn:translate-x-1 transition-transform" /></>}
+                    </span>
+                    <span className="text-[15px] text-black font-black tracking-tight group-hover:text-black/60 transition-colors">
+                      {isAnnual ? "₹8,999 / year" : "₹1,200 / month"}
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="mt-16 text-center animate-in fade-in duration-1000 delay-500">
             <p className="text-white/20 text-sm mb-4">Want to see how your plan stacks up?</p>
             <button 
               onClick={() => {
                 const el = document.getElementById('comparison');
                 el?.scrollIntoView({ behavior: 'smooth' });
               }}
-              className="text-white/40 hover:text-white underline underline-offset-8 decoration-white/10 hover:decoration-white transition-all text-xs uppercase tracking-widest font-bold"
+              className="text-white/40 hover:text-white underline underline-offset-8 decoration-white/10 hover:decoration-white transition-all text-xs uppercase tracking-widest font-bold cursor-pointer"
             >
               View Full Comparison
             </button>
           </div>
           
-          <div id="comparison" className="mt-32 pt-20">
-             <div className="mb-10 text-center">
-                <h2 className="text-3xl font-black mb-2 tracking-tight">Full Plan Breakdown</h2>
-                <p className="text-white/40 text-sm">Every detail of our infrastructure tiers.</p>
+          <div id="comparison" className="mt-32 pt-20 border-t border-white/5">
+             <div className="mb-12 text-center">
+                <h2 className="text-4xl font-black mb-3 tracking-tighter">Full Plan Breakdown</h2>
+                <p className="text-white/40 text-base max-w-md mx-auto">Compare features across our high-performance infrastructure tiers.</p>
               </div>
 
               <div className="rounded-3xl border border-white/10 overflow-hidden bg-white/[0.01] backdrop-blur-3xl shadow-2xl">
                 <div className="grid grid-cols-[2fr_1fr_1fr_1fr] border-b border-white/10 bg-[#1a1a1a]">
-                  <div className="px-6 py-6 text-xs font-bold uppercase tracking-[0.2em] text-white/30">Infrastructure</div>
-                  <div className="px-3 py-6 text-center text-sm font-bold text-white/50">Free</div>
-                  <div className={`px-3 py-6 text-center text-sm font-bold ${!isPro ? 'text-blue-400 bg-blue-500/10' : 'text-blue-400/40'}`}>Essentials</div>
-                  <div className={`px-3 py-6 text-center text-sm font-bold ${isPro ? 'text-yellow-400 bg-yellow-500/10' : 'text-yellow-400/40'}`}>Pro</div>
+                  <div className="px-6 py-6 text-[10px] font-bold uppercase tracking-[0.25em] text-white/30">Infrastructure</div>
+                  <div className="px-3 py-6 text-center text-xs font-bold uppercase tracking-wider text-white/50">Free</div>
+                  <div className={`px-3 py-6 text-center text-xs font-bold uppercase tracking-wider transition-colors duration-500 ${plan === 'ESSENTIAL' ? 'text-blue-400 bg-blue-500/10' : 'text-blue-400/40'}`}>Essentials</div>
+                  <div className={`px-3 py-6 text-center text-xs font-bold uppercase tracking-wider transition-colors duration-500 ${plan === 'PRO' ? 'text-yellow-400 bg-yellow-500/10' : 'text-yellow-400/40'}`}>Pro</div>
                 </div>
 
                 {COMPARISON_SECTIONS.map((section) => (
-                  <Section key={section.title} section={section} />
+                  <Section 
+                    key={section.title} 
+                    section={{
+                      ...section,
+                      rows: section.rows.map(row => {
+                        if (section.title === "Pricing") {
+                          if (row.label === "Price per month" || row.label === "Price per year") {
+                            return {
+                              ...row,
+                              label: isAnnual ? "Price per year" : "Price per month",
+                              essential: isAnnual ? "₹2,299" : "₹300",
+                              pro: isAnnual ? "₹8,999" : "₹1,200"
+                            };
+                          }
+                          if (row.label === "Original price") {
+                            return {
+                              ...row,
+                              essential: isAnnual ? "₹14,400" : "₹1,200",
+                              pro: isAnnual ? "₹67,200" : "₹5,600"
+                            };
+                          }
+                        }
+                        return row;
+                      })
+                    }} 
+                  />
                 ))}
               </div>
           </div>
@@ -400,13 +471,42 @@ export default function Premium() {
     );
   }
 
+  // --- RENDER FOR FREE USERS (UNCHANGED) ---
   return (
     <div className="min-h-screen bg-[#141414] text-white">
       <Navbar />
       <main className="max-w-6xl mx-auto px-4 py-12">
-        <div className="text-center mb-12">
+        <div className="text-center mb-8">
           <h1 className="text-4xl font-bold mb-3 tracking-tight">Unlock the Full Potential of FastURL</h1>
           <p className="text-white/40 text-base max-w-xl mx-auto">Stop guessing and start tracking. Deliver the insights you need to grow your digital presence.</p>
+        </div>
+
+        <div className="flex flex-col items-center gap-4 mb-12">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 mr-2">
+              <span className="text-[10px] font-bold bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full uppercase tracking-wider">
+                Save upto 38%
+              </span>
+              <span className={`text-sm font-medium transition-colors ${isAnnual ? "text-white" : "text-white/40"}`}>
+                Annually
+              </span>
+            </div>
+            
+            <button
+              onClick={() => setIsAnnual(!isAnnual)}
+              className="relative w-12 h-6 rounded-full bg-white/10 transition-colors duration-200 focus:outline-none cursor-pointer"
+            >
+              <div
+                className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-blue-500 transition-transform duration-200 ease-in-out ${
+                  !isAnnual ? "translate-x-6" : ""
+                }`}
+              />
+            </button>
+            
+            <span className={`text-sm font-medium transition-colors ${!isAnnual ? "text-white" : "text-white/40"}`}>
+              Monthly
+            </span>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-16">
@@ -439,8 +539,8 @@ export default function Premium() {
               <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-blue-500/20 text-blue-300">Popular</span>
             </div>
             <div className="flex items-baseline gap-2 mb-0.5">
-              <span className="text-sm line-through text-white/25">₹1,200</span>
-              <span className="text-3xl font-bold">₹300<span className="text-base font-normal text-white/40">/mo</span></span>
+              <span className="text-sm line-through text-white/25">{isAnnual ? "₹14,400" : "₹1,200"}</span>
+              <span className="text-3xl font-bold">₹{isAnnual ? "2,299" : "300"}<span className="text-base font-normal text-white/40">{isAnnual ? "/yr" : "/mo"}</span></span>
             </div>
             <div className="text-xs text-white/30 mb-5">Most popular choice</div>
             <ul className="flex flex-col gap-3 mb-8 flex-1">
@@ -464,7 +564,7 @@ export default function Premium() {
             <button
               onClick={() => handleCheckout("ESSENTIAL")}
               disabled={loading !== null}
-              className="w-full py-3 rounded-xl bg-blue-500 hover:bg-blue-400 text-white text-sm font-bold transition-all flex items-center justify-center gap-2 disabled:opacity-70"
+              className="w-full py-3 rounded-xl bg-blue-500 hover:bg-blue-400 text-white text-sm font-bold transition-all flex items-center justify-center gap-2 disabled:opacity-70 cursor-pointer"
             >
               {loading === "ESSENTIAL" ? <Loader2 className="w-4 h-4 animate-spin" /> : "Upgrade Now"}
             </button>
@@ -476,8 +576,8 @@ export default function Premium() {
               <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-yellow-500/20 text-yellow-300">Best value</span>
             </div>
             <div className="flex items-baseline gap-2 mb-0.5">
-              <span className="text-sm line-through text-white/25">₹5,600</span>
-              <span className="text-3xl font-bold">₹1,200<span className="text-base font-normal text-white/40">/mo</span></span>
+              <span className="text-sm line-through text-white/25">{isAnnual ? "₹67,200" : "₹5,600"}</span>
+              <span className="text-3xl font-bold">₹{isAnnual ? "8,999" : "1,200"}<span className="text-base font-normal text-white/40">{isAnnual ? "/yr" : "/mo"}</span></span>
             </div>
             <div className="text-xs text-white/30 mb-5">For power users</div>
             <ul className="flex flex-col gap-3 mb-8 flex-1">
@@ -501,7 +601,7 @@ export default function Premium() {
             <button
               onClick={() => handleCheckout("PRO")}
               disabled={loading !== null}
-              className="w-full py-3 rounded-xl bg-yellow-500 hover:bg-yellow-400 text-black text-sm font-bold transition-all flex items-center justify-center gap-2 disabled:opacity-70"
+              className="w-full py-3 rounded-xl bg-yellow-500 hover:bg-yellow-400 text-black text-sm font-bold transition-all flex items-center justify-center gap-2 disabled:opacity-70 cursor-pointer"
             >
               {loading === "PRO" ? <Loader2 className="w-4 h-4 animate-spin" /> : "Go Pro"}
             </button>
@@ -522,7 +622,33 @@ export default function Premium() {
           </div>
 
           {COMPARISON_SECTIONS.map((section) => (
-            <Section key={section.title} section={section} />
+            <div key={section.title}>
+              <Section 
+                section={{
+                  ...section,
+                  rows: section.rows.map(row => {
+                    if (section.title === "Pricing") {
+                      if (row.label === "Price per month" || row.label === "Price per year") {
+                        return {
+                          ...row,
+                          label: isAnnual ? "Price per year" : "Price per month",
+                          essential: isAnnual ? "₹2,299" : "₹300",
+                          pro: isAnnual ? "₹8,999" : "₹1,200"
+                        };
+                      }
+                      if (row.label === "Original price") {
+                        return {
+                          ...row,
+                          essential: isAnnual ? "₹14,400" : "₹1,200",
+                          pro: isAnnual ? "₹67,200" : "₹5,600"
+                        };
+                      }
+                    }
+                    return row;
+                  })
+                }} 
+              />
+            </div>
           ))}
         </div>
 

@@ -9,6 +9,7 @@ type Payment = {
   currency: string;
   status: string;
   method: string | null;
+  planType: string | null;
   createdAt: string;
   paymentId: string;
 };
@@ -23,8 +24,10 @@ export default function BillingPage() {
         const res = await fetch("/api/billing/history");
         const data = await res.json();
         setPayments(data);
+        
       } catch (err) {
         console.error(err);
+        
       } finally {
         setLoading(false);
       }
@@ -61,6 +64,7 @@ export default function BillingPage() {
               <th className="px-6 py-4 text-sm font-semibold text-neutral-300">Amount</th>
               <th className="px-6 py-4 text-sm font-semibold text-neutral-300">Status</th>
               <th className="px-6 py-4 text-sm font-semibold text-neutral-300">Method</th>
+              <th className="px-6 py-4 text-sm font-semibold text-neutral-300">Plan Type</th>
               <th className="px-6 py-4 text-sm font-semibold text-neutral-300">Upgraded at</th>
               <th className="px-6 py-4 text-sm font-semibold text-neutral-300 text-right">Invoice</th>
             </tr>
@@ -101,6 +105,13 @@ export default function BillingPage() {
                     <div className="flex items-center gap-2">
                       <CreditCard className="w-4 h-4 text-neutral-500" />
                       {p.method || "Standard"}
+                    </div>
+                  </td>
+
+                  <td className="px-6 py-4 text-neutral-400 text-sm">
+                    <div className="flex items-center gap-2">
+                      <CreditCard className="w-4 h-4 text-neutral-500" />
+                      {p.planType || "Standard"}
                     </div>
                   </td>
 
