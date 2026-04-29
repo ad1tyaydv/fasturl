@@ -10,7 +10,9 @@ import {
   PlusSignIcon,
   Link04Icon,
   File02Icon,
-  QrCode01Icon
+  QrCode01Icon,
+  ArrowLeft01Icon,
+  ArrowRight01Icon
 } from '@hugeicons/core-free-icons';
 
 import Navbar from "../../components/navbar";
@@ -109,7 +111,7 @@ function AllLinks() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<FilterType>("all");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 25;
 
   const [selectedLink, setSelectedLink] = useState<any>(null);
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
@@ -167,6 +169,10 @@ function AllLinks() {
 
 
   useEffect(() => { if (isLoggedIn) fetchData(); }, [fetchData, isLoggedIn]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [view, statusFilter, searchQuery]);
 
 
   const filteredData = useMemo(() => {
@@ -247,6 +253,7 @@ function AllLinks() {
 
 
   const paginatedData = filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
 
   return (
@@ -356,27 +363,83 @@ function AllLinks() {
               ) : (
                 <div className="fade-in">
                   {view === "links" && (
-                    <div className="flex flex-col w-full">
-                      {paginatedData.map((url) => (
-                        <Links
-                          key={url.id}
-                          url={url}
-                          nextDomain={NEXT_DOMAIN}
-                          onRefresh={fetchData}
-                          onOpenQr={(u) => { setSelectedLink(u); setIsQrModalOpen(true); }}
-                          onOpenPassword={(u) => { setSelectedLink(u); setIsPasswordModalOpen(true); }}
-                          onOpenCustom={(u) => { setSelectedLink(u); setIsCustomModalOpen(true); }}
-                          getRelativeTime={getRelativeTime}
-                          router={router}
-                          userPlan={tier}
-                        />
-                      ))}
-                    </div>
+                    <>
+                      <div className="flex flex-col w-full">
+                        {paginatedData.map((url) => (
+                          <Links
+                            key={url.id}
+                            url={url}
+                            nextDomain={NEXT_DOMAIN}
+                            onRefresh={fetchData}
+                            onOpenQr={(u) => { setSelectedLink(u); setIsQrModalOpen(true); }}
+                            onOpenPassword={(u) => { setSelectedLink(u); setIsPasswordModalOpen(true); }}
+                            onOpenCustom={(u) => { setSelectedLink(u); setIsCustomModalOpen(true); }}
+                            getRelativeTime={getRelativeTime}
+                            router={router}
+                            userPlan={tier}
+                          />
+                        ))}
+                      </div>
+
+                      {/* PAGINATION FOR LINKS */}
+                      {totalPages > 1 && (
+                        <div className="flex justify-center items-center gap-2 mt-10 pb-10 flex-wrap">
+                          <button
+                            disabled={currentPage === 1}
+                            onClick={() => {
+                              setCurrentPage((prev) => prev - 1);
+                              document.querySelector('main')?.scrollTo({ top: 0, behavior: 'smooth' });
+                            }}
+                            className="bg-background border border-border text-foreground hover:bg-accent disabled:opacity-40 px-4 py-2 rounded-lg flex items-center gap-2 cursor-pointer transition-colors"
+                          >
+                            <HugeiconsIcon icon={ArrowLeft01Icon} size={18} /> Prev
+                          </button>
+
+                          {(() => {
+                            const pages = [];
+                            for (let i = 1; i <= totalPages; i++) {
+                              if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
+                                pages.push(i);
+                              } else if (i === currentPage - 3 || i === currentPage + 3) {
+                                pages.push("...");
+                              }
+                            }
+                            return pages.map((page, index) =>
+                              page === "..." ? (
+                                <span key={index} className="px-2 text-muted-foreground">...</span>
+                              ) : (
+                                <button
+                                  key={page}
+                                  onClick={() => {
+                                    setCurrentPage(Number(page));
+                                    document.querySelector('main')?.scrollTo({ top: 0, behavior: 'smooth' });
+                                  }}
+                                  className={`w-10 h-10 rounded-lg border font-one transition-colors cursor-pointer ${currentPage === page ? "bg-primary text-primary-foreground border-primary" : "bg-background border-border text-foreground hover:bg-accent"}`}
+                                >
+                                  {page}
+                                </button>
+                              )
+                            );
+                          })()}
+
+                          <button
+                            disabled={currentPage === totalPages}
+                            onClick={() => {
+                              setCurrentPage((prev) => prev + 1);
+                              document.querySelector('main')?.scrollTo({ top: 0, behavior: 'smooth' });
+                            }}
+                            className="bg-background border border-border text-foreground hover:bg-accent disabled:opacity-40 px-4 py-2 rounded-lg flex items-center gap-2 cursor-pointer transition-colors"
+                          >
+                            Next <HugeiconsIcon icon={ArrowRight01Icon} size={18} />
+                          </button>
+                        </div>
+                      )}
+                    </>
                   )}
 
                   {view === "bulk" && (
                     <BulkLinks
-                      bulkLinks={paginatedData}
+                      bulkLinks={filteredData}
                       onRefresh={fetchData}
                       domain={NEXT_DOMAIN!}
                       userTier={tier}
@@ -391,7 +454,7 @@ function AllLinks() {
 
                   {view === "qr" && (
                     <QrCodes
-                      qrCodes={paginatedData}
+                      qrCodes={filteredData}
                       onRefresh={fetchData}
                       itemCount={filteredData.length}
                       router={router}

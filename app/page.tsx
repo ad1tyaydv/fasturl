@@ -228,7 +228,7 @@ export default function Dashboard() {
         <div className="flex flex-col lg:flex-row items-start justify-between gap-12 lg:gap-20">
 
           <div className="flex-1 text-center lg:text-left lg:pt-6">
-            <h1 className="text-3xl sm:text-3xl md:text-5xl font-bold mb-6 text-foreground leading-tight font-one tracking-tight">
+            <h1 className="text-3xl sm:text-3xl md:text-5xl font-bold mb-6 text-foreground leading-tight font-three tracking-tight">
               The Best <span className="text-red-500">URL Shortener</span> for Branded Links
             </h1>
 
@@ -237,7 +237,7 @@ export default function Dashboard() {
             </p>
 
             <p className="hidden lg:block font-one text-lg text-muted-foreground max-w-lg mx-auto lg:mx-0 mb-8">
-              FastURL is your all-in-one link management platform for digital marketing links, affiliate link shortener needs, and real time click tracking.
+              FastURL is your all-in-one link management platform for digital marketing links, and real time click tracking.
             </p>
 
           </div>
@@ -298,7 +298,7 @@ export default function Dashboard() {
             <div className="flex flex-col items-center mt-6 min-h-[280px] w-full">
               {(isLoggedIn || authLoading) && (
                 <div className="mb-4">
-                  <span className="px-3 py-1.5 bg-card border border-border text-sm font-medium text-muted-foreground inline-flex items-center gap-1.5 rounded-lg shadow-sm">
+                  <span className="px-3 py-1.5 bg-card border border-border text-sm font-one text-muted-foreground inline-flex items-center gap-1.5 rounded-lg shadow-sm">
                     You have
                     <span className="inline-flex items-center justify-center min-w-[20px]">
                       {linksLeft === null ? (
@@ -317,7 +317,7 @@ export default function Dashboard() {
                   <div className="flex flex-col items-center justify-center h-[200px]">
                     <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
                     <p className="mt-4 text-sm font-medium text-muted-foreground animate-pulse font-one">
-                      Generating your QR...
+                      Generating QR, Please wait...
                     </p>
                   </div>
                 ) : typeof showQr === "string" ? (
@@ -348,7 +348,9 @@ export default function Dashboard() {
               {!authLoading && !isLoggedIn && (
                 <div className="mt-4 font-one text-lg text-muted-foreground text-center">
                   <p>Guest limit: 1 link/day</p>
-                  <button onClick={() => router.push("/auth/signin")} className="mt-1 underline cursor-pointer text-foreground hover:text-blue-400 transition-colors">
+                  <button 
+                    onClick={() => router.push("/auth/signin")}
+                    className="mt-1 underline cursor-pointer text-foreground hover:text-blue-400 transition-colors">
                     Login for custom domains & much more
                   </button>
                 </div>
@@ -358,7 +360,7 @@ export default function Dashboard() {
         </div>
 
         <div className="mt-12 flex flex-col items-center justify-center gap-4 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300">
-          <div className="flex items-center gap-4 px-6 py-3 rounded-full bg-secondary border border-border backdrop-blur-md shadow-2xl">
+          <div className="flex items-center gap-4 px-6 py-3 rounded-2xl bg-secondary border border-border backdrop-blur-md shadow-2xl">
             <div className="flex -space-x-3">
               {[1, 2, 3, 4, 5].map((i) => (
                 <div key={i} className="w-10 h-10 rounded-full border-2 border-background bg-muted flex items-center justify-center overflow-hidden">
@@ -369,7 +371,7 @@ export default function Dashboard() {
                   />
                 </div>
               ))}
-              <div className="w-10 h-10 rounded-full border-2 border-background bg-blue-600 flex items-center justify-center text-[10px] font-bold text-white shadow-lg shadow-blue-500/20">
+              <div className="w-10 h-10 rounded-full border-2 border-background bg-blue-600 flex items-center justify-center text-[10px] font-one text-white shadow-lg shadow-blue-500/20">
                 500+
               </div>
             </div>
@@ -379,7 +381,7 @@ export default function Dashboard() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
               </span>
-              Trusted by <span className="text-foreground font-bold underline decoration-blue-500/50 underline-offset-4">500+ global users</span>
+              Trusted by <span className="text-foreground font-semibold underline decoration-blue-500/50 underline-offset-4">global users</span>
             </p>
           </div>
         </div>
@@ -424,8 +426,8 @@ export default function Dashboard() {
         onClose={() => setIsDownloadModalOpen(false)}
         qrData={showQr ? {
           qrImage: showQr as string,
-          shortUrl: `${selectedDomain}/${shortUrl}`, // Full short URL
-          longUrl: url, // Original long URL
+          shortUrl: `${selectedDomain}/${shortUrl}`,
+          longUrl: url,
           qrName: `qr-${shortUrl}`
         } : null}
       />

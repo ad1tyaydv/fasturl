@@ -18,8 +18,8 @@ interface QrDownloadModalProps {
 }
 
 export default function QrDownloadModal({ isOpen, onClose, qrData }: QrDownloadModalProps) {
+  const [showLogo, setShowLogo] = useState(true);
   const [showShortUrl, setShowShortUrl] = useState(true);
-  const [showLongUrl, setShowLongUrl] = useState(true);
   const [qrOnly, setQrOnly] = useState(false);
   const previewRef = useRef<HTMLDivElement>(null);
 
@@ -47,7 +47,6 @@ export default function QrDownloadModal({ isOpen, onClose, qrData }: QrDownloadM
       toast.success("QR Code downloaded successfully");
 
     } catch (error) {
-      console.error("Download error:", error);
       toast.error("Failed to download QR code");
     }
   };
@@ -74,12 +73,11 @@ export default function QrDownloadModal({ isOpen, onClose, qrData }: QrDownloadM
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-4">
           <div className="flex flex-col items-center w-full">
-            <p className="text-muted-foreground text-sm mb-3 self-start">Preview</p>
             <div
               ref={previewRef}
               style={{
                 backgroundColor: "#ffffff",
-                padding: "32px",
+                padding: qrOnly ? "24px" : "32px",
                 borderRadius: "12px",
                 display: "flex",
                 flexDirection: "column",
@@ -87,20 +85,33 @@ export default function QrDownloadModal({ isOpen, onClose, qrData }: QrDownloadM
                 width: "100%",
                 maxWidth: "320px",
                 height: "auto",
-                minHeight: "400px",
+                minHeight: qrOnly ? "auto" : "360px",
                 boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
                 color: "#000000",
                 boxSizing: "border-box"
               }}
             >
-              <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "24px" }}>
-                <img src="/favicon.ico" alt="Logo" style={{ width: "28px", height: "28px", objectFit: "contain" }} />
-                <span style={{ color: "#000000", fontWeight: "bold", fontSize: "20px", letterSpacing: "-0.05em", fontFamily: "sans-serif" }}>
-                  FASTURL
-                </span>
-              </div>
+              {!qrOnly && showLogo && (
+                <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "24px" }}>
+                  <img src="/favicon.ico" alt="Logo" style={{ width: "28px", height: "28px", objectFit: "contain" }} />
+                  <span style={{ color: "#000000", fontWeight: "bold", fontSize: "20px", letterSpacing: "-0.05em", fontFamily: "sans-serif" }}>
+                    fasturl
+                  </span>
+                </div>
+              )}
 
-              <div style={{ width: "100%", aspectRatio: "1/1", marginBottom: "24px", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid #f3f4f6", padding: "10px", backgroundColor: "#ffffff", boxSizing: "border-box" }}>
+              <div style={{ 
+                width: "100%", 
+                aspectRatio: "1/1", 
+                marginBottom: qrOnly ? "0" : "24px", 
+                display: "flex", 
+                alignItems: "center", 
+                justifyContent: "center", 
+                border: qrOnly ? "none" : "1px solid #f3f4f6", 
+                padding: qrOnly ? "0" : "10px", 
+                backgroundColor: "#ffffff", 
+                boxSizing: "border-box" 
+              }}>
                 <img
                   src={qrData.qrImage}
                   alt="QR Code"
@@ -108,24 +119,18 @@ export default function QrDownloadModal({ isOpen, onClose, qrData }: QrDownloadM
                 />
               </div>
 
-              <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: "16px", textAlign: "left" }}>
-                {showShortUrl && (
-                  <div style={{ width: "100%" }}>
-                    <span style={{ fontWeight: "bold", color: "#666666", fontSize: "11px", display: "block", marginBottom: "4px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Short URL:</span>
-                    <div style={{ color: "#2563eb", fontSize: "12px", wordBreak: "break-all", lineHeight: "1.4", fontWeight: "500" }}>
-                      {qrData.shortUrl}
+              {!qrOnly && (
+                <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: "16px", textAlign: "left" }}>
+                  {showShortUrl && (
+                    <div style={{ width: "100%" }}>
+                      <span style={{ fontWeight: "bold", color: "#666666", fontSize: "11px", display: "block", marginBottom: "4px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Short URL:</span>
+                      <div style={{ color: "#2563eb", fontSize: "12px", wordBreak: "break-all", lineHeight: "1.4", fontWeight: "500" }}>
+                        {qrData.shortUrl}
+                      </div>
                     </div>
-                  </div>
-                )}
-                {showLongUrl && (
-                  <div style={{ width: "100%" }}>
-                    <span style={{ fontWeight: "bold", color: "#666666", fontSize: "11px", display: "block", marginBottom: "4px", textTransform: "uppercase", letterSpacing: "0.05em" }}>Original URL:</span>
-                    <div style={{ color: "#2563eb", fontSize: "12px", wordBreak: "break-all", lineHeight: "1.4", fontWeight: "500" }}>
-                      {qrData.longUrl}
-                    </div>
-                  </div>
-                )}
-              </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
@@ -133,12 +138,50 @@ export default function QrDownloadModal({ isOpen, onClose, qrData }: QrDownloadM
             <div className="space-y-4">
               <div className="flex items-center justify-between p-4 bg-secondary/50 border border-border rounded-xl">
                 <div>
+                  <p className="text-foreground font-medium">QR Only</p>
+                  <p className="text-muted-foreground text-xs">Only the QR code</p>
+                </div>
+                <button
+                  onClick={() => setQrOnly(!qrOnly)}
+                  className={`w-12 h-6 rounded-full transition-colors relative cursor-pointer ${
+                    qrOnly ? "bg-blue-500" : "bg-muted"
+                  }`}
+                >
+                  <div
+                    className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${
+                      qrOnly ? "right-1" : "left-1"
+                    }`}
+                  />
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between p-4 bg-secondary/50 border border-border rounded-xl">
+                <div>
+                  <p className="text-foreground font-medium">Show Logo</p>
+                  <p className="text-muted-foreground text-xs">Show FastURL logo</p>
+                </div>
+                <button
+                  onClick={() => setShowLogo(!showLogo)}
+                  className={`w-12 h-6 rounded-full transition-colors relative cursor-pointer ${
+                    showLogo ? "bg-blue-500" : "bg-muted"
+                  }`}
+                >
+                  <div
+                    className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${
+                      showLogo ? "right-1" : "left-1"
+                    }`}
+                  />
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between p-4 bg-secondary/50 border border-border rounded-xl">
+                <div>
                   <p className="text-foreground font-medium">Show Short URL</p>
                   <p className="text-muted-foreground text-xs">Include short URL in download</p>
                 </div>
                 <button
                   onClick={() => setShowShortUrl(!showShortUrl)}
-                  className={`w-12 h-6 rounded-full transition-colors relative ${
+                  className={`w-12 h-6 rounded-full transition-colors relative cursor-pointer ${
                     showShortUrl ? "bg-blue-500" : "bg-muted"
                   }`}
                 >
@@ -149,38 +192,19 @@ export default function QrDownloadModal({ isOpen, onClose, qrData }: QrDownloadM
                   />
                 </button>
               </div>
-
-              <div className="flex items-center justify-between p-4 bg-secondary/50 border border-border rounded-xl">
-                <div>
-                  <p className="text-foreground font-medium">Show Original URL</p>
-                  <p className="text-muted-foreground text-xs">Include original URL in download</p>
-                </div>
-                <button
-                  onClick={() => {setShowLongUrl(!showLongUrl); console.log("Toggled showLongUrl:", !showLongUrl)}}
-                  className={`w-12 h-6 rounded-full transition-colors relative ${
-                    showLongUrl ? "bg-blue-500" : "bg-muted"
-                  }`}
-                >
-                  <div
-                    className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${
-                      showLongUrl ? "right-1" : "left-1"
-                    }`}
-                  />
-                </button>
-              </div>
             </div>
 
             <div className="mt-8 space-y-3">
               <Button
                 onClick={handleDownload}
-                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-bold h-12 text-lg rounded-xl transition-all active:scale-95"
+                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-bold h-12 text-lg rounded-xl transition-all active:scale-95 cursor-pointer"
               >
-                <Download className="mr-2 h-5 w-5" /> Download PNG
+                <Download className="mr-2 h-5 w-5" /> Download
               </Button>
               <Button
                 variant="outline"
                 onClick={onClose}
-                className="w-full bg-transparent text-muted-foreground border-border hover:bg-accent hover:text-accent-foreground h-12 rounded-xl"
+                className="w-full bg-transparent text-muted-foreground border-border hover:bg-accent hover:text-accent-foreground h-12 rounded-xl cursor-pointer"
               >
                 Cancel
               </Button>

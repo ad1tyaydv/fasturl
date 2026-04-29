@@ -34,15 +34,15 @@ export default function QrCodes({
   qrCodes, onRefresh, itemCount, router
 }: any) {
   const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 25;
+  const totalPages = Math.ceil(itemCount / itemsPerPage);
+
   const [editingId, setEditingId] = useState<string | null>(null);
   const [tempName, setTempName] = useState("");
   const [savingId, setSavingId] = useState<string | null>(null);
 
   const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
   const [selectedQrForDownload, setSelectedQrForDownload] = useState<any>(null);
-
-  const itemsPerPage = 10;
-  const totalPages = Math.ceil(itemCount / itemsPerPage);
 
   const handleDeleteQr = async (id: string) => {
     const loadingToast = toast.loading("Deleting QR Code...");

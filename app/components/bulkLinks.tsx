@@ -47,7 +47,7 @@ export default function BulkLinks({
   const menuRef = useRef<HTMLDivElement>(null);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 25;
   const totalPages = Math.ceil(itemCount / itemsPerPage);
 
   useEffect(() => {

@@ -39,16 +39,27 @@ const docsData: Record<string, Doc> = {
       { subtitle: "Algorithmic Generation", text: "To ensure every link is unique, we use Base62 encoding. This allows our fast url shortener to create billions of unique combinations using a very small number of characters, providing a simple url shortener experience with advanced capabilities." }
     ]
   },
+  'security-features': {
+    id: 'security-features',
+    category: 'basics',
+    title: "Security & Privacy",
+    description: "Your security is our priority. FastURL provides multiple layers of protection for your links and account.",
+    sections: [
+      { subtitle: "Two-Factor Authentication (2FA)", text: "Secure your account with 2FA using TOTP (Time-based One-Time Password) apps like Google Authenticator or Authy. This ensures only you can access your dashboard and manage your links." },
+      { subtitle: "Link Password Protection", text: "Add an extra layer of security to sensitive links. When enabled, visitors must enter a password that you set before being redirected to the destination URL." },
+      { subtitle: "Secure Redirection", text: "All redirects are handled through secure protocols, and we monitor for malicious destination URLs to protect our users and their audience." }
+    ]
+  },
   'link-management': {
     id: 'link-management',
     category: 'management',
     title: "Link Management & Customization",
     description: "Manage your digital footprint with our professional url shortener platform, offering custom short links and branded links for maximum engagement.",
     sections: [
-      { subtitle: "Custom Slugs (Branded Links)", text: "How it works: Instead of a random string, you can choose a custom keyword for your short link (e.g., fasturl.com/summer-sale). Use case: Branded links increase trust and click-through rates by 34% because users know exactly where the link leads. It's the best url shortener strategy for brand recognition." },
-      { subtitle: "Password Protection", text: "How it works: Enable 'Link Protection' and set a password. Visitors must enter the correct key to reach the destination. Use case: Secure url shortener features are perfect for sharing private documents, early-access content, or internal company files through secure short urls." },
-      { subtitle: "Link Expiration", text: "How it works: Set a specific date and time for your link to stop working. Use case: Use this link expiration tool for limited-time offers, flash sales, or temporary downloads to ensure your marketing link shortener campaigns remain relevant." },
-      { subtitle: "Redirect Targeting", text: "How it works: Use the 'Redirect To' feature to change the destination of a short link at any time without changing the link itself. Use case: If a destination URL changes or an offer expires, you can update the link in real-time, making it a smart link shortener for dynamic campaigns." }
+      { subtitle: "Custom Slugs (Branded Links)", text: "How it works: Instead of a random string, you can choose a custom keyword for your short link (e.g., fasturl.com/summer-sale). Use case: Branded links increase trust and click-through rates by 34% because users know exactly where the link leads." },
+      { subtitle: "Password Protection", text: "How it works: Enable 'Link Protection' and set a password. Visitors must enter the correct key to reach the destination. Perfect for private documents or internal company files." },
+      { subtitle: "Link Expiration", text: "How it works: Set a specific date and time for your link to stop working. Use case: Use this for limited-time offers, flash sales, or temporary downloads." },
+      { subtitle: "Dynamic 'Redirect To'", text: "How it works: Update the destination of a short link at any time without changing the short link itself. If your landing page changes, just update the target URL in your dashboard." }
     ]
   },
   'analytics-guide': {
@@ -57,10 +68,10 @@ const docsData: Record<string, Doc> = {
     title: "Advanced Link Analytics",
     description: "Our url shortener with analytics provides deep insights into your audience behavior with a real time click tracking dashboard.",
     sections: [
-      { subtitle: "Geo-Tracking & Location Insights", text: "How it works: We use IP-based geolocation to identify the country, state, and city of every click. Use case: Geo tracking for links helps you understand your global reach and optimize regional marketing efforts or ad spend based on location based analytics." },
-      { subtitle: "Device & Browser Analytics", text: "How it works: Our system parses the User-Agent header to identify if the user is on Mobile, Desktop, or Tablet, and which browser they are using. Use case: Browser analytics for links and device tracking url data help you ensure your destination page is optimized for the most popular devices among your audience." },
-      { subtitle: "Referrer Tracking", text: "How it works: We track the source website or app that brought the user to your link. Use case: Traffic source tracking is essential for affiliate link shortener users and digital marketing links to see which platforms (Twitter, Instagram, YouTube) are driving the most conversions." },
-      { subtitle: "Real-Time Click Data", text: "How it works: Clicks are logged instantly and reflected in your click analytics dashboard without delay. Use case: Monitor the success of a live campaign or a viral post with real-time click tracking to make data driven decisions links." }
+      { subtitle: "Geo-Tracking", text: "Identify the country, state, and city of every click using IP-based geolocation. Optimize regional marketing efforts based on where your audience is located." },
+      { subtitle: "Device & Browser Insights", text: "Track if users are on Mobile, Desktop, or Tablet, and which browser they prefer (Chrome, Safari, Firefox, etc.). Ensure your content is optimized for the devices your audience uses." },
+      { subtitle: "Traffic Sources (Referrers)", text: "See which websites or apps (Twitter, LinkedIn, YouTube, etc.) are driving traffic to your links. Essential for measuring social media ROI." },
+      { subtitle: "Real-Time Tracking", text: "Clicks are logged and reflected in your dashboard instantly, allowing you to monitor the performance of live campaigns as they happen." }
     ]
   },
   'qr-codes': {
@@ -69,8 +80,8 @@ const docsData: Record<string, Doc> = {
     title: "QR Code Generation",
     description: "Bridge the gap between offline and online marketing with our integrated short link tool and QR code generator.",
     sections: [
-      { subtitle: "Dynamic QR Codes", text: "How it works: Every QR code is linked to a short URL, which then redirects to your destination. Use case: Since the QR code points to a short link, you can change the destination URL even after printing the QR code. This is perfect for restaurant menus, business cards, or event posters." },
-      { subtitle: "QR Analytics", text: "How it works: Just like links, every scan is tracked with full analytics. Use case: Measure the ROI of physical marketing materials by tracking link clicks specifically from your QR code scans." }
+      { subtitle: "Dynamic QR Codes", text: "Since every QR code is linked to a short URL, you can change the destination URL even after the QR code is printed. Perfect for restaurant menus and business cards." },
+      { subtitle: "QR Analytics", text: "Track every scan with full analytics, just like your short links. Measure the effectiveness of your physical marketing materials." }
     ]
   },
   'bulk-shortening': {
@@ -79,8 +90,8 @@ const docsData: Record<string, Doc> = {
     title: "Bulk URL Shortener",
     description: "Scale your operations with our mass url shortener tool, designed for batch link shortener workflows.",
     sections: [
-      { subtitle: "Shorten Multiple Links", text: "How it works: Upload a list of URLs or enter them manually to shorten urls free online in bulk. Use case: Perfect for ecommerce managers who need to create short links for hundreds of products or marketers running multi-channel campaigns." },
-      { subtitle: "Bulk Link Analytics", text: "How it works: Track the performance of an entire batch of links at once. Use case: Compare the performance of different link sets to see which campaign strategy is most effective using bulk link tracking." }
+      { subtitle: "Mass Shortening", text: "Upload multiple URLs at once to generate short links in seconds. Designed for ecommerce and large-scale marketing campaigns." },
+      { subtitle: "Bulk Management", text: "Apply passwords or expiration dates to an entire batch of links simultaneously, saving you hours of manual work." }
     ]
   },
   'custom-domains': {
@@ -89,18 +100,30 @@ const docsData: Record<string, Doc> = {
     title: "Custom Domain Support",
     description: "Establish ultimate brand authority with branded url shortener capabilities using your own custom domain.",
     sections: [
-      { subtitle: "Branded Short Domains", text: "How it works: Connect your own domain (e.g., link.yourbrand.com) to FastURL via CNAME and TXT records. Use case: Domain based short links remove our branding and replace it with yours, making your links look more professional and increasing user click tracking engagement." },
-      { subtitle: "White Label URL Shortener", text: "How it works: All redirects happen through your domain, providing a seamless brand experience. Use case: Enterprise url shortener users use this for customer communication, SMS marketing, and high-stakes social media link shortener needs." }
+      { subtitle: "Verification Process", text: "To connect your domain, you need to add two records to your DNS provider: 1. A TXT record for verification (e.g., _verify.yourdomain.com) with the token provided in your dashboard. 2. A CNAME record pointing to 'cname.fasturl.in'." },
+      { subtitle: "Branded Experience", text: "Once verified, all your short links will use your own domain (e.g., links.yourbrand.com/slug), providing a seamless and professional experience for your users." }
     ]
   },
-  'api-access': {
-    id: 'api-access',
-    category: 'advanced',
-    title: "Developer API",
-    description: "Integrate link shortening directly into your applications with our robust link shortening api.",
+  'pricing-plans': {
+    id: 'pricing-plans',
+    category: 'management',
+    title: "Subscription Plans",
+    description: "Choose the plan that fits your needs, from individual use to enterprise-scale operations.",
     sections: [
-      { subtitle: "Programmable Link Shortener", text: "How it works: Use our REST API for url shortening to create, manage, and track links via code. Use case: Automate link creation in your own SaaS platform, CRM, or mobile app using our developer friendly api." },
-      { subtitle: "Real Time Analytics API", text: "How it works: Fetch click data and analytics programmatically for your own internal dashboards. Use case: Build custom reporting tools or integrate link performance analytics directly into your business intelligence links workflow." }
+      { subtitle: "Free Plan", text: "100 links/month, 30 QR codes, basic tracking. Perfect for personal use." },
+      { subtitle: "Essentials Plan", text: "10,000 links/month, 300 QR codes, real-time analytics, 4 custom domains, bulk shortening, and password protection." },
+      { subtitle: "Pro Plan", text: "40,000 links/month, 2,000 QR codes, 10 custom domains, full API access, white-label support, and priority 24/7 assistance." }
+    ]
+  },
+  'api-reference': {
+    id: 'api-reference',
+    category: 'advanced',
+    title: "API Reference",
+    description: "Integrate FastURL directly into your workflow with our RESTful API.",
+    sections: [
+      { subtitle: "Authentication", text: "All API requests require an API key passed in the 'Authorization' header as a Bearer token: Authorization: Bearer YOUR_API_KEY." },
+      { subtitle: "Shorten a Link (POST /v1/shortLink)", text: "Endpoint: /api/v1/shortLink | Method: POST | Body: { \"url\": \"https://example.com\", \"linkName\": \"My Link\", \"password\": \"optional-pass\", \"expiry\": \"YYYY-MM-DD\" } | Response: { \"success\": true, \"shortUrl\": \"...\" }" },
+      { subtitle: "Usage Limits", text: "API access is available on Pro plans. Ensure you monitor your usage count in the dashboard to avoid hitting your monthly limit." }
     ]
   },
   'seo-index': {
@@ -262,9 +285,9 @@ export default function App() {
         </aside>
 
         {/* Main Content */}
-        <main id="docs-content" className="flex-1 overflow-y-auto custom-scrollbar bg-background p-6 sm:p-10 md:p-12 lg:p-16">
+        <main id="docs-content" className="flex-1 overflow-y-auto custom-scrollbar bg-background p-6 sm:p-10 md:p-12 lg:py-16 lg:pl-12 lg:pr-24">
           {activeDoc ? (
-            <article className="animate-in fade-in slide-in-from-bottom-2 duration-500 max-w-4xl mx-auto pb-20">
+            <article className="animate-in fade-in slide-in-from-bottom-2 duration-500 max-w-4xl pb-20">
               <div className="text-[10px] sm:text-xs text-muted-foreground mb-6 sm:mb-8 flex items-center gap-2 uppercase tracking-wider font-semibold">
                 <span>Docs</span>
                 <ChevronRight size={12} />

@@ -23,6 +23,7 @@ import TotalData from "@/app/components/totalData";
 import Features from "@/app/components/features";
 import Footer from "@/app/components/footer";
 import { Button } from "@/components/ui/button";
+import QrDownloadModal from "@/app/modals/qrDownloadModal";
 
 
 import { useUser } from "@/app/components/userContext";
@@ -39,6 +40,7 @@ export default function QRGenerator() {
   const [loading, setLoading] = useState(false);
   const [showQr, setShowQr] = useState<string | null>(null);
   const [upgradeMsg, setUpgradeMsg] = useState(false);
+  const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
 
   const [modalConfig, setModalConfig] = useState<{
     show: boolean;
@@ -327,12 +329,23 @@ export default function QRGenerator() {
               </div>
               
               <Button
-                onClick={downloadQr}
-                className="bg-primary text-primary-foreground hover:opacity-90 font-bold px-5 py-5 rounded-xl text-lg shadow-lg transition-all active:scale-95 flex items-center gap-2 cursor-pointer"
+                onClick={() => setIsDownloadModalOpen(true)}
+                className="bg-primary text-primary-foreground hover:opacity-90 font-one px-5 py-5 rounded-xl text-lg shadow-lg transition-all active:scale-95 flex items-center gap-2 cursor-pointer"
               >
                 <HugeiconsIcon icon={Download01Icon}/>
-                Download QR Code
+                Download
               </Button>
+
+              <QrDownloadModal
+                isOpen={isDownloadModalOpen}
+                onClose={() => setIsDownloadModalOpen(false)}
+                qrData={{
+                  qrImage: showQr,
+                  shortUrl: url,
+                  longUrl: url,
+                  qrName: "qr-code"
+                }}
+              />
             </div>
           )}
 

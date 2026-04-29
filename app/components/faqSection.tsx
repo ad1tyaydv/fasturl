@@ -46,8 +46,8 @@ const faqsLeft: FaqItem[] = [
     answer: "You can set an expiration date or click limit for any link. Once the limit is reached, the link will automatically deactivate, and visitors will be shown an expired page or redirected elsewhere if configured."
   },
   {
-    question: "How can I integrate Fasturl into my own application?",
-    answer: "We provide a robust Developer API that allows you to programmatically create links, manage domains, and fetch analytics. You can generate an API key in your settings to get started with integration."
+    question: "How can I integrate fasturl into my own application?",
+    answer: "We provide a robust Developer API that allows you to programmatically create links. You can generate an API key in your settings to get started with integration."
   },
   {
     question: "What are the limits of the Free plan?",
@@ -61,7 +61,7 @@ const faqsRight: FaqItem[] = [
     answer: "Yes! With our 'Redirect To' feature, you can update the original long URL of any short link at any time. This allows you to correct mistakes or pivot your campaign without changing the link you've shared."
   },
   {
-    question: "Does Fasturl support geo-targeted redirects?",
+    question: "Does fasturl support geo-targeted redirects?",
     answer: "Currently, we provide geo-tracking for all clicks. Advanced geo-targeting, which allows you to redirect users to different destinations based on their country, is a feature we are actively developing."
   },
   {
@@ -70,11 +70,11 @@ const faqsRight: FaqItem[] = [
   },
   {
     question: "What is a 'White Label' shortener?",
-    answer: "A White Label shortener allows you to remove all Fasturl branding and use your own domain and logo. This provides a seamless, professional experience for your customers and strengthens your brand authority."
+    answer: "A White Label shortener allows you to remove all fasturl branding and use your own domain and logo. This provides a seamless, professional experience for your customers and strengthens your brand authority."
   },
   {
-    question: "How do I track UTM parameters with Fasturl?",
-    answer: "You can include UTM parameters in your long URL before shortening it. Fasturl will preserve these parameters during redirection, allowing you to see the data in your Google Analytics or other tracking tools."
+    question: "How do I track UTM parameters with fasturl?",
+    answer: "You can include UTM parameters in your long URL before shortening it. fasturl will preserve these parameters during redirection, allowing you to see the data in your Google Analytics or other tracking tools."
   },
   {
     question: "Is there a limit on how many clicks I can track?",
@@ -94,7 +94,7 @@ const faqsRight: FaqItem[] = [
   },
   {
     question: "How do I contact support if I have more questions?",
-    answer: "Our support team is available 24/7. You can reach out to us via the contact form on our website or email us directly at support@fasturl.cloud for priority assistance."
+    answer: "Our support team is available 24/7. You can reach out to us via the contact form on our website or email us directly at fasturl@tutamail.com for priority assistance."
   }
 ];
 
@@ -113,17 +113,16 @@ export default function FaqSection() {
       <div className="max-w-7xl mx-auto">
         
         <div className="text-center mb-20">
-          <h2 className="text-4xl md:text-5xl font-three font-bold text-foreground tracking-tight">
+          <h2 className="text-4xl md:text-5xl font-one font-bold text-foreground tracking-tight">
             Frequently Asked Questions
           </h2>
           <p className="mt-6 text-muted-foreground font-one text-lg max-w-2xl mx-auto">
-            Have questions about Fasturl? We've got answers. If you can't find what you're looking for, feel free to contact our support team.
+            Have questions about fasturl? We've got answers. If you can't find what you're looking for, feel free to contact our support team.
           </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-12 lg:gap-x-24">
           
-          {/* Left Column */}
           <div className="space-y-4">
             {faqsLeft.map((faq, index) => {
               const key = `left-${index}`;
@@ -137,7 +136,7 @@ export default function FaqSection() {
                     onClick={() => toggleFaq('left', index)}
                     className="w-full py-6 flex items-center justify-between text-left group cursor-pointer"
                   >
-                    <span className={`text-lg font-three font-bold transition-colors ${isOpen ? 'text-blue-500' : 'text-foreground group-hover:text-blue-500'}`}>
+                    <span className={`text-lg font-one font-bold transition-colors ${isOpen ? 'text-blue-500' : 'text-foreground group-hover:text-blue-500'}`}>
                       {faq.question}
                     </span>
                     <HugeiconsIcon icon={ArrowDown01Icon}
@@ -159,7 +158,6 @@ export default function FaqSection() {
             })}
           </div>
 
-          {/* Right Column */}
           <div className="space-y-4">
             {faqsRight.map((faq, index) => {
               const key = `right-${index}`;

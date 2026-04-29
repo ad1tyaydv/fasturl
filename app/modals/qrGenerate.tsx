@@ -19,8 +19,8 @@ interface QrDownloadModalProps {
 }
 
 export default function QrDownloadModal({ isOpen, onClose, qrData, selectedUrl }: QrDownloadModalProps) {
+  const [showLogo, setShowLogo] = useState(true);
   const [showShortUrl, setShowShortUrl] = useState(true);
-  const [showLongUrl, setShowLongUrl] = useState(true);
   const [qrOnly, setQrOnly] = useState(false);
   const [isImageLoading, setIsImageLoading] = useState(true);
   const previewRef = useRef<HTMLDivElement>(null);
@@ -120,7 +120,7 @@ export default function QrDownloadModal({ isOpen, onClose, qrData, selectedUrl }
                 color: "#000000",
               }}
             >
-              {!qrOnly && (
+              {!qrOnly && showLogo && (
                 <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "24px" }}>
                   <img src="/favicon.ico" alt="Logo" style={{ width: "24px", height: "24px" }} />
                   <span style={{ color: "#000000", fontWeight: "800", fontSize: "18px", fontFamily: "sans-serif" }}>
@@ -138,6 +138,7 @@ export default function QrDownloadModal({ isOpen, onClose, qrData, selectedUrl }
                 alignItems: "center", 
                 justifyContent: "center", 
                 border: qrOnly ? "none" : "1px solid #f3f4f6",
+                padding: qrOnly ? "0" : "10px",
                 backgroundColor: "#ffffff"
               }}>
                 {isImageLoading && (
@@ -169,14 +170,6 @@ export default function QrDownloadModal({ isOpen, onClose, qrData, selectedUrl }
                       </div>
                     </div>
                   )}
-                  {showLongUrl && (
-                    <div style={{ width: "100%" }}>
-                      <span style={{ fontWeight: "bold", color: "#888888", fontSize: "10px", textTransform: "uppercase" }}>Original URL</span>
-                      <div style={{ color: "#444444", fontSize: "11px", wordBreak: "break-all" }}>
-                        {effectiveQrData.longUrl}
-                      </div>
-                    </div>
-                  )}
                 </div>
               )}
             </div>
@@ -186,8 +179,8 @@ export default function QrDownloadModal({ isOpen, onClose, qrData, selectedUrl }
             <div className="space-y-3">
               {[
                 { label: "QR Only", sub: "Only the code", state: qrOnly, setter: setQrOnly },
-                { label: "Short URL", sub: "Show link", state: showShortUrl, setter: setShowShortUrl },
-                { label: "Original URL", sub: "Show destination", state: showLongUrl, setter: setShowLongUrl }
+                { label: "Show Logo", sub: "Show FastURL logo", state: showLogo, setter: setShowLogo },
+                { label: "Short URL", sub: "Show link", state: showShortUrl, setter: setShowShortUrl }
               ].map((item) => (
                 <div key={item.label} className="flex items-center justify-between p-3 bg-secondary/50 border border-border rounded-xl">
                   <div>
@@ -211,7 +204,7 @@ export default function QrDownloadModal({ isOpen, onClose, qrData, selectedUrl }
                 className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-bold h-12 rounded-xl transition-all"
               >
                 {isImageLoading ? <Loader2 className="animate-spin mr-2" /> : <Download className="mr-2 h-5 w-5" />}
-                Download PNG
+                Download
               </Button>
               <Button
                 variant="outline"
