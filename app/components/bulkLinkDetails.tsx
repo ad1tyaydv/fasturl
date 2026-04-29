@@ -90,18 +90,27 @@ function BulkLinkItem({
       if (onRefresh) await onRefresh();
     } catch {
       toast.error("Update failed");
+
     } finally {
       setIsSavingName(false);
       setIsEditing(false);
     }
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     setIsDeleting(true);
-    setTimeout(() => {
-        setIsDeleting(false);
-        setShowMobileMenu(false);
-    }, 500);
+    try {
+      await axios.post(`/api/shortUrl/delete/${link.id}`);
+      toast.success("Link deleted successfully!");
+      if (onRefresh) await onRefresh();
+      setShowMobileMenu(false);
+
+    } catch {
+      toast.error("Failed to delete link");
+      
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   return (

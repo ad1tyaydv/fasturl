@@ -20,6 +20,7 @@ async function logApiRequest(data: any) {
                 device: data.userAgent ?? null,
             },
         });
+
     } catch (err) {
         console.log("Logging failed:", err);
     }
@@ -87,7 +88,7 @@ export async function POST(req: NextRequest) {
             if (key?.id) await incrementFailed(key.id);
 
             return NextResponse.json(
-                { success: false, message: "Invalid api key" },
+                { message: "Invalid api key" },
                 { status: 401 }
             );
         }

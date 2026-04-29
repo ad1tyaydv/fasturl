@@ -6,67 +6,85 @@ import jwt from "jsonwebtoken";
 
 const JWT_SECRET = process.env.NEXTAUTH_SECRET!;
 
-export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string}> } ) {
-
-    const token = req.cookies.get("token")?.value;
-
-    if (!token) {
-        return NextResponse.json(
-            { message: "Unauthorized" },
-            { status: 401 }
-        );
-    }
-
-    const decoded = jwt.verify(token!, JWT_SECRET) as {
-        userId: string;
-    }
-    const userId = decoded.userId;
-
-    const { id } = await params;
-
-    const find = await prisma.link.findUnique({
-        where: {
-            id: id
-        },
-        select: {
-            shorturl: true
-        }
-    })
-
-    if(!find) {
-        return NextResponse.json(
-            {message: "User does not exist"},
-            {status: 404}
-        )
-    }
-
-    await redis.del(`fetchLinks:${userId}`)
-    await redis.del(`analytics${find.shorturl}`)
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 
     try {
+        const token = req.cookies.get("token")?.value;
 
-        await prisma.click.deleteMany({
-            where: {
-                linkId: id
-            }
-        })
+        if (!token) {
+            return NextResponse.json(
+                { message: "Unauthorized" },
+                { status: 401 }
+            );
+        }
 
-        await prisma.link.delete({
+        const decoded = jwt.verify(token!, JWT_SECRET) as {
+            userId: string;
+        }
+        const userId = decoded.userId;
+
+        const { id } = await params;
+
+        const find = await prisma.link.findUnique({
             where: {
                 id: id
             }
         })
 
-        return NextResponse.json(
-            {message: "Link deleted successfully"},
-            {status: 200}
-        )
-        
+        if (!find) {
+            return NextResponse.json(
+                { message: "Link does not exist" },
+                { status: 404 }
+            )
+        }
+
+        if (find.checkBulk === true) {
+            await redis.del(`fetchBulkLinks:${userId}`);
+
+            await prisma.click.deleteMany({
+                where: {
+                    linkId: id
+                }
+            })
+
+            await prisma.link.delete({
+                where: {
+                    id: id
+                }
+            })
+
+            return NextResponse.json(
+                { message: "Link deleted successfully" },
+                { status: 200 }
+            )
+
+        } else {
+            await redis.del(`fetchLinks:${userId}`);
+            await redis.del(`analytics${find.shorturl}`);
+
+            await prisma.click.deleteMany({
+                where: {
+                    linkId: id
+                }
+            })
+
+            await prisma.link.delete({
+                where: {
+                    id: id
+                }
+            })
+
+            return NextResponse.json(
+                { message: "Link deleted successfully" },
+                { status: 200 }
+            )
+        }
+
     } catch (error) {
         console.log(error)
         return NextResponse.json(
-            {message: "Error while deleting the url"},
-            {status: 500}
+            { message: "Error while deleting the url" },
+            { status: 500 }
         )
     }
 }

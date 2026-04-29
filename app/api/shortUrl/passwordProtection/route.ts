@@ -11,14 +11,14 @@ export async function POST(req: NextRequest) {
 
     try {
         const token = req.cookies.get("token")?.value;
-    
+
         if (!token) {
             return NextResponse.json(
                 { message: "Unauthorized" },
                 { status: 401 }
             );
         }
-    
+
         const decoded = jwt.verify(token!, JWT_SECRET) as {
             userId: string;
         }
@@ -36,49 +36,74 @@ export async function POST(req: NextRequest) {
         const find = await prisma.link.findUnique({
             where: {
                 id: data.shortUrlId
-            },
-            select: {
-                shorturl: true
             }
         })
-    
-        if(!find) {
+
+        if (!find) {
             return NextResponse.json(
-                {message: "User does not exist"},
-                {status: 404}
+                { message: "User does not exist" },
+                { status: 404 }
             )
         }
-    
-        await redis.del(`fetchLinks:${userId}`)
-        await redis.del(`analytics${find.shorturl}`)
 
-        let hashedPassword = null;
+        if (find?.checkBulk === true) {
+            await redis.del(`fetchBulkLinks:${userId}`);
 
-        if(data.password) {
-            hashedPassword = await bcrypt.hash(data.password, 10);
+            let hashedPassword = null;
+
+            if (data.password) {
+                hashedPassword = await bcrypt.hash(data.password, 10);
+            }
+
+            const expiresAt = data.expiryDate ? new Date(data.expiryDate) : null;
+
+            await prisma.link.update({
+                where: {
+                    id: data.shortUrlId
+                },
+                data: {
+                    password: hashedPassword,
+                    expiresAt: expiresAt
+                },
+            })
+
+            return NextResponse.json(
+                { message: "Password Protection added" },
+                { status: 200 }
+            )
+
+        } else {
+            await redis.del(`fetchLinks:${userId}`)
+            await redis.del(`analytics${find.shorturl}`)
+
+            let hashedPassword = null;
+
+            if (data.password) {
+                hashedPassword = await bcrypt.hash(data.password, 10);
+            }
+
+            const expiresAt = data.expiryDate ? new Date(data.expiryDate) : null;
+
+            await prisma.link.update({
+                where: {
+                    id: data.shortUrlId
+                },
+                data: {
+                    password: hashedPassword,
+                    expiresAt: expiresAt
+                },
+            })
+
+            return NextResponse.json(
+                { message: "Password Protection added" },
+                { status: 200 }
+            )
         }
 
-        const expiresAt = data.expiryDate ? new Date(data.expiryDate) : null;
-
-        await prisma.link.update({
-            where: {
-                id: data.shortUrlId
-            },
-            data: {
-                password: hashedPassword,
-                expiresAt: expiresAt
-            },
-        })
-
-        return NextResponse.json(
-            {message: "Password Protection added"},
-            {status: 200}
-        )
-        
     } catch (error) {
         return NextResponse.json(
-            {message: "Error while adding password protection"},
-            {status: 500}
+            { message: "Error while adding password protection" },
+            { status: 500 }
         )
     }
 }

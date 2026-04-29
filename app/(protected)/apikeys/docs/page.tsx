@@ -56,7 +56,6 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 export default function DocsTab() {
     return (
         <div className="animate-in fade-in duration-300 font-one">
-            {/* Header section - Hidden on mobile, shown from sm breakpoint up */}
             <div className="mb-8 hidden sm:block">
                 <h2 className="text-2xl font-bold text-foreground mb-1">Docs</h2>
                 <p className="text-muted-foreground text-sm">
@@ -70,13 +69,13 @@ export default function DocsTab() {
                 </p>
                 <CodeBlock
                     language="bash"
-                    code={`curl ${BASE_URL}/v1/shortLink \\
+                    code={`curl ${BASE_URL}/app/v1/shortLink \\
   -H "Authorization: Bearer YOUR_API_KEY"`}
                 />
             </Section>
 
             <Section title="Base URL">
-                <CodeBlock language="text" code={`${BASE_URL}/v1`} />
+                <CodeBlock language="text" code={`${BASE_URL}/app/v1/shortLink`} />
             </Section>
 
             <Section title="Create Short Link">
@@ -86,7 +85,7 @@ export default function DocsTab() {
 
                 <CodeBlock
                     language="bash"
-                    code={`curl -X POST ${BASE_URL}/v1/shortLink \\
+                    code={`curl -X POST ${BASE_URL}/app/v1/shortLink \\
 -H "Authorization: Bearer YOUR_API_KEY" \\
 -H "Content-Type: application/json" \\
 -d '{
@@ -99,7 +98,7 @@ export default function DocsTab() {
 
                 <CodeBlock
                     language="javascript"
-                    code={`const res = await fetch("${BASE_URL}/v1/shortLink", {
+                    code={`const res = await fetch("${BASE_URL}/app/v1/shortLink", {
   method: "POST",
   headers: {
     Authorization: "Bearer YOUR_API_KEY",

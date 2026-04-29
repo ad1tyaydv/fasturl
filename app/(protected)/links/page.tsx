@@ -265,24 +265,26 @@ function AllLinks() {
         <UrlsPageSidebar view={view} onViewChange={handleViewChange} />
 
         <main className="flex-1 w-full px-4 py-6 sm:px-10 sm:py-10 min-w-0 overflow-y-auto">
-          <div className="hidden sm:flex sm:items-center justify-between gap-4 mb-8 border-b border-border pb-6">
-            <div>
-              <h1 className="text-4xl font-one tracking-tight">
-                {view === "links" ? "My Links" : view === "bulk" ? "Bulk Links" : view === "qr" ? "QR Codes" : "API Requests"}
-              </h1>
-              <p className="text-muted-foreground text-sm mt-1">
-                {view === "api" ? "Links generated via your API keys." : "Track and manage your shortened URLs and assets."}
-              </p>
-            </div>
-
-            {view !== "api" && (data.length > 0 || loading) && (
-              <div className="flex items-center gap-3">
-                <span className="px-4 py-2 font-bold bg-secondary border border-border rounded-lg text-xs uppercase tracking-widest text-muted-foreground">
-                  {loading ? "Loading..." : `Total - ${filteredData.length}`}
-                </span>
+          {!isDetailViewOpen && (
+            <div className="hidden sm:flex sm:items-center justify-between gap-4 mb-8 border-b border-border pb-6">
+              <div>
+                <h1 className="text-4xl font-one tracking-tight">
+                  {view === "links" ? "My Links" : view === "bulk" ? "Bulk Links" : view === "qr" ? "QR Codes" : "API Requests"}
+                </h1>
+                <p className="text-muted-foreground text-sm mt-1">
+                  {view === "api" ? "Links generated via your API keys." : "Track and manage your shortened URLs and assets."}
+                </p>
               </div>
-            )}
-          </div>
+
+              {view !== "api" && (data.length > 0 || loading) && (
+                <div className="flex items-center gap-3">
+                  <span className="px-4 py-2 font-bold bg-secondary border border-border rounded-lg text-xs uppercase tracking-widest text-muted-foreground">
+                    {loading ? "Loading..." : `Total - ${filteredData.length}`}
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
 
           {view === "api" ? (
             <ApiLinks />
@@ -449,6 +451,9 @@ function AllLinks() {
                       setStatusFilter={setStatusFilter}
                       setIsDetailViewOpen={setIsDetailViewOpen}
                       itemCount={filteredData.length}
+                      onOpenQr={(u: any) => { setSelectedLink(u); setIsQrModalOpen(true); }}
+                      onOpenPassword={(u: any) => { setSelectedLink(u); setIsPasswordModalOpen(true); }}
+                      onOpenCustom={(u: any) => { setSelectedLink(u); setIsCustomModalOpen(true); }}
                     />
                   )}
 

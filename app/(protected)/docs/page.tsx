@@ -122,7 +122,7 @@ const docsData: Record<string, Doc> = {
     description: "Integrate FastURL directly into your workflow with our RESTful API.",
     sections: [
       { subtitle: "Authentication", text: "All API requests require an API key passed in the 'Authorization' header as a Bearer token: Authorization: Bearer YOUR_API_KEY." },
-      { subtitle: "Shorten a Link (POST /v1/shortLink)", text: "Endpoint: /api/v1/shortLink | Method: POST | Body: { \"url\": \"https://example.com\", \"linkName\": \"My Link\", \"password\": \"optional-pass\", \"expiry\": \"YYYY-MM-DD\" } | Response: { \"success\": true, \"shortUrl\": \"...\" }" },
+      { subtitle: "Shorten a Link (POST /app/v1/shortLink)", text: "Endpoint: /api/v1/shortLink | Method: POST | Body: { \"url\": \"https://example.com\", \"linkName\": \"My Link\", \"password\": \"optional-pass\", \"expiry\": \"YYYY-MM-DD\" } | Response: { \"success\": true, \"shortUrl\": \"...\" }" },
       { subtitle: "Usage Limits", text: "API access is available on Pro plans. Ensure you monitor your usage count in the dashboard to avoid hitting your monthly limit." }
     ]
   },
@@ -173,7 +173,6 @@ export default function App() {
     window.history.pushState({ path: newUrl }, '', newUrl);
     setIsSidebarOpen(false);
     
-    // Smooth scroll to top
     const mainElement = document.getElementById('docs-content');
     if (mainElement) {
       mainElement.scrollTo({ top: 0, behavior: 'smooth' });
@@ -206,7 +205,6 @@ export default function App() {
       </div>
       
       <div className="flex flex-1 pt-2 h-full overflow-hidden relative"> 
-        {/* Mobile Sidebar Overlay */}
         {isSidebarOpen && (
           <div 
             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[45] lg:hidden transition-opacity"
@@ -214,7 +212,6 @@ export default function App() {
           />
         )}
 
-        {/* Sidebar Toggle (Mobile) */}
         <button 
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
           className="lg:hidden fixed bottom-8 right-8 z-[55] p-4 bg-primary text-primary-foreground rounded-full shadow-2xl active:scale-95 transition-all border border-primary-foreground/10"
@@ -222,7 +219,6 @@ export default function App() {
           {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
 
-        {/* Sidebar */}
         <aside className={`
           fixed top-[88px] bottom-0 left-0 z-50 w-72 bg-background border-r border-border flex flex-col transition-transform duration-300 lg:translate-x-0 lg:static lg:h-full
           ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
@@ -284,7 +280,6 @@ export default function App() {
           </nav>
         </aside>
 
-        {/* Main Content */}
         <main id="docs-content" className="flex-1 overflow-y-auto custom-scrollbar bg-background p-6 sm:p-10 md:p-12 lg:py-16 lg:pl-12 lg:pr-24">
           {activeDoc ? (
             <article className="animate-in fade-in slide-in-from-bottom-2 duration-500 max-w-4xl pb-20">
