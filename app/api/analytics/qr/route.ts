@@ -1,8 +1,6 @@
 import { prisma } from "@/lib/dbConfig";
 import { NextRequest, NextResponse } from "next/server";
 
-const JWT_SECRET = process.env.NEXTAUTH_SECRET!;
-
 export async function GET(req: NextRequest) {
 
     try {
@@ -16,7 +14,7 @@ export async function GET(req: NextRequest) {
             )
         }
 
-        const qrId = req.nextUrl.searchParams.get("qrId");
+        const qrId = req.nextUrl.searchParams.get("qr");
         if (!qrId) {
             return NextResponse.json(
                 { message: "qrId is required" },
@@ -24,26 +22,57 @@ export async function GET(req: NextRequest) {
             );
         }
 
+        const qrRecord = await prisma.qr.findUnique({
+            where: {
+                id: qrId
+            }
+        });
+
+        if (!qrRecord) {
+            return NextResponse.json(
+                { message: "QR code not found" },
+                { status: 404 }
+            );
+        }
+
+        const link = await prisma.link.findFirst({
+            where: {
+                shorturl: qrRecord.shortUrl,
+                userId: qrRecord.userId
+            }
+        });
+
+        if (!link) {
+            return NextResponse.json(
+                { message: "Associated link not found" },
+                { status: 404 }
+            );
+        }
+
+        const linkId = link.id;
+
         const clicks = await prisma.click.groupBy({
             by: ["country", "state"],
             where: {
-                qrId: qrId,
+                linkId: linkId,
+                isQr: true,
             },
             _count: {
-                qrId: true
+                linkId: true
             }
         })
         const formatted = clicks.map((a) => ({
             country: a.country || "Unknown",
             state: a.state || "Unknown",
-            count: a._count.qrId,
+            count: a._count.linkId,
         }));
 
 
         const browsers = await prisma.click.groupBy({
             by: ["browser"],
             where: {
-                qrId: qrId,
+                linkId: linkId,
+                isQr: true
             },
             _count: {
                 browser: true
@@ -58,7 +87,8 @@ export async function GET(req: NextRequest) {
         const devices = await prisma.click.groupBy({
             by: ["device"],
             where: {
-                qrId: qrId,
+                linkId: linkId,
+                isQr: true
             },
             _count: {
                 device: true
@@ -73,7 +103,8 @@ export async function GET(req: NextRequest) {
         const os = await prisma.click.groupBy({
             by: ["OS"],
             where: {
-                qrId: qrId,
+                linkId: linkId,
+                isQr: true
             },
             _count: {
                 OS: true
@@ -87,8 +118,13 @@ export async function GET(req: NextRequest) {
 
         const referrers = await prisma.click.groupBy({
             by: ["referrer"],
-            where: { qrId },
-            _count: { referrer: true }
+            where: {
+                linkId: linkId,
+                isQr: true
+            },
+            _count: {
+                referrer: true
+            }
         });
         const referrerData = referrers.map((e) => ({
             referrer: e.referrer || "Direct",

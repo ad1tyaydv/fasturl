@@ -13,6 +13,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ shor
     try {
         const { shortUrl } = await params;
 
+        const { searchParams } = new URL(req.url);
+        const source = searchParams.get("source");
+        const isQr = source === "qr";
 
         let originalUrl = await redis.get(`link:${shortUrl}`);
 
@@ -118,6 +121,17 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ shor
             }
         }
 
+        let qrId = null;
+        if (isQr) {
+            const qrRecord = await prisma.qr.findFirst({
+                where: {
+                    shortUrl: shortUrl,
+                    userId: findUrl.userId
+                }
+            });
+            qrId = qrRecord?.id;
+        }
+
         Promise.all([
             prisma.link.update({
                 where: {
@@ -133,6 +147,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ shor
             prisma.click.create({
                 data: {
                     linkId: findUrl!.id,
+                    qrId: qrId,
                     ip,
                     country: countryFullName,
                     state: stateFullName,
@@ -141,6 +156,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ shor
                     device,
                     OS,
                     referrer,
+                    isQr: isQr
                 },
             }),
 
@@ -151,8 +167,6 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ shor
         return NextResponse.redirect(originalUrl as string);
 
     } catch (error) {
-        console.error(error);
-
         return NextResponse.json(
             { message: "Something went wrong" },
             { status: 500 }

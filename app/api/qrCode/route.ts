@@ -120,7 +120,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const fullShortUrl = `${process.env.NEXT_PUBLIC_DOMAIN}/${data.shortUrl}`;
+    const fullShortUrl = `${process.env.NEXT_PUBLIC_DOMAIN}/${data.shortUrl}?source=qr`;
 
     const qr = await QRCode.toDataURL(fullShortUrl, {
       width: 300,

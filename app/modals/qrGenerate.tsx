@@ -27,29 +27,51 @@ export default function QrDownloadModal({ isOpen, onClose, qrData, selectedUrl }
 
   const [effectiveQrData, setEffectiveQrData] = useState<any>(null);
 
+
+  const buildUrl = (path: string) => {
+    const domain = process.env.NEXT_PUBLIC_DOMAIN || "localhost:3000";
+
+    const protocol = domain.includes("localhost") ? "http" : "https";
+
+    return `${protocol}://${domain}/${path}`;
+  };
+
   useEffect(() => {
     if (qrData) {
       setEffectiveQrData(qrData);
+
     } else if (selectedUrl) {
-      const nextDomain = process.env.NEXT_PUBLIC_DOMAIN;
-      const getShortLink = () => {
-        if (selectedUrl.domain && selectedUrl.subdomain) {
-          return `${selectedUrl.subdomain}.${selectedUrl.domain}/${selectedUrl.shorturl}`;
-        }
-        return `${nextDomain}/${selectedUrl.shorturl}`;
-      };
-      const shortLink = getShortLink();
-      
+      let shortLink = "";
+
+      if (selectedUrl.domain && selectedUrl.subdomain) {
+        shortLink = `${selectedUrl.subdomain}.${selectedUrl.domain}/${selectedUrl.shorturl}`;
+
+      } else {
+        shortLink = buildUrl(selectedUrl.shorturl);
+      }
+
+      let finalUrl = shortLink;
+
+      if (!finalUrl.startsWith("http://") && !finalUrl.startsWith("https://")) {
+        const isLocal = finalUrl.includes("localhost");
+        finalUrl = `${isLocal ? "http" : "https"}://${finalUrl}`;
+      }
+
       setEffectiveQrData({
-        qrImage: `https://api.qrserver.com/v1/create-qr-code/?size=1000x1000&data=${encodeURIComponent('https://' + shortLink)}`,
-        shortUrl: shortLink,
+        qrImage: `https://api.qrserver.com/v1/create-qr-code/?size=1000x1000&data=${encodeURIComponent(
+          finalUrl
+        )}`,
+        shortUrl: finalUrl,
         longUrl: selectedUrl.original,
-        qrName: selectedUrl.linkName || "qr-code"
+        qrName: selectedUrl.linkName || "qr-code",
       });
+
     } else {
       setEffectiveQrData(null);
     }
+
   }, [qrData, selectedUrl, isOpen]);
+
 
   useEffect(() => {
     if (isOpen) {
@@ -68,12 +90,13 @@ export default function QrDownloadModal({ isOpen, onClose, qrData, selectedUrl }
         useCORS: true,
         backgroundColor: "#ffffff",
         scale: 3,
-        logging: false,
       });
+
       const link = document.createElement("a");
       link.href = canvas.toDataURL("image/png");
       link.download = `${effectiveQrData.qrName || "qrcode"}.png`;
       link.click();
+
       toast.success("QR Code downloaded successfully");
 
     } catch (error) {
@@ -81,6 +104,7 @@ export default function QrDownloadModal({ isOpen, onClose, qrData, selectedUrl }
       toast.error("Failed to download QR code");
     }
   };
+
 
   return (
     <div
@@ -129,14 +153,14 @@ export default function QrDownloadModal({ isOpen, onClose, qrData, selectedUrl }
                 </div>
               )}
 
-              <div style={{ 
-                width: "100%", 
-                aspectRatio: "1/1", 
+              <div style={{
+                width: "100%",
+                aspectRatio: "1/1",
                 position: "relative",
-                marginBottom: qrOnly ? "0" : "24px", 
-                display: "flex", 
-                alignItems: "center", 
-                justifyContent: "center", 
+                marginBottom: qrOnly ? "0" : "24px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
                 border: qrOnly ? "none" : "1px solid #f3f4f6",
                 padding: qrOnly ? "0" : "10px",
                 backgroundColor: "#ffffff"
@@ -146,16 +170,16 @@ export default function QrDownloadModal({ isOpen, onClose, qrData, selectedUrl }
                     <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
                   </div>
                 )}
-                
+
                 <img
                   src={effectiveQrData.qrImage}
                   alt="QR Code"
                   onLoad={() => setIsImageLoading(false)}
-                  style={{ 
-                    width: "100%", 
-                    height: "100%", 
+                  style={{
+                    width: "100%",
+                    height: "100%",
                     objectFit: "contain",
-                    display: isImageLoading ? "none" : "block" 
+                    display: isImageLoading ? "none" : "block"
                   }}
                 />
               </div>

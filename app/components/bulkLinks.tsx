@@ -54,31 +54,36 @@ export default function BulkLinks({
   const itemsPerPage = 25;
   const totalPages = Math.ceil(itemCount / itemsPerPage);
 
-  // Restore state from URL
   useEffect(() => {
     const batchId = searchParams.get("batchId");
     if (batchId && bulkLinks.length > 0) {
       const batch = bulkLinks.find((b: any) => b.id === batchId);
+
       if (batch) setSelectedBatchDetails(batch);
     }
+
   }, [searchParams, bulkLinks]);
 
-  // Sync URL when selection changes
+
   const updateBatchSelection = (batch: any | null) => {
     setSelectedBatchDetails(batch);
     const params = new URLSearchParams(searchParams.toString());
     if (batch) {
       params.set("batchId", batch.id);
+
     } else {
       params.delete("batchId");
     }
+
     router.push(`${pathname}?${params.toString()}`);
   };
 
   useEffect(() => {
     const handler = setTimeout(() => setSearchQuery(displaySearch), 300);
     return () => clearTimeout(handler);
+
   }, [displaySearch, setSearchQuery]);
+
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -86,15 +91,20 @@ export default function BulkLinks({
         setActiveMenuId(null);
       }
     };
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
+
   }, []);
+
 
   useEffect(() => {
     if (setIsDetailViewOpen) {
       setIsDetailViewOpen(!!selectedBatchDetails);
     }
+    
   }, [selectedBatchDetails, setIsDetailViewOpen]);
+
 
   const handleProtectedAction = (action: () => void) => {
     if (userTier === "FREE") {
@@ -129,14 +139,16 @@ export default function BulkLinks({
     }
   };
 
-  const handleDeleteBatch = async (urlId: string) => {
+  const handleDeleteBatch = async (id: string) => {
     const loadingToast = toast.loading("Deleting batch...");
     try {
-      await axios.post(`/api/shortUrl/bulkLinks/delete/${urlId}`);
+      await axios.post(`/api/shortUrl/bulkLinks/delete/${id}`);
       toast.success("Batch deleted successfully!", { id: loadingToast });
+
       onRefresh();
     } catch (error) {
       toast.error("Failed to delete the batch. Please try again.", { id: loadingToast });
+      
     }
   };
 

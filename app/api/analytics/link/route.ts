@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 const JWT_SECRET = process.env.NEXTAUTH_SECRET!;
 
 export async function POST(req: NextRequest) {
+
     try {
         const token = req.cookies.get("token")?.value;
         if (!token) {
@@ -26,8 +27,8 @@ export async function POST(req: NextRequest) {
 
         const search = await prisma.link.findUnique({
             where: {
-                id: linkId
-            }
+                id: linkId,
+            },
         })
         const shortUrl = search?.shorturl;
 

@@ -97,13 +97,14 @@ model Link {
 }
 
 model Click {
-  id String @id @default(uuid())
+  id    String   @id @default(uuid())
 
   linkId String
-  link   Link   @relation(fields: [linkId], references: [id], onDelete: Cascade)
+  link   Link     @relation(fields: [linkId], references: [id], onDelete: Cascade)
 
   qrId String?
-  qr   Qr?     @relation(fields: [qrId], references: [id], onDelete: Cascade)
+  qr   Qr?        @relation(fields: [qrId], references: [id], onDelete: Cascade)
+  isQr  Boolean   @default(false)
 
   ip      String
   country String?
