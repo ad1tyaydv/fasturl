@@ -358,14 +358,14 @@ export default function Dashboard() {
               {[1, 2, 3, 4, 5].map((i) => (
                 <div key={i} className="w-10 h-10 rounded-full border-2 border-background bg-muted flex items-center justify-center overflow-hidden">
                   <img
-                    src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${i + 42}`}
+                    src={`https://api.dicebear.com/9.x/micah/svg?seed=${i + 42}`}
                     alt="User"
                     className="w-full h-full object-cover"
                   />
                 </div>
               ))}
               <div className="w-10 h-10 rounded-full border-2 border-background bg-blue-600 flex items-center justify-center text-[10px] font-one text-white shadow-lg shadow-blue-500/20">
-                500+
+                1˝0+
               </div>
             </div>
             <div className="h-6 w-px bg-border mx-1"></div>

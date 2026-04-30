@@ -1,4 +1,9 @@
 "use client";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -38,6 +43,10 @@ export default function Profile() {
   const [showAvatarModal, setShowAvatarModal] = useState(false);
   const [updateImageLoader, setUpdateImageLoader] = useState(false);
   const [pageLoading, setPageLoading] = useState(true);
+
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [verifyOtpLoader, setVerifyOtpLoader] = useState(false);
 
 
   useEffect(() => {
@@ -107,18 +116,49 @@ export default function Profile() {
       toast.error("Email cannot be empty");
       return;
     }
+
+    if (updateEmail === email) {
+      toast.error("Email is already set to this address");
+      return;
+    }
+
     setUpdateEmailLoader(true);
 
     try {
       await axios.post("/api/auth/update/email", { email: updateEmail });
-      setEmail(updateEmail);
-      toast.success("Email updated successfully");
+      setShowOtpModal(true);
+      toast.success("OTP sent to your new email address");
 
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Error updating email");
 
     } finally {
       setUpdateEmailLoader(false);
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    if (!otp.trim() || otp.length !== 6) {
+      toast.error("Please enter a valid 6-digit OTP");
+      return;
+    }
+    setVerifyOtpLoader(true);
+
+    try {
+      await axios.post("/api/auth/update/email/verifyOtp", {
+        email: updateEmail,
+        otp: otp
+      });
+      setEmail(updateEmail);
+      setShowOtpModal(false);
+      setOtp("");
+      toast.success("Email updated successfully");
+
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Error verifying OTP");
+
+    } finally {
+      setVerifyOtpLoader(false);
     }
   };
 
@@ -277,6 +317,54 @@ export default function Profile() {
             >
               {updateImageLoader ? <Loader2 className="w-4 h-4 animate-spin" /> : "Update"}
             </button>
+          </div>
+        </div>
+      )}
+
+      {showOtpModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/60 backdrop-blur-[2px] p-4">
+          <div className="bg-popover border border-border rounded-md p-6 w-full max-w-sm shadow-2xl animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-base font-semibold text-foreground">Verify Email</h2>
+              <button
+                onClick={() => setShowOtpModal(false)}
+                className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <p className="text-sm text-muted-foreground mb-6">
+              An OTP has been sent to <span className="text-foreground font-medium">{updateEmail}</span>. Please enter it to verify your new email.
+            </p>
+
+            <div className="space-y-6 flex flex-col items-center">
+              <InputOTP
+                maxLength={6}
+                value={otp}
+                onChange={(value) => setOtp(value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleVerifyOtp();
+                }}
+              >
+                <InputOTPGroup className="gap-2">
+                  <InputOTPSlot index={0} className="w-12 h-12 text-lg rounded-md border" />
+                  <InputOTPSlot index={1} className="w-12 h-12 text-lg rounded-md border" />
+                  <InputOTPSlot index={2} className="w-12 h-12 text-lg rounded-md border" />
+                  <InputOTPSlot index={3} className="w-12 h-12 text-lg rounded-md border" />
+                  <InputOTPSlot index={4} className="w-12 h-12 text-lg rounded-md border" />
+                  <InputOTPSlot index={5} className="w-12 h-12 text-lg rounded-md border" />
+                </InputOTPGroup>
+              </InputOTP>
+
+              <button
+                onClick={handleVerifyOtp}
+                disabled={verifyOtpLoader}
+                className="w-full py-2.5 bg-primary text-primary-foreground hover:opacity-90 disabled:opacity-50 font-semibold rounded-md transition-all text-sm flex items-center justify-center gap-2 cursor-pointer"
+              >
+                {verifyOtpLoader ? <Loader2 className="w-4 h-4 animate-spin" /> : "Verify OTP"}
+              </button>
+            </div>
           </div>
         </div>
       )}

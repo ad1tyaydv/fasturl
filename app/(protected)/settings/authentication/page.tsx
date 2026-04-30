@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ViewIcon, ViewOffSlashIcon } from "@hugeicons/core-free-icons";
 
-// --- Sub-components ---
 
 function Toast({ message, onClose }: { message: string; onClose: () => void }) {
   useEffect(() => {
@@ -97,7 +96,6 @@ function OtpInput({ value, onChange }: { value: string[]; onChange: (v: string[]
   );
 }
 
-// --- Main Component ---
 
 export default function AuthenticationPage() {
   const router = useRouter();
@@ -143,7 +141,10 @@ export default function AuthenticationPage() {
 
     setLoadingPassword(true);
     try {
-      await axios.post("/api/auth/update/resetPassword", { currentPassword, newPassword });
+      await axios.post("/api/auth/update/resetPassword", {
+        currentPassword,
+        newPassword
+      });
       setToast("Password updated successfully");
       setCurrentPassword(""); setNewPassword(""); setConfirmPassword("");
 
