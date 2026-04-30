@@ -60,14 +60,28 @@ export async function POST(req: NextRequest) {
             to: [newEmail],
             subject: "Verify your new email address",
             html: `
-              <div style="font-family: Arial; padding:20px;">
-                <h2>Fasturl Email Update</h2>
-                <p>You requested to update your email address. Please use the following OTP to verify your new email:</p>
-                <h1 style="letter-spacing:6px;">${otp}</h1>
-                <p>This OTP expires in 10 minutes.</p>
-                <p>If you didn't request this change, please ignore this email.</p>
-              </div>
-            `,
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; text-align: center; padding: 40px 20px; color: #000;">
+      <p style="font-size: 18px; margin-bottom: 24px;">Enter this code to verify your new email address:</p>
+      
+      <div style="display: inline-block; background-color: #e5e5e5; padding: 15px 40px; border-radius: 8px; margin-bottom: 30px;">
+        <h1 style="margin: 0; color: #83c5be; font-size: 36px; letter-spacing: 4px; font-weight: bold;">${otp}</h1>
+      </div>
+
+      <p style="font-size: 14px; color: #666; margin-top: -10px; margin-bottom: 30px;">This OTP expires in 10 minutes.</p>
+
+      <hr style="border: none; border-top: 1px solid #ddd; margin: 30px auto; width: 80%;" />
+
+      <p style="font-size: 16px; color: #000;">
+        Need help? Contact us at <a href="mailto:fasturl@tutamail.com" style="color: #22c55e; text-decoration: underline;">fasturl@tutamail.com</a>.
+      </p>
+
+      <div style="margin-top: 40px;">
+        <h2 style="font-size: 32px; font-weight: bold; color: #83c5be; margin: 0;">fasturl</h2>
+      </div>
+      
+      <p style="font-size: 12px; color: #999; margin-top: 20px;">If you didn't request this change, please ignore this email.</p>
+    </div>
+    `,
         });
 
         return NextResponse.json(

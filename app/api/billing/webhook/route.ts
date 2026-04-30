@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/dbConfig";
 import { redis } from "@/lib/redis";
+import { Resend } from "resend";
+
+const resend = new Resend(process.env.RESEND_API_KEY!);
 
 type Plan = "FREE" | "ESSENTIAL" | "PRO";
-type BillingCycle = "MONTHLY" | "ANNUALLY";
 
 const PLAN_LIMITS = {
   FREE: { links: 100, qr: 30 },
@@ -17,11 +19,49 @@ const PLAN_PRIORITY: Record<Plan, number> = {
   PRO: 2,
 };
 
+async function sendEmail(to: string, subject: string, userName: string, title: string, message: string) {
+  try {
+    await resend.emails.send({
+      from: "FastURL <no-reply@fasturl.in>",
+      to: [to],
+      subject: subject,
+      html: `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; text-align: center; padding: 50px 20px; color: #000; line-height: 1.6;">
+          
+          <h2 style="font-size: 24px; font-weight: bold; margin-bottom: 10px;">${title}</h2>
+          
+          <p style="font-size: 16px; color: #333; margin-bottom: 24px;">
+            Hello <strong>${userName || "there"}</strong>,
+          </p>
+
+          <div style="max-width: 500px; margin: 0 auto; font-size: 16px; color: #444; text-align: center;">
+            ${message}
+          </div>
+
+          <hr style="border: none; border-top: 1px solid #ddd; margin: 40px auto; width: 80%;" />
+
+          <p style="font-size: 15px; color: #000;">
+            Need help? Contact us at <a href="mailto:fasturl@tutamail.com" style="color: #83c5be; text-decoration: underline;">fasturl@tutamail.com</a>.
+          </p>
+
+          <div style="margin-top: 50px;">
+            <h2 style="font-size: 32px; font-weight: bold; color: #83c5be; margin: 0; letter-spacing: -1px;">fasturl</h2>
+          </div>
+          
+        </div>
+      `,
+    });
+
+  } catch (error) {
+    console.error("Error while sending email");
+  }
+}
+
+
 export async function POST(req: NextRequest) {
+
   try {
     const body = await req.json();
-
-    console.log("WEBHOOK HIT");
 
     const event = body?.type;
     const data = body?.data;
@@ -105,6 +145,14 @@ export async function POST(req: NextRequest) {
         }
       });
 
+      await sendEmail(
+        user.email,
+        "Your payment was successful - FastURL",
+        user.userName || "",
+        "Payment Successful",
+        `Your payment of ${data.total_amount / 100} ${data.currency} was successful. Your account has been upgraded to the ${plan} plan (${planType}). Enjoy your new limits!`
+      );
+
       await prisma.payment.upsert({
         where: {
           paymentId: data.payment_id
@@ -180,6 +228,14 @@ export async function POST(req: NextRequest) {
         }
       });
 
+      await sendEmail(
+        user.email,
+        "Payment failed - FastURL",
+        user.userName || "",
+        "Payment Failed",
+        `Your payment for the ${plan} plan failed. Please check your payment method and try again. If you have any questions, feel free to reach out to our support team.`
+      );
+
       await prisma.payment.upsert({
         where: {
           paymentId: data.payment_id
@@ -229,6 +285,14 @@ export async function POST(req: NextRequest) {
           billingStatus: "pending"
         },
       });
+
+      await sendEmail(
+        user.email,
+        "Payment is processing - FastURL",
+        user.userName || "",
+        "Payment Processing",
+        `Your payment for the ${plan} plan is currently being processed. We will notify you once the payment is completed and your account is upgraded.`
+      );
 
       await prisma.payment.upsert({
         where: {
@@ -289,6 +353,14 @@ export async function POST(req: NextRequest) {
         },
       });
 
+      await sendEmail(
+        user.email,
+        "Subscription renewed - FastURL",
+        user.userName || "",
+        "Subscription Renewed",
+        `Your premium subscription has been successfully renewed. Thank you for continuing with FastURL!`
+      );
+
       if (subscriptionId) {
         await prisma.subscription.update({
           where: {
@@ -327,6 +399,14 @@ export async function POST(req: NextRequest) {
           actionUrl: "/premium"
         }
       });
+
+      await sendEmail(
+        user.email,
+        "Subscription cancelled - FastURL",
+        user.userName || "",
+        "Subscription Cancelled",
+        "Your premium subscription has been cancelled. Your account has been reverted to the Free plan. We're sorry to see you go!"
+      );
     }
 
     if (event === "payment.refunded") {
@@ -349,6 +429,14 @@ export async function POST(req: NextRequest) {
           actionUrl: "/premium"
         }
       });
+
+      await sendEmail(
+        user.email,
+        "Payment refunded - FastURL",
+        user.userName || "",
+        "Payment Refunded",
+        "Your payment has been refunded, and your account has been reverted to the Free plan."
+      );
     }
 
     if (event === "subscription.expired") {
@@ -376,6 +464,14 @@ export async function POST(req: NextRequest) {
           actionUrl: "/premium"
         }
       });
+
+      await sendEmail(
+        user.email,
+        "Subscription expired - FastURL",
+        user.userName || "",
+        "Subscription Expired",
+        "Your premium subscription has expired. Your account has been reverted to the Free plan. Renew your subscription to continue enjoying premium features!"
+      );
     }
 
     console.log("EVENT:", event);

@@ -226,7 +226,7 @@ export default function NotificationPage() {
                 variant="destructive"
                 onClick={deleteAllNotifications}
                 disabled={isClearingAll}
-                className="rounded-lg sm:rounded-xl text-destructive-foreground font-bold text-[10px] sm:text-xs h-10 px-2 sm:px-5 cursor-pointer transition-all border bg-destructive hover:bg-destructive/90 w-full sm:w-auto"
+                className="rounded-lg sm:rounded-xl text-destructive-foreground font-bold text-[10px] sm:text-xs h-10 px-2 sm:px-5 cursor-pointer transition-all border bg-red-500 hover:bg-red-600 w-full sm:w-auto"
               >
                 {isClearingAll ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <HugeiconsIcon icon={Delete02Icon} className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 sm:mr-2 text-current" />}
                 Clear all
@@ -235,7 +235,6 @@ export default function NotificationPage() {
           )}
         </div>
 
-        {/* Filter and Search Bar */}
         <div className="flex flex-col md:flex-row items-center gap-4 mb-8 bg-card p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-border shadow-sm">
           <div className="relative w-full md:w-96">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />

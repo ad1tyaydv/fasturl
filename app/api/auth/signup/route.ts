@@ -45,20 +45,31 @@ export async function POST(req: NextRequest) {
         await resend.emails.send({
             from: "FastURL <no-reply@fasturl.in>",
             to: [data.email],
-            subject: "Password Reset OTP",
+            subject: "Signup otp for fasturl",
             html: `
-        <div style="font-family: Arial; padding:20px;">
-          <h2>Welcome to fasturl</h2>
-          <p>Your OTP is:</p>
-          <h1 style="letter-spacing:6px;">${otp}</h1>
-          <p>This OTP expires in 10 minutes.</p>
-        </div>
-      `,
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; text-align: center; padding: 40px 20px; color: #000;">
+      <p style="font-size: 18px; margin-bottom: 24px;">Enter this code to complete verification:</p>
+      
+      <div style="display: inline-block; background-color: #e5e5e5; padding: 15px 40px; border-radius: 8px; margin-bottom: 30px;">
+        <h1 style="margin: 0; color: #83c5be; font-size: 36px; letter-spacing: 4px; font-weight: bold;">${otp}</h1>
+      </div>
+
+      <hr style="border: none; border-top: 1px solid #ddd; margin: 30px auto; width: 80%;" />
+
+      <p style="font-size: 16px; color: #000;">
+        Need help? Contact us at <a href="mailto:fasturl@tutamail.com" style="color: #22c55e; text-decoration: underline;">fasturl@tutamail.com</a>.
+      </p>
+
+      <div style="margin-top: 40px;">
+        <h2 style="font-size: 32px; font-weight: bold; color: #83c5be; margin: 0;">fasturl</h2>
+      </div>
+    </div>
+    `,
         });
 
         return NextResponse.json(
-            {message: "Otp is sent to your email"},
-            {status: 200}
+            { message: "Otp is sent to your email" },
+            { status: 200 }
         )
 
 
