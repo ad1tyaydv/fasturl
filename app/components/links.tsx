@@ -16,7 +16,7 @@ interface UrlItemProps {
   url: any;
   nextDomain: string | undefined;
   onRefresh: () => Promise<void>;
-  onOpenQr?: (url: any) => void; // Made optional as we handle it internally now
+  onOpenQr?: (url: any) => void;
   onOpenPassword: (url: any) => void;
   onOpenCustom: (url: any) => void;
   getRelativeTime: (date?: string) => string;

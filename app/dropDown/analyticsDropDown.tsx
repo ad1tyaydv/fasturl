@@ -45,14 +45,14 @@ export function AnalyticsDropDown({ days, setDays }: AnalyticsFilterProps) {
         </DropdownMenuLabel>
         <DropdownMenuSeparator className="bg-border" />
         
-        {[7, 14, 28].map((range) => (
+        {[7, 14, 28, 180].map((range) => (
           <DropdownMenuCheckboxItem
             key={range}
             checked={days === range}
             onCheckedChange={() => setDays(range)}
             className="cursor-pointer focus:bg-accent focus:text-accent-foreground py-2"
           >
-            Last {range} Days
+            {range === 180 ? "Last 6 Months" : `Last ${range} Days`}
           </DropdownMenuCheckboxItem>
         ))}
       </DropdownMenuContent>

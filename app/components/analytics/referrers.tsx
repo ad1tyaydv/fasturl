@@ -1,25 +1,25 @@
 "use client"
-import * as React from "react"
 import { useMemo, useState } from "react"
 import { Globe, Search, Instagram, Twitter, Facebook, Linkedin, MessageCircle, X } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 
-const getReferrerIcon = (referrer: string, size = "w-4 h-4") => {
-  const ref = referrer?.toLowerCase() || ""
-  if (ref.includes("google") || ref.includes("bing") || ref.includes("yahoo"))
-    return <Search className={`${size} text-blue-400`} />
-  if (ref.includes("instagram"))
-    return <Instagram className={`${size} text-pink-500`} />
-  if (ref.includes("twitter") || ref.includes("x.com"))
-    return <Twitter className={`${size} text-sky-400`} />
-  if (ref.includes("facebook"))
-    return <Facebook className={`${size} text-blue-600`} />
-  if (ref.includes("linkedin"))
-    return <Linkedin className={`${size} text-blue-700`} />
-  if (ref.includes("whatsapp") || ref.includes("t.me"))
-    return <MessageCircle className={`${size} text-green-500`} />
-  return <Globe className={`${size} text-muted-foreground`} />
-}
+
+const getDomain = (url: string) => {
+  try {
+    if (!url || url === "Direct / Internal") return "";
+    const domain = new URL(url.startsWith('http') ? url : `https://${url}`).hostname;
+    return domain.replace('www.', '');
+
+  } catch {
+    return url;
+  }
+};
+
+const getLogo = (urlStr: string) => {
+  const domain = getDomain(urlStr);
+  if (!domain) return null;
+  return `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
+};
 
 interface ReferrerAnalyticsProps {
   data?: any[]
@@ -56,6 +56,24 @@ export default function ReferrerAnalytics({ data = [], days = 7 }: ReferrerAnaly
   const top5 = allData.slice(0, 5)
   const total = allData.reduce((sum, d) => sum + d.count, 0)
 
+  const ReferrerLogo = ({ referrer }: { referrer: string }) => {
+    const logo = getLogo(referrer);
+    
+    if (logo) {
+      return (
+        <img 
+          src={logo} 
+          alt={referrer} 
+          className="w-5 h-5 rounded-sm object-contain"
+          onError={(e) => {
+            (e.target as HTMLImageElement).style.display = 'none';
+          }}
+        />
+      );
+    }
+
+  };
+
   return (
     <>
       <Card className="bg-transparent text-foreground w-full h-full flex flex-col border-none shadow-none">
@@ -72,10 +90,10 @@ export default function ReferrerAnalytics({ data = [], days = 7 }: ReferrerAnaly
                   <div key={index} className="group flex flex-col gap-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 bg-secondary rounded-lg">
-                          {getReferrerIcon(item.referrer)}
+                        <div className="w-8 h-8 flex items-center justify-center bg-secondary rounded-lg overflow-hidden">
+                          <ReferrerLogo referrer={item.referrer} />
                         </div>
-                        <span className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors">
+                        <span className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors truncate max-w-[150px] sm:max-w-none">
                           {item.referrer}
                         </span>
                       </div>
@@ -146,10 +164,10 @@ export default function ReferrerAnalytics({ data = [], days = 7 }: ReferrerAnaly
                     className="flex items-center justify-between py-3 px-4 rounded-2xl hover:bg-accent transition-colors group"
                   >
                     <div className="flex items-center gap-4 flex-1">
-                      <div className="p-2 bg-secondary rounded-lg flex-shrink-0">
-                        {getReferrerIcon(item.referrer)}
+                      <div className="w-8 h-8 flex items-center justify-center bg-secondary rounded-lg flex-shrink-0 overflow-hidden">
+                        <ReferrerLogo referrer={item.referrer} />
                       </div>
-                      <span className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors">{item.referrer}</span>
+                      <span className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors truncate max-w-[200px] sm:max-w-none">{item.referrer}</span>
                     </div>
                     <div className="flex items-center gap-10 text-sm tabular-nums font-three">
                       <span className="text-foreground font-bold">{item.count.toLocaleString()}</span>

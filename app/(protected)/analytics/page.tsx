@@ -53,7 +53,6 @@ function PremiumBlock({ children, isFree }: { children: React.ReactNode; isFree:
 
 export default function AnalyticsPage() {
   const router = useRouter();
-  const { user } = useUser();
 
   const [analyticsType, setAnalyticsType] = useState<AnalyticsType>("links");
   const [isChangingType, setIsChangingType] = useState(false);

@@ -8,11 +8,11 @@ import { ComputerVideoIcon, SmartPhone02Icon, Tablet02Icon } from '@hugeicons/co
 const getDeviceIcon = (device: string) => {
   const type = device?.toLowerCase() || ""
   if (type.includes("desktop") || type.includes("windows") || type.includes("mac"))
-    return <HugeiconsIcon icon={ComputerVideoIcon} size={20} />
+    return <HugeiconsIcon icon={ComputerVideoIcon} size={20} className="text-blue-500" />
   if (type.includes("mobile") || type.includes("iphone") || type.includes("android"))
-    return <HugeiconsIcon icon={SmartPhone02Icon} />
+    return <HugeiconsIcon icon={SmartPhone02Icon} size={20} className="text-green-500" />
   if (type.includes("tablet") || type.includes("ipad"))
-    return <HugeiconsIcon icon={Tablet02Icon} />
+    return <HugeiconsIcon icon={Tablet02Icon} size={20} className="text-purple-500" />
   return <MonitorSmartphone className="w-4 h-4 text-muted-foreground" />
 }
 

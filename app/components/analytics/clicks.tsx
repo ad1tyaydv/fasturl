@@ -58,7 +58,7 @@ export default function ClicksAnalytics({ data = [], days = 7 }: ClicksAnalytics
   )
 
   return (
-    <Card className="bg-card text-foreground overflow-hidden border-none shadow-none">
+    <Card className="bg-card text-foreground overflow-hidden border-none shadow-none ring-0">
       <CardHeader className="flex flex-col items-stretch border-b border-border p-0 sm:flex-row">
         <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-4 sm:py-6">
           <CardTitle className="text-xl font-three">Total Clicks</CardTitle>
@@ -98,7 +98,7 @@ export default function ClicksAnalytics({ data = [], days = 7 }: ClicksAnalytics
               cursor={false} 
               content={
                 <ChartTooltipContent 
-                  className="bg-card border-border text-foreground min-w-[120px]"
+                  className="bg-card border-border text-foreground min-w-[120px] shadow-none"
                   indicator="dot"
                   formatter={(value) => (
                     <div className="flex items-center gap-3">

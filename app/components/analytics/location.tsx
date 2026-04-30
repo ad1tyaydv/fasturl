@@ -6,23 +6,7 @@ import { HugeiconsIcon } from '@hugeicons/react'
 import { EarthIcon } from '@hugeicons/core-free-icons'
 import { X } from "lucide-react"
 
-const getCountryFlag = (country: string): string | null => {
-  const map: Record<string, string> = {
-    "united states": "US",
-    "united states of america": "US",
-    "usa": "US",
-    "india": "IN",
-    "brazil": "BR",
-    "canada": "CA",
-    "united kingdom": "GB",
-    "uk": "GB",
-    "germany": "DE",
-    "france": "FR",
-    "china": "CN",
-    "japan": "JP",
-  }
-  return map[country?.toLowerCase()] || null
-}
+import { getCountryCode } from "@/app/helpers/getCountryFlag"
 
 interface CountryAnalyticsProps {
   data?: any[]
@@ -60,7 +44,7 @@ export default function LocationAnalytics({ data = [], days = 7 }: CountryAnalyt
   const total = sortedData.reduce((sum, d) => sum + d.count, 0)
 
   const FlagIcon = ({ country }: { country: string }) => {
-    const code = getCountryFlag(country)
+    const code = getCountryCode(country)
     return code ? (
       <ReactCountryFlag countryCode={code} svg style={{ width: "18px", height: "18px" }} />
     ) : (
