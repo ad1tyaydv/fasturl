@@ -45,16 +45,14 @@ export async function POST(req: NextRequest) {
         const api_key = Api_keyGenerator();
 
         const tier = user.plan;
-        let maxLimit = 0;
-        if(tier === "ESSENTIAL") {
-            maxLimit = 1000;
-
-        } else if(tier === "PRO") {
-            maxLimit = 5000;
-
-        } else {
-            maxLimit = 0;
+        if (tier !== "PRO") {
+            return NextResponse.json(
+                { message: "Only PRO plan users can create API keys" },
+                { status: 403 }
+            );
         }
+
+        const maxLimit = 5000;
 
         const apiKey = await prisma.api_key.create({
             data: {

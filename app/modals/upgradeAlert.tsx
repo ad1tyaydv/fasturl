@@ -15,19 +15,20 @@ interface UpgradeAlertProps {
   isOpen: boolean;
   onClose: (open: boolean) => void;
   onConfirm: () => void;
+  title?: string;
+  description?: string;
 }
 
-export function UpgradeAlert({ isOpen, onClose, onConfirm }: UpgradeAlertProps) {
+export function UpgradeAlert({ isOpen, onClose, onConfirm, title, description }: UpgradeAlertProps) {
   return (
     <AlertDialog open={isOpen} onOpenChange={onClose}>
       <AlertDialogContent className="bg-background border-border text-foreground">
         <AlertDialogHeader>
           <AlertDialogTitle className="text-xl font-one">
-            Limit Reached
+            {title || "Limit Reached"}
           </AlertDialogTitle>
           <AlertDialogDescription className="text-muted-foreground font-one">
-            You've reached the link limit for your current plan. Upgrade your plan 
-            to generate more links, access custom domains, and get advanced analytics.
+            {description || "You've reached the limit for your current plan. Upgrade your plan to get access to more features and higher limits."}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

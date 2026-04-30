@@ -181,13 +181,13 @@ export default function PricingSection() {
               {[
                 "10,000 links/month",
                 "300 QR Codes/month",
-                "Real-time click analytics",
+                "Unlimited click analytics",
                 "Bulk url shortener tool",
                 "Custom short links & slugs",
-                "Branded links & Custom domains",
-                "4 custom domains included",
                 "Password protected links",
                 "Link expiration tool",
+                "Add upto 4 custom subdomains",
+                "Support 24/7"
               ].map((f) => (
                 <li
                   key={f}
@@ -238,12 +238,13 @@ export default function PricingSection() {
               {[
                 "40,000 links/month",
                 "2,000 QR Codes/month",
-                "Advanced data analytics",
-                "Batch link shortener access",
-                "Branded short domains",
-                "Link shortening api",
-                "10 custom domains",
-                "White label url shortener",
+                "Unlimited click analytics",
+                "Bulk url shortener tool",
+                "Custom short links & slugs",
+                "Password protected links",
+                "Link expiration tool",
+                "Add upto 10 custom subdomains",
+                "Api key for link shortening",
                 "Priority Support 24/7",
               ].map((f) => (
                 <li

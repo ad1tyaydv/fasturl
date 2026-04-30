@@ -64,7 +64,7 @@ export default function Navbar() {
     try {
       await logout();
       setIsSidebarOpen(false);
-      router.push("/");
+      window.location.href = "/";
 
     } catch (error) {
       console.error("Logout failed");

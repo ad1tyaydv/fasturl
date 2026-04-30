@@ -191,13 +191,15 @@ export default function Premium() {
           setPlanExpiresAt(res.data.planExpiresAt || "");
           setTotalLinksUsed(res.data.linksUsed || 0);
           setTotalQrCodesUsed(res.data.qrUsed || 0);
+
         } else {
           setIsAuthenticated(false);
         }
 
       } catch (err) {
-        console.error("Auth check failed", err);
+        console.error("Auth check failed");
         setIsAuthenticated(false);
+
       } finally {
         setIsInitialLoading(false);
       }
@@ -210,6 +212,7 @@ export default function Premium() {
       router.push("/auth/signin");
       return;
     }
+
     try {
       setLoading(targetPlan);
       const res = await fetch("/api/billing/checkout", {
@@ -557,13 +560,13 @@ export default function Premium() {
               {[
                 "10,000 links/month",
                 "300 QR Codes/month",
-                "Real-time click analytics",
+                "Unlimited click analytics",
                 "Bulk url shortener tool",
                 "Custom short links & slugs",
-                "Branded links & Custom domains",
-                "4 custom domains included",
                 "Password protected links",
                 "Link expiration tool",
+                "Add upto 4 custom subdomains",
+                "Support 24/7"
               ].map((f) => (
                 <li key={f} className="flex items-center gap-2 text-sm text-foreground/80">
                   <CheckIcon className="w-4 h-4 shrink-0 text-blue-600 dark:text-blue-400" />
@@ -594,12 +597,13 @@ export default function Premium() {
               {[
                 "40,000 links/month",
                 "2,000 QR Codes/month",
-                "Advanced data analytics",
-                "Batch link shortener access",
-                "Branded short domains",
-                "Link shortening api",
-                "10 custom domains",
-                "White label url shortener",
+                "Unlimited click analytics",
+                "Bulk url shortener tool",
+                "Custom short links & slugs",
+                "Password protected links",
+                "Link expiration tool",
+                "Add upto 10 custom subdomains",
+                "Api key for link shortening",
                 "Priority Support 24/7",
               ].map((f) => (
                 <li key={f} className="flex items-center gap-2 text-sm text-foreground/80">
@@ -649,8 +653,8 @@ export default function Premium() {
                       if (row.label === "Original price") {
                         return {
                           ...row,
-                          essential: isAnnual ? "₹14,400" : "₹1,200",
-                          pro: isAnnual ? "₹67,200" : "₹5,600"
+                          essential: isAnnual ? "₹3,599" : "₹599",
+                          pro: isAnnual ? "₹9,999" : "₹1,999"
                         };
                       }
                     }

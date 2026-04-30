@@ -3,10 +3,12 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2, Plus, Copy, Trash2, Key, Settings2 } from "lucide-react";
+import { Loader2, Plus, Copy, Trash2, Key } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import { useUser } from "@/app/components/userContext";
+import { UpgradeAlert } from "@/app/modals/upgradeAlert";
 
 interface ApiKey {
   id?: string;
@@ -20,6 +22,7 @@ interface ApiKey {
 
 export default function AllKeysTab() {
   const router = useRouter();
+  const { user } = useUser();
   const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -28,6 +31,7 @@ export default function AllKeysTab() {
   const [generatedKey, setGeneratedKey] = useState<string | null>(null);
   const [togglingId, setTogglingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
 
   useEffect(() => {
     fetchApiKeys();
@@ -45,6 +49,14 @@ export default function AllKeysTab() {
     }
   };
 
+  const handleGenerateClick = () => {
+    if (user?.plan !== "PRO") {
+      setIsUpgradeModalOpen(true);
+      return;
+    }
+    setIsModalOpen(true);
+  };
+
   const handleGenerate = async () => {
     if (!keyName.trim()) return;
     try {
@@ -54,8 +66,12 @@ export default function AllKeysTab() {
       setGeneratedKey(newKey.key ?? newKey.apiKey ?? null);
       await fetchApiKeys();
       toast.success("API key generated successfully.");
-    } catch (err) {
-      toast.error("Failed to generate API key.");
+    } catch (err: any) {
+      if (err.response?.status === 403) {
+        toast.error("Only PRO plan users can create API keys.");
+      } else {
+        toast.error("Failed to generate API key.");
+      }
     } finally {
       setIsGenerating(false);
     }
@@ -108,6 +124,13 @@ export default function AllKeysTab() {
 
   return (
     <div className="animate-in fade-in duration-300 font-one">
+      <UpgradeAlert 
+        isOpen={isUpgradeModalOpen} 
+        onClose={setIsUpgradeModalOpen} 
+        onConfirm={() => router.push("/premium")} 
+        title="PRO Feature"
+        description="API key creation is only available for PRO plan users. Upgrade your plan to generate API keys and integrate FastURL with your applications."
+      />
       {/* Header */}
       <div className="flex items-start justify-between mb-8 gap-4 flex-wrap">
         <div>
@@ -118,7 +141,7 @@ export default function AllKeysTab() {
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <Button
-            onClick={() => setIsModalOpen(true)}
+            onClick={handleGenerateClick}
             className="bg-primary text-primary-foreground hover:opacity-90 font-bold px-6 py-2.5 rounded-lg gap-2 cursor-pointer transition-all shadow-md"
           >
             <Plus className="w-4 h-4" />
@@ -155,7 +178,7 @@ export default function AllKeysTab() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {apiKeys.map((apiKey, i) => (
+              {apiKeys.map((apiKey) => (
                 <tr
                   key={apiKey.id ?? apiKey.key}
                   className="transition-colors hover:bg-accent/30"

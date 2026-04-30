@@ -136,7 +136,7 @@ export default function TwoFactorPage() {
               onClick={handleDisable}
               disabled={isDisabling}
               variant="outline"
-              className="border-border text-destructive hover:bg-destructive/10 hover:border-destructive font-bold px-8 py-2.5 cursor-pointer rounded-xl transition-all"
+              className="border-border text-black bg-red-400 hover:bg-red-600 hover:border-destructive font-bold px-8 py-4 cursor-pointer rounded transition-all"
             >
               {isDisabling ? <Loader2 className="w-4 h-4 animate-spin" /> : "Disable 2FA"}
             </Button>
@@ -165,7 +165,7 @@ export default function TwoFactorPage() {
                 onClick={() => setIsModalOpen(false)}
                 className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors sm:hidden cursor-pointer"
               >
-                <ArrowLeft size={20} />
+                <ArrowLeft />
                 <span className="text-sm font-bold">Back</span>
               </button>
               <h3 className="hidden sm:block text-foreground text-xl font-bold">
@@ -187,11 +187,11 @@ export default function TwoFactorPage() {
 
             <div className="flex justify-center mb-10">
               {isLoading ? (
-                <div className="w-48 h-48 sm:w-52 sm:h-52 bg-secondary border border-border flex items-center justify-center rounded-2xl">
+                <div className="w-48 h-48 sm:w-52 sm:h-52 bg-secondary border flex items-center justify-center rounded-2xl">
                   <Loader2 className="w-8 h-8 animate-spin text-primary" />
                 </div>
               ) : qrCode ? (
-                <div className="bg-white p-3 rounded-2xl shadow-xl border border-border">
+                <div className="bg-white p-3 rounded shadow-xl border">
                    <img
                     src={qrCode}
                     alt="2FA QR Code"
