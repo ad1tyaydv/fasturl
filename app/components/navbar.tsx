@@ -191,7 +191,7 @@ export default function Navbar() {
                {mounted && (
                 <button
                   onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                  className="p-2 hover:bg-accent rounded-full transition-colors"
+                  className="p-2 hover:bg-accent rounded-full transition-colors cursor-pointer"
                 >
                   {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
                 </button>
@@ -227,7 +227,7 @@ export default function Navbar() {
               {mounted && (
                 <button
                   onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                  className="p-3 bg-secondary hover:bg-accent text-muted-foreground hover:text-foreground rounded-full transition-all duration-200 border border-border active:scale-90"
+                  className="p-3 bg-secondary hover:bg-accent text-muted-foreground hover:text-foreground rounded-full transition-all duration-200 border border-border active:scale-90 cursor-pointer"
                 >
                   {theme === "dark" ? <Sun className="w-6 h-6" /> : <Moon className="w-6 h-6" />}
                 </button>

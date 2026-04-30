@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
             subject: "Password Reset OTP",
             html: `
         <div style="font-family: Arial; padding:20px;">
-          <h2>Thanks for using fasturl</h2>
+          <h2>Welcome to fasturl</h2>
           <p>Your OTP is:</p>
           <h1 style="letter-spacing:6px;">${otp}</h1>
           <p>This OTP expires in 10 minutes.</p>

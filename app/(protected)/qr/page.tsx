@@ -3,11 +3,9 @@
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
-import { 
-  IoRefreshOutline,
+import {
   IoCloseOutline,
   IoCheckmarkCircle,
-  IoDownloadOutline,
 } from "react-icons/io5";
 
 import { HugeiconsIcon } from '@hugeicons/react';
@@ -32,6 +30,12 @@ export default function QRGenerator() {
   const router = useRouter();
   const pricingRef = useRef<HTMLDivElement>(null);
   const { user, loading: authLoading } = useUser();
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push("/auth/signin");
+    }
+  }, [user, authLoading, router]);
 
   const [url, setUrl] = useState("");
   const isLoggedIn = !!user;
@@ -119,22 +123,11 @@ export default function QRGenerator() {
       if (error.response?.status === 429) {
         slowScrollToPricing();
       }
-      console.log("Error while generating qr code", error);
+      console.log("Error while generating qr code");
 
     } finally {
       setLoading(false);
     }
-  };
-
-
-  const downloadQr = () => {
-    if (!showQr) return;
-    const link = document.createElement("a");
-    link.href = showQr;
-    link.download = `qr-code-${Date.now()}.png`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
   };
 
 
@@ -157,9 +150,11 @@ export default function QRGenerator() {
         try {
           const count = await axios.get("/api/qrCode/qrLeft");
           setQrsLeft(count.data.qrLeft);
+
         } catch (error) {
-          console.error("Error fetching qrLeft", error);
+          console.error("Error fetching qrLeft");
         }
+
       } else {
         setQrsLeft(null);
       }
