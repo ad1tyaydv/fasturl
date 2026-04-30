@@ -27,9 +27,14 @@ import { AnalyticsTypeToggle, AnalyticsType } from "@/app/dropDown/analyticsType
 
 const DOMAIN = process.env.NEXT_PUBLIC_DOMAIN!;
 
-function PremiumBlock({ children, isFree }: { children: React.ReactNode; isFree: boolean }) {
+function PremiumBlock({ children, isFree, isLoading }: { children: React.ReactNode; isFree: boolean; isLoading?: boolean }) {
   return (
     <div className="relative flex w-full bg-card border border-border rounded-xl p-4 min-h-[400px] overflow-hidden">
+      {isLoading && (
+        <div className="absolute inset-0 z-50 bg-background/40 backdrop-blur-[2px] flex items-center justify-center">
+          <Loader2 className="animate-spin text-blue-500" />
+        </div>
+      )}
       {isFree && (
         <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background/40 backdrop-blur-[6px]">
           <div className="p-3 bg-secondary rounded-full mb-3 border border-border">
@@ -68,11 +73,11 @@ export default function AnalyticsPage() {
   const [days, setDays] = useState<number>(7);
 
 
-  const fetchAnalytics = async (id: string, type: AnalyticsType) => {
+  const fetchAnalytics = async (id: string, type: AnalyticsType, currentDays: number) => {
     setFetchingStats(true);
     try {
       const endpoint = type === "links" ? "/api/analytics/link" : "/api/analytics/bulkLinks";
-      const payload = type === "links" ? { linkId: id } : { batchId: id };
+      const payload = type === "links" ? { linkId: id, days: currentDays } : { batchId: id, days: currentDays };
 
       const res = await fetch(endpoint, {
         method: "POST",
@@ -88,6 +93,13 @@ export default function AnalyticsPage() {
       setFetchingStats(false);
     }
   };
+
+
+  useEffect(() => {
+    if (selectedId) {
+      fetchAnalytics(selectedId, analyticsType, days);
+    }
+  }, [days]);
 
 
   useEffect(() => {
@@ -140,7 +152,7 @@ export default function AnalyticsPage() {
 
             if (item) {
               setSelectedId(item.id);
-              fetchAnalytics(item.id, currentType);
+              fetchAnalytics(item.id, currentType, days);
             }
           }
         }
@@ -185,7 +197,7 @@ export default function AnalyticsPage() {
 
   const handleItemClick = (item: any) => {
     setSelectedId(item.id);
-    fetchAnalytics(item.id, analyticsType);
+    fetchAnalytics(item.id, analyticsType, days);
 
     const typeStr = analyticsType === "links" ? "linkanalytics" : "bulkanalytics";
     const identifier = analyticsType === "links" ? item.shorturl : item.id;
@@ -303,22 +315,22 @@ export default function AnalyticsPage() {
                       </section>
 
                       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <PremiumBlock isFree={isFree}>
+                        <PremiumBlock isFree={isFree} isLoading={fetchingStats}>
                           <LocationAnalytics data={analyticsData?.countries} days={days} />
                         </PremiumBlock>
-                        <PremiumBlock isFree={isFree}>
+                        <PremiumBlock isFree={isFree} isLoading={fetchingStats}>
                           <BrowserAnalytics data={analyticsData?.browsers} days={days} />
                         </PremiumBlock>
-                        <PremiumBlock isFree={isFree}>
+                        <PremiumBlock isFree={isFree} isLoading={fetchingStats}>
                           <DeviceAnalytics data={analyticsData?.devices} days={days} />
                         </PremiumBlock>
                       </section>
 
                       <section className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-10">
-                        <PremiumBlock isFree={isFree}>
+                        <PremiumBlock isFree={isFree} isLoading={fetchingStats}>
                           <OSAnalytics data={analyticsData?.os} days={days} />
                         </PremiumBlock>
-                        <PremiumBlock isFree={isFree}>
+                        <PremiumBlock isFree={isFree} isLoading={fetchingStats}>
                           <ReferrerAnalytics data={analyticsData?.referrers} days={days} />
                         </PremiumBlock>
                       </section>

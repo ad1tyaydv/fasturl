@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
             )
         }
 
-        const { batchId } = await req.json();
+        const { batchId, days } = await req.json();
 
         if (!batchId) {
             return NextResponse.json(
@@ -21,6 +21,11 @@ export async function POST(req: NextRequest) {
                 { status: 400 }
             );
         }
+
+        const analyticsDays = days || 7;
+        const startDate = new Date();
+        startDate.setDate(startDate.getDate() - analyticsDays);
+        startDate.setHours(0, 0, 0, 0);
 
         const bulk = await prisma.bulkLinks.findUnique({
             where: {
@@ -48,6 +53,9 @@ export async function POST(req: NextRequest) {
             where: {
                 linkId: {
                     in: linkIds
+                },
+                createdAt: {
+                    gte: startDate
                 }
             },
             select: {
@@ -63,6 +71,9 @@ export async function POST(req: NextRequest) {
             where: {
                 linkId: {
                     in: linkIds
+                },
+                createdAt: {
+                    gte: startDate
                 }
             },
             _count: {
@@ -80,6 +91,9 @@ export async function POST(req: NextRequest) {
             where: {
                 linkId: {
                     in: linkIds
+                },
+                createdAt: {
+                    gte: startDate
                 }
             },
             _count: {
@@ -97,6 +111,9 @@ export async function POST(req: NextRequest) {
             where: {
                 linkId: {
                     in: linkIds
+                },
+                createdAt: {
+                    gte: startDate
                 }
             },
             _count: {
@@ -114,6 +131,9 @@ export async function POST(req: NextRequest) {
             where: {
                 linkId: {
                     in: linkIds
+                },
+                createdAt: {
+                    gte: startDate
                 }
             },
             _count: {
@@ -131,6 +151,9 @@ export async function POST(req: NextRequest) {
             where: { 
                 linkId: {
                     in: linkIds
+                },
+                createdAt: {
+                    gte: startDate
                 }
              },
             _count: {
@@ -161,5 +184,3 @@ export async function POST(req: NextRequest) {
         )
     }
 }
-
-
