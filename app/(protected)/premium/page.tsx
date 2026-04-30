@@ -170,6 +170,7 @@ export default function Premium() {
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [loading, setLoading] = useState<"ESSENTIAL" | "PRO" | null>(null);
   const [isAnnual, setIsAnnual] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   
   const [plan, setPlan] = useState("FREE"); 
   const [planType, setPlanType] = useState("monthly");
@@ -182,21 +183,21 @@ export default function Premium() {
     const checkAuth = async () => {
       try {
         const res = await axios.get("/api/auth/me");
-        if (!res.data.authenticated) {
-          router.push("/auth/signin");
-          return;
+        if (res.data.authenticated) {
+          setIsAuthenticated(true);
+          setPlan(res.data.plan || "FREE");
+          setPlanType(res.data.planType || "monthly");
+          setPlanStartedAt(res.data.planStartedAt || "");
+          setPlanExpiresAt(res.data.planExpiresAt || "");
+          setTotalLinksUsed(res.data.linksUsed || 0);
+          setTotalQrCodesUsed(res.data.qrUsed || 0);
+        } else {
+          setIsAuthenticated(false);
         }
-
-        setPlan(res.data.plan || "FREE");
-        setPlanType(res.data.planType || "monthly");
-        setPlanStartedAt(res.data.planStartedAt || "");
-        setPlanExpiresAt(res.data.planExpiresAt || "");
-        setTotalLinksUsed(res.data.linksUsed || 0);
-        setTotalQrCodesUsed(res.data.qrUsed || 0);
 
       } catch (err) {
         console.error("Auth check failed", err);
-        router.push("/auth/signin");
+        setIsAuthenticated(false);
       } finally {
         setIsInitialLoading(false);
       }
@@ -205,6 +206,10 @@ export default function Premium() {
   }, [router]);
 
   async function handleCheckout(targetPlan: "ESSENTIAL" | "PRO") {
+    if (!isAuthenticated) {
+      router.push("/auth/signin");
+      return;
+    }
     try {
       setLoading(targetPlan);
       const res = await fetch("/api/billing/checkout", {
@@ -513,7 +518,9 @@ export default function Premium() {
           <div className="rounded-2xl border border-border bg-card p-6 flex flex-col shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <span className="text-xl font-bold text-foreground/70">Free</span>
-              <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-secondary text-muted-foreground">Current</span>
+              {isAuthenticated && plan === "FREE" && (
+                <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-secondary text-muted-foreground">Current</span>
+              )}
             </div>
             <div className="text-3xl font-bold mb-1 text-foreground">₹0</div>
             <div className="text-xs text-muted-foreground mb-5">Perfect to get started</div>
@@ -525,8 +532,11 @@ export default function Premium() {
                 </li>
               ))}
             </ul>
-            <button className="w-full py-3 rounded-xl border border-border bg-secondary/50 text-sm text-muted-foreground font-medium cursor-not-allowed">
-              Current Plan
+            <button 
+              onClick={() => !isAuthenticated && router.push("/auth/signin")}
+              className={`w-full py-3 rounded-xl border border-border text-sm font-medium ${isAuthenticated && plan === "FREE" ? "bg-secondary/50 text-muted-foreground cursor-not-allowed" : "bg-primary text-primary-foreground hover:opacity-90 cursor-pointer"}`}
+            >
+              {isAuthenticated && plan === "FREE" ? "Current Plan" : "Get Started"}
             </button>
           </div>
 

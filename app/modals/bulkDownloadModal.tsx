@@ -16,7 +16,7 @@ interface BulkDownloadModalProps {
   isOpen: boolean;
   onClose: () => void;
   batchName: string;
-  links: any[]; // Ensure this is passed as an array
+  links: any[];
 }
 
 const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN;
@@ -32,7 +32,6 @@ export default function BulkDownloadModal({ isOpen, onClose, batchName, links }:
     return () => { document.body.style.overflow = "unset"; };
   }, [isOpen]);
 
-  // FIX: Safety check to ensure links is always an array
   const safeLinks = Array.isArray(links) ? links : [];
 
   const downloadCSV = () => {
@@ -40,6 +39,7 @@ export default function BulkDownloadModal({ isOpen, onClose, batchName, links }:
 
     const data = safeLinks.map(link => {
       const fullShortUrl = `${NEXT_DOMAIN}/${link.shorturl || link.short}`;
+
       return {
         Name: link.linkName || link.name || "Unnamed",
         Original_URL: link.original || link.url,
@@ -88,13 +88,10 @@ export default function BulkDownloadModal({ isOpen, onClose, batchName, links }:
 
   return (
     <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
-      {/* Dark Overlay */}
       <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={onClose} />
       
-      {/* Modal Container - Increased Width and Padding */}
       <div className="relative bg-background border border-border w-full max-w-[500px] min-h-[320px] rounded-2xl p-8 shadow-2xl animate-in zoom-in-95 duration-200">
         
-        {/* Close Button - Top Right */}
         <button 
           onClick={onClose} 
           className="absolute top-6 right-6 text-muted-foreground hover:text-foreground transition-colors cursor-pointer p-1"

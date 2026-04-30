@@ -4,12 +4,13 @@
 import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Loader2, Lock, ChevronLeft } from "lucide-react";
+import { Loader2 }from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { HugeiconsIcon } from '@hugeicons/react';
 import {
-  AnalyticsUpIcon, Search01Icon, Link04Icon, File02Icon 
+  AnalyticsUpIcon, Search01Icon, File02Icon, 
+  Edit03Icon, ArrowLeft01Icon
 } from '@hugeicons/core-free-icons';
 
 import Navbar from "@/app/components/navbar";
@@ -32,7 +33,7 @@ function PremiumBlock({ children, isFree }: { children: React.ReactNode; isFree:
       {isFree && (
         <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background/40 backdrop-blur-[6px]">
           <div className="p-3 bg-secondary rounded-full mb-3 border border-border">
-            <Lock className="w-6 h-6 text-muted-foreground" />
+            <HugeiconsIcon icon={Edit03Icon} className="w-6 h-6 text-muted-foreground" />
           </div>
           <h3 className="text-foreground font-medium text-lg mb-1">Detailed Analytics Locked</h3>
           <p className="text-muted-foreground text-sm mb-5 text-center px-4">Upgrade your plan to see deeper insights.</p>
@@ -277,7 +278,7 @@ export default function AnalyticsPage() {
                     <div className="flex flex-col items-start gap-4">
                       {selectedId && (
                         <button onClick={() => setSelectedId(null)} className="md:hidden flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
-                            <ChevronLeft className="w-4 h-4" /> Back
+                            <HugeiconsIcon icon={ArrowLeft01Icon} className="w-4 h-4" /> Back
                         </button>
                       )}
 

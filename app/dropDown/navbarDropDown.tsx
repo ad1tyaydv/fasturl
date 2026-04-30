@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { HugeiconsIcon } from '@hugeicons/react';
-import { Settings01Icon, Logout01Icon } from '@hugeicons/core-free-icons';
+import { Settings01Icon, Logout01Icon, Moon02Icon, Sun03Icon,  } from '@hugeicons/core-free-icons';
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { Moon, Sun } from "lucide-react";
@@ -53,12 +53,12 @@ export function NavbarDropDown({ user, onLogout, trigger }: UserAccountNavProps)
         >
           {theme === "dark" ? (
             <>
-              <Sun className="w-4 h-4" />
+              <HugeiconsIcon icon={Sun03Icon} className="w-4 h-4" />
               <span className="text-sm">Light Mode</span>
             </>
           ) : (
             <>
-              <Moon className="w-4 h-4" />
+              <HugeiconsIcon icon={Moon02Icon} className="w-4 h-4" />
               <span className="text-sm">Dark Mode</span>
             </>
           )}

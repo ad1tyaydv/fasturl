@@ -9,8 +9,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { IoFilterOutline, IoChevronDown } from "react-icons/io5"
-
+import { IoFilterOutline } from "react-icons/io5"
+import { HugeiconsIcon } from '@hugeicons/react';
+import {
+  ArrowDown01Icon
+}
+  from '@hugeicons/core-free-icons';
 export type SortOrder = "most" | "least" | "newest" | "oldest";
 
 interface FilterProps {
@@ -37,11 +41,10 @@ export function AnalyticsFilter({ sortOrder, setSortOrder }: FilterProps) {
         >
           <IoFilterOutline size={18} className="text-blue-500" />
           <span className="text-sm">Sort: {getLabel()}</span>
-          <IoChevronDown size={14} className="text-muted-foreground" />
+          <HugeiconsIcon icon={ArrowDown01Icon} className="text-muted-foreground" />
         </Button>
       </DropdownMenuTrigger>
 
-      {/* Added font-three to the Content to ensure all items inherit the font */}
       <DropdownMenuContent 
         align="end"
         className="w-56 bg-popover border-border text-popover-foreground font-three shadow-2xl rounded-lg"

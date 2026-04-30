@@ -8,6 +8,8 @@ import {
   IoEyeOffOutline,
   IoCalendarOutline,
 } from "react-icons/io5";
+import { HugeiconsIcon } from '@hugeicons/react';
+import { Cancel01Icon, Globe02Icon, Alert02Icon, ViewIcon, ViewOffSlashIcon, Edit03Icon, Calendar01Icon } from '@hugeicons/core-free-icons';
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { DayPicker } from "react-day-picker";
@@ -118,7 +120,7 @@ export default function BulkPasswordProtectionModal({
                   }}
                   className="text-blue-500 hover:text-blue-400 cursor-pointer transition-colors"
                 >
-                  <IoPencilOutline size={18} />
+                  <HugeiconsIcon icon={Edit03Icon} />
                 </button>
               )}
             </div>
@@ -143,9 +145,9 @@ export default function BulkPasswordProtectionModal({
                   className="px-4 text-muted-foreground hover:text-foreground cursor-pointer"
                 >
                   {showPassword ? (
-                    <IoEyeOffOutline size={20} />
+                    <HugeiconsIcon icon={ViewOffSlashIcon} />
                   ) : (
-                    <IoEyeOutline size={20} />
+                    <HugeiconsIcon icon={ViewIcon} />
                   )}
                 </button>
               </div>
@@ -188,10 +190,7 @@ export default function BulkPasswordProtectionModal({
                     ? expiryDate.toLocaleDateString()
                     : "Pick expiry date"}
 
-                  <IoCalendarOutline
-                    size={20}
-                    className="text-muted-foreground"
-                  />
+                  <HugeiconsIcon icon={Calendar01Icon} size={20} className="text-muted-foreground" />
                 </button>
 
                 {showCalendar && (

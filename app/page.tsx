@@ -2,7 +2,6 @@
 
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { useEffect, useState, useRef } from "react";
 import { IoCloseOutline } from "react-icons/io5";
 
@@ -20,7 +19,6 @@ import Footer from "./components/footer";
 import { DomainDropdown } from "./dropDown/domainDropDown";
 import { toast } from "sonner";
 import { UpgradeAlert } from "./modals/upgradeAlert";
-import { useUser } from "./components/userContext";
 import QrDownloadModal from "./modals/qrDownloadModal";
 
 
@@ -28,7 +26,6 @@ const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN!;
 
 export default function Dashboard() {
   const router = useRouter();
-  const { user } = useUser();
   const pricingRef = useRef<HTMLDivElement>(null);
 
 
@@ -47,7 +44,6 @@ export default function Dashboard() {
 
   const [authLoading, setAuthLoading] = useState(true);
   const [isLoadingQr, setIsLoadingQr] = useState(false);
-  const [display, setDisplay] = useState(false);
 
   const [selectedDomain, setSelectedDomain] = useState(NEXT_DOMAIN);
 
@@ -60,13 +56,10 @@ export default function Dashboard() {
   useEffect(() => {
     router.prefetch("/auth/signin");
     router.prefetch("/links?types=links");
-    router.prefetch("/bulklinks");
     router.prefetch("/qr");
-    router.prefetch("/analytics");
     router.prefetch("/domain");
     router.prefetch("/premium");
     router.prefetch("/docs?docs=core");
-    router.prefetch("/settings/profile");
   }, []);
 
 
@@ -348,7 +341,7 @@ export default function Dashboard() {
               {!authLoading && !isLoggedIn && (
                 <div className="mt-4 font-one text-lg text-muted-foreground text-center">
                   <p>Guest limit: 1 link/day</p>
-                  <button 
+                  <button
                     onClick={() => router.push("/auth/signin")}
                     className="mt-1 underline cursor-pointer text-foreground hover:text-blue-400 transition-colors">
                     Login for custom domains & much more
@@ -391,23 +384,26 @@ export default function Dashboard() {
       <Features isLoggedIn={isLoggedIn} userPlan={userPlan} />
       <div className="w-full h-px bg-border my-12 shadow-sm"></div>
 
-      {user?.plan === "FREE" && (
-        <div ref={pricingRef}>
-          <PricingSection />
-          <div className="w-full h-px bg-border my-12 shadow-sm"></div>
-        </div>
-      )}
+      {userPlan !== "ESSENTIAL" && userPlan !== "PRO" && <PricingSection />}
       <FaqSection />
 
       {copied && (
-        <div className="fixed font-one top-24 left-1/2 -translate-x-1/2 px-6 py-3 shadow-2xl z-[100] text-white font-bold rounded-full animate-in fade-in slide-in-from-top-6 duration-300">
-          <div role="alert" className="alert alert-success">
+        <div className="toast toast-top toast-center z-[100] animate-in fade-in slide-in-from-top-4 duration-500">
+          <div className="alert alert-success border-none shadow-lg text-white">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6 shrink-0 stroke-current" fill="none" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              className="h-6 w-6 shrink-0 stroke-current"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
-            <span>Link copied successfully!</span>
+            <span className="font-medium">Link copied successfully!</span>
           </div>
         </div>
       )}

@@ -6,7 +6,6 @@ import {
   IoListOutline, 
   IoKeyOutline,
 } from "react-icons/io5";
-import { motion } from "framer-motion";
 
 import { HugeiconsIcon } from '@hugeicons/react';
 import {
@@ -101,15 +100,7 @@ export default function Features({ isLoggedIn }: FasturlFeaturesProps) {
               key={i} 
               className={`flex flex-col lg:items-center gap-12 lg:gap-20 ${i % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'}`}
             >
-              <motion.div 
-                initial={{ x: i % 2 === 0 ? -60 : 60, opacity: 0 }}
-                whileInView={{ x: 0, opacity: 1 }}
-                viewport={{ once: true, amount: 0.3 }}
-                transition={{ 
-                  duration: 1, 
-                  ease: [0.22, 1, 0.36, 1],
-                  delay: 0.1
-                }}
+              <div 
                 className="flex-1 space-y-6"
               >
                 <div className={`inline-flex p-3 rounded-2xl ${f.bgLight} ${f.accent} mb-2 shadow-sm`}>
@@ -127,27 +118,14 @@ export default function Features({ isLoggedIn }: FasturlFeaturesProps) {
                     {f.buttonText} <HugeiconsIcon icon={ArrowRightDoubleIcon} />
                   </Link>
                 </div>
-              </motion.div>
+              </div>
 
-              <motion.div 
-                initial={{ x: i % 2 === 0 ? 60 : -60, opacity: 0 }}
-                whileInView={{ x: 0, opacity: 1 }}
-                viewport={{ once: true, amount: 0.3 }}
-                transition={{ 
-                  duration: 1, 
-                  ease: [0.22, 1, 0.36, 1],
-                }}
+              <div 
                 className="flex-1 relative flex justify-center"
               >
                 <div className={`absolute -inset-4 rounded-3xl opacity-20 blur-2xl ${f.bgLight} transition-all duration-500 group-hover:opacity-30`}></div>
-                <motion.div 
-                  whileHover={{ 
-                    rotateY: i % 2 === 0 ? 2 : -2,
-                    rotateX: 1,
-                  }}
-                  transition={{ type: "spring", stiffness: 200, damping: 25 }}
+                <div 
                   className={`relative aspect-video bg-secondary border ${f.border} rounded-2xl overflow-hidden shadow-2xl group cursor-pointer w-full max-w-[480px]`}
-                  style={{ perspective: 1000 }}
                 >
                   <img 
                     src={f.image} 
@@ -156,8 +134,8 @@ export default function Features({ isLoggedIn }: FasturlFeaturesProps) {
                   />
                   
                   <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-40 group-hover:opacity-20 transition-opacity duration-500"></div>
-                </motion.div>
-              </motion.div>
+                </div>
+              </div>
             </div>
           ))}
         </div>

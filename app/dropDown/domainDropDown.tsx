@@ -2,17 +2,16 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { ChevronDown, Check, Plus, Globe } from "lucide-react";
+import { HugeiconsIcon } from '@hugeicons/react';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  ArrowDown01Icon, Globe02Icon, PlusSignIcon,Tick02Icon
+}
+  from '@hugeicons/core-free-icons';
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
+  DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 
 
 interface DomainDropdownProps {
@@ -33,10 +32,9 @@ export function DomainDropdown({ selectedDomain, onSelect, defaultDomain }: Doma
         const res = await axios.get("/api/domain/fetchDomain");
         const verifiedDomains = res.data.userDomains?.filter((d: any) => d.isActive) || [];
         setDomains(verifiedDomains);
-        console.log("Fetched domains:", verifiedDomains);
 
       } catch (err) {
-        console.error("Failed to fetch domains", err);
+        console.error("Failed to fetch domains");
       }
     };
     getDomains();
@@ -51,10 +49,10 @@ export function DomainDropdown({ selectedDomain, onSelect, defaultDomain }: Doma
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="flex items-center gap-2 px-4 py-2 bg-background border border-border text-foreground text-sm font-medium rounded-lg hover:bg-accent hover:text-accent-foreground transition-all outline-none focus:ring-1 focus:ring-ring">
-          <Globe size={16} className="text-blue-500" />
+        <button className="flex items-center gap-2 px-4 py-2 bg-background border border-border text-foreground text-sm font-medium rounded-lg hover:bg-accent hover:text-accent-foreground transition-all outline-none focus:ring-1 focus:ring-ring cursor-pointer">
+          <HugeiconsIcon icon={Globe02Icon} className="text-blue-500" />
           <span className="truncate max-w-[180px]">{displayDomain}</span>
-          <ChevronDown size={14} className="text-muted-foreground" />
+          <HugeiconsIcon icon={ArrowDown01Icon} className="text-muted-foreground" />
         </button>
       </DropdownMenuTrigger>
 
@@ -70,7 +68,7 @@ export function DomainDropdown({ selectedDomain, onSelect, defaultDomain }: Doma
           <span className="truncate">
             {defaultDomain.replace(/^https?:\/\//, "")} (Default)
           </span>
-          {selectedDomain === defaultDomain && <Check size={14} className="text-blue-500 ml-2 shrink-0" />}
+          {selectedDomain === defaultDomain && <HugeiconsIcon icon={Tick02Icon} className="text-blue-500 ml-2 shrink-0" />}
         </DropdownMenuItem>
 
         {domains.map((d) => {
@@ -91,7 +89,7 @@ export function DomainDropdown({ selectedDomain, onSelect, defaultDomain }: Doma
               </span>
 
               {selectedDomain === fullDomain && (
-                <Check size={14} className="text-blue-500 ml-2 shrink-0" />
+                <HugeiconsIcon icon={Tick02Icon} className="text-blue-500 ml-2 shrink-0" />
               )}
             </DropdownMenuItem>
           );
@@ -103,7 +101,7 @@ export function DomainDropdown({ selectedDomain, onSelect, defaultDomain }: Doma
           onClick={() => router.push("/domain")}
           className="flex items-center gap-2 text-muted-foreground focus:bg-accent focus:text-accent-foreground cursor-pointer transition-colors mx-1 rounded-md"
         >
-          <Plus size={14} />
+          <HugeiconsIcon icon={PlusSignIcon} />
           <span>Manage Domains</span>
         </DropdownMenuItem>
       </DropdownMenuContent>

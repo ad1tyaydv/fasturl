@@ -47,8 +47,10 @@ export default function DomainsPage() {
       setLoading(true);
       const res = await axios.get("/api/domain/fetchDomain");
       setDomains(res.data.userDomains || []);
+
     } catch (err) {
       toast.error("Failed to load domains");
+
     } finally {
       setLoading(false);
     }
@@ -57,10 +59,12 @@ export default function DomainsPage() {
   useEffect(() => {
     const initAuth = async () => {
       try {
-        const plan = user?.plan || "FREE";
+        const plan = user?.plan;
         setUserTier(plan);
-        if (plan !== "FREE" && plan !== "") {
+
+        if (plan !== "") {
           setIsLoggedIn(true);
+
         } else {
           router.push("/auth/signin");
         }
@@ -70,6 +74,7 @@ export default function DomainsPage() {
       }
     };
     initAuth();
+
   }, [router]);
 
   useEffect(() => {
@@ -121,8 +126,10 @@ export default function DomainsPage() {
         toast.success("Domain verified successfully!");
         await fetchDomains();
       }
+
     } catch (error: any) {
       toast.error("DNS records not found yet, Try again.");
+
     } finally {
       setVerifyingId(null);
     }
@@ -133,6 +140,7 @@ export default function DomainsPage() {
       await axios.post(`/api/domain/deleteDomain/${id}`);
       toast.success("Domain deleted successfully");
       fetchDomains();
+      
     } catch (error) {
       toast.error("Error while deleting domain");
     }

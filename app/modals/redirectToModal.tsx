@@ -22,7 +22,6 @@ export default function RedirectToModal({ isOpen, onClose, selectedUrl, onSucces
 
   useEffect(() => {
     if (isOpen && selectedUrl) {
-      // Pre-fill with existing redirect URL if it exists
       setDestinationUrl(selectedUrl.redirectTo || "");
       document.body.style.overflow = "hidden";
     } else {
@@ -35,7 +34,6 @@ export default function RedirectToModal({ isOpen, onClose, selectedUrl, onSucces
 
   if (!isOpen || !selectedUrl) return null;
 
-  // Check if a redirect already exists for this link
   const hasExistingRedirect = !!selectedUrl.redirectTo;
 
   const handleUpdate = async () => {

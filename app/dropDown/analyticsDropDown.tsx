@@ -12,7 +12,7 @@ import {
 
 import { HugeiconsIcon } from '@hugeicons/react';
 import {
-  FilterIcon, ArrowDown01Icon, QrCodeIcon }
+  FilterIcon, ArrowDown01Icon }
   from '@hugeicons/core-free-icons';
 
 interface AnalyticsFilterProps {

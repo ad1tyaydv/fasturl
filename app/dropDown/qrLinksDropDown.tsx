@@ -16,6 +16,7 @@ interface QrFilterDropDownProps {
 }
 
 export function QrFilterDropDown({ value, onChange }: QrFilterDropDownProps) {
+  
   return (
     <Select value={value} onValueChange={(val) => onChange(val as QrFilterType)}>
       <SelectTrigger className="w-[200px] bg-background border-border text-foreground rounded-lg outline-none cursor-pointer">

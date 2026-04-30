@@ -24,28 +24,29 @@ function CheckIcon({ className }: { className?: string }) {
   );
 }
 
-export default function Premium() {
+export default function PricingSection() {
   const router = useRouter();
-  const { user, logout, loading: userLoading } = useUser();
+  const { user, loading: isUserLoading } = useUser();
   const [isAnnual, setIsAnnual] = useState(true);
   const [loading, setLoading] = useState<string | null>(null);
 
-  const handleUpgrade = async (plan: string) => {
-    try {
-      setLoading(plan);
-      const res = await axios.get("/api/auth/me");
+  const isAuthenticated = !!user;
+  const userPlan = user?.plan || "FREE";
 
-      if (!res.data.authenticated) {
-        router.push("/auth/signin");
-        return;
-      }
+  const handleCheckout = async (targetPlan: "ESSENTIAL" | "PRO") => {
+    if (!isAuthenticated) {
+      router.push("/auth/signin");
+      return;
+    }
+    try {
+      setLoading(targetPlan);
 
       const checkoutRes = await fetch("/api/billing/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({ 
-          plan: plan === "ESSENTIALS" ? "ESSENTIAL" : plan,
+          plan: targetPlan,
           billingPeriod: isAnnual ? "ANNUALLY" : "MONTHLY"
         }),
       });
@@ -57,6 +58,7 @@ export default function Premium() {
     } catch (error) {
       console.error(error);
       alert("Unable to start checkout. Please try again.");
+
     } finally {
       setLoading(null);
     }
@@ -79,7 +81,7 @@ export default function Premium() {
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 mr-2">
               <span className="text-[10px] font-bold bg-green-500/20 text-green-600 dark:text-green-400 px-2 py-1 rounded-full uppercase tracking-wider">
-                Save upto 38%
+                Save upto 33%
               </span>
               <span className={`text-sm font-medium transition-colors ${isAnnual ? "text-foreground" : "text-muted-foreground"}`}>
                 Annually
@@ -108,9 +110,11 @@ export default function Premium() {
           <div className="rounded-2xl border border-border bg-card p-8 flex flex-col shadow-sm">
             <div className="flex items-center justify-between mb-6">
               <span className="text-xl font-bold text-foreground/70">Free Tool</span>
-              <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-secondary text-muted-foreground">
-                Current
-              </span>
+              {isAuthenticated && userPlan === "FREE" && (
+                <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-secondary text-muted-foreground">
+                  Current
+                </span>
+              )}
             </div>
 
             <div className="text-4xl font-bold mb-1">₹0</div>
@@ -135,8 +139,11 @@ export default function Premium() {
               ))}
             </ul>
 
-            <button className="w-full py-3 rounded-xl border border-border bg-secondary/50 text-sm text-muted-foreground font-medium cursor-default">
-              Start Free
+            <button 
+              onClick={() => !isAuthenticated && router.push("/auth/signin")}
+              className={`w-full py-3 rounded-xl border border-border text-sm font-medium ${isAuthenticated && userPlan === "FREE" ? "bg-secondary/50 text-muted-foreground cursor-not-allowed" : "bg-primary text-primary-foreground hover:opacity-90 cursor-pointer"}`}
+            >
+              {isAuthenticated && userPlan === "FREE" ? "Current Plan" : "Start Free"}
             </button>
           </div>
 
@@ -156,10 +163,10 @@ export default function Premium() {
 
             <div className="flex items-baseline gap-2 mb-1">
               <span className="text-sm line-through text-muted-foreground/50">
-                {isAnnual ? "₹14,400" : "₹1,200"}
+                {isAnnual ? "₹3,599" : "₹599"}
               </span>
               <span className="text-4xl font-bold">
-                ₹{isAnnual ? "2,299" : "300"}
+                ₹{isAnnual ? "2,299" : "299"}
                 <span className="text-base font-normal text-muted-foreground ml-1">
                   {isAnnual ? "/yr" : "/mo"}
                 </span>
@@ -193,11 +200,11 @@ export default function Premium() {
             </ul>
 
             <button
-              onClick={() => handleUpgrade("ESSENTIALS")}
+              onClick={() => handleCheckout("ESSENTIAL")}
               disabled={loading !== null}
               className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition-all shadow-lg shadow-blue-600/20 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-70 active:scale-[0.98]"
             >
-              {loading === "ESSENTIALS" ? <Loader2 className="w-4 h-4 animate-spin" /> : "Upgrade to Essentials"}
+              {loading === "ESSENTIAL" ? <Loader2 className="w-4 h-4 animate-spin" /> : "Upgrade to Essentials"}
             </button>
           </div>
 
@@ -213,10 +220,10 @@ export default function Premium() {
 
             <div className="flex items-baseline gap-2 mb-1">
               <span className="text-sm line-through text-muted-foreground/50">
-                {isAnnual ? "₹67,200" : "₹5,600"}
+                {isAnnual ? "₹9,999" : "₹1,999"}
               </span>
               <span className="text-4xl font-bold">
-                ₹{isAnnual ? "8,999" : "1,200"}
+                ₹{isAnnual ? "5,699" : "999"}
                 <span className="text-base font-normal text-muted-foreground ml-1">
                   {isAnnual ? "/yr" : "/mo"}
                 </span>
@@ -250,7 +257,7 @@ export default function Premium() {
             </ul>
 
             <button
-              onClick={() => handleUpgrade("PRO")}
+              onClick={() => handleCheckout("PRO")}
               disabled={loading !== null}
               className="w-full py-3 rounded-xl bg-foreground text-background hover:opacity-90 text-sm font-semibold transition-all shadow-lg cursor-pointer flex items-center justify-center gap-2 disabled:opacity-70 active:scale-[0.98]"
             >
