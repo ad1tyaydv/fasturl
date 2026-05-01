@@ -274,7 +274,7 @@ export default function Login() {
           ) : (
             <div className="flex flex-col items-center text-center">
               <div className="mb-10 flex flex-col items-center">
-                <div className="w-20 h-20 bg-secondary text-[#F07D51] rounded-[28px] flex items-center justify-center mb-8 border border-border shadow-xl shadow-[#F07D51]/10">
+                <div className="w-20 h-20 bg-secondary text-[#83c5be] rounded-[28px] flex items-center justify-center mb-8 border border-border shadow-xl shadow-[#83c5be]/10">
                   <HugeiconsIcon icon={FingerPrintIcon} size={40} />
                 </div>
                 <h2 className="text-4xl font-extrabold tracking-tight text-foreground mb-4">Verify Identity</h2>
@@ -301,7 +301,7 @@ export default function Login() {
                           handleOtpBackspace(index);
                         }
                       }}
-                      className="w-12 h-16 sm:w-14 sm:h-18 rounded-2xl bg-secondary/50 border border-border focus:border-[#F07D51] focus:bg-secondary focus:ring-4 focus:ring-[#F07D51]/10 outline-none text-foreground font-bold text-3xl text-center transition-all"
+                      className="w-12 h-16 sm:w-14 sm:h-18 rounded-2xl bg-secondary/50 border border-border focus:border-[#83c5be] focus:bg-secondary focus:ring-4 focus:ring-[#83c5be]/10 outline-none text-foreground font-bold text-3xl text-center transition-all"
                       placeholder="-"
                     />
                   ))}
@@ -310,7 +310,7 @@ export default function Login() {
                 <button
                   onClick={handleVerify2FA}
                   disabled={verifying2FA || otp.join("").length !== 6}
-                  className="w-full py-5 bg-[#F07D51] text-white font-bold text-xl rounded-2xl transition-all hover:bg-[#e06d41] hover:shadow-[0_0_30px_rgba(240,125,81,0.3)] active:scale-[0.98] disabled:opacity-50 cursor-pointer flex items-center justify-center gap-3"
+                  className="w-full py-5 bg-[#83c5be] text-white font-bold text-xl rounded-2xl transition-all hover:bg-[#83c5be] hover:shadow-[0_0_30px_rgba(240,125,81,0.3)] active:scale-[0.98] disabled:opacity-50 cursor-pointer flex items-center justify-center gap-3"
                 >
                   {verifying2FA ? (
                     <HugeiconsIcon icon={Loading02Icon} className="w-7 h-7 animate-spin" />

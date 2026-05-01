@@ -11,12 +11,10 @@ export default function SupportPage() {
       <p className="text-muted-foreground mb-4">
         The best way to reach us is via email. We typically respond within 24 hours.
       </p>
-      <a 
-        href="mailto:support@fasturl.com" 
-        className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
-      >
-        Email us at support@fasturl.com
-      </a>
+      <div className="flex gap-2 text-black">
+        <p>Email us:</p>
+        <p className="font-bold">fasturl@tutamail.com</p>
+      </div>
 
       <h2 className="text-xl font-semibold mt-6 mb-2">Social Media</h2>
       <p className="text-muted-foreground mb-4">
