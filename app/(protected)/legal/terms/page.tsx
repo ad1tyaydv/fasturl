@@ -64,7 +64,7 @@ export default function TermsPage() {
       <h2 className="text-xl font-semibold mt-6 mb-2">8. Contact</h2>
       <p className="text-muted-foreground">
         If you have any questions about these Terms, please contact us at
-        support@fasturl.com.
+        fasturl@tutamail.com
       </p>
     </div>
   );

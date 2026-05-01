@@ -33,6 +33,7 @@ import Footer from "@/app/components/footer";
 
 import { useUser } from "@/app/components/userContext";
 
+
 const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN;
 
 const getRelativeTime = (dateString?: string) => {
@@ -169,12 +170,15 @@ export default function BulkCreateLinks() {
       setCreatedLinks(res.data.success || []);
       await fetchPastBulkLinks();
       setFile(null);
+
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || "";
       if (errorMessage.toLowerCase().includes("limit") || error.response?.status === 403) {
         setShowLimitModal(true);
       }
+
       setStatus({ type: "error", message: errorMessage || "Failed to process bulk upload." });
+      
     } finally {
       setLoading(false);
     }
@@ -189,8 +193,10 @@ export default function BulkCreateLinks() {
       setPastBulkLinks((prev) =>
         prev.map((link) => (link.id === id ? { ...link, name: newName } : link))
       );
+
     } catch (err) {
-      console.error("Failed to update name:", err);
+      console.error("Failed to update name");
+
     } finally {
       setEditingId(null);
     }
@@ -201,12 +207,15 @@ export default function BulkCreateLinks() {
     try {
       await axios.post(`/api/shortUrl/bulkLinks/delete/${id}`);
       setPastBulkLinks((prev) => prev.filter((link) => link.id !== id));
+
     } catch (error) {
-      console.error("Failed to delete bulk links", error);
+      console.error("Failed to delete bulk links");
+
     } finally {
       setDeletingId(null);
     }
   };
+
 
   const exportPDF = () => {
     if (!Array.isArray(createdLinks) || createdLinks.length === 0) {
@@ -233,6 +242,7 @@ export default function BulkCreateLinks() {
     doc.save("Fasturl_Links.pdf");
   };
 
+
   const exportCSV = () => {
     if (!Array.isArray(createdLinks) || createdLinks.length === 0) {
       toast.error("No links available to export.");
@@ -253,6 +263,7 @@ export default function BulkCreateLinks() {
     window.URL.revokeObjectURL(url);
   };
 
+
   const closeAllModals = () => {
     setSelectedUrl(null);
     setIsPasswordModalOpen(false);
@@ -263,6 +274,7 @@ export default function BulkCreateLinks() {
     setIsEditingExpiry(false);
   };
 
+
   const handleAddPassword = async () => {
     try {
       const finalPassword = isEditingPassword ? password : selectedUrl?.password;
@@ -272,16 +284,20 @@ export default function BulkCreateLinks() {
         password: finalPassword,
         expiryDate: finalExpiry,
       });
+      
       toast.success("Protection Updated successfully");
       await fetchPastBulkLinks();
       closeAllModals();
+
     } catch (error) {
       console.log("Update failed");
     }
   };
 
+
   const topFiveLinks = pastBulkLinks.slice(0, 5);
 
+  
   return (
     <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
       <Navbar />

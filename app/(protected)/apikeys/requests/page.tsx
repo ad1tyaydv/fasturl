@@ -36,9 +36,11 @@ export default function RequestsTab() {
 
   const [page, setPage] = useState(1);
 
+
   useEffect(() => {
     fetchRequests();
   }, []);
+
 
   const fetchRequests = async () => {
     try {
@@ -61,12 +63,15 @@ export default function RequestsTab() {
 
       setAllRows(flat);
       setApiKeyNames(apiKeys.map((k) => k.name));
+
     } catch (err) {
-      toast.error("Failed to fetch requests.");
+      toast.error("Failed to fetch requests");
+
     } finally {
       setIsLoading(false);
     }
   };
+
 
   const filteredRows = useMemo(() => {
     let rows = [...allRows];
@@ -80,39 +85,50 @@ export default function RequestsTab() {
       const cutoff = new Date();
       if (timeFilter === "today") {
         cutoff.setHours(0, 0, 0, 0);
+
       } else if (timeFilter === "7days") {
         cutoff.setDate(now.getDate() - 7);
+
       } else if (timeFilter === "28days") {
         cutoff.setDate(now.getDate() - 28);
       }
       rows = rows.filter((r) => new Date(r.createdAt) >= cutoff);
     }
-
     return rows;
+
   }, [allRows, selectedKey, timeFilter]);
+
 
   const totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
   const pagedRows = filteredRows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
 
   useEffect(() => {
     setPage(1);
   }, [selectedKey, timeFilter]);
 
+
   const getPageNumbers = () => {
     const pages: (number | "...")[] = [];
     if (totalPages <= 7) {
       for (let i = 1; i <= totalPages; i++) pages.push(i);
+
     } else {
       pages.push(1);
-      if (page > 3) pages.push("...");
+      if (page > 3) {
+        pages.push("...");
+      }
       for (let i = Math.max(2, page - 1); i <= Math.min(totalPages - 1, page + 1); i++) {
         pages.push(i);
       }
-      if (page < totalPages - 2) pages.push("...");
+      if (page < totalPages - 2) {
+        pages.push("...");
+      }
       pages.push(totalPages);
     }
     return pages;
   };
+  
 
   return (
     <div className="animate-in fade-in duration-300 font-one">

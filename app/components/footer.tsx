@@ -32,10 +32,10 @@ export default function Footer() {
     {
       title: "Contact Us",
       links: [
-        { name: "Help Desk", href: "https://mail.google.com/mail/?view=cm&fs=1&to=fasturl@tutamail.com", external: true },
-        { name: "Contact Sales", href: "https://mail.google.com/mail/?view=cm&fs=1&to=fasturl@tutamail.com", external: true },
-        { name: "Contact Support", href: "https://mail.google.com/mail/?view=cm&fs=1&to=fasturl@tutamail.com", external: true },
-        { name: "Report Abuse", href: "https://mail.google.com/mail/?view=cm&fs=1&to=fasturl@tutamail.com", external: true },
+        { name: "Support", href: "/contact/support" },
+        { name: "Feedback", href: "/contact/feedback" },
+        { name: "Business", href: "/contact/business" },
+        { name: "Help Desk", href: "/contact/support" },
       ],
     },
     {

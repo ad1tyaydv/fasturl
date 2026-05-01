@@ -81,7 +81,7 @@ export default function CookiePage() {
       </h2>
       <p className="text-muted-foreground">
         If you have any questions about our use of cookies, please contact us at
-        support@fasturl.com.
+        fasturl@tutamail.com
       </p>
     </div>
   );

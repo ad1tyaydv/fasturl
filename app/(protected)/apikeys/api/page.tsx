@@ -33,6 +33,7 @@ export default function AllKeysTab() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
 
+
   useEffect(() => {
     fetchApiKeys();
   }, []);
@@ -42,12 +43,15 @@ export default function AllKeysTab() {
       setIsLoading(true);
       const res = await axios.get("/api/api_key/fetchApi_keys");
       setApiKeys(Array.isArray(res.data) ? res.data : (res.data.apiKeys ?? []));
+
     } catch (err) {
       toast.error("Failed to fetch API keys.");
+
     } finally {
       setIsLoading(false);
     }
   };
+
 
   const handleGenerateClick = () => {
     if (user?.plan !== "PRO") {
@@ -59,29 +63,36 @@ export default function AllKeysTab() {
 
   const handleGenerate = async () => {
     if (!keyName.trim()) return;
+
     try {
       setIsGenerating(true);
       const res = await axios.post("/api/api_key", { name: keyName.trim() });
       const newKey = res.data;
       setGeneratedKey(newKey.key ?? newKey.apiKey ?? null);
+
       await fetchApiKeys();
       toast.success("API key generated successfully.");
+
     } catch (err: any) {
       if (err.response?.status === 403) {
         toast.error("Only PRO plan users can create API keys.");
+
       } else {
         toast.error("Failed to generate API key.");
       }
+
     } finally {
       setIsGenerating(false);
     }
   };
+
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setKeyName("");
     setGeneratedKey(null);
   };
+
 
   const handleToggle = async (id: string, currentStatus: boolean) => {
     try {
@@ -91,12 +102,15 @@ export default function AllKeysTab() {
         prev.map((k) => (k.id === id ? { ...k, isActive: !currentStatus } : k))
       );
       toast.success(`Key ${!currentStatus ? "activated" : "deactivated"}.`);
+
     } catch (err) {
       toast.error("Failed to update key status.");
+
     } finally {
       setTogglingId(null);
     }
   };
+
 
   const handleDelete = async (id: string) => {
     try {
@@ -104,23 +118,28 @@ export default function AllKeysTab() {
       await axios.post(`/api/api_key/deleteApi_key/${id}`);
       setApiKeys((prev) => prev.filter((k) => k.id !== id));
       toast.success("API key deleted.");
+
     } catch (err) {
-      console.log(err);
+      console.log("Failed to delete key");
       toast.error("Failed to delete key.");
+
     } finally {
       setDeletingId(null);
     }
   };
+
 
   const handleCopy = (key: string) => {
     navigator.clipboard.writeText(key);
     toast.success("Copied to clipboard.");
   };
 
+
   const maskKey = (key: string) => {
     if (!key) return "";
     return `${key.slice(0, 8)}${"•".repeat(24)}`;
   };
+
 
   return (
     <div className="animate-in fade-in duration-300 font-one">
@@ -131,7 +150,6 @@ export default function AllKeysTab() {
         title="PRO Feature"
         description="API key creation is only available for PRO plan users. Upgrade your plan to generate API keys and integrate FastURL with your applications."
       />
-      {/* Header */}
       <div className="flex items-start justify-between mb-8 gap-4 flex-wrap">
         <div>
           <h2 className="text-2xl font-bold text-foreground mb-1">API Keys</h2>
@@ -150,7 +168,6 @@ export default function AllKeysTab() {
         </div>
       </div>
 
-      {/* Keys Table */}
       {isLoading ? (
         <div className="flex items-center gap-3 text-muted-foreground py-10">
           <Loader2 className="w-5 h-5 animate-spin text-primary" />
@@ -260,7 +277,6 @@ export default function AllKeysTab() {
         </div>
       )}
 
-      {/* Generate Modal */}
       {isModalOpen && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4 animate-in fade-in duration-200"

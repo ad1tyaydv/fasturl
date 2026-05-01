@@ -35,13 +35,16 @@ export default function LogsTab() {
   const [successFilter, setSuccessFilter] = useState<ApiSuccessFilter>("all");
   const [timeFilter, setTimeFilter]       = useState<ApiLogTimeFilter>("all");
 
+
   useEffect(() => {
     fetchLogs();
   }, []);
 
+
   useEffect(() => {
     setPage(1);
   }, [methodFilter, successFilter, timeFilter]);
+
 
   const fetchLogs = async () => {
     try {
@@ -52,12 +55,15 @@ export default function LogsTab() {
 
       flat.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
       setAllLogs(flat);
+
     } catch (err) {
-      toast.error("Failed to fetch logs.");
+      toast.error("Failed to fetch logs");
+
     } finally {
       setIsLoading(false);
     }
   };
+
 
   const filteredLogs = useMemo(() => {
     let logs = [...allLogs];
@@ -76,10 +82,13 @@ export default function LogsTab() {
       logs = logs.filter((l) => new Date(l.createdAt) >= cutoff);
     }
     return logs;
+
   }, [allLogs, methodFilter, successFilter, timeFilter]);
+
 
   const totalPages = Math.max(1, Math.ceil(filteredLogs.length / PAGE_SIZE));
   const pagedLogs = filteredLogs.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
 
   const getMethodColor = (method: string) => {
     switch (method.toUpperCase()) {
@@ -91,11 +100,13 @@ export default function LogsTab() {
     }
   };
 
+  
   const getStatusDot = (status: number) => {
     if (status >= 200 && status < 300) return "bg-emerald-500";
     if (status >= 400) return "bg-red-500";
     return "bg-amber-500";
   };
+
 
   const getPageNumbers = () => {
     const pages: (number | "...")[] = [];
@@ -103,9 +114,13 @@ export default function LogsTab() {
       for (let i = 1; i <= totalPages; i++) pages.push(i);
     } else {
       pages.push(1);
-      if (page > 3) pages.push("...");
+      if (page > 3) {
+        pages.push("...");
+      }
       for (let i = Math.max(2, page - 1); i <= Math.min(totalPages - 1, page + 1); i++) pages.push(i);
-      if (page < totalPages - 2) pages.push("...");
+      if (page < totalPages - 2) {
+        pages.push("...");
+      }
       pages.push(totalPages);
     }
     return pages;

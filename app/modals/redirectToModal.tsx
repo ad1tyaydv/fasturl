@@ -36,6 +36,7 @@ export default function RedirectToModal({ isOpen, onClose, selectedUrl, onSucces
 
   const hasExistingRedirect = !!selectedUrl.redirectTo;
 
+
   const handleUpdate = async () => {
     if (!destinationUrl.trim()) {
       return toast.error("Please enter a destination URL");
@@ -54,8 +55,10 @@ export default function RedirectToModal({ isOpen, onClose, selectedUrl, onSucces
 
       onSuccess();
       onClose();
+
     } catch (error) {
-      toast.error("Failed to update redirect.");
+      toast.error("Failed to update redirect");
+
     } finally {
       setIsUpdating(false);
     }
@@ -73,7 +76,9 @@ export default function RedirectToModal({ isOpen, onClose, selectedUrl, onSucces
       onSuccess();
       onClose();
     } catch (error) {
-      toast.error("Failed to remove redirect.");
+
+      toast.error("Failed to remove redirect");
+      
     } finally {
       setIsRemoving(false);
     }
@@ -93,16 +98,13 @@ export default function RedirectToModal({ isOpen, onClose, selectedUrl, onSucces
             <HugeiconsIcon icon={Link04Icon} size={32} />
           </div>
           <h3 className="text-xl sm:text-2xl font-three text-foreground">
-            Redirect Destination
+            Change redirect
           </h3>
-          <p className="text-muted-foreground font-three text-sm mt-2">
-            Let the user know where this link will redirect To
-          </p>
         </div>
 
         <div className="space-y-6 mb-8">
           <div className="space-y-2">
-            <label className="text-xl font-one text-foreground">Destination URL</label>
+            <label className="text-xl font-one text-foreground">New destination URL</label>
             <div className="relative flex items-center border border-border bg-secondary rounded-lg overflow-hidden">
               <input
                 type="url"

@@ -72,10 +72,6 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ shor
             return NextResponse.redirect(new URL("/expired", req.url));
         }
 
-        // if(findUrl.redirectTo) {
-        //     return NextResponse.redirect(new URL(`/r/${findUrl.shorturl}`, req.url));
-        // }
-
         if (findUrl?.password) {
             return NextResponse.redirect(new URL(`/verify/${shortUrl}`, req.url));
         }
@@ -163,6 +159,10 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ shor
             redis.del(`fetchLinks:${findUrl?.userId}`),
             redis.del(`analytics:${shortUrl}`),
         ]);
+
+        if(findUrl.redirectTo) {
+            return NextResponse.redirect(findUrl.redirectTo as string);
+        }
 
         return NextResponse.redirect(originalUrl as string);
 

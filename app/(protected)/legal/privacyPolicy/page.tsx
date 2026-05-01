@@ -94,7 +94,7 @@ export default function PrivacyPage() {
       </h2>
       <p className="text-muted-foreground">
         If you have any questions or concerns about this Privacy Policy, please
-        contact us at support@fasturl.com.
+        contact us at fasturl@tutamail.com
       </p>
     </div>
   );

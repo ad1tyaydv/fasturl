@@ -155,6 +155,7 @@ function AllLinks() {
         if (res.data.authenticated) {
           setIsLoggedIn(true);
           setTier(res.data.plan || "FREE");
+          
         } else {
           router.push("/auth/signin");
         }
@@ -306,7 +307,6 @@ function AllLinks() {
                     </ButtonGroup>
                   </div>
 
-                  {/* CONDITIONAL DROPDOWN RENDERING */}
                   <div className="w-full sm:w-auto flex justify-end">
                     {view === "bulk" ? (
                       <BulkFilterDropDown
@@ -383,7 +383,6 @@ function AllLinks() {
                         ))}
                       </div>
 
-                      {/* PAGINATION FOR LINKS */}
                       {totalPages > 1 && (
                         <div className="flex justify-center items-center gap-2 mt-10 pb-10 flex-wrap">
                           <button

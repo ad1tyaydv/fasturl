@@ -21,7 +21,6 @@ import LocationAnalytics from "@/app/components/analytics/location";
 import OSAnalytics from "@/app/components/analytics/os";
 import ReferrerAnalytics from "@/app/components/analytics/referrers";
 import { AnalyticsDropDown } from "@/app/dropDown/analyticsDropDown";
-import { useUser } from "@/app/components/userContext";
 import { AnalyticsTypeToggle, AnalyticsType } from "@/app/dropDown/analyticsTypeDropDown";
 
 
@@ -87,7 +86,7 @@ export default function AnalyticsPage() {
       setAnalyticsData(data);
 
     } catch (err) {
-      console.error(err);
+      console.error("Something went wrong");
 
     } finally {
       setFetchingStats(false);
@@ -130,7 +129,6 @@ export default function AnalyticsPage() {
           setBulkBatches(fetchedBulk);
         }
 
-        // Handle URL parameters for initial state
         const search = window.location.search;
         if (search.startsWith("?=")) {
           const fullValue = search.substring(2);
@@ -140,6 +138,7 @@ export default function AnalyticsPage() {
           if (typePart === "bulkanalytics") {
             currentType = "bulk";
             setAnalyticsType("bulk");
+
           } else {
             setAnalyticsType("links");
           }
@@ -157,7 +156,7 @@ export default function AnalyticsPage() {
           }
         }
       } catch (e) {
-        console.error("Initialization error:", e);
+        console.error("Initialization error");
 
       } finally {
         setLoading(false);
@@ -192,6 +191,7 @@ export default function AnalyticsPage() {
         }
         return item.name?.toLowerCase().includes(searchLower);
     }).sort((a: any, b: any) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+    
   }, [urls, bulkBatches, searchQuery, analyticsType]);
 
 
@@ -207,14 +207,17 @@ export default function AnalyticsPage() {
 
   const isFree = tier === "FREE";
 
+  
   const getDomain = (urlStr: string) => {
     try { return new URL(urlStr).hostname.replace("www.", ""); } catch { return ""; }
   };
+
 
   const getLogo = (urlStr: string) => {
     const domain = getDomain(urlStr);
     return `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
   };
+
 
   return (
     <div className="flex flex-col h-screen bg-background text-foreground font-sans selection:bg-blue-500/30 overflow-hidden">
