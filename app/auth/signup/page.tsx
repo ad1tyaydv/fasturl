@@ -151,7 +151,7 @@ export default function SignupPage() {
               <div className="mb-12">
                 <h2 className="text-4xl font-extrabold mb-3">Get Started</h2>
                 <p className="text-muted-foreground text-lg">
-                  Already have an account? <button onClick={() => router.push("/auth/signin")} className="text-[#83c5be] font-bold">Sign In</button>
+                  Already have an account? <button onClick={() => router.push("/auth/signin")} className="text-[#83c5be] font-bold cursor-pointer">Sign In</button>
                 </p>
               </div>
 

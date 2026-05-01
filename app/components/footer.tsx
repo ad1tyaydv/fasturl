@@ -76,7 +76,7 @@ export default function Footer() {
           <div className="col-span-2 flex flex-col items-center lg:items-end justify-center lg:justify-start gap-6 lg:ml-auto">
             <div className="flex gap-6">
               <span className="text-muted-foreground">Follow us on</span>
-              <Link href="#" className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
+              <Link href="https://x.com/fasturldotin" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
                 <HugeiconsIcon icon={NewTwitterIcon} />
               </Link>
             </div>
