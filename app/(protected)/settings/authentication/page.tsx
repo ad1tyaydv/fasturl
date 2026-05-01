@@ -159,7 +159,7 @@ export default function AuthenticationPage() {
 
   const handleLogout = async () => {
     await axios.post("/api/auth/logout");
-    router.push("/");
+    window.location.href = "/";
   };
 
 
