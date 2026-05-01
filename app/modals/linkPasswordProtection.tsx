@@ -2,13 +2,15 @@
 
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { 
-  IoPencilOutline, IoEyeOutline, 
-  IoEyeOffOutline, IoCalendarOutline 
-} from "react-icons/io5";
+
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
+import { DayPicker } from "react-day-picker";
+import "react-day-picker/dist/style.css";
+import { format } from "date-fns";
 import toast from "react-hot-toast";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Calendar03Icon, PencilEdit02Icon, ViewIcon, ViewOffSlashIcon } from "@hugeicons/core-free-icons";
 
 interface LinkPasswordProps {
   isOpen: boolean;
@@ -17,18 +19,21 @@ interface LinkPasswordProps {
   onSuccess: () => void;
 }
 
-export default function LinkPasswordModal({ isOpen, onClose, selectedUrl, onSuccess }: LinkPasswordProps) {
+export default function LinkPasswordProtectionModal({ isOpen, onClose, selectedUrl, onSuccess }: LinkPasswordProps) {
   const [password, setPassword] = useState("");
-  const [expiryDate, setExpiryDate] = useState("");
+  const [expiryDate, setExpiryDate] = useState<Date | undefined>();
+  const [showCalendar, setShowCalendar] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isEditingPassword, setIsEditingPassword] = useState(false);
   const [isEditingExpiry, setIsEditingExpiry] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [isRemoving, setIsRemoving] = useState(false);
+
 
   useEffect(() => {
     if (isOpen && selectedUrl) {
       setPassword("");
-      setExpiryDate("");
+      setExpiryDate(undefined);
       setIsEditingPassword(!selectedUrl.password);
       setIsEditingExpiry(!selectedUrl.expiresAt);
       setShowPassword(false);
@@ -37,119 +42,210 @@ export default function LinkPasswordModal({ isOpen, onClose, selectedUrl, onSucc
 
   if (!isOpen || !selectedUrl) return null;
 
+  
   const handleUpdate = async () => {
-    setIsLoading(true);
+    setIsUpdating(true);
+
     try {
       const finalPassword = isEditingPassword ? password : selectedUrl?.password;
-      const finalExpiry = isEditingExpiry ? expiryDate : selectedUrl?.expiresAt;
-      
+      const finalExpiry = isEditingExpiry ? expiryDate?.toISOString() : selectedUrl?.expiresAt;
+
       await axios.post("/api/shortUrl/passwordProtection", {
         shortUrlId: selectedUrl?.id,
         password: finalPassword,
         expiryDate: finalExpiry,
       });
-      
+
       toast.success(selectedUrl.password ? "Protection updated!" : "Protection added!", {
-        style: { background: '#1c1c1c', color: '#fff', border: '1px solid #333' },
+        style: {
+          background: 'hsl(var(--popover))',
+          color: 'hsl(var(--popover-foreground))',
+          border: '1px solid hsl(var(--border))'
+        },
       });
-      
+
       onSuccess();
       onClose();
+
     } catch (error) {
       toast.error("Failed to update protection.");
+
     } finally {
-      setIsLoading(false);
+      setIsUpdating(false);
     }
   };
 
   const handleRemoveProtection = async () => {
-    setIsLoading(true);
+    setIsRemoving(true);
     try {
-      // Sending empty values to clear the existing protection
-      await axios.post("/api/shortUrl/passwordProtection", {
+      await axios.post("/api/shortUrl/passwordProtection/removePassword", {
         shortUrlId: selectedUrl?.id,
         password: "",
         expiryDate: "",
       });
-      
+
       toast.success("Password removed!", {
-        style: { background: '#1c1c1c', color: '#fff', border: '1px solid #333' },
+        style: {
+          background: 'hsl(var(--popover))',
+          color: 'hsl(var(--popover-foreground))',
+          border: '1px solid hsl(var(--border))'
+        },
       });
-      
+
       onSuccess();
       onClose();
+
     } catch (error) {
+      console.log(error);
       toast.error("Failed to remove Password.");
+
     } finally {
-      setIsLoading(false);
+      setIsRemoving(false);
     }
   };
 
   const hasExistingProtection = selectedUrl.password || selectedUrl.expiresAt;
 
+
   return (
-    <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/80 p-4 transition-opacity" onClick={() => !isLoading && onClose()}>
-      <div className="bg-[#1c1c1c] shadow-2xl w-full max-w-lg p-6 sm:p-10 border border-neutral-800 rounded-xl" onClick={(e) => e.stopPropagation()}>
-        <h3 className="text-xl sm:text-2xl font-three mb-8 text-center text-white">Link Protection</h3>
-        
-        <div className="space-y-6 mb-8">
-          <div className="space-y-2">
-            <div className="flex justify-between items-center">
-              <label className="text-xl font-one text-white">Password <span className="text-sm text-neutral-500 font-three font-normal">(Optional)</span></label>
-              {!isEditingPassword && selectedUrl.password && (
-                <button onClick={() => { setIsEditingPassword(true); setPassword(""); }} className="text-blue-500 hover:text-blue-400 cursor-pointer" disabled={isLoading}>
-                  <IoPencilOutline size={18} />
-                </button>
-              )}
-            </div>
-            {!isEditingPassword && selectedUrl.password ? (
-              <div className="w-full p-3 border border-dashed border-neutral-700 bg-[#1a1a1a] text-neutral-400 font-three italic rounded-lg">Password configured</div>
-            ) : (
-              <div className="relative flex items-center border border-neutral-700 bg-[#111111] focus-within:border-blue-500 rounded-lg overflow-hidden">
-                <input type={showPassword ? "text" : "password"} placeholder="Enter password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full p-3 bg-transparent text-white font-three focus:outline-none" />
-                <button type="button" onClick={() => setShowPassword(!showPassword)} className="px-4 text-neutral-500 hover:text-white cursor-pointer">
-                  {showPassword ? <IoEyeOffOutline size={20} /> : <IoEyeOutline size={20} />}
-                </button>
-              </div>
+  <div
+    className="fixed inset-0 z-[110] flex items-center justify-center bg-background/50 backdrop-blur-sm p-4 transition-opacity"
+    onClick={() => !(isUpdating || isRemoving) && onClose()}
+  >
+    <div
+      className="bg-background shadow-2xl w-full max-w-lg p-6 sm:p-10 rounded-xl border border-border"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <h3 className="text-xl sm:text-2xl font-three mb-8 text-center text-foreground">
+        Link Protection
+      </h3>
+
+      <div className="space-y-6 mb-8">
+        <div className="space-y-2">
+          <div className="flex justify-between items-center">
+            <label className="text-xl font-one text-foreground">
+              Password{" "}
+              <span className="text-sm text-muted-foreground font-three font-normal">
+                (Optional)
+              </span>
+            </label>
+
+            {!isEditingPassword && selectedUrl.password && (
+              <button
+                onClick={() => {
+                  setIsEditingPassword(true);
+                  setPassword("");
+                }}
+                className="text-blue-500 hover:text-blue-400 cursor-pointer"
+                disabled={isUpdating || isRemoving}
+              >
+                <HugeiconsIcon icon={PencilEdit02Icon} />
+              </button>
             )}
           </div>
-          
-          <div className="space-y-2">
-            <div className="flex justify-between items-center">
-              <label className="text-xl font-one text-white">Set Expiry Date</label>
+
+          {!isEditingPassword && selectedUrl.password ? (
+            <div className="w-full p-3 border border-dashed border-border bg-secondary text-muted-foreground font-three italic rounded-lg">
+              Password configured
             </div>
-            <div className="relative group">
-              <input type="date" value={expiryDate} onChange={(e) => setExpiryDate(e.target.value)} className="w-full p-3 border border-neutral-700 bg-[#111111] text-white font-three focus:outline-none focus:border-blue-500 rounded-lg cursor-pointer [color-scheme:dark]" />
-              <div className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-500 pointer-events-none">
-                <IoCalendarOutline size={20} />
-              </div>
+          ) : (
+            <div className="relative flex items-center border border-border bg-background focus-within:ring-1 focus-within:ring-ring rounded-lg overflow-hidden transition-colors">
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Enter password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full p-3 bg-transparent text-foreground font-three focus:outline-none"
+              />
+
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="px-4 text-muted-foreground hover:text-foreground cursor-pointer"
+              >
+                {showPassword ? (
+                  <HugeiconsIcon icon={ViewOffSlashIcon} />
+                ) : (
+                  <HugeiconsIcon icon={ViewIcon} />
+                )}
+              </button>
             </div>
-          </div>
+          )}
         </div>
 
-        <div className="flex items-center justify-between">
-          <div>
-            {hasExistingProtection && (
-              <Button 
-                onClick={handleRemoveProtection} 
-                disabled={isLoading} 
-                className="bg-white h-10 text-red-600 hover:text-red-700 hover:bg-gray-200 font-bold px-4 cursor-pointer"
-              >
-                {isLoading ? <Loader2 className="h-5 w-5 animate-spin mx-auto" /> : "Remove Password"}
-              </Button>
+        <div className="space-y-2">
+          <label className="text-xl font-one text-foreground">
+            Set Expiry Date
+          </label>
+
+          <div className="relative">
+            <button
+              onClick={() => setShowCalendar(!showCalendar)}
+              disabled={isUpdating || isRemoving}
+              className="w-full p-3 border border-border bg-background text-foreground font-three rounded-lg flex justify-between items-center cursor-pointer hover:bg-accent transition-colors"
+            >
+              {expiryDate ? format(expiryDate, "PPP") : "Pick expiry date"}
+              <HugeiconsIcon icon={Calendar03Icon} />
+            </button>
+
+            {showCalendar && (
+              <div className="absolute z-50 mt-2 bg-popover border border-border rounded-lg p-3 shadow-lg">
+                <DayPicker
+                  className="text-popover-foreground"
+                  mode="single"
+                  selected={expiryDate}
+                  onSelect={(date) => {
+                    setExpiryDate(date);
+                    setShowCalendar(false);
+                  }}
+                />
+              </div>
             )}
-          </div>
-          
-          <div className="flex gap-3">
-            <Button variant="outline" onClick={onClose} disabled={isLoading} className="bg-transparent h-10 px-6 text-white border-neutral-700 hover:bg-[#2a2a2a] cursor-pointer">
-              Cancel
-            </Button>
-            <Button onClick={handleUpdate} disabled={isLoading} className="bg-white h-10 text-black hover:bg-gray-200 font-bold min-w-[120px] cursor-pointer">
-              {isLoading ? <Loader2 className="h-5 w-5 animate-spin mx-auto" /> : "Update"}
-            </Button>
           </div>
         </div>
       </div>
+
+      <div className="flex items-center justify-between">
+        <div>
+          {hasExistingProtection && (
+            <Button
+              onClick={handleRemoveProtection}
+              disabled={isUpdating || isRemoving}
+              className="bg-primary h-10 text-primary-foreground hover:bg-destructive hover:text-destructive-foreground font-bold px-4 cursor-pointer"
+            >
+              {isRemoving ? (
+                <Loader2 className="h-5 w-5 animate-spin mx-auto" />
+              ) : (
+                "Remove Password"
+              )}
+            </Button>
+          )}
+        </div>
+
+        <div className="flex gap-3">
+          <Button
+            variant="outline"
+            onClick={onClose}
+            disabled={isUpdating || isRemoving}
+            className="font-three text-sm bg-transparent h-10 w-22 text-foreground border-border hover:bg-accent transition-colors cursor-pointer"
+          >
+            Cancel
+          </Button>
+
+          <Button
+            onClick={handleUpdate}
+            disabled={isUpdating || isRemoving}
+            className="bg-primary h-10 text-primary-foreground hover:bg-primary/90 font-bold min-w-[120px] cursor-pointer"
+          >
+            {isUpdating ? (
+              <Loader2 className="h-5 w-5 animate-spin mx-auto" />
+            ) : (
+              "Update"
+            )}
+          </Button>
+        </div>
+      </div>
     </div>
-  );
+  </div>
+);
 }

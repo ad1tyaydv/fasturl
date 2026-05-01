@@ -6,6 +6,12 @@ import { redis } from "@/lib/redis";
 
 const JWT_SECRET = process.env.NEXTAUTH_SECRET!;
 
+function add30Days(date: Date) {
+  const d = new Date(date);
+  d.setDate(d.getDate() + 30);
+  return d;
+}
+
 export async function GET(req: NextRequest) {
 
     try {
@@ -14,7 +20,7 @@ export async function GET(req: NextRequest) {
         if(!token) {
             return NextResponse.json(
                 {message: "User not found"},
-                {status: 500}
+                {status: 401}
             )
         }
 
@@ -39,44 +45,79 @@ export async function GET(req: NextRequest) {
             },
             select: {
                 plan: true,
+                cycleStart: true,
+                cycleEnd: true,
+                createdAt: true,
                 planStartedAt: true,
-                planExpiresAt: true
             }
         })
 
         if(!user) {
             return NextResponse.json(
                 {message: "User not found"},
-                {status: 500}
+                {status: 404}
             )
         }
 
-        const currentUsageCount = await prisma.link.count({
+        const now = new Date();
+        let cycleStart = user.cycleStart;
+        let cycleEnd = user.cycleEnd;
+
+        if (!cycleStart || !cycleEnd) {
+          cycleStart =
+            user.plan === "FREE"
+              ? user.createdAt
+              : user.planStartedAt || new Date();
+
+          cycleEnd = add30Days(cycleStart);
+
+          await prisma.user.update({
+            where: { id: userId },
+            data: { 
+              cycleStart, 
+              cycleEnd,
+              linksUsed: 0
+            },
+          });
+        }
+
+        if (cycleEnd && now > new Date(cycleEnd)) {
+          cycleStart = now;
+          cycleEnd = add30Days(now);
+
+          await prisma.user.update({
+            where: { id: userId },
+            data: { 
+              cycleStart, 
+              cycleEnd,
+              linksUsed: 0
+            },
+          });
+        }
+
+        const currentUsageCount = await prisma.user.findUnique({
             where: {
-                userId: userId,
-                createdAt: {
-                    gte: user.planStartedAt ? new Date(user.planStartedAt) : new Date(0)
-                }
+                id: userId,
+            },
+            select: {
+                linksUsed: true,
             }
         })
 
         const planLimits: Record<string, number> = {
-            "FREE": 20,
-            "ESSENTIAL": 20000,
+            "FREE": 100,
+            "ESSENTIAL": 10000,
             "PRO": 40000,
         };
         
-        const limit = planLimits[user.plan] || 20;
+        const limit = planLimits[user.plan] || 100;
 
-        let linksLeft = Math.max(0, limit - currentUsageCount);
+        const linksUsed = currentUsageCount?.linksUsed ?? 0;
+        let linksLeft = limit - linksUsed;
 
-
-        const expiresAt = user.planExpiresAt
-        ? new Date(user.planExpiresAt).getTime()
-        : Date.now() + 7 * 24 * 60 * 60 * 1000;
+        const seconds = Math.floor((new Date(cycleEnd!).getTime() - Date.now()) / 1000);
         
-        const seconds = Math.floor((expiresAt - Date.now()) / 1000);
-        await redis.set(cacheKey, linksLeft, {ex: seconds})
+        await redis.set(cacheKey, linksLeft, { ex: seconds });
 
         return NextResponse.json(
             {message: "Links left", linksLeft}

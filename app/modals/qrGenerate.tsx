@@ -1,121 +1,244 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import axios from "axios";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Loader2, X, Download } from "lucide-react";
+import { X, Download, Loader2 } from "lucide-react";
+import html2canvas from "html2canvas";
 import { toast } from "sonner";
 
-interface QRCodeModalProps {
+interface QrDownloadModalProps {
   isOpen: boolean;
   onClose: () => void;
-  selectedUrl: any;
+  qrData?: {
+    qrImage: string;
+    shortUrl: string;
+    longUrl: string;
+    qrName?: string;
+  } | null;
+  selectedUrl?: any;
 }
 
-export default function QRCodeModal({ isOpen, onClose, selectedUrl }: QRCodeModalProps) {
-  const [qrImage, setQrImage] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+export default function QrDownloadModal({ isOpen, onClose, qrData, selectedUrl }: QrDownloadModalProps) {
+  const [showLogo, setShowLogo] = useState(true);
+  const [showShortUrl, setShowShortUrl] = useState(true);
+  const [qrOnly, setQrOnly] = useState(false);
+  const [isImageLoading, setIsImageLoading] = useState(true);
+  const previewRef = useRef<HTMLDivElement>(null);
+
+  const [effectiveQrData, setEffectiveQrData] = useState<any>(null);
+
+
+  const buildUrl = (path: string) => {
+    const domain = process.env.NEXT_PUBLIC_DOMAIN || "localhost:3000";
+
+    const protocol = domain.includes("localhost") ? "http" : "https";
+
+    return `${protocol}://${domain}/${path}`;
+  };
+
+  useEffect(() => {
+    if (qrData) {
+      setEffectiveQrData(qrData);
+
+    } else if (selectedUrl) {
+      let shortLink = "";
+
+      if (selectedUrl.domain && selectedUrl.subdomain) {
+        shortLink = `${selectedUrl.subdomain}.${selectedUrl.domain}/${selectedUrl.shorturl}`;
+
+      } else {
+        shortLink = buildUrl(selectedUrl.shorturl);
+      }
+
+      let finalUrl = shortLink;
+
+      if (!finalUrl.startsWith("http://") && !finalUrl.startsWith("https://")) {
+        const isLocal = finalUrl.includes("localhost");
+        finalUrl = `${isLocal ? "http" : "https"}://${finalUrl}`;
+      }
+
+      setEffectiveQrData({
+        qrImage: `https://api.qrserver.com/v1/create-qr-code/?size=1000x1000&data=${encodeURIComponent(
+          finalUrl
+        )}`,
+        shortUrl: finalUrl,
+        longUrl: selectedUrl.original,
+        qrName: selectedUrl.linkName || "qr-code",
+      });
+
+    } else {
+      setEffectiveQrData(null);
+    }
+
+  }, [qrData, selectedUrl, isOpen]);
 
 
   useEffect(() => {
-    if (isOpen && selectedUrl) {
-      handleGenerateQr();
+    if (isOpen) {
+      setIsImageLoading(true);
     }
+  }, [isOpen, effectiveQrData?.qrImage]);
 
-    if (!isOpen) {
-      setQrImage(null);
-    }
-
-  }, [isOpen, selectedUrl]);
+  if (!isOpen || !effectiveQrData) return null;
 
 
-  const handleGenerateQr = async () => {
-    if (!selectedUrl?.original) {
-        console.error("No original URL found for QR generation");
-        return;
-    }
+  const handleDownload = async () => {
+    if (!previewRef.current || isImageLoading) return;
 
     try {
-      setIsLoading(true);
-      const res = await axios.post("/api/qrCode", {
-        shortUrl: selectedUrl.shorturl,
-        longUrl: selectedUrl.original,
+      const canvas = await html2canvas(previewRef.current, {
+        useCORS: true,
+        backgroundColor: "#ffffff",
+        scale: 3,
       });
 
-      console.log(res.data.qrImage)
+      const link = document.createElement("a");
+      link.href = canvas.toDataURL("image/png");
+      link.download = `${effectiveQrData.qrName || "qrcode"}.png`;
+      link.click();
 
-      if (res.data.qrImage) {
-        setQrImage(res.data.qrImage);
-      }
+      toast.success("QR Code downloaded successfully");
 
-    } catch (error: any) {
-      console.error("QR Error:", error);
-      toast.error("Failed to generate QR code");
-
-    } finally {
-      setIsLoading(false);
+    } catch (error) {
+      console.error("Download error:", error);
+      toast.error("Failed to download QR code");
     }
   };
 
 
-  if (!isOpen) return null;
-
-  
   return (
     <div
-      className="fixed inset-0 z-[120] flex items-center justify-center bg-black/80 p-4"
+      className="fixed inset-0 z-[150] flex items-center justify-center bg-background/80 backdrop-blur-sm p-4"
       onClick={onClose}
     >
       <div
-        className="bg-[#1c1c1c] w-full max-w-lg p-6 sm:p-10 border border-neutral-800 rounded-xl relative animate-in fade-in zoom-in duration-200"
+        className="bg-background w-full max-w-2xl p-6 sm:p-10 border border-border rounded-2xl relative animate-in fade-in zoom-in duration-200"
         onClick={(e) => e.stopPropagation()}
       >
-        <button onClick={onClose} className="absolute right-4 top-4 text-neutral-500 hover:text-white transition-colors">
+        <button
+          onClick={onClose}
+          className="absolute right-4 top-4 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+        >
           <X size={24} />
         </button>
 
-        <h3 className="text-xl sm:text-2xl font-three mb-8 text-center text-white">Link QR Code</h3>
+        <h3 className="text-xl sm:text-2xl font-semibold mb-6 text-center text-foreground">
+          Download QR Code
+        </h3>
 
-        <div className="flex flex-col items-center justify-center space-y-6 mb-8">
-          <div className="relative w-64 h-64 bg-white rounded-lg flex items-center justify-center overflow-hidden">
-            {isLoading ? (
-              <div className="flex flex-col items-center gap-3">
-                <Loader2 className="h-10 w-10 animate-spin text-black" />
-                <p className="text-black text-[10px] font-bold font-three uppercase tracking-widest">Generating...</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-4">
+          <div className="flex flex-col items-center w-full">
+            <p className="text-muted-foreground text-sm mb-3 self-start">Preview</p>
+            <div
+              ref={previewRef}
+              style={{
+                backgroundColor: "#ffffff",
+                padding: qrOnly ? "24px" : "32px",
+                borderRadius: "12px",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                width: "100%",
+                maxWidth: "320px",
+                boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
+                color: "#000000",
+              }}
+            >
+              {!qrOnly && showLogo && (
+                <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "24px" }}>
+                  <img src="/favicon.ico" alt="Logo" style={{ width: "24px", height: "24px" }} />
+                  <span style={{ color: "#000000", fontWeight: "800", fontSize: "18px", fontFamily: "sans-serif" }}>
+                    FASTURL
+                  </span>
+                </div>
+              )}
+
+              <div style={{
+                width: "100%",
+                aspectRatio: "1/1",
+                position: "relative",
+                marginBottom: qrOnly ? "0" : "24px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                border: qrOnly ? "none" : "1px solid #f3f4f6",
+                padding: qrOnly ? "0" : "10px",
+                backgroundColor: "#ffffff"
+              }}>
+                {isImageLoading && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-white z-10">
+                    <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
+                  </div>
+                )}
+
+                <img
+                  src={effectiveQrData.qrImage}
+                  alt="QR Code"
+                  onLoad={() => setIsImageLoading(false)}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "contain",
+                    display: isImageLoading ? "none" : "block"
+                  }}
+                />
               </div>
-            ) : qrImage ? (
-              <img src={qrImage} alt="QR Code" className="w-full h-full p-4 object-contain" />
-            ) : (
-              <p className="text-neutral-400 text-xs">Preparing QR...</p>
-            )}
+
+              {!qrOnly && (
+                <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: "12px" }}>
+                  {showShortUrl && (
+                    <div style={{ width: "100%" }}>
+                      <span style={{ fontWeight: "bold", color: "#888888", fontSize: "10px", textTransform: "uppercase" }}>Short URL</span>
+                      <div style={{ color: "#2563eb", fontSize: "12px", wordBreak: "break-all", fontWeight: "500" }}>
+                        {effectiveQrData.shortUrl}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
 
-          <div className="text-center space-y-1 w-full px-4">
-            <p className="text-white font-one text-lg truncate uppercase tracking-tight">
-              {selectedUrl?.name || "Untitled Link"}
-            </p>
-            <p className="text-neutral-500 font-three text-xs truncate">
-              {selectedUrl?.original}
-            </p>
-          </div>
-        </div>
+          <div className="flex flex-col gap-4 justify-center">
+            <div className="space-y-3">
+              {[
+                { label: "QR Only", sub: "Only the code", state: qrOnly, setter: setQrOnly },
+                { label: "Show Logo", sub: "Show FastURL logo", state: showLogo, setter: setShowLogo },
+                { label: "Short URL", sub: "Show link", state: showShortUrl, setter: setShowShortUrl }
+              ].map((item) => (
+                <div key={item.label} className="flex items-center justify-between p-3 bg-secondary/50 border border-border rounded-xl">
+                  <div>
+                    <p className="text-foreground text-sm font-medium">{item.label}</p>
+                    <p className="text-muted-foreground text-[10px]">{item.sub}</p>
+                  </div>
+                  <button
+                    onClick={() => item.setter(!item.state)}
+                    className={`w-10 h-5 rounded-full transition-colors relative ${item.state ? "bg-blue-500" : "bg-muted"}`}
+                  >
+                    <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all ${item.state ? "right-1" : "left-1"}`} />
+                  </button>
+                </div>
+              ))}
+            </div>
 
-        <div className="flex justify-end gap-3">
-          <Button variant="outline" onClick={onClose} className="bg-transparent text-white border-neutral-700 hover:bg-[#2a2a2a]">
-            Close
-          </Button>
-          <Button
-            onClick={() => {
-                const link = document.createElement("a");
-                link.href = qrImage!;
-                link.download = `qr-${selectedUrl?.name || 'code'}.png`;
-                link.click();
-            }}
-            disabled={isLoading || !qrImage}
-            className="bg-white text-black hover:bg-gray-200 font-bold"
-          >
-            <Download className="mr-2 h-4 w-4" /> Download
-          </Button>
+            <div className="mt-4 space-y-3">
+              <Button
+                onClick={handleDownload}
+                disabled={isImageLoading}
+                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-bold h-12 rounded-xl transition-all"
+              >
+                {isImageLoading ? <Loader2 className="animate-spin mr-2" /> : <Download className="mr-2 h-5 w-5" />}
+                Download
+              </Button>
+              <Button
+                variant="outline"
+                onClick={onClose}
+                className="w-full bg-transparent text-muted-foreground border-border hover:bg-accent h-12 rounded-xl"
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

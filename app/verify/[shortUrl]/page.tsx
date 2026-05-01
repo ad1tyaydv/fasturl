@@ -4,6 +4,8 @@ import { useState } from "react";
 import axios from "axios";
 import { useParams } from "next/navigation";
 import { IoEyeOutline, IoEyeOffOutline, IoLockClosedOutline } from "react-icons/io5";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ViewIcon, ViewOffSlashIcon } from "@hugeicons/core-free-icons";
 
 export default function VerifyPage() {
   const { shortUrl } = useParams();
@@ -69,7 +71,7 @@ export default function VerifyPage() {
             onClick={() => setShowPassword(!showPassword)}
             className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-white transition-colors"
           >
-            {showPassword ? <IoEyeOffOutline size={20} /> : <IoEyeOutline size={20} />}
+            {showPassword ? <HugeiconsIcon icon={ViewOffSlashIcon} /> : <HugeiconsIcon icon={ViewIcon} />}
           </button>
         </div>
 

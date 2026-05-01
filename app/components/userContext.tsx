@@ -1,42 +1,64 @@
 "use client";
 
+import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import { getUser } from "@/lib/getUser";
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
 type UserContextType = {
-    user: any | null;
-    setUser: (u: any) => void;
-}
+  user: any | null;
+  loading: boolean;
+  linksLeft: number;
+  setLinksLeft: React.Dispatch<React.SetStateAction<number>>;
+  refreshUser: () => Promise<void>;
+  logout: () => void;
+};
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
-
 export const UserProvider = ({ children }: { children: ReactNode }) => {
-    const [user, setUser ] = useState<any | null>(null);
+  const [user, setUser] = useState<any | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [linksLeft, setLinksLeft] = useState(0);
+  const refreshUser = async () => {
+    const data = await getUser();
+    setUser(data);
+  };
 
-    useEffect(() => {
-        async function fetchUser() {
-            const stored = localStorage.getItem("user");
-            if(stored) {
-                setUser(JSON.stringify(stored));
-                return;
-            }
+  useEffect(() => {
+    const init = async () => {
+      try {
+        const data = await getUser();
 
-            try {
-                const data = await getUser();
-                if(data) {
-                    localStorage.setItem("user", JSON.stringify(data));
-                }
+        if (data) {
+          setUser(data);
+          setLinksLeft(data.totalLinks ?? 0);
 
-            } catch (error) {
-                console.log(Error);
-            }
+        } else {
+          setUser(null);
+          setLinksLeft(0);
         }
-        fetchUser();
 
-    }, [])
+      } catch (err) {
+        setUser(null);
+        setLinksLeft(0);
+        
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    return <UserContext.Provider value={{ user, setUser }}>{children}</UserContext.Provider>
+    init();
+  }, []);
+
+  const logout = async () => {
+    await fetch("/api/auth/logout", { method: "POST" });
+    setUser(null);
+  };
+
+  return (
+    <UserContext.Provider value={{ user, loading, linksLeft, setLinksLeft, refreshUser, logout }}>
+      {children}
+    </UserContext.Provider>
+  );
 };
 
 export const useUser = () => {

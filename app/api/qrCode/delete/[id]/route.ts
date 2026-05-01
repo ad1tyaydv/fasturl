@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 const ANON_USER_CLICK = process.env.ANONYMOUS_USER_CLICK!;
 
-export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string}> } ) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string}> } ) {
 
     const { id } = await params;
 

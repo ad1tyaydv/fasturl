@@ -1,15 +1,16 @@
-
-
 export async function getUser() {
-
   try {
-    const res = await fetch("/api/auth/me");
+    const res = await fetch("/api/auth/me", {
+      credentials: "include",
+    });
+
     if (!res.ok) return null;
 
-    return await res.json();
+    const data = await res.json();
 
-  } catch (err) {
+    return data?.authenticated ? data : null;
+    
+  } catch {
     return null;
   }
-
 }

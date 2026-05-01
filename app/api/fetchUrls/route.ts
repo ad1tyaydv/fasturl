@@ -38,14 +38,18 @@ export async function GET(req: NextRequest) {
             select: {
                 links: {
                     where: {
-                        checkBulk: false
+                        checkBulk: false,
+                        api_link: false,
                     },
                     select: {
                         id: true,
                         shorturl: true,
+                        domain: true,
+                        subdomain: true,
                         original: true,
                         linkName: true,
                         clicks: true,
+                        redirectTo: true,
                         password: true,
                         createdAt: true
                     },

@@ -1,12 +1,9 @@
 import { prisma } from "@/lib/dbConfig";
 import { NextRequest, NextResponse } from "next/server";
 
-const JWT_SECRET = process.env.NEXTAUTH_SECRET!;
-
-export async function GET(req: NextRequest) {
+export async function POST(req: NextRequest) {
 
     try {
-
         const token = req.cookies.get("token")?.value;
         
         if(!token) {
@@ -16,25 +13,32 @@ export async function GET(req: NextRequest) {
             )
         }
 
-        const linkId = req.nextUrl.searchParams.get("linkId");
+        const { batchId, days } = await req.json();
 
-        if (!linkId) {
+        if (!batchId) {
             return NextResponse.json(
-                { message: "linkId is required" },
+                { message: "batchId is required" },
                 { status: 400 }
             );
         }
 
+        const analyticsDays = days || 7;
+        const startDate = new Date();
+        startDate.setDate(startDate.getDate() - analyticsDays);
+        startDate.setHours(0, 0, 0, 0);
+
         const bulk = await prisma.bulkLinks.findUnique({
-            where: { id: linkId },
-                include: {
-                    links: {
-                        select: {
-                            id: true
-                        }
+            where: {
+                id: batchId
+            },
+            include: {
+                links: {
+                    select: {
+                        id: true
                     }
                 }
-            });
+            }
+        });
 
         if (!bulk) {
             return NextResponse.json(
@@ -45,21 +49,40 @@ export async function GET(req: NextRequest) {
 
         const linkIds = bulk.links.map(link => link.id);
 
-        const clicks = await prisma.click.groupBy({
-            by: ["country", "state"],
+        const clicks = await prisma.click.findMany({
             where: {
                 linkId: {
                     in: linkIds
+                },
+                createdAt: {
+                    gte: startDate
+                }
+            },
+            select: {
+                createdAt: true
+            },
+            orderBy: {
+                createdAt: 'asc'
+            }
+        });
+
+        const countries = await prisma.click.groupBy({
+            by: ["country"],
+            where: {
+                linkId: {
+                    in: linkIds
+                },
+                createdAt: {
+                    gte: startDate
                 }
             },
             _count: {
-                linkId: true
+                country: true
             }
-        })
-        const formatted = clicks.map((a) => ({
-            country: a.country || "Unknown",
-            state: a.state || "Unknown",
-            count: a._count.linkId,
+        });
+        const formattedCountries = countries.map((c) => ({
+            country: c.country || "Unknown",
+            count: c._count.country,
         }));
 
 
@@ -68,16 +91,19 @@ export async function GET(req: NextRequest) {
             where: {
                 linkId: {
                     in: linkIds
+                },
+                createdAt: {
+                    gte: startDate
                 }
             },
             _count: {
                 browser: true
             }
-        })
+        });
         const browserData = browsers.map((b) => ({
             browser: b.browser || "Unknown",
             count: b._count.browser,
-        }))
+        }));
 
 
         const devices = await prisma.click.groupBy({
@@ -85,16 +111,19 @@ export async function GET(req: NextRequest) {
             where: {
                 linkId: {
                     in: linkIds
+                },
+                createdAt: {
+                    gte: startDate
                 }
             },
             _count: {
                 device: true
             }
-        })
+        });
         const deviceData = devices.map((c) => ({
-            devices: c.device || "Unknown",
+            device: c.device || "Unknown",
             count: c._count.device,
-        }))
+        }));
 
 
         const os = await prisma.click.groupBy({
@@ -102,16 +131,19 @@ export async function GET(req: NextRequest) {
             where: {
                 linkId: {
                     in: linkIds
+                },
+                createdAt: {
+                    gte: startDate
                 }
             },
             _count: {
                 OS: true
             }
-        })
+        });
         const osData = os.map((d) => ({
-            os: (d.OS || "Unknown").replace(/"/g, ""),
+            os: (d.OS || "Unknown").replace(/["']/g, "").trim(),
             count: d._count.OS,
-        }))
+        }));
 
 
         const referrers = await prisma.click.groupBy({
@@ -119,6 +151,9 @@ export async function GET(req: NextRequest) {
             where: { 
                 linkId: {
                     in: linkIds
+                },
+                createdAt: {
+                    gte: startDate
                 }
              },
             _count: {
@@ -134,7 +169,7 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({
             message: "Analytics fetched successfully",
             clicks: clicks,
-            countries: formatted,
+            countries: formattedCountries,
             browsers: browserData,
             devices: deviceData,
             os: osData,
@@ -142,7 +177,7 @@ export async function GET(req: NextRequest) {
         });
 
     } catch (error) {
-        console.log(error);
+        console.error(error);
         return NextResponse.json(
             {message: "Something went wrong!"},
             {status: 500}

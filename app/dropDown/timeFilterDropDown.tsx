@@ -20,25 +20,25 @@ export function TimeFilterDropDown({ value, onChange }: TimeFilterProps) {
     
   return (
     <Select value={value} onValueChange={(val) => onChange(val as TimeFilter)}>
-      <SelectTrigger className="w-[180px] bg-[#1a1a1a] border-neutral-800 text-white font-three focus:ring-1 focus:ring-blue-500 rounded-lg outline-none">
+      <SelectTrigger className="w-[180px] bg-background border-border text-foreground font-three focus:ring-1 focus:ring-ring rounded-lg outline-none cursor-pointer">
         <SelectValue placeholder="Select timeframe" />
       </SelectTrigger>
       
       <SelectContent 
         position="popper" 
         sideOffset={5} 
-        className="bg-[#1a1a1a] border-neutral-800 text-white font-three rounded-lg w-[180px]"
+        className="bg-popover border-border text-popover-foreground font-three rounded-lg w-[180px]"
       >
-        <SelectItem value="today" className="cursor-pointer">
+        <SelectItem value="today" className="cursor-pointer hover:bg-accent hover:text-accent-foreground">
           Created Today
         </SelectItem>
-        <SelectItem value="7days" className="cursor-pointer">
+        <SelectItem value="7days" className="cursor-pointer hover:bg-accent hover:text-accent-foreground">
           Last 7 Days
         </SelectItem>
-        <SelectItem value="30days" className="cursor-pointer">
+        <SelectItem value="30days" className="cursor-pointer hover:bg-accent hover:text-accent-foreground">
           Last 30 Days
         </SelectItem>
-        <SelectItem value="lifetime" className="cursor-pointer">
+        <SelectItem value="lifetime" className="cursor-pointer hover:bg-accent hover:text-accent-foreground">
           Lifetime
         </SelectItem>
       </SelectContent>

@@ -7,7 +7,6 @@ datasource db {
   provider = "postgresql"
 }
 
-
 enum Plan {
   FREE
   ESSENTIAL
@@ -15,74 +14,110 @@ enum Plan {
 }
 
 model User {
-  id             String      @id @default(uuid())
-  email          String      @unique
-  password       String
-  userName       String?
-  ipAddress      String?
+  id                String    @id @default(uuid())
+  email             String    @unique
+  password          String?
+  userName          String?
 
-  totalLinks     Int         @default(0)
+  twofactorEnabled  Boolean   @default(false)
+  twofactorSecret   String?
 
-  plan           Plan      @default(FREE)
-  planStartedAt  DateTime?
-  planExpiresAt  DateTime?
+  provider          String?
+  image             String?
 
-  links          Link[]
-  qr             Qr[]
-  bulkLinks      BulkLinks[]
+  ipAddress         String?
 
-  domain         CustomDomain[]
+  totalLinks        Int       @default(0)
+  linksUsed         Int       @default(0)
+  totalLinksCreated  Int?       @default(0)
 
-  createdAt      DateTime    @default(now())
+  totalQr           Int       @default(0)
+  qrUsed         Int       @default(0)
+  totalQrCreated     Int?       @default(0)
+
+  plan              Plan      @default(FREE)
+  planType          String?   @default("")
+  planStartedAt     DateTime?
+  planExpiresAt     DateTime?
+
+  subscriptionId    String?
+  customerId        String?
+
+  billingStatus     String?
+  cancelAtPeriodEnd Boolean    @default(false)
+
+  cycleStart        DateTime?
+  cycleEnd          DateTime?
+
+  links             Link[]
+  qr                Qr[]
+  bulkLinks         BulkLinks[]
+  domain            CustomDomain[]
+  api_key           Api_key[]
+  subscription      Subscription[]
+  payment           Payment[]
+  notification      Notification[]
+
+  createdAt         DateTime   @default(now())
 }
 
 model Link {
-  id           String      @id @default(uuid())
-  linkName     String?
-  shorturl     String      @unique
-  original     String
+  id       String  @id @default(uuid())
+  linkName String?
+  shorturl String  @unique
+  original String
 
-  clicks       Int         @default(0)
-  clickLogs    Click[]
+  subdomain String?
+  domain   String?
 
-  bulkLinksId  String?
-  bulk         BulkLinks?  @relation(fields: [bulkLinksId], references: [id])
+  clicks    Int     @default(0)
+  clickLogs Click[]
 
-  checkBulk    Boolean     @default(false)
+  bulkLinksId String?
+  bulk        BulkLinks? @relation(fields: [bulkLinksId], references: [id], onDelete: Cascade)
 
-  ipAddress    String?
+  apiLinkId String?
+  apiLink   Api_key? @relation(fields: [apiLinkId], references: [id], onDelete: Cascade)
 
-  password     String?
-  isProtected  Boolean     @default(false)
-  expiresAt    DateTime?
-  
-  userId       String
-  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  checkBulk Boolean @default(false)
+  api_link  Boolean @default(false)
 
-  createdAt   DateTime    @default(now())
+  ipAddress String?
+
+  password    String?
+  isProtected Boolean   @default(false)
+  expiresAt   DateTime?
+
+  redirectTo  String?
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
 }
 
 model Click {
-  id          String      @id @default(uuid())
+  id    String   @id @default(uuid())
 
-  linkId      String
-  link        Link        @relation(fields: [linkId], references: [id])
+  linkId String
+  link   Link     @relation(fields: [linkId], references: [id], onDelete: Cascade)
 
-  qrId        String?
-  qr          Qr?         @relation(fields: [qrId], references: [id])
+  qrId String?
+  qr   Qr?        @relation(fields: [qrId], references: [id], onDelete: Cascade)
+  isQr  Boolean   @default(false)
 
-  ip          String
-  country     String?
-  state       String?
-  city        String?
+  ip      String
+  country String?
+  state   String?
+  city    String?
 
-  device      String?
-  browser     String?
-  OS          String?
+  device  String?
+  browser String?
+  OS      String?
 
-  referrer    String?
+  referrer String?
 
-  createdAt   DateTime    @default(now())
+  createdAt DateTime @default(now())
 
   @@index([linkId])
   @@index([qrId])
@@ -90,62 +125,184 @@ model Click {
 }
 
 model Qr {
-  id          String      @id @default(uuid())
-  qrName      String?
-  shortUrl    String
-  longUrl     String
+  id       String  @id @default(uuid())
+  qrName   String?
+  shortUrl String
+  longUrl  String
 
-  qrImage     String
+  qrImage String
 
-  clicks      Int         @default(0)
-  clickLogs   Click[]
+  clicks    Int     @default(0)
+  clickLogs Click[]
 
-  ipAddress   String?
+  ipAddress String?
 
-  userId      String
-  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  createdAt   DateTime    @default(now())
+  createdAt DateTime @default(now())
 }
 
 model BulkLinks {
-  id         String      @id @default(uuid())
+  id String @id @default(uuid())
 
-  name       String      @default("")
+  name String @default("")
 
-  password   String?
-  expiresAt  DateTime?
+  password  String?
+  expiresAt DateTime?
 
-  links      Link[]
+  links Link[]
 
-  userId     String
-  user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  createdAt  DateTime     @default(now())
+  createdAt DateTime @default(now())
 }
 
-  model CustomDomain {
-    id            String       @id @default(uuid())
-    domain        String       @unique
-    subDomain     String?
+model CustomDomain {
+  id        String  @id @default(uuid())
+  domain    String
+  subDomain String?
 
-    txtValue      String?
-    txtVerified   Boolean      @default(false)
+  txtValue    String?
+  txtName     String?
+  txtVerified Boolean @default(false)
 
-    cnameTarget   String?
-    cnameVerfied  Boolean      @default(false)
+  cnameTarget  String?
+  cnameVerfied Boolean @default(false)
 
-    isActive      Boolean      @default(false)
-    
-    userId        String
-    user          User          @relation(fields: [userId], references: [id])
-    
-    createdAt     DateTime      @default(now())
-  }
+  isActive Boolean @default(false)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([domain, subDomain])
+}
+
+model Api_key {
+  id   String  @id @default(uuid())
+  key  String  @unique
+  name String?
+
+  usageLimit Int @default(1000)
+  usageCount Int @default(0)
+
+  success Int @default(0)
+  failed  Int @default(0)
+
+  isActive Boolean @default(true)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  apiLinks Link[]
+  apiLogs  ApiLog[]
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model ApiLog {
+  id       String @id @default(uuid())
+  endpoint String
+  method   String
+
+  status  Int
+  success Boolean
+  error   String?
+
+  ipAddress String?
+  device    String?
+
+  apiKeyId String
+  apiKey   Api_key @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([apiKeyId])
+  @@index([createdAt])
+}
+
+model OTP {
+  id     String  @id @default(uuid())
+  email  String?
+
+  otp String
+
+  reason String?
+
+  isUsed Boolean @default(false)
+
+  expiresAt DateTime
+
+  createdAt DateTime @default(now())
+}
+
+model Subscription {
+  id              String   @id @default(uuid())
+
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  plan            String
+  planType        String   @default("")
+  status          String
+
+  subscriptionId  String   @unique
+  customerId      String?
+
+  planStartedAt DateTime?
+  planEndedAt   DateTime?
+
+  cancelAtPeriodEnd Boolean @default(false)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Payment {
+  id            String   @id @default(uuid())
+
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  paymentId     String   @unique
+  subscriptionId String?
+
+  amount        Int
+  currency      String
+
+  status        String
+  method        String?
+  planType      String?   @default("")
+
+  createdAt     DateTime @default(now())
+}
 
 model Count {
-  countId     String      @id @default(uuid())
-  linkCount   Int         @default(0)
-  qrCount     Int         @default(0)
-  totalClicks Int         @default(0)
+  countId     String @id @default(uuid())
+  linkCount   Int    @default(0)
+  qrCount     Int    @default(0)
+  totalClicks Int    @default(0)
+}
+
+model Notification {
+  id          String   @id @default(uuid())
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  title       String
+  message     String
+
+  isRead      Boolean  @default(false)
+  readAt      DateTime?
+
+  metadata    Json?
+  actionUrl   String?
+
+  createdAt   DateTime  @default(now())
 }

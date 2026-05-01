@@ -1,27 +1,42 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
-import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
-import { FcGoogle } from "react-icons/fc";
-import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
 import { useUser } from "@/app/components/userContext";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { 
+  ViewIcon, 
+  ViewOffSlashIcon, 
+  ArrowRight01Icon, 
+  ArrowLeft01Icon, 
+  Loading02Icon, 
+  Mail01Icon 
+} from "@hugeicons/core-free-icons";
+
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
 
 
-export default function Signup() {
+export default function SignupPage() {
   const router = useRouter();
-  const { setUser } = useUser();
+  const { refreshUser } = useUser();
 
   const [formData, setFormData] = useState({
     userName: "",
     email: "",
     password: "",
   });
+
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [agreed, setAgreed] = useState(false);
+  const [showOtpScreen, setShowOtpScreen] = useState(false);
+  const [otpValue, setOtpValue] = useState("");
 
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -29,39 +44,50 @@ export default function Signup() {
   };
 
 
-  const handleSignup = async (e: React.FormEvent) => {
+  const handleSignupInitiate = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!agreed) return toast.error("Please agree to the terms & conditions");
-
     setLoading(true);
-    const signupToast = toast.loading("Creating your account...");
+    const signupToast = toast.loading("Sending verification code...");
 
     try {
       await axios.post("/api/auth/signup", {
-        userName: formData.userName,
         email: formData.email,
-        password: formData.password
       });
-      
-      const newUser = {
-        userName: formData.userName,
-        email: formData.email,
-        plan: "FREE"
-      }
 
-      localStorage.setItem("user", JSON.stringify(newUser));
-      localStorage.setItem("plan", "FREE");
-
-      setUser(newUser);
-
-      toast.success("Account created successfully!", { 
-          id: signupToast
-        });
-
-      router.push("/");
+      toast.success("OTP sent to your email!", { id: signupToast });
+      setShowOtpScreen(true);
 
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Signup failed!", { id: signupToast });
+      toast.error(error.response?.data?.message || "Failed to send OTP.", { id: signupToast });
+
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+  const handleVerifyOtp = async () => {
+    if (otpValue.length !== 6) return toast.error("Please enter the full 6-digit code");
+
+    setLoading(true);
+    const verifyToast = toast.loading("Creating your account...");
+
+    try {
+      const res = await axios.post("/api/auth/signup/verify-otp", {
+        email: formData.email,
+        otp: otpValue,
+        userName: formData.userName,
+        password: formData.password,
+      });
+
+      if (res.data.success) {
+        await refreshUser();
+        toast.success("Account created successfully!", { id: verifyToast });
+        router.push("/");
+      }
+
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Invalid OTP code", { id: verifyToast });
 
     } finally {
       setLoading(false);
@@ -70,149 +96,130 @@ export default function Signup() {
 
 
   return (
-    <div className="min-h-screen flex w-full bg-[#0a0a0a] text-white selection:bg-red-500/30 overflow-hidden">
-      <Toaster position="top-center" />
+    <div className="min-h-screen w-full flex flex-col lg:flex-row overflow-hidden bg-background text-foreground selection:bg-[#F07D51]">
+      <Toaster 
+        position="bottom-right" 
+        toastOptions={{ 
+            style: { 
+                background: 'hsl(var(--popover))', 
+                color: 'hsl(var(--popover-foreground))', 
+                border: '1px solid hsl(var(--border))' 
+            } 
+        }} 
+      />
 
-      <div className="hidden lg:flex lg:w-[60%] relative bg-[#0f0f0f] border-r border-white/5">
-        <img
-          src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop" 
-          alt="Abstract Dark Background"
-          className="absolute inset-0 w-full h-full object-cover"
-        />
-        
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#0a0a0a]/20 to-[#0a0a0a]"></div>
-        
-        <div className="absolute top-12 left-12 flex items-center gap-3 z-20">
-          <div className="w-10 h-10 bg-red-600 rounded-xl flex items-center justify-center text-white font-black text-2xl shadow-[0_0_20px_rgba(220,38,38,0.4)]">
-            S
-          </div>
-          <h1 className="text-2xl font-bold tracking-tight text-white">Fasturl</h1>
+      <div className="w-full lg:w-1/2 bg-background p-8 lg:p-20 flex flex-col relative overflow-hidden min-h-[40vh] lg:min-h-screen border-r border-border/50">
+        <div className="relative z-20 flex items-center gap-3 cursor-pointer w-fit group mb-auto" onClick={() => router.push("/")}>
+          <img src="/favicon.ico" alt="Logo" className="w-10 h-10 transition-transform group-hover:scale-110" />
+          <span className="text-2xl font-bold tracking-tight">Fasturl</span>
         </div>
-
-        <div className="relative z-10 flex flex-col justify-center px-20">
-            <h2 className="text-6xl font-bold leading-tight max-w-xl">
-                Start Your <span className="text-red-500 text-glow">Journey</span> <br /> 
-                <span className="text-white/90">With Us.</span>
-            </h2>
-            <div className="h-1 w-24 bg-red-600 my-8 rounded-full shadow-[0_0_10px_#dc2626]"></div>
-            <p className="text-gray-300 text-xl max-w-md font-light leading-relaxed">
-                Create an account to track your links, analyze your audience, and build your brand.
-            </p>
+        <div className="relative z-10 flex-grow flex flex-col justify-center lg:-mt-32">
+          <h1 className="text-6xl lg:text-7xl font-extrabold leading-[1.05] mb-10">
+            {showOtpScreen ? "Check your " : "Shorten links, "} <br /> 
+            <span className="text-[#83c5be]">{showOtpScreen ? "Inbox." : "expand reach."}</span>
+          </h1>
+          <p className="text-muted-foreground text-xl lg:text-2xl leading-relaxed max-w-md">
+            {showOtpScreen 
+              ? `We've sent a 6-digit verification code to ${formData.email}`
+              : "Join Fasturl to create clean, professional, and trackable links in seconds."}
+          </p>
         </div>
-
-        <div className="absolute bottom-12 left-12 text-white/20 text-sm font-mono tracking-tighter">
-            PRO_VERSION // 2026_BUILD
-        </div>
+        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-[#F07D51]/10 rounded-full blur-[120px] opacity-30" />
       </div>
 
-      <div className="w-full lg:w-[40%] flex flex-col justify-center p-8 sm:p-12 lg:p-16 bg-[#0a0a0a]">
-        <div className="w-full max-w-md mx-auto">
-          
-          <div className="flex lg:hidden items-center gap-3 mb-12">
-            <div className="w-10 h-10 bg-red-600 rounded-xl flex items-center justify-center text-white font-black text-2xl shadow-[0_0_20px_rgba(220,38,38,0.3)]">
-              S
-            </div>
-            <h1 className="text-2xl font-bold tracking-tight">Fasturl</h1>
-          </div>
+      <div className="w-full lg:w-1/2 p-8 lg:p-20 flex flex-col justify-center bg-background min-h-screen relative">
+        
+        <div className="absolute top-8 left-8 lg:top-12 lg:left-20">
+            <button 
+                onClick={() => showOtpScreen ? setShowOtpScreen(false) : router.push("/")} 
+                className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors font-medium group cursor-pointer"
+            >
+                <HugeiconsIcon icon={ArrowLeft01Icon} size={20} className="group-hover:-translate-x-1 transition-transform" /> 
+                {showOtpScreen ? "Back to Signup" : "Back to Home"}
+            </button>
+        </div>
 
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold mb-2 text-white">Create an account</h1>
-            <p className="text-gray-400">
-              Already have an account?{" "}
-              <button 
-                onClick={() => router.push("/auth/signin")}
-                className="text-red-500 hover:text-red-400 font-medium cursor-pointer transition-colors"
-              >
-                Log in
-              </button>
-            </p>
-          </div>
+        <AnimatePresence mode="wait">
+          {!showOtpScreen ? (
+            <motion.div 
+              key="signup"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="max-w-[440px] mx-auto w-full"
+            >
+              <div className="mb-12">
+                <h2 className="text-4xl font-extrabold mb-3">Get Started</h2>
+                <p className="text-muted-foreground text-lg">
+                  Already have an account? <button onClick={() => router.push("/auth/signin")} className="text-[#83c5be] font-bold cursor-pointer">Sign In</button>
+                </p>
+              </div>
 
-          <form className="space-y-4" onSubmit={handleSignup}>
-            <div className="space-y-1">
-              <label className="text-sm font-medium text-gray-400 ml-1">Username</label>
-              <input
-                name="userName"
-                placeholder="Username"
-                value={formData.userName}
-                onChange={handleChange}
-                className="w-full px-4 py-3.5 rounded-xl bg-[#141414] border border-white/10 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none transition-all placeholder:text-gray-600 text-white"
-                required
-              />
-            </div>
+              <form onSubmit={handleSignupInitiate} className="space-y-6">
+                <div className="space-y-2">
+                  <label className="text-[12px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Username</label>
+                  <input name="userName" type="text" placeholder="Pick a username" value={formData.userName} onChange={handleChange} className="w-full px-6 py-4 rounded-2xl border border-border bg-secondary/50 focus:border-[#83c5be] focus:ring-4 focus:ring-[#83c5be]/10 outline-none text-foreground transition-all" required />
+                </div>
 
-            <div className="space-y-1">
-              <label className="text-sm font-medium text-gray-400 ml-1">Email</label>
-              <input
-                name="email"
-                type="email"
-                placeholder="Email"
-                value={formData.email}
-                onChange={handleChange}
-                className="w-full px-4 py-3.5 rounded-xl bg-[#141414] border border-white/10 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none transition-all placeholder:text-gray-600 text-white"
-                required
-              />
-            </div>
+                <div className="space-y-2">
+                  <label className="text-[12px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Email</label>
+                  <input name="email" type="email" placeholder="name@example.com" value={formData.email} onChange={handleChange} className="w-full px-6 py-4 rounded-2xl border border-border bg-secondary/50 focus:border-[#83c5be] focus:ring-4 focus:ring-[#83c5be]/10 outline-none text-foreground transition-all" required />
+                </div>
 
-            <div className="space-y-1">
-              <label className="text-sm font-medium text-gray-400 ml-1">Password</label>
-              <div className="relative">
-                <input
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Enter your password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3.5 rounded-xl bg-[#141414] border border-white/10 focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none transition-all pr-12 placeholder:text-gray-600 text-white"
-                  required
-                />
-                <button
-                  type="button"
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-red-500 cursor-pointer"
-                  onClick={() => setShowPassword(!showPassword)}
+                <div className="space-y-2">
+                  <label className="text-[12px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Password</label>
+                  <div className="relative">
+                    <input name="password" type={showPassword ? "text" : "password"} placeholder="••••••••" value={formData.password} onChange={handleChange} className="w-full px-6 py-4 rounded-2xl border border-border bg-secondary/50 focus:border-[#83c5be] focus:ring-4 focus:ring-[#83c5be]/10 outline-none text-foreground transition-all" required />
+                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-6 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-[#83c5be] cursor-pointer">
+                      {showPassword ? <HugeiconsIcon icon={ViewOffSlashIcon} size={22} /> : <HugeiconsIcon icon={ViewIcon} size={22} />}
+                    </button>
+                  </div>
+                </div>
+
+                <button type="submit" disabled={loading} className="w-full py-5 rounded-2xl bg-foreground text-background font-bold text-xl hover:bg-[#83c5be] hover:text-white transition-all disabled:opacity-50 flex items-center justify-center gap-3 cursor-pointer">
+                  {loading ? <HugeiconsIcon icon={Loading02Icon} className="animate-spin" /> : <>Create Account <HugeiconsIcon icon={ArrowRight01Icon} size={22} /></>}
+                </button>
+              </form>
+            </motion.div>
+          ) : (
+            <motion.div 
+              key="otp"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="max-w-[440px] mx-auto w-full text-center"
+            >
+              <div className="mb-10 flex flex-col items-center">
+                <div className="w-20 h-20 bg-secondary text-[#83c5be] rounded-[28px] flex items-center justify-center mb-8 border border-border">
+                  <HugeiconsIcon icon={Mail01Icon} size={40} />
+                </div>
+                <h2 className="text-4xl font-extrabold mb-4">Verify Email</h2>
+                <p className="text-muted-foreground text-lg">Enter the 6-digit code we sent you.</p>
+              </div>
+
+              <div className="flex flex-col items-center gap-8">
+                <InputOTP maxLength={6} value={otpValue} onChange={(val) => setOtpValue(val)}>
+                  <InputOTPGroup className="gap-3">
+                    {[...Array(6)].map((_, i) => (
+                      <InputOTPSlot 
+                        key={i} 
+                        index={i} 
+                        className="w-14 h-16 rounded-2xl border-border bg-secondary/50 text-3xl font-bold focus:border-[#83c5be] focus:ring-4 focus:ring-[#83c5be]/10 text-foreground" 
+                      />
+                    ))}
+                  </InputOTPGroup>
+                </InputOTP>
+
+                <button 
+                  onClick={handleVerifyOtp}
+                  disabled={loading || otpValue.length !== 6}
+                  className="w-full py-5 bg-[#83c5be] text-black font-bold text-xl rounded-2xl hover:bg-[#2a9d8f] transition-all disabled:opacity-50 flex items-center justify-center gap-3 cursor-pointer"
                 >
-                  {showPassword ? <AiOutlineEyeInvisible size={22} /> : <AiOutlineEye size={22} />}
+                  {loading ? <HugeiconsIcon icon={Loading02Icon} className="animate-spin" /> : "Verify & Complete"}
                 </button>
               </div>
-            </div>
-
-            <div className="flex items-center gap-2 py-2">
-              <input 
-                type="checkbox" 
-                id="terms"
-                checked={agreed}
-                onChange={(e) => setAgreed(e.target.checked)}
-                className="w-4 h-4 rounded border-white/20 bg-[#141414] text-red-600 focus:ring-red-500 cursor-pointer"
-              />
-              <label htmlFor="terms" className="text-sm text-gray-400 cursor-pointer select-none">
-                I agree to the <span className="text-red-500 underline decoration-red-500/30">terms & conditions</span>
-              </label>
-            </div>
-
-            <Button
-              type="submit"
-              disabled={loading}
-              className="w-full py-7 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl transition-all active:scale-[0.98] mt-2 shadow-[0_10px_20px_rgba(220,38,38,0.2)] border-none text-lg cursor-pointer"
-            >
-              {loading ? "Creating account..." : "Create account"}
-            </Button>
-          </form>
-
-          <div className="mt-8">
-            <div className="relative flex items-center justify-center mb-6">
-              <div className="w-full border-t border-white/5"></div>
-              <span className="absolute bg-[#0a0a0a] px-4 text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold">OR</span>
-            </div>
-
-            <button
-              type="button"
-              className="w-full flex items-center justify-center gap-3 py-3.5 px-4 rounded-xl border border-white/10 bg-[#141414] hover:bg-[#1f1f1f] transition-all font-medium text-white shadow-sm cursor-pointer"
-            >
-              <FcGoogle size={20} />
-              Sign up with Google
-            </button>
-          </div>
-        </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

@@ -14,7 +14,9 @@ export default function QRAnalyticsTab({ urls, onSelect }: QRTabProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {urls.length > 0 ? (
-        urls.map((url) => (
+        urls.map((url) => {
+          if (typeof url === "object" && url !== null) return null;
+          return (
           <div 
             key={url.id} 
             onClick={() => onSelect(url)} 
@@ -28,13 +30,14 @@ export default function QRAnalyticsTab({ urls, onSelect }: QRTabProps) {
                 Scans: {url.clicks || 0}
               </div>
             </div>
-            <h3 className="font-three text-lg truncate mb-1">{NEXT_DOMAIN}/{url.shorturl}</h3>
-            <p className="text-xs font-three text-muted-foreground truncate mb-6">{url.original}</p>
+            <h3 className="font-three text-lg truncate mb-1">{NEXT_DOMAIN}/{url.shortUrl || url.shorturl}</h3>
+            <p className="text-xs font-three text-muted-foreground truncate mb-6">{url.longUrl || url.original}</p>
             <div className="flex items-center gap-2 text-xs font-three text-primary uppercase">
               QR Report <IoArrowForwardOutline className="group-hover:translate-x-1 transition-transform" />
             </div>
           </div>
-        ))
+          );
+        })
       ) : (
         <div className="col-span-full py-20 text-center border-2 border-dashed border-border rounded-3xl">
           <p className="text-muted-foreground">No QRs found. Create one to see analytics!</p>

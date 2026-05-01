@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -27,7 +26,7 @@ export function ExpiryDropDown({ expiryType, setExpiryType }: ExpiryDropDownProp
       <DropdownMenuTrigger asChild>
         <Button 
           variant="outline" 
-          className="bg-[#111111] border-neutral-700 text-white hover:bg-[#1a1a1a] font-three rounded-lg flex items-center gap-2 h-12 w-full justify-between px-4"
+          className="bg-background border-border text-foreground hover:bg-accent hover:text-accent-foreground font-three rounded-lg flex items-center gap-2 h-12 w-full justify-between px-4 outline-none focus:ring-1 focus:ring-ring"
         >
           <div className="flex items-center gap-2">
             <IoTimerOutline size={18} className="text-blue-500" />
@@ -35,17 +34,17 @@ export function ExpiryDropDown({ expiryType, setExpiryType }: ExpiryDropDownProp
                 {expiryType === "date" ? "Expiry by Date" : "Expiry by Clicks"}
             </span>
           </div>
-          <IoChevronDown size={14} className="text-neutral-500" />
+          <IoChevronDown size={14} className="text-muted-foreground" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-[300px] bg-[#1c1c1c] border-neutral-800 text-white font-three shadow-2xl">
-        <DropdownMenuLabel className="text-neutral-500 text-xs uppercase tracking-widest p-3">Expiration Method</DropdownMenuLabel>
-        <DropdownMenuSeparator className="bg-neutral-800" />
+      <DropdownMenuContent className="w-[300px] bg-popover border-border text-popover-foreground font-three shadow-2xl rounded-lg">
+        <DropdownMenuLabel className="text-muted-foreground text-xs uppercase tracking-widest p-3">Expiration Method</DropdownMenuLabel>
+        <DropdownMenuSeparator className="bg-border" />
         
         <DropdownMenuCheckboxItem
           checked={expiryType === "date"}
           onSelect={() => setExpiryType("date")}
-          className="cursor-pointer focus:bg-blue-600 focus:text-white p-3"
+          className="cursor-pointer focus:bg-accent focus:text-accent-foreground p-3"
         >
           <IoCalendarOutline className="mr-3" size={18} /> By Specific Date
         </DropdownMenuCheckboxItem>
@@ -53,7 +52,7 @@ export function ExpiryDropDown({ expiryType, setExpiryType }: ExpiryDropDownProp
         <DropdownMenuCheckboxItem
           checked={expiryType === "clicks"}
           onSelect={() => setExpiryType("clicks")}
-          className="cursor-pointer focus:bg-blue-600 focus:text-white p-3"
+          className="cursor-pointer focus:bg-accent focus:text-accent-foreground p-3"
         >
           <IoStatsChartOutline className="mr-3" size={18} /> By Max Clicks
         </DropdownMenuCheckboxItem>

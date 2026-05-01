@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 const JWT_SECRET = process.env.NEXTAUTH_SECRET!;
 
 export async function POST(req: NextRequest) {
+
     try {
         const token = req.cookies.get("token")?.value;
         if (!token) {
@@ -15,32 +16,40 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        const { linkId } = await req.json();
+        const { linkId, days } = await req.json();
         
         if (!linkId) {
             return NextResponse.json(
-                {message: "linkId required"}, 
+                {message: "linkId required"},
                 {status: 400}
             );
         }
 
         const search = await prisma.link.findUnique({
             where: {
-                id: linkId
-            }
+                id: linkId,
+            },
         })
         const shortUrl = search?.shorturl;
 
-        const cachedKey = `analytics:${shortUrl}`;
+        const analyticsDays = days || 7;
+        const cachedKey = `analytics:${shortUrl}:${analyticsDays}`;
         const cachedData = await redis.get(cachedKey);
 
         if(cachedData) {
             return NextResponse.json(typeof cachedData === "string" ? JSON.parse(cachedData) : cachedData);
 
         } else {
+            const startDate = new Date();
+            startDate.setDate(startDate.getDate() - analyticsDays);
+            startDate.setHours(0, 0, 0, 0);
+
             const clickTimeline = await prisma.click.findMany({
                 where: {
-                    linkId: linkId
+                    linkId: linkId,
+                    createdAt: {
+                        gte: startDate
+                    }
                 },
                 select: {
                     createdAt: true
@@ -53,7 +62,10 @@ export async function POST(req: NextRequest) {
             const browsers = await prisma.click.groupBy({
                 by: ["browser"],
                 where: {
-                    linkId: linkId
+                    linkId: linkId,
+                    createdAt: {
+                        gte: startDate
+                    }
                 },
                 _count: {
                     browser: true
@@ -63,7 +75,10 @@ export async function POST(req: NextRequest) {
             const devices = await prisma.click.groupBy({
                 by: ["device"],
                 where: {
-                    linkId: linkId
+                    linkId: linkId,
+                    createdAt: {
+                        gte: startDate
+                    }
                 },
                 _count: {
                     device: true
@@ -73,7 +88,10 @@ export async function POST(req: NextRequest) {
             const osData = await prisma.click.groupBy({
                 by: ["OS"],
                 where: {
-                    linkId: linkId
+                    linkId: linkId,
+                    createdAt: {
+                        gte: startDate
+                    }
                 },
                 _count: {
                     OS: true
@@ -83,7 +101,10 @@ export async function POST(req: NextRequest) {
             const countries = await prisma.click.groupBy({
                 by: ["country"],
                 where: {
-                    linkId: linkId
+                    linkId: linkId,
+                    createdAt: {
+                        gte: startDate
+                    }
                 },
                 _count: {
                     country: true
@@ -93,7 +114,10 @@ export async function POST(req: NextRequest) {
             const referrers = await prisma.click.groupBy({
                 by: ["referrer"],
                 where: {
-                    linkId: linkId
+                    linkId: linkId,
+                    createdAt: {
+                        gte: startDate
+                    }
                 },
                 _count: {
                     referrer: true
@@ -113,7 +137,7 @@ export async function POST(req: NextRequest) {
                 })),
 
                 os: osData.map(o => ({
-                    os: o.OS || "Unknown",
+                    os: (o.OS || "Unknown").replace(/["']/g, "").trim(),
                     count: o._count.OS
                 })),
                 
@@ -134,7 +158,6 @@ export async function POST(req: NextRequest) {
 
 
     } catch (error) {
-        console.error(error);
         return NextResponse.json(
             {message: "Error fetching stats"},
             {status: 500}

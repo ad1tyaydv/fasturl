@@ -20,6 +20,22 @@ export async function GET(req: NextRequest) {
             userId: string;
         };
         const userId = decoded.userId;
+
+        const userTier = await prisma.user.findUnique({
+            where: {
+                id: userId
+            },
+            select: {
+                plan: true
+            }
+        })
+
+        if(userTier?.plan === 'FREE') {
+            return NextResponse.json(
+                {message: "Please upgrade to add domains!"},
+                {status: 404}
+            )
+        }
         
 
         const userDomains = await prisma.customDomain.findMany({
@@ -29,7 +45,9 @@ export async function GET(req: NextRequest) {
             select: {
                 id: true,
                 domain: true,
+                subDomain: true,
                 isActive: true,
+                txtName: true,
                 txtValue: true,
                 cnameTarget: true,
                 createdAt: true

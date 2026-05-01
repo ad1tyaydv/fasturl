@@ -2,23 +2,24 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { ChevronDown, Check, Plus, Globe } from "lucide-react";
+import { HugeiconsIcon } from '@hugeicons/react';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  ArrowDown01Icon, Globe02Icon, PlusSignIcon,Tick02Icon
+}
+  from '@hugeicons/core-free-icons';
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
+  DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+
 
 interface DomainDropdownProps {
   selectedDomain: string;
   onSelect: (domain: string) => void;
   defaultDomain: string;
 }
+
 
 export function DomainDropdown({ selectedDomain, onSelect, defaultDomain }: DomainDropdownProps) {
   const router = useRouter();
@@ -29,53 +30,37 @@ export function DomainDropdown({ selectedDomain, onSelect, defaultDomain }: Doma
     const getDomains = async () => {
       try {
         const res = await axios.get("/api/domain/fetchDomain");
-        const verifiedOnes = res.data.userDomains?.filter((d: any) => d.verified) || [];
-        setDomains(verifiedOnes);
+        const verifiedDomains = res.data.userDomains?.filter((d: any) => d.isActive) || [];
+        setDomains(verifiedDomains);
 
       } catch (err) {
-        console.error("Failed to fetch domains", err);
+        console.error("Failed to fetch domains");
       }
     };
     getDomains();
-    
+
   }, []);
 
 
-  const handleVerifyDomain = async (domainName: string) => {
-    try {
-      const res = await axios.post("/api/domain/verifyDomain", {
-        domain: domainName
-      });
-      
-      if (res.status === 200) {
-        toast.success("Domain verified successfully!");
-      }
-
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || "DNS records not found yet. Try again later.");
-    } 
-  };
+  const displayDomain = (selectedDomain ?? "").replace(/^https?:\/\//, "");
+  const itemClasses = "flex items-center justify-between text-foreground focus:bg-accent focus:text-accent-foreground cursor-pointer transition-colors duration-200 rounded-md mx-1";
 
 
-  const displayDomain = selectedDomain.replace(/^https?:\/\//, "");
-  const itemClasses = "flex items-center justify-between text-white focus:text-white cursor-pointer transition-colors duration-200";
-
-  
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="flex items-center gap-2 px-4 py-2 bg-neutral-900 border border-neutral-800 text-neutral-300 text-sm font-medium rounded-lg hover:border-neutral-600 transition-all outline-none focus:ring-0">
-          <Globe size={16} className="text-blue-500" />
+        <button className="flex items-center gap-2 px-4 py-2 bg-background border border-border text-foreground text-sm font-medium rounded-lg hover:bg-accent hover:text-accent-foreground transition-all outline-none focus:ring-1 focus:ring-ring cursor-pointer">
+          <HugeiconsIcon icon={Globe02Icon} className="text-blue-500" />
           <span className="truncate max-w-[180px]">{displayDomain}</span>
-          <ChevronDown size={14} className="text-neutral-500" />
+          <HugeiconsIcon icon={ArrowDown01Icon} className="text-muted-foreground" />
         </button>
       </DropdownMenuTrigger>
-      
-      <DropdownMenuContent className="w-64 bg-[#1c1c1c] border-neutral-800 text-white shadow-2xl">
-        <DropdownMenuLabel className="text-neutral-500 text-[10px] uppercase tracking-widest px-2 py-1.5">
+
+      <DropdownMenuContent className="w-64 bg-popover border-border text-popover-foreground shadow-2xl rounded-lg p-1">
+        <DropdownMenuLabel className="text-muted-foreground text-[10px] uppercase tracking-widest px-2 py-1.5">
           Select Domain
         </DropdownMenuLabel>
-        
+
         <DropdownMenuItem
           onClick={() => onSelect(defaultDomain)}
           className={itemClasses}
@@ -83,30 +68,40 @@ export function DomainDropdown({ selectedDomain, onSelect, defaultDomain }: Doma
           <span className="truncate">
             {defaultDomain.replace(/^https?:\/\//, "")} (Default)
           </span>
-          {selectedDomain === defaultDomain && <Check size={14} className="text-blue-400 ml-2 shrink-0" />}
+          {selectedDomain === defaultDomain && <HugeiconsIcon icon={Tick02Icon} className="text-blue-500 ml-2 shrink-0" />}
         </DropdownMenuItem>
 
-        {domains.map((d) => (
-          <DropdownMenuItem
-            key={d.domain}
-            onClick={() => {
-              onSelect(d.domain);
-              handleVerifyDomain(d.domain);
-            }}
-            className={itemClasses}
-          >
-            <span className="truncate">{d.domain}</span>
-            {selectedDomain === d.domain && <Check size={14} className="text-white ml-2 shrink-0" />}
-          </DropdownMenuItem>
-        ))}
+        {domains.map((d) => {
+          const fullDomain = d.subDomain
+            ? `${d.subDomain}.${d.domain}`
+            : d.domain;
 
-        <DropdownMenuSeparator className="bg-neutral-800" />
-        
+          return (
+            <DropdownMenuItem
+              key={d.id}
+              onClick={() => {
+                onSelect(fullDomain);
+              }}
+              className={itemClasses}
+            >
+              <span className="truncate">
+                {fullDomain}
+              </span>
+
+              {selectedDomain === fullDomain && (
+                <HugeiconsIcon icon={Tick02Icon} className="text-blue-500 ml-2 shrink-0" />
+              )}
+            </DropdownMenuItem>
+          );
+        })}
+
+        <DropdownMenuSeparator className="bg-border" />
+
         <DropdownMenuItem
           onClick={() => router.push("/domain")}
-          className="flex items-center gap-2 text-neutral-400 focus:text-white cursor-pointer transition-colors"
+          className="flex items-center gap-2 text-muted-foreground focus:bg-accent focus:text-accent-foreground cursor-pointer transition-colors mx-1 rounded-md"
         >
-          <Plus size={14} />
+          <HugeiconsIcon icon={PlusSignIcon} />
           <span>Manage Domains</span>
         </DropdownMenuItem>
       </DropdownMenuContent>

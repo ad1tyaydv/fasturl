@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { prisma } from "@/lib/dbConfig";
+import { redis } from "@/lib/redis";
 
 
 const JWT_SECRET = process.env.NEXTAUTH_SECRET!;
@@ -23,26 +24,40 @@ export async function GET(req: NextRequest) {
         }
         const userId = decoded.userId;
 
-        const bulkLinks = await prisma.bulkLinks.findMany({
-            where: {
-                userId: userId
-            },
-            include: {
-                links: true
-            },
-            orderBy: {
-                createdAt: "desc"
-            }
-        })
+        const cachedKey = `fetchBulkLinks:${userId}`
+        const cachedData = await redis.get(cachedKey);
+        if (cachedData) {
+            const parsedData = typeof cachedData === "string" ? JSON.parse(cachedData) : cachedData;
 
-        return NextResponse.json(
-            {message: "Bulk links fetched", bulkLinks}
-        )
+            return NextResponse.json({
+                message: "Bulk links fetched",
+                bulkLinks: parsedData
+            });
+
+        } else {
+            const bulkLinks = await prisma.bulkLinks.findMany({
+                where: {
+                    userId: userId
+                },
+                include: {
+                    links: true
+                },
+                orderBy: {
+                    createdAt: "desc"
+                }
+            })
+
+            await redis.set(cachedKey, bulkLinks);
+
+            return NextResponse.json(
+                { message: "Bulk links fetched", bulkLinks }
+            )
+        }
 
     } catch (error) {
         return NextResponse.json(
-            {message: "Error while fetching bulk links"},
-            {status: 500}
+            { message: "Error while fetching bulk links" },
+            { status: 500 }
         )
     }
 }

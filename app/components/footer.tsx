@@ -1,74 +1,69 @@
 "use client";
 
+import { NewTwitterIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import Link from "next/link";
-import { 
-  IoLogoFacebook, 
-  IoLogoInstagram, 
-  IoLogoLinkedin, 
-  IoLogoTwitter 
-} from "react-icons/io5";
 
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
 
-  const footerLinks = [
+  const footerLinks: Array<{ title: string; links: Array<{ name: string; href: string; external?: boolean }> }> = [
     {
       title: "Features",
       links: [
-        { name: "Link Editor", href: "/features" },
-        { name: "Link Management", href: "/urls" },
-        { name: "Branded Links", href: "/premium" },
+        { name: "Link Editor", href: "/" },
+        { name: "Link Management", href: "/links?types=links" },
+        { name: "Branded Links", href: "/links?types=links" },
         { name: "Short URL Tracking", href: "/analytics" },
-        { name: "QR Code Generator", href: "/qr-generator" },
-        { name: "Short URL API", href: "/api-docs" },
+        { name: "QR Code Generator", href: "/qr" },
+        { name: "Short URL API", href: "/apikeys" },
       ],
     },
     {
       title: "Resources",
       links: [
-        { name: "Blog", href: "#" },
-        { name: "For Developers", href: "#" },
-        { name: "Our Proven Process", href: "#" },
-        { name: "About Us", href: "#" },
+        { name: "Blog", href: "/docs" },
+        { name: "For Developers", href: "/docs" },
+        { name: "Our Proven Process", href: "/docs" },
+        { name: "About Us", href: "/docs" },
       ],
     },
     {
       title: "Contact Us",
       links: [
-        { name: "Help Desk", href: "#" },
-        { name: "Contact Sales", href: "#" },
-        { name: "Contact Support", href: "#" },
-        { name: "Report Abuse", href: "#" },
+        { name: "Support", href: "/contact/support" },
+        { name: "Feedback", href: "/contact/feedback" },
+        { name: "Business", href: "/contact/business" },
+        { name: "Help Desk", href: "/contact/support" },
       ],
     },
     {
       title: "Legal",
       links: [
-        { name: "Terms of Service", href: "/terms" },
-        { name: "Privacy Policy", href: "/privacy" },
-        { name: "Cookie Policy", href: "#" },
-        { name: "Accessibility Statement", href: "#" },
-        { name: "Privacy Manager", href: "#" },
+        { name: "Terms of Service", href: "/legal/terms" },
+        { name: "Privacy Policy", href: "/legal/privacyPolicy" },
+        { name: "Cookie Policy", href: "/legal/cookies" },
       ],
     },
   ];
 
-  
+
   return (
-    <footer className="bg-[#141414] text-white border-t border-neutral-800 transition-colors duration-300">
+    <footer className="bg-background text-foreground border-t border-border transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-6 py-16">
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-10">
           
           {footerLinks.map((section, idx) => (
             <div key={idx} className="flex flex-col gap-4">
-              <h4 className="font-one font-bold text-lg text-white">{section.title}</h4>
+              <h4 className="font-one font-three text-lg text-foreground">{section.title}</h4>
               <ul className="flex flex-col gap-2">
                 {section.links.map((link, lIdx) => (
                   <li key={lIdx}>
-                    <Link 
+                    <Link
                       href={link.href} 
-                      className="text-neutral-400 hover:text-blue-500 transition-colors text-sm font-two"
+                      {...(link.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                      className="text-muted-foreground hover:text-blue-500 transition-colors text-sm font-one"
                     >
                       {link.name}
                     </Link>
@@ -80,25 +75,17 @@ export default function Footer() {
 
           <div className="col-span-2 flex flex-col items-center lg:items-end justify-center lg:justify-start gap-6 lg:ml-auto">
             <div className="flex gap-6">
-              <Link href="#" className="text-neutral-400 hover:text-white transition-colors cursor-pointer">
-                <IoLogoFacebook size={22} />
-              </Link>
-              <Link href="#" className="text-neutral-400 hover:text-white transition-colors cursor-pointer">
-                <IoLogoInstagram size={22} />
-              </Link>
-              <Link href="#" className="text-neutral-400 hover:text-white transition-colors cursor-pointer">
-                <IoLogoLinkedin size={22} />
-              </Link>
-              <Link href="#" className="text-neutral-400 hover:text-white transition-colors cursor-pointer">
-                <IoLogoTwitter size={22} />
+              <span className="text-muted-foreground">Follow us on</span>
+              <Link href="https://x.com/fasturldotin" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
+                <HugeiconsIcon icon={NewTwitterIcon} />
               </Link>
             </div>
 
             <div className="text-center lg:text-right">
-              <h2 className="text-4xl font-one font-black tracking-tighter mb-2 text-white">
+              <h2 className="text-4xl font-three font-black tracking-tighter mb-2 text-foreground">
                 FASTURL
               </h2>
-              <p className="text-xs text-neutral-500 font-two leading-relaxed">
+              <p className="text-xs text-muted-foreground font-one leading-relaxed">
                 © {currentYear} FASTURL LLC <br />
                 All Rights Reserved
               </p>
