@@ -108,9 +108,11 @@ export default function SignupPage() {
         }} 
       />
 
-      <div className="w-full lg:w-1/2 bg-background p-8 lg:p-20 flex flex-col relative overflow-hidden min-h-[40vh] lg:min-h-screen border-r border-border/50">
-        <div className="relative z-20 flex items-center gap-3 cursor-pointer w-fit group mb-auto" onClick={() => router.push("/")}>
-          <img src="/favicon.ico" alt="Logo" className="w-10 h-10 transition-transform group-hover:scale-110" />
+      <div className="hidden lg:flex w-full lg:w-1/2 bg-background p-8 lg:p-20 flex-col relative overflow-hidden lg:min-h-screen border-r border-border/50">
+        <div className="relative z-20 flex items-center gap-3 cursor-pointer w-fit group mb-auto lg:pt-4" onClick={() => router.push("/")}>
+          <div className="w-10 h-10 flex items-center justify-center transition-transform group-hover:scale-110">
+            <img src="/favicon.ico" alt="Fasturl Logo" className="w-full h-full object-contain" />
+          </div>
           <span className="text-2xl font-bold tracking-tight">Fasturl</span>
         </div>
         <div className="relative z-10 flex-grow flex flex-col justify-center lg:-mt-32">
@@ -129,15 +131,26 @@ export default function SignupPage() {
 
       <div className="w-full lg:w-1/2 p-8 lg:p-20 flex flex-col justify-center bg-background min-h-screen relative">
         
-        <div className="absolute top-8 left-8 lg:top-12 lg:left-20">
-            <button 
-                onClick={() => showOtpScreen ? setShowOtpScreen(false) : router.push("/")} 
-                className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors font-medium group cursor-pointer"
-            >
-                <HugeiconsIcon icon={ArrowLeft01Icon} size={20} className="group-hover:-translate-x-1 transition-transform" /> 
-                {showOtpScreen ? "Back to Signup" : "Back to Home"}
-            </button>
-        </div>
+        {/* Mobile Back Button */}
+        {!showOtpScreen && (
+          <button
+            onClick={() => router.push("/")}
+            className="lg:hidden absolute top-8 left-8 flex items-center gap-2 text-muted-foreground hover:text-foreground transition-all cursor-pointer z-20"
+          >
+            <HugeiconsIcon icon={ArrowLeft01Icon} className="w-5 h-5" />
+            <span className="text-sm font-bold uppercase tracking-widest">Back</span>
+          </button>
+        )}
+
+        {showOtpScreen && (
+          <button
+            onClick={() => setShowOtpScreen(false)}
+            className="absolute top-10 left-10 lg:top-20 lg:left-20 flex items-center gap-2 text-muted-foreground hover:text-[#2a9d8f] transition-all cursor-pointer group z-20"
+          >
+            <HugeiconsIcon icon={ArrowLeft01Icon} className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+            <span className="text-sm font-bold uppercase tracking-widest">Go Back</span>
+          </button>
+        )}
 
         <AnimatePresence mode="wait">
           {!showOtpScreen ? (

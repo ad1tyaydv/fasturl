@@ -141,7 +141,8 @@ export default function Login() {
         }} 
       />
 
-      <div className="w-full lg:w-1/2 bg-background p-8 lg:p-20 flex flex-col relative overflow-hidden min-h-[50vh] lg:min-h-screen border-r border-border/50">
+      {/* Left Column - Hidden on Mobile */}
+      <div className="hidden lg:flex w-full lg:w-1/2 bg-background p-8 lg:p-20 flex-col relative overflow-hidden lg:min-h-screen border-r border-border/50">
         
         <div 
           className="relative z-20 flex items-center gap-3 cursor-pointer w-fit group mb-auto lg:pt-4" 
@@ -175,6 +176,17 @@ export default function Login() {
 
       <div className="w-full lg:w-1/2 p-8 lg:p-20 flex flex-col justify-center bg-background min-h-screen relative">
         
+        {/* Mobile Back Button */}
+        {!show2FA && (
+          <button
+            onClick={() => router.push("/")}
+            className="lg:hidden absolute top-8 left-8 flex items-center gap-2 text-muted-foreground hover:text-foreground transition-all cursor-pointer z-20"
+          >
+            <HugeiconsIcon icon={ArrowLeft01Icon} className="w-5 h-5" />
+            <span className="text-sm font-bold uppercase tracking-widest">Back</span>
+          </button>
+        )}
+
         {show2FA && (
           <button
             onClick={() => setShow2FA(false)}
@@ -212,7 +224,7 @@ export default function Login() {
                   <input
                     name="email"
                     type="email"
-                    placeholder="name@company.com"
+                    placeholder="Email Address"
                     value={formData.email}
                     onChange={handleChange}
                     className="w-full px-6 py-4 rounded-2xl border border-border bg-secondary/50 focus:bg-secondary focus:border-[#83c5be] focus:ring-4 focus:ring-[#83c5be]/10 outline-none transition-all placeholder:text-muted-foreground/50 text-lg text-foreground"
@@ -226,7 +238,7 @@ export default function Login() {
                     <input
                       name="password"
                       type={showPassword ? "text" : "password"}
-                      placeholder="••••••••"
+                      placeholder="Password"
                       value={formData.password}
                       onChange={handleChange}
                       className="w-full px-6 py-4 rounded-2xl border border-border bg-secondary/50 focus:bg-secondary focus:border-[#83c5be] focus:ring-4 focus:ring-[#83c5be]/10 outline-none transition-all placeholder:text-muted-foreground/50 text-lg text-foreground"
