@@ -10,8 +10,9 @@ import {
 
 import { HugeiconsIcon } from '@hugeicons/react';
 import {
-  Refresh04Icon, Download01Icon, 
-  ArrowRight01Icon}
+  Refresh04Icon, Download01Icon,
+  ArrowRight01Icon
+}
   from '@hugeicons/core-free-icons';
 
 import Navbar from "@/app/components/navbar";
@@ -22,8 +23,6 @@ import Features from "@/app/components/features";
 import Footer from "@/app/components/footer";
 import { Button } from "@/components/ui/button";
 import QrDownloadModal from "@/app/modals/qrDownloadModal";
-
-
 import { useUser } from "@/app/components/userContext";
 
 export default function QRGenerator() {
@@ -31,11 +30,13 @@ export default function QRGenerator() {
   const pricingRef = useRef<HTMLDivElement>(null);
   const { user, loading: authLoading } = useUser();
 
+  
   useEffect(() => {
     if (!authLoading && !user) {
       router.push("/auth/signin");
     }
   }, [user, authLoading, router]);
+
 
   const [url, setUrl] = useState("");
   const isLoggedIn = !!user;
@@ -58,9 +59,19 @@ export default function QRGenerator() {
     title: "",
     description: "",
     buttonText: "",
-    action: () => {},
+    action: () => { },
     showPlans: false,
   });
+
+  useEffect(() => {
+    if (authLoading) {
+      return;
+    }
+
+    if (!user) {
+      router.replace("/auth/signin");
+    }
+  }, [user, authLoading]);
 
 
   const slowScrollToPricing = () => {
@@ -68,16 +79,16 @@ export default function QRGenerator() {
       const targetPosition = pricingRef.current.offsetTop;
       const startPosition = window.pageYOffset;
       const distance = targetPosition - startPosition;
-      const duration = 1200; 
+      const duration = 1200;
       let start: number | null = null;
 
       const step = (timestamp: number) => {
         if (!start) start = timestamp;
         const progress = timestamp - start;
         const percentage = Math.min(progress / duration, 1);
-        
-        const easing = percentage < 0.5 
-          ? 4 * percentage * percentage * percentage 
+
+        const easing = percentage < 0.5
+          ? 4 * percentage * percentage * percentage
           : 1 - Math.pow(-2 * percentage + 2, 3) / 2;
 
         window.scrollTo(0, startPosition + distance * easing);
@@ -86,7 +97,7 @@ export default function QRGenerator() {
 
       window.requestAnimationFrame(step);
     }
-    
+
     setUpgradeMsg(true);
     setTimeout(() => setUpgradeMsg(false), 3000);
   };
@@ -110,7 +121,7 @@ export default function QRGenerator() {
     try {
       setLoading(true);
       const res = await axios.post("/api/qrCode", {
-        shortUrl: url, 
+        shortUrl: url,
         longUrl: url
       });
 
@@ -168,7 +179,8 @@ export default function QRGenerator() {
     <div className="min-h-screen transition-colors duration-300 bg-background text-foreground relative">
       <Navbar />
 
-      <style dangerouslySetInnerHTML={{__html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         @keyframes gentleShake {
           0%, 100% { transform: rotate(0deg); }
           25% { transform: rotate(-0.5deg); }
@@ -184,7 +196,7 @@ export default function QRGenerator() {
           <div className={`bg-popover border border-border p-6 rounded-2xl shadow-2xl animate-in zoom-in-95 duration-200 ${modalConfig.showPlans ? 'max-w-4xl w-full' : 'max-w-sm w-full'}`}>
             <div className="flex justify-between items-start mb-2">
               <h3 className="text-xl font-bold font-one text-foreground">{modalConfig.title}</h3>
-              <button 
+              <button
                 onClick={() => setModalConfig({ ...modalConfig, show: false })}
                 className="p-1 text-muted-foreground hover:text-foreground hover:bg-accent rounded-full transition-colors cursor-pointer"
               >
@@ -205,8 +217,8 @@ export default function QRGenerator() {
                     <span className="text-muted-foreground text-sm">/mo</span>
                   </div>
                   <ul className="text-sm space-y-2 mb-6 text-foreground/80">
-                    <li className="flex items-center gap-2"><IoCheckmarkCircle className="text-blue-500"/> 200 Links / Mo</li>
-                    <li className="flex items-center gap-2"><IoCheckmarkCircle className="text-blue-500"/> 20 QR Codes / Mo</li>
+                    <li className="flex items-center gap-2"><IoCheckmarkCircle className="text-blue-500" /> 200 Links / Mo</li>
+                    <li className="flex items-center gap-2"><IoCheckmarkCircle className="text-blue-500" /> 20 QR Codes / Mo</li>
                   </ul>
                   <button className="w-full py-2 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition cursor-pointer">Upgrade Essentials</button>
                 </div>
@@ -218,14 +230,14 @@ export default function QRGenerator() {
                     <span className="text-muted-foreground text-sm">/mo</span>
                   </div>
                   <ul className="text-sm space-y-2 mb-6 text-foreground/80">
-                    <li className="flex items-center gap-2"><IoCheckmarkCircle className="text-muted-foreground"/> Unlimited Links</li>
-                    <li className="flex items-center gap-2"><IoCheckmarkCircle className="text-muted-foreground"/> 500 QR Codes / Mo</li>
+                    <li className="flex items-center gap-2"><IoCheckmarkCircle className="text-muted-foreground" /> Unlimited Links</li>
+                    <li className="flex items-center gap-2"><IoCheckmarkCircle className="text-muted-foreground" /> 500 QR Codes / Mo</li>
                   </ul>
                   <button className="w-full py-2 bg-secondary text-foreground rounded-lg font-bold hover:bg-accent transition cursor-pointer">Go Premium</button>
                 </div>
               </div>
             ) : (
-              <button 
+              <button
                 onClick={modalConfig.action}
                 className="w-full py-3 bg-primary text-primary-foreground rounded-xl font-bold transition hover:opacity-90 active:scale-95 cursor-pointer"
               >
@@ -245,9 +257,8 @@ export default function QRGenerator() {
             Transform any URL into a high-quality, shareable QR code instantly.
           </p>
 
-          <div className={`flex flex-col sm:flex-row gap-3 border rounded-xl p-2 sm:p-3 transition-colors shadow-sm bg-secondary/50 ${
-            showQr ? 'border-blue-500' : 'border-border'
-          }`}>
+          <div className={`flex flex-col sm:flex-row gap-3 border rounded-xl p-2 sm:p-3 transition-colors shadow-sm bg-secondary/50 ${showQr ? 'border-blue-500' : 'border-border'
+            }`}>
             <input
               type="text"
               placeholder="Enter URL to generate QR..."
@@ -290,7 +301,7 @@ export default function QRGenerator() {
           {(isLoggedIn || authLoading) && (
             <div className="mt-4 flex flex-col items-center gap-4 animate-in fade-in slide-in-from-top-2">
               <span className="px-3 py-1.5 bg-secondary border border-border text-sm font-medium text-muted-foreground rounded-lg inline-flex items-center gap-1.5 shadow-sm">
-                You have 
+                You have
                 <span className="inline-flex items-center justify-center min-w-[20px]">
                   {qrsLeft === null ? (
                     <div className="w-3 h-3 border-2 border-muted-foreground border-t-foreground rounded-full animate-spin"></div>
@@ -322,12 +333,12 @@ export default function QRGenerator() {
               <div className="bg-white p-4 rounded-xl shadow-2xl border border-border mb-6">
                 <img src={showQr} alt="Generated QR Code" className="w-52 h-52 object-contain" />
               </div>
-              
+
               <Button
                 onClick={() => setIsDownloadModalOpen(true)}
                 className="bg-primary text-primary-foreground hover:opacity-90 font-one px-5 py-5 rounded-xl text-lg shadow-lg transition-all active:scale-95 flex items-center gap-2 cursor-pointer"
               >
-                <HugeiconsIcon icon={Download01Icon}/>
+                <HugeiconsIcon icon={Download01Icon} />
                 Download
               </Button>
 
@@ -347,7 +358,7 @@ export default function QRGenerator() {
           {!authLoading && !isLoggedIn && (
             <div className="mt-6 flex font-one flex-col items-center justify-center text-sm sm:text-base text-muted-foreground">
               <p>Sign in to download and save your QR codes</p>
-              <button 
+              <button
                 onClick={() => router.push("/auth/signin")}
                 className="font-semibold font-one mt-1 hover:underline cursor-pointer text-foreground"
               >
@@ -375,10 +386,10 @@ export default function QRGenerator() {
       <div className="w-full h-px bg-border my-6"></div>
 
       <FaqSection />
-      
+
       <TotalData />
 
-      <Footer />      
+      <Footer />
     </div>
   );
 }

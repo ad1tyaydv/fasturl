@@ -66,6 +66,7 @@ export default function Navbar() {
       setIsSidebarOpen(false);
       window.location.href = "/";
       window.location.reload();
+      
     } catch (error) {
       console.error("Logout failed");
     }
