@@ -1,3 +1,4 @@
+
 "use client";
 import {
   InputOTP,
@@ -8,6 +9,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Loader2, X } from "lucide-react";
+import { useUser } from "@/app/components/userContext";
 
 const AVATAR_LIST = [
   "https://api.dicebear.com/9.x/fun-emoji/svg?seed=Felix",
@@ -32,6 +34,7 @@ function Skeleton({ className }: { className?: string }) {
 }
 
 export default function Profile() {
+  const { user, loading: userLoading, refreshUser } = useUser();
   const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [updateUserName, setUpdateUserName] = useState("");
@@ -42,7 +45,6 @@ export default function Profile() {
   const [tempAvatar, setTempAvatar] = useState(AVATAR_LIST[0]);
   const [showAvatarModal, setShowAvatarModal] = useState(false);
   const [updateImageLoader, setUpdateImageLoader] = useState(false);
-  const [pageLoading, setPageLoading] = useState(true);
 
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [otp, setOtp] = useState("");
@@ -50,25 +52,14 @@ export default function Profile() {
 
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const res = await axios.get("/api/auth/me");
-        setUserName(res.data.userName || "");
-        setEmail(res.data.email || "");
-        setUpdateUserName(res.data.userName || "");
-        setUpdateEmail(res.data.email || "");
-        setSelectedAvatar(res.data.image || AVATAR_LIST[0]);
-        
-      } catch (error) {
-        toast.error("Failed to load user data");
-
-      } finally {
-        setPageLoading(false);
-      }
-    };
-    fetchUserData();
-
-  }, []);
+    if (user) {
+      setUserName(user.userName || "");
+      setEmail(user.email || "");
+      setUpdateUserName(user.userName || "");
+      setUpdateEmail(user.email || "");
+      setSelectedAvatar(user.image || AVATAR_LIST[0]);
+    }
+  }, [user]);
 
 
   const handleUpdateUserName = async () => {
@@ -81,6 +72,7 @@ export default function Profile() {
     try {
       await axios.post("/api/auth/update/userName", { userName: updateUserName });
       setUserName(updateUserName);
+      await refreshUser();
       toast.success("Username updated successfully");
 
     } catch (error: any) {
@@ -100,6 +92,7 @@ export default function Profile() {
         image: imageUrl
       });
       setSelectedAvatar(imageUrl);
+      await refreshUser();
       toast.success("Avatar updated");
 
     } catch (error: any) {
@@ -150,6 +143,7 @@ export default function Profile() {
         otp: otp
       });
       setEmail(updateEmail);
+      await refreshUser();
       setShowOtpModal(false);
       setOtp("");
       toast.success("Email updated successfully");
@@ -180,7 +174,7 @@ export default function Profile() {
   };
 
 
-  if (pageLoading) {
+  if (userLoading) {
     return (
       <div className="pl-6">
         <Skeleton className="h-8 w-48 mb-8" />
@@ -213,6 +207,8 @@ export default function Profile() {
       </div>
     );
   }
+
+  if (!user) return null;
 
   return (
     <div className="pl-6 font-one">
@@ -283,7 +279,7 @@ export default function Profile() {
 
       {showAvatarModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4">
-          <div className="bg-popover border border-border rounded-2xl p-6 w-full max-w-sm shadow-2xl animate-in zoom-in-95 duration-200">
+          <div className="bg-popover border border-border rounded-2xl p-6 w-full max-sm shadow-2xl animate-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-base font-semibold text-foreground">Choose Emoji</h2>
               <button
@@ -333,7 +329,7 @@ export default function Profile() {
                 <X className="w-5 h-5" />
               </button>
             </div>
-            
+
             <p className="text-sm text-muted-foreground mb-6">
               An OTP has been sent to <span className="text-foreground font-medium">{updateEmail}</span>. Please enter it to verify your new email.
             </p>

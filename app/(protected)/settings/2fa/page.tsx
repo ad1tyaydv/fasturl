@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -5,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2, ArrowLeft, X, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";
+import { useUser } from "@/app/components/userContext";
 
 // Shadcn Input OTP Components
 import {
@@ -16,6 +18,7 @@ import {
 import React from "react";
 
 export default function TwoFactorPage() {
+  const { user, loading: userLoading, refreshUser } = useUser();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [qrCode, setQrCode] = useState<string | null>(null);
   const [otp, setOtp] = useState("");
@@ -24,7 +27,6 @@ export default function TwoFactorPage() {
   const [isDisabling, setIsDisabling] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isEnabled, setIsEnabled] = useState(false);
-  const [loading, setloading] = useState(false);
 
   useEffect(() => {
     if (isModalOpen) {
@@ -37,22 +39,10 @@ export default function TwoFactorPage() {
   }, [isModalOpen]);
 
   useEffect(() => {
-    const check2fa = async () => {
-      setloading(true);
-      try {
-        const res = await axios.get("/api/auth/me");
-        setIsEnabled(res.data.twofactorEnabled);
-
-      } catch (error) {
-        console.log("Error while 2fa check");
-
-      } finally {
-        setloading(false);
-      }
-    };
-    check2fa();
-
-  }, []);
+    if (user) {
+      setIsEnabled(user.twofactorEnabled);
+    }
+  }, [user]);
 
 
   const fetchQrCode = async () => {
@@ -74,13 +64,14 @@ export default function TwoFactorPage() {
 
   const handleVerify = async () => {
     if (otp.length < 6) return;
-    
+
     try {
       setIsVerifying(true);
       setError(null);
 
       await axios.post("/api/auth/2fa/verify", { otp: otp });
       setIsEnabled(true);
+      await refreshUser();
       setIsModalOpen(false);
       setQrCode(null);
       toast.success("Two-factor authentication enabled successfully.");
@@ -98,6 +89,7 @@ export default function TwoFactorPage() {
       setIsDisabling(true);
       await axios.post("/api/auth/2fa/disable");
       setIsEnabled(false);
+      await refreshUser();
       toast.success("Two-factor authentication disabled.");
 
     } catch (err) {
@@ -108,7 +100,7 @@ export default function TwoFactorPage() {
     }
   };
 
-  
+
   return (
     <div className="animate-in fade-in duration-300 font-one">
       <h2 className="text-2xl font-bold text-foreground mb-4">
@@ -121,7 +113,7 @@ export default function TwoFactorPage() {
       </p>
 
       <div className="min-h-[44px] flex items-center">
-        {loading ? (
+        {userLoading ? (
           <div className="flex items-center gap-3 text-muted-foreground">
             <Loader2 className="w-5 h-5 animate-spin text-primary" />
             <span className="text-sm font-medium">Checking security status...</span>
@@ -212,7 +204,7 @@ export default function TwoFactorPage() {
                 <label className="block text-[11px] font-bold text-muted-foreground uppercase tracking-widest mb-4">
                   6-Digit Verification Code
                 </label>
-                
+
                 <InputOTP 
                   maxLength={6} 
                   value={otp} 

@@ -1,14 +1,15 @@
+
 "use client";
 
-import axios from "axios";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useUser } from "@/app/components/userContext";
 
 export default function SubscriptionPage() {
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
+  const { user, loading: userLoading } = useUser();
   const [plan, setPlan] = useState("FREE");
   const [planStartedAt, setPlanStartedAt] = useState("");
   const [planExpiresAt, setPlanExpiresAt] = useState("");
@@ -18,30 +19,15 @@ export default function SubscriptionPage() {
 
 
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const res = await axios.get("/api/auth/me");
-        if (!res.data.authenticated) {
-          router.push("/auth/signin");
-          return;
-        }
-
-        setPlan(res.data.plan || "FREE");
-        setPlanStartedAt(res.data.planStartedAt || "N/A");
-        setPlanExpiresAt(res.data.planExpiresAt || "N/A");
-        setTotalLinks(res.data.totalLinks || 0);
-        setBulkLinks(res.data.bulkLinks || 0);
-        setTotalQrCodes(res.data.totalQrCodes || 0);
-
-      } catch {
-        router.push("/auth/signin");
-
-      } finally {
-        setLoading(false);
-      }
-    };
-    checkAuth();
-  }, [router]);
+    if (user) {
+      setPlan(user.plan || "FREE");
+      setPlanStartedAt(user.planStartedAt || "N/A");
+      setPlanExpiresAt(user.planExpiresAt || "N/A");
+      setTotalLinks(user.totalLinks || 0);
+      setBulkLinks(user.bulkLinks || 0);
+      setTotalQrCodes(user.totalQrCodes || 0);
+    }
+  }, [user]);
 
   return (
     <div className="animate-in fade-in duration-300 font-one">
@@ -51,7 +37,7 @@ export default function SubscriptionPage() {
 
       <div className="flex flex-col gap-5 w-full max-w-lg mb-8">
         <div className="flex items-center gap-4 text-base sm:text-lg min-h-[40px]">
-          {loading ? (
+          {userLoading ? (
             <div className="flex items-center gap-4 w-full">
               <Skeleton className="h-6 w-32 bg-secondary" />
               <Skeleton className="h-8 w-24 bg-secondary rounded-lg" />
@@ -76,7 +62,7 @@ export default function SubscriptionPage() {
           )}
         </div>
 
-        {loading ? (
+        {userLoading ? (
           <div className="space-y-4">
             <Skeleton className="h-5 w-48 bg-secondary" />
             <Skeleton className="h-5 w-56 bg-secondary" />
@@ -100,9 +86,9 @@ export default function SubscriptionPage() {
       <div className="w-full h-px bg-border my-8 max-w-2xl"></div>
 
       <h3 className="text-xl font-bold text-foreground mb-4">Usage Statistics</h3>
-      
+
       <div className="flex flex-col gap-4 w-full max-w-lg mt-2">
-        {loading ? (
+        {userLoading ? (
           Array.from({ length: 3 }).map((_, i) => (
             <div key={i} className="flex items-center gap-3">
                <Skeleton className="h-5 w-28 bg-secondary" />

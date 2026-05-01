@@ -14,6 +14,7 @@ import {
 } from '@hugeicons/core-free-icons';
 
 import Navbar from "@/app/components/navbar";
+import { useUser } from "@/app/components/userContext";
 import ClicksAnalytics from "@/app/components/analytics/clicks";
 import BrowserAnalytics from "@/app/components/analytics/browsers";
 import DeviceAnalytics from "@/app/components/analytics/devices";
@@ -57,6 +58,7 @@ function PremiumBlock({ children, isFree, isLoading }: { children: React.ReactNo
 
 export default function AnalyticsPage() {
   const router = useRouter();
+  const { user, loading: userLoading } = useUser();
 
   const [analyticsType, setAnalyticsType] = useState<AnalyticsType>("links");
   const [isChangingType, setIsChangingType] = useState(false);
@@ -102,18 +104,25 @@ export default function AnalyticsPage() {
 
 
   useEffect(() => {
+    if (!userLoading && !user) {
+      router.push("/auth/signin");
+    }
+  }, [user, userLoading, router]);
+
+  useEffect(() => {
+    if (user) {
+      setTier(user.plan || "FREE");
+    }
+  }, [user]);
+
+
+  useEffect(() => {
     async function init() {
       try {
-        const [authRes, urlsRes, bulkRes] = await Promise.all([
-          fetch("/api/auth/me").catch(() => null),
+        const [urlsRes, bulkRes] = await Promise.all([
           fetch("/api/fetchUrls").catch(() => null),
           fetch("/api/shortUrl/bulkLinks/fetchBulkLinks").catch(() => null),
         ]);
-
-        if (authRes?.ok) {
-          const authData = await authRes.json();
-          setTier(authData.plan || "FREE");
-        }
 
         let fetchedUrls = [];
         if (urlsRes?.ok) {
@@ -162,9 +171,12 @@ export default function AnalyticsPage() {
         setLoading(false);
       }
     }
-    init();
+    
+    if (user) {
+        init();
+    }
 
-  }, []);
+  }, [user]);
 
 
   const handleTypeChange = (newType: AnalyticsType) => {
@@ -240,11 +252,11 @@ export default function AnalyticsPage() {
           )}
         </AnimatePresence>
 
-        {loading ? (
+        {userLoading || (loading && user) ? (
           <div className="flex flex-1 items-center justify-center bg-background">
             <Loader2 className="animate-spin text-foreground w-8 h-8" />
           </div>
-        ) : (
+        ) : !user ? null : (
           <>
             <aside className={`border-r border-border flex-col bg-background shrink-0 ${selectedId ? 'hidden md:flex md:w-80' : 'flex w-full md:w-80'}`}>
               <div className="p-6 space-y-4">

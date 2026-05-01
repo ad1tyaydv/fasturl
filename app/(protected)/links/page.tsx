@@ -1,3 +1,4 @@
+
 "use client";
 
 import axios from "axios";
@@ -32,6 +33,7 @@ import { Input } from "@/components/ui/input";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { BulkFilterDropDown, BulkFilterType } from "@/app/dropDown/bulkLinksDropDown";
 import { QrFilterDropDown, QrFilterType } from "@/app/dropDown/qrLinksDropDown";
+import { useUser } from "@/app/components/userContext";
 
 
 const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN;
@@ -101,12 +103,12 @@ function AllLinks() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const { user, loading: userLoading } = useUser();
 
   const [view, setView] = useState<LocalViewType>((searchParams.get("types") as LocalViewType) || "links");
   const [data, setData] = useState<any[]>([]);
   const [tier, setTier] = useState("FREE");
   const [loading, setLoading] = useState(true);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<FilterType>("all");
@@ -149,27 +151,19 @@ function AllLinks() {
 
 
   useEffect(() => {
-    const initAuth = async () => {
-      try {
-        const res = await axios.get("/api/auth/me");
-        if (res.data.authenticated) {
-          setIsLoggedIn(true);
-          setTier(res.data.plan || "FREE");
-          
-        } else {
-          router.push("/auth/signin");
-        }
+    if (!userLoading && !user) {
+      router.push("/auth/signin");
+    }
+  }, [user, userLoading, router]);
 
-      } catch {
-        router.push("/auth/signin");
-      }
-    };
-    initAuth();
-
-  }, [router]);
+  useEffect(() => {
+    if (user) {
+      setTier(user.plan || "FREE");
+    }
+  }, [user]);
 
 
-  useEffect(() => { if (isLoggedIn) fetchData(); }, [fetchData, isLoggedIn]);
+  useEffect(() => { if (user) fetchData(); }, [fetchData, user]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -328,7 +322,7 @@ function AllLinks() {
                 </div>
               )}
 
-              {loading ? (
+              {(loading || userLoading) ? (
                 <div className="flex flex-col w-full">
                   {[...Array(6)].map((_, i) => (
                     view === "qr" ? <QrSkeleton key={i} /> :

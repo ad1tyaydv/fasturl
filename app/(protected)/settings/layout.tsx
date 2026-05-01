@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import axios from "axios";
 import Navbar from "../../components/navbar";
 import { Menu, X, ChevronRight } from "lucide-react";
 import { useUser } from "@/app/components/userContext";
