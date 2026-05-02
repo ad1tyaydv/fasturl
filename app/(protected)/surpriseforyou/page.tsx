@@ -18,7 +18,7 @@ export default function SurprisePage() {
   const { user } = useUser();
 
   const handleCopy = () => {
-    navigator.clipboard.writeText("FAST90");
+    navigator.clipboard.writeText("FAST80");
     setCopied(true);
     toast.success("Coupon code copied!");
     setTimeout(() => setCopied(false), 2000);
