@@ -120,7 +120,26 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const fullShortUrl = `${process.env.NEXT_PUBLIC_DOMAIN}/${data.shortUrl}?source=qr`;
+    const domain = process.env.NEXT_PUBLIC_DOMAIN || "localhost:3000";
+    const baseDomain = domain.startsWith("http") 
+      ? domain 
+      : `${domain.includes("localhost") ? "http" : "https"}://${domain}`;
+
+    let fullShortUrl = data.shortUrl;
+
+    if (!fullShortUrl.startsWith("http")) {
+      fullShortUrl = `${baseDomain}/${data.shortUrl}${data.shortUrl.includes('?') ? '&' : '?'}source=qr`;
+    } else {
+      try {
+        const urlObj = new URL(fullShortUrl);
+        if (!urlObj.searchParams.has("source")) {
+          urlObj.searchParams.set("source", "qr");
+          fullShortUrl = urlObj.toString();
+        }
+      } catch (e) {
+        fullShortUrl = `${baseDomain}/${data.shortUrl}${data.shortUrl.includes('?') ? '&' : '?'}source=qr`;
+      }
+    }
 
     const qr = await QRCode.toDataURL(fullShortUrl, {
       width: 300,

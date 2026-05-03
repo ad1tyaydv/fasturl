@@ -31,9 +31,12 @@ export default function QrDownloadModal({ isOpen, onClose, qrData, selectedUrl }
   const buildUrl = (path: string) => {
     const domain = process.env.NEXT_PUBLIC_DOMAIN || "localhost:3000";
 
-    const protocol = domain.includes("localhost") ? "http" : "https";
+    if (domain.startsWith("http")) {
+      return `${domain}/${path}`;
+    }
 
-    return `${protocol}://${domain}/${path}`;
+    const protocol = domain.includes("localhost") ? "http://" : "https://";
+    return `${protocol}${domain}/${path}`;
   };
 
   useEffect(() => {
@@ -41,20 +44,18 @@ export default function QrDownloadModal({ isOpen, onClose, qrData, selectedUrl }
       setEffectiveQrData(qrData);
 
     } else if (selectedUrl) {
-      let shortLink = "";
+      let finalUrl = "";
 
       if (selectedUrl.domain && selectedUrl.subdomain) {
-        shortLink = `${selectedUrl.subdomain}.${selectedUrl.domain}/${selectedUrl.shorturl}`;
+        finalUrl = `${selectedUrl.subdomain}.${selectedUrl.domain}/${selectedUrl.shorturl}`;
 
       } else {
-        shortLink = buildUrl(selectedUrl.shorturl);
+        finalUrl = buildUrl(selectedUrl.shorturl);
       }
 
-      let finalUrl = shortLink;
-
-      if (!finalUrl.startsWith("http://") && !finalUrl.startsWith("https://")) {
+      if (!finalUrl.startsWith("http")) {
         const isLocal = finalUrl.includes("localhost");
-        finalUrl = `${isLocal ? "http" : "https"}://${finalUrl}`;
+        finalUrl = `${isLocal ? "http://" : "https://"}${finalUrl}`;
       }
 
       setEffectiveQrData({

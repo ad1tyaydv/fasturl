@@ -75,7 +75,7 @@ export default function DocsTab() {
             </Section>
 
             <Section title="Base URL">
-                <CodeBlock language="text" code={`${BASE_URL}/app/v1/shortLink`} />
+                <CodeBlock language="text" code={`${BASE_URL}/api/v1/shortLink`} />
             </Section>
 
             <Section title="Create Short Link">
@@ -85,7 +85,7 @@ export default function DocsTab() {
 
                 <CodeBlock
                     language="bash"
-                    code={`curl -X POST ${BASE_URL}/app/v1/shortLink \\
+                    code={`curl -X POST ${BASE_URL}/api/v1/shortLink \\
 -H "Authorization: Bearer YOUR_API_KEY" \\
 -H "Content-Type: application/json" \\
 -d '{
@@ -98,7 +98,7 @@ export default function DocsTab() {
 
                 <CodeBlock
                     language="javascript"
-                    code={`const res = await fetch("${BASE_URL}/app/v1/shortLink", {
+                    code={`const res = await fetch("${BASE_URL}/api/v1/shortLink", {
   method: "POST",
   headers: {
     Authorization: "Bearer YOUR_API_KEY",

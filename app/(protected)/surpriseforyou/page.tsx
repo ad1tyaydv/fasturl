@@ -32,7 +32,6 @@ export default function SurprisePage() {
 
     setShowSurprise(true);
     
-    // Party popper effect - Refined to be less intense and smaller
     const duration = 2 * 1000;
     const animationEnd = Date.now() + duration;
     const defaults = { 

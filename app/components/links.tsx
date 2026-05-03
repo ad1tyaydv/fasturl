@@ -65,9 +65,13 @@ export default function Links({
 
   const handleOpenQr = () => {
     const shortLink = getShortLink();
+    const isLocal = shortLink.includes("localhost");
+    const protocol = isLocal ? "http://" : "https://";
+    const finalUrl = shortLink.startsWith("http") ? shortLink : `${protocol}${shortLink}`;
+
     setSelectedQrData({
-      qrImage: `https://api.qrserver.com/v1/create-qr-code/?size=1000x1000&data=${encodeURIComponent('https://' + shortLink)}`,
-      shortUrl: shortLink,
+      qrImage: `https://api.qrserver.com/v1/create-qr-code/?size=1000x1000&data=${encodeURIComponent(finalUrl)}`,
+      shortUrl: finalUrl,
       longUrl: url.original,
       qrName: url.linkName || "qr-code"
     });
@@ -75,8 +79,12 @@ export default function Links({
   };
 
   const copyToClipboard = () => {
-    const link = getShortLink();
-    navigator.clipboard.writeText(`https://${link}`);
+    const shortLink = getShortLink();
+    const isLocal = shortLink.includes("localhost");
+    const protocol = isLocal ? "http://" : "https://";
+    const finalUrl = shortLink.startsWith("http") ? shortLink : `${protocol}${shortLink}`;
+
+    navigator.clipboard.writeText(finalUrl);
     setCopied(true);
     toast.success("Link copied!");
     setTimeout(() => setCopied(false), 2000);
@@ -206,7 +214,11 @@ export default function Links({
           </button>
 
           <button
-            onClick={() => window.open(`https://${getShortLink()}`, '_blank')}
+            onClick={() => {
+                const shortLink = getShortLink();
+                const finalUrl = shortLink.startsWith("http") ? shortLink : `https://${shortLink}`;
+                window.open(finalUrl, '_blank');
+            }}
             className="hover:text-foreground p-2 cursor-pointer"
             title="Open Link"
           >
