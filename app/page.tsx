@@ -223,15 +223,14 @@ export default function Dashboard() {
 
           <div className="flex-1 text-center lg:text-left lg:pt-6">
             <h1 className="text-3xl sm:text-3xl md:text-5xl font-bold mb-6 text-foreground leading-tight font-three tracking-tight">
-              The Best <span className="text-red-500">URL Shortener</span> for Branded Links
+              <span className="text-red-500">Url Shortner,</span><br />
+              QR Generator,<br />
+              Custom Domain,<br />
+              Detailed Analytics.
             </h1>
 
             <p className="font-one text-lg text-muted-foreground max-w-lg mx-auto lg:mx-0 mb-4 px-2 sm:px-0">
-              Transform long URLs into custom short links with advanced link performance analytics, branded url shortener features, and instant QR code generation.
-            </p>
-
-            <p className="hidden lg:block font-one text-lg text-muted-foreground max-w-lg mx-auto lg:mx-0 mb-8">
-              FastURL is your all-in-one link management platform for digital marketing links, and real time click tracking.
+              Fasturl is your all-in-one link management platform for digital marketing links, and real time click tracking.
             </p>
 
           </div>

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, FileText, ChevronDown, ChevronRight, Menu, X } from 'lucide-react';
 import Navbar from '@/app/components/navbar';
 

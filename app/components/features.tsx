@@ -90,8 +90,8 @@ export default function Features({ isLoggedIn }: FasturlFeaturesProps) {
     <section className="py-24 px-6 bg-background border-t border-border transition-colors duration-300 overflow-hidden font-one">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-20">
-          <h2 className="text-4xl md:text-5xl font-three font-bold mb-6 text-foreground tracking-tight">Everything You Need to <span className="text-red-500">Scale</span></h2>
-          <p className="text-muted-foreground font-one text-lg max-w-2xl mx-auto">Powerful link management tools and enterprise-grade analytics designed to help you track your brand's reach and engagement across the globe.</p>
+          <h2 className="text-4xl md:text-5xl font-three font-bold mb-6 text-foreground tracking-tight">Powerful fasturl <span className="text-red-500">features</span></h2>
+          <p className="text-muted-foreground font-one text-lg max-w-2xl mx-auto">Manage all your links with our management tools and many features all in one place.</p>
         </div>
 
         <div className="space-y-48">
