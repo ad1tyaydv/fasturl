@@ -66,6 +66,9 @@ export default function CustomUrlModal({ isOpen, onClose, selectedUrl, onSuccess
       if (error.response?.status === 409) {
         setErrorMessage("This alias is already taken");
 
+      } else if (error.response?.status === 403) {
+        setErrorMessage("cannot use reserved words");
+
       } else {
         toast.error("Something went wrong");
       }

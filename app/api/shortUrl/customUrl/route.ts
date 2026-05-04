@@ -6,6 +6,10 @@ import { redis } from "@/lib/redis";
 
 const JWT_SECRET = process.env.NEXTAUTH_SECRET!;
 
+const RESERVED_ROUTES = ["premium", "signin", "signup", "bulklinks", "qr", "domain", "apikeys",
+    "analytics", "settings", "links", "docs", "verify", "expired", "api", "auth", "surpriseforyou", "contact", "legal", "notification"
+];
+
 export async function POST(req: NextRequest) {
 
     try {
@@ -29,6 +33,13 @@ export async function POST(req: NextRequest) {
             return NextResponse.json(
                 { message: "Short url or custom url are missing" },
                 { status: 400 }
+            );
+        }
+
+        if (RESERVED_ROUTES.includes(data.customUrl.toLowerCase())) {
+            return NextResponse.json(
+                { message: "Reserved word" },
+                { status: 403 }
             );
         }
 

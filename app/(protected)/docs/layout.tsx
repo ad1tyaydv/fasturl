@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import DocsClient from "./DocsClient";
 
 export const metadata: Metadata = {
   title: "FastURL - Professional Link Management",
@@ -27,5 +28,5 @@ export default function DocsLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return <DocsClient>{children}</DocsClient>;
 }

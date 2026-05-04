@@ -15,6 +15,13 @@ function add30Days(date: Date) {
   return d;
 }
 
+const RESERVED_ROUTES = ["premium", "signin", "signup", "bulklinks", "qr", "domain", "apikeys",
+  "analytics", "analytics?=linkanalytics", "analytics?=bulkanalytics",
+  "settings/profile", "settings", "settings/authentication", "settings/2fa", "settings/subscription",
+  "settings/invoices", "settings/api", "links?types=links", "links?types=bulk", "links?types=qr",
+  "links?types=api", "apikeys?type=allkeys", "apikeys?type=requests", "apikeys?type=logs", "apikeys?type=docs",
+];
+
 export async function POST(req: NextRequest) {
   try {
     const ip =
@@ -61,7 +68,9 @@ export async function POST(req: NextRequest) {
         where: {
           ipAddress: ip,
           userId: ANON_USER_ID,
-          createdAt: { gte: today },
+          createdAt: {
+            gte: today
+          },
         },
       });
 

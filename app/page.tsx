@@ -59,7 +59,7 @@ export default function Dashboard() {
     router.prefetch("/qr");
     router.prefetch("/domain");
     router.prefetch("/premium");
-    router.prefetch("/docs?docs=core");
+    router.prefetch("/docs/what-is-url-shortener");
   }, []);
 
 
