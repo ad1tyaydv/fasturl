@@ -71,3 +71,11 @@ Two-Factor Authentication (2FA) for account security
 Password-protected links
 Compliant data handling per privacy regulations
 UTM parameter preservation through redirects
+
+
+📬 Support & Contact
+📧 Email                     fasturl@tutamail.com
+📖 Docs                      fasturl.in/docs
+🌐 Website                   fasturl.in
+
+Support is available 24/7 for paid plan users.
