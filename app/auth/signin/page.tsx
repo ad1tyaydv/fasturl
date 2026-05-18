@@ -252,6 +252,15 @@ export default function Login() {
                       {showPassword ? <HugeiconsIcon icon={ViewOffSlashIcon} size={22} /> : <HugeiconsIcon icon={ViewIcon} size={22} />}
                     </button>
                   </div>
+                  <div className="flex justify-end">
+                    <button
+                      type="button"
+                      onClick={() => router.push("/auth/reset")}
+                      className="text-[#83c5be] font-bold hover:text-[#2a9d8f] cursor-pointer transition-all text-sm"
+                    >
+                      Forgot Password?
+                    </button>
+                  </div>
                 </div>
 
                 <button

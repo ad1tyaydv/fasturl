@@ -228,7 +228,7 @@ export default function Profile() {
             onClick={openAvatarModal}
             className="px-4 py-1.5 text-xs font-medium rounded-lg border border-border bg-secondary hover:bg-accent text-foreground transition-colors cursor-pointer"
           >
-            Update Emoji
+            Update Avatar
           </button>
         </div>
       </div>
@@ -279,9 +279,9 @@ export default function Profile() {
 
       {showAvatarModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4">
-          <div className="bg-popover border border-border rounded-2xl p-6 w-full max-sm shadow-2xl animate-in zoom-in-95 duration-200">
+          <div className="bg-popover border border-border rounded-2xl p-6 w-full max-w-sm shadow-2xl animate-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between mb-5">
-              <h2 className="text-base font-semibold text-foreground">Choose Emoji</h2>
+              <h2 className="text-base font-semibold text-foreground">Choose Avatar</h2>
               <button
                 onClick={() => setShowAvatarModal(false)}
                 className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer"

@@ -41,7 +41,7 @@ export default async function DocPage({ params }: { params: Promise<{ slug: stri
 
       <div className="mt-20 sm:mt-24 pt-8 border-t border-border flex flex-col sm:flex-row justify-between items-center gap-4 text-[10px] sm:text-xs text-muted-foreground font-semibold uppercase tracking-widest">
         <span>FastURL Documentation</span>
-        <span>Last updated: Today</span>
+        <span>Last updated: May 9, 2026</span>
       </div>
     </article>
   );
