@@ -49,7 +49,11 @@ function BrowserLogo({ browser, size = "md" }: { browser: string; size?: "sm" | 
   const key = getBrowserKey(browser)
   const domain = key ? BROWSER_FAVICON_DOMAINS[key] : null
   const color = key ? BROWSER_COLORS[key] : "currentColor"
-  const iconUrl = domain
+  
+  // Use a direct Safari logo from Simple Icons for better accuracy
+  const iconUrl = key === 'safari'
+    ? `https://cdn.simpleicons.org/safari/${BROWSER_COLORS.safari.replace('#', '')}`
+    : domain
     ? `https://icons.duckduckgo.com/ip3/${domain.split("/")[0]}.ico`
     : null
 
@@ -109,7 +113,10 @@ export default function BrowserAnalytics({ data = [], days = 7 }: BrowserAnalyti
         const itemDate = new Date(item.createdAt)
         if (itemDate < cutoffDate) return
       }
-      const browserName = item.browser || "Unknown"
+      let browserName = item.browser || "Unknown"
+      if (browserName === "Mobile Chrome") {
+        browserName = "Chrome"
+      }
       const count = item.count !== undefined ? item.count : 1
       browserCounts[browserName] = (browserCounts[browserName] || 0) + count
     })

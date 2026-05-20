@@ -1,8 +1,9 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useMemo, useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { X } from "lucide-react"
+import { useTheme } from "next-themes"
 
 const OS_LOGOS: Record<string, string> = {
   windows: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/windows8/windows8-original.svg",
@@ -69,8 +70,21 @@ const getOSKey = (os: string): string | null => {
 }
 
 function OSLogo({ os, size = "md" }: { os: string; size?: "sm" | "md" }) {
+  const { resolvedTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
   const key = getOSKey(os)
-  const src = key ? OS_LOGOS[key] : null
+  let src = key ? OS_LOGOS[key] : null
+  
+  if (mounted && key && (key === 'macos' || key === 'ios' || key === 'ipados' || key === 'mac os')) {
+    const isDark = resolvedTheme === 'dark'
+    src = `https://cdn.simpleicons.org/apple/${isDark ? 'ffffff' : '000000'}`
+  }
+
   const color = key ? OS_COLORS[key] : "currentColor"
   const dim = size === "sm" ? "w-7 h-7 rounded-md" : "w-9 h-9 rounded-xl"
   const imgSize = size === "sm" ? 18 : 22

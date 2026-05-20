@@ -374,7 +374,7 @@ export default function Dashboard() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
               </span>
-              Trusted by 10+ <span className="text-foreground font-semibold underline decoration-blue-500/50 underline-offset-4">global users</span>
+              Trusted by 15+ <span className="text-foreground font-semibold underline decoration-blue-500/50 underline-offset-4">global users</span>
             </p>
           </div>
         </div>

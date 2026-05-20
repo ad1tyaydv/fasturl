@@ -174,7 +174,23 @@ export async function POST(req: NextRequest) {
       originalLink = "https://" + originalLink;
     }
 
-    const shortUrl = shortUrlGenerator();
+    let shortUrl = shortUrlGenerator();
+
+    let checkExistingShortUrl = await prisma.link.findUnique({
+      where: {
+        shorturl: shortUrl
+      }
+    })
+
+    while (checkExistingShortUrl) {
+      shortUrl = shortUrlGenerator();
+
+      checkExistingShortUrl = await prisma.link.findUnique({
+        where: {
+          shorturl: shortUrl,
+        },
+      });
+    }
 
     const { urlShort, updatedUser } = await prisma.$transaction(async (tx) => {
       const created = await tx.link.create({
@@ -223,7 +239,7 @@ export async function POST(req: NextRequest) {
       if (milestones.includes(totalCount)) {
         let title = "Link Milestone!";
         let message = `Congrats! You've created ${totalCount} links with fasturl.`;
-        
+
         if (totalCount === 1) {
           message = "Congrats on creating your first link! Try generating a QR code next.";
         }
@@ -243,7 +259,7 @@ export async function POST(req: NextRequest) {
         const linksLeft = 100 - count;
         let title = "Plan Usage Update";
         let message = `You've used ${count} links this month. You have ${linksLeft} links left in your free plan.`;
-        
+
         if (count === 100) {
           message = "You've reached your free plan limit for this month. Upgrade to continue creating links.";
 
@@ -259,7 +275,7 @@ export async function POST(req: NextRequest) {
             actionUrl: "/premium"
           }
         });
-        
+
         if (count >= 80) milestoneMessage = message;
       }
 
@@ -273,8 +289,8 @@ export async function POST(req: NextRequest) {
       original: urlShort!.original,
     });
 
+    
   } catch (error) {
-    console.log(error);
     return NextResponse.json(
       { message: "Server error, try again later" },
       { status: 500 }
