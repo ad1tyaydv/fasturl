@@ -49,10 +49,12 @@ export function DomainDropdown({ selectedDomain, onSelect, defaultDomain }: Doma
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="flex items-center gap-2 px-4 py-2 bg-background border border-border text-foreground text-sm font-medium rounded-lg hover:bg-accent hover:text-accent-foreground transition-all outline-none focus:ring-1 focus:ring-ring cursor-pointer">
-          <HugeiconsIcon icon={Globe02Icon} className="text-blue-500" />
-          <span className="truncate max-w-[180px]">{displayDomain}</span>
-          <HugeiconsIcon icon={ArrowDown01Icon} className="text-muted-foreground" />
+        <button className="flex items-center justify-between w-full gap-2 px-4 py-3.5 bg-transparent text-foreground text-base font-medium transition-all outline-none cursor-pointer hover:bg-accent/50">
+          <div className="flex items-center gap-2 truncate">
+            <HugeiconsIcon icon={Globe02Icon} className="text-blue-500 shrink-0" />
+            <span className="truncate">{displayDomain}</span>
+          </div>
+          <HugeiconsIcon icon={ArrowDown01Icon} className="text-muted-foreground shrink-0" />
         </button>
       </DropdownMenuTrigger>
 

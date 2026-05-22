@@ -336,7 +336,7 @@ export default function Dashboard() {
                   <button
                     onClick={handleAction}
                     disabled={loading || !url}
-                    className="w-full mt-2 bg-black hover:bg-black/90 disabled:opacity-60 text-white rounded-xl py-4 text-lg font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm"
+                    className="w-full mt-2 bg-primary hover:bg-primary/90 disabled:opacity-60 text-white rounded-xl py-4 text-lg font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm"
                   >
                     {loading ? (
                       <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
@@ -435,7 +435,6 @@ export default function Dashboard() {
                 ) : (
                   <div className="mt-2 font-one text-sm sm:text-base text-muted-foreground text-center">
                     <div className="flex flex-col sm:flex-row items-center gap-1.5 justify-center">
-                      <span className="text-base">💡</span> 
                       <span>Tip: <button onClick={() => router.push("/auth/signin")} className="text-foreground underline underline-offset-2 hover:text-blue-500 transition-colors font-medium">Sign up</button> to unlock advanced features</span>
                     </div>
                     <p className="text-xs mt-2 opacity-70">Guest limit: 1 link/day</p>
