@@ -64,6 +64,7 @@ export default function Dashboard() {
 
 
   useEffect(() => {
+
     const checkAuth = async () => {
       try {
         const res = await axios.get("/api/auth/me");
@@ -123,7 +124,7 @@ export default function Dashboard() {
       if (linksLeft !== null) {
         setLinksLeft((prev) => Math.max(0, (prev || 0) - 1));
       }
-      
+
       return generatedShortUrl;
 
     } catch (error: unknown) {
@@ -262,18 +263,17 @@ export default function Dashboard() {
 
           <div className="flex-1 w-full max-w-xl">
             <div className="w-full p-6 sm:p-8 bg-card border border-border rounded-[32px] shadow-sm font-one">
-              
+
               <div className="flex p-1.5 bg-secondary/60 rounded-full mb-8">
                 <button
                   onClick={() => {
                     setActiveTab("shorten");
                     handleReset();
                   }}
-                  className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-full text-base font-medium transition-all cursor-pointer ${
-                    activeTab === "shorten"
-                      ? "bg-background text-foreground shadow-sm"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
+                  className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-full text-base font-medium transition-all cursor-pointer ${activeTab === "shorten"
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                    }`}
                 >
                   <HugeiconsIcon icon={Link01Icon} size={20} />
                   Shorten a Link
@@ -283,11 +283,10 @@ export default function Dashboard() {
                     setActiveTab("qr");
                     handleReset();
                   }}
-                  className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-full text-base font-medium transition-all cursor-pointer ${
-                    activeTab === "qr"
-                      ? "bg-background text-foreground shadow-sm"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
+                  className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-full text-base font-medium transition-all cursor-pointer ${activeTab === "qr"
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                    }`}
                 >
                   <HugeiconsIcon icon={QrCodeIcon} size={20} />
                   Generate QR Code
@@ -363,18 +362,16 @@ export default function Dashboard() {
                       {activeTab === "shorten" && (
                         <button
                           onClick={() => handleGenerateQr()}
-                          className={`px-5 py-4 rounded-xl flex items-center justify-center transition-colors cursor-pointer ${
-                            showQr ? "bg-background shadow-md border border-border text-foreground" : "bg-secondary text-foreground hover:bg-secondary/80"
-                          }`}
+                          className={`px-5 py-4 rounded-xl flex items-center justify-center transition-colors cursor-pointer ${showQr ? "bg-background shadow-md border border-border text-foreground" : "bg-secondary text-foreground hover:bg-secondary/80"
+                            }`}
                         >
                           <HugeiconsIcon icon={QrCodeIcon} size={24} />
                         </button>
                       )}
                       <button
                         onClick={copyToClipboard}
-                        className={`flex-1 sm:flex-none px-5 py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all duration-300 cursor-pointer ${
-                          copied ? "bg-black dark:bg-white text-white dark:text-black shadow-md" : "bg-secondary text-foreground hover:bg-secondary/80 shadow-sm"
-                        }`}
+                        className={`flex-1 sm:flex-none px-5 py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all duration-300 cursor-pointer ${copied ? "bg-black dark:bg-white text-white dark:text-black shadow-md" : "bg-secondary text-foreground hover:bg-secondary/80 shadow-sm"
+                          }`}
                       >
                         {copied ? <HugeiconsIcon icon={CopyCheckIcon} size={24} /> : <HugeiconsIcon icon={CopyIcon} size={24} />}
                       </button>
@@ -412,7 +409,7 @@ export default function Dashboard() {
                 </div>
               )}
 
-              <div className="mt-8 pt-6 border-t border-border/50 flex flex-col items-center gap-4">                
+              <div className="mt-8 pt-6 border-t border-border/50 flex flex-col items-center gap-4">
                 {(isLoggedIn || authLoading) ? (
                   <span className="px-3 py-1.5 bg-secondary border border-border text-xs sm:text-sm font-one text-muted-foreground inline-flex items-center gap-1.5 rounded-lg shadow-sm">
                     You have

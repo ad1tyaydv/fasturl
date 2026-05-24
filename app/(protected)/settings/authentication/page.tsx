@@ -6,6 +6,7 @@ import { Loader2, X, AlertTriangle, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ViewIcon, ViewOffSlashIcon } from "@hugeicons/core-free-icons";
+import { signOut } from "next-auth/react";
 
 
 function Toast({ message, onClose }: { message: string; onClose: () => void }) {
@@ -155,8 +156,17 @@ export default function AuthenticationPage() {
 
 
   const handleLogout = async () => {
-    await axios.post("/api/auth/logout");
-    window.location.href = "/";
+    try {
+      await axios.post("/api/auth/logout");
+
+      await signOut({
+        redirect: false,
+      });
+
+      window.location.href = "/";
+    } catch (error) {
+      console.error("Logout failed");
+    }
   };
 
 
@@ -169,7 +179,7 @@ export default function AuthenticationPage() {
 
       } catch (error) {
         console.error("Error deleting account", error);
-        
+
       } finally {
         setLoadingDelete(false);
       }
@@ -363,7 +373,7 @@ export default function AuthenticationPage() {
                 To confirm, type <span className="font-bold text-foreground">delete my account</span> below.
               </p>
             </div>
-            
+
             <input
               type="text"
               value={deleteConfirmation}
@@ -371,7 +381,7 @@ export default function AuthenticationPage() {
               className="w-full bg-background border border-border rounded-lg px-4 py-2.5 mb-6 focus:outline-none focus:border-muted-foreground/50 text-foreground transition-all placeholder:text-muted-foreground/30 text-sm"
               placeholder="delete my account"
             />
-            
+
             <div className="flex flex-row items-center gap-3 w-full">
               <Button
                 variant="destructive"

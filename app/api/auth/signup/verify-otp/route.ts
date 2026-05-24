@@ -49,6 +49,7 @@ export async function POST(req: NextRequest) {
                 email: data.email,
                 password: hashedPassword,
                 plan: "FREE",
+                provider: "CREDENTIALS",
                 totalLinks: 100,
                 linksUsed: 0,
                 totalLinksCreated: 0,
