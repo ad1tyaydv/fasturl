@@ -1,4 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import jwt from "jsonwebtoken";
+
+
+const JWT_SECRET = process.env.NEXTAUTH_SECRET!;
 
 export async function proxy(req: NextRequest) {
     const host = req.headers.get("host") || "";
@@ -9,6 +13,38 @@ export async function proxy(req: NextRequest) {
 
     const token = req.cookies.get("token")?.value;
     const pathName = req.nextUrl.pathname;
+
+    if (!token) {
+        return NextResponse.json(
+            { message: "No token" },
+            { status: 401 }
+        );
+    }
+
+    try {
+        if (token) {
+            const decoded = jwt.verify(token, JWT_SECRET) as {
+                exp: number;
+            };
+
+            const currentTime = Math.floor(Date.now() / 1000)
+
+            if (decoded.exp < currentTime) {
+                const response = NextResponse.json(
+                    { message: "Token expired" },
+                    { status: 400 }
+                )
+                response.cookies.delete("token");
+                return response;
+            }
+        }
+
+    } catch (error) {
+        return NextResponse.json(
+            { message: "Token not found" },
+            { status: 404 }
+        )
+    }
 
     if (pathName.startsWith('/api/cronJobs')) {
         return NextResponse.next();
