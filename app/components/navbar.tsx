@@ -16,10 +16,12 @@ import {
   FileText,
   Settings,
   Bell,
+  Star,
   LucideIcon,
   Moon,
   Sun,
 } from "lucide-react";
+import { FaGithub } from "react-icons/fa";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Logout05Icon, User02Icon } from "@hugeicons/core-free-icons";
 import { useTheme } from "next-themes";
@@ -123,6 +125,19 @@ export default function Navbar() {
             </div>
           ) : user ? (
             <>
+              <Link
+                href="https://github.com/ad1tyaydv/fasturl"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-3 py-1.5 hover:bg-accent rounded-lg transition-all group border border-border/50 bg-secondary/30"
+              >
+                <FaGithub className="w-5 h-5 text-muted-foreground group-hover:text-foreground" />
+                <div className="flex items-center gap-1 text-sm font-medium text-muted-foreground group-hover:text-foreground">
+                  <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                  <span>1</span>
+                </div>
+              </Link>
+
               <Link
                 href="/notification"
                 className="p-2 hover:bg-accent rounded-full transition-colors relative group"
@@ -268,6 +283,24 @@ export default function Navbar() {
                 </Link>
               );
             })}
+
+            <Link
+              href="https://github.com/ad1tyaydv/fasturl"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setIsSidebarOpen(false)}
+              className="flex items-center justify-between px-5 py-4 rounded-xl font-three font-medium text-lg text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-all"
+            >
+              <div className="flex items-center gap-4">
+                <FaGithub className="w-5 h-5 text-neutral-500" />
+                GitHub
+              </div>
+              <div className="flex items-center gap-1.5 text-sm bg-secondary/50 px-2.5 py-1 rounded-lg border border-border">
+                <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                <span className="font-bold text-foreground">1</span>
+              </div>
+            </Link>
+
 
             {user && (
               <Link

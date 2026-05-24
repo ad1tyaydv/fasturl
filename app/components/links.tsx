@@ -111,7 +111,6 @@ export default function Links({
   };
 
   const handleDelete = async () => {
-    if (!confirm("Are you sure you want to delete this link?")) return;
     setIsDeleting(true);
     try {
       await axios.post(`/api/shortUrl/delete/${url.id}`);
