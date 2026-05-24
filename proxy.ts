@@ -14,13 +14,6 @@ export async function proxy(req: NextRequest) {
     const token = req.cookies.get("token")?.value;
     const pathName = req.nextUrl.pathname;
 
-    if (!token) {
-        return NextResponse.json(
-            { message: "No token" },
-            { status: 401 }
-        );
-    }
-
     try {
         if (token) {
             const decoded = jwt.verify(token, JWT_SECRET) as {
@@ -40,10 +33,7 @@ export async function proxy(req: NextRequest) {
         }
 
     } catch (error) {
-        return NextResponse.json(
-            { message: "Token not found" },
-            { status: 404 }
-        )
+
     }
 
     if (pathName.startsWith('/api/cronJobs')) {
