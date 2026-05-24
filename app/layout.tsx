@@ -7,6 +7,8 @@ import { Toaster } from "sonner";
 import "./globals.css";
 import { ThemeProvider } from "./components/theme-provider";
 import UpgradeDiscount from "./modals/upgradeDiscount";
+import Providers from "./components/providers";
+import GoogleAuthSync from "./components/googleAuthSync";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -76,20 +78,23 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="light"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <UserProvider>
-            {children}
-            <UpgradeDiscount />
-            <Toaster />
-          </UserProvider>
-          <Analytics />
-          <SpeedInsights />
-        </ThemeProvider>
+        <Providers>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="light"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <UserProvider>
+              <GoogleAuthSync />
+              {children}
+              <UpgradeDiscount />
+              <Toaster />
+            </UserProvider>
+            <Analytics />
+            <SpeedInsights />
+          </ThemeProvider>
+        </Providers>
       </body>
     </html>
   );

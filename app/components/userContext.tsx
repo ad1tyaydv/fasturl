@@ -2,6 +2,8 @@
 
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import { getUser } from "@/lib/getUser";
+import axios from "axios";
+import { signOut } from "next-auth/react";
 
 type UserContextType = {
   user: any | null;
@@ -50,9 +52,21 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const logout = async () => {
-    await fetch("/api/auth/logout", { method: "POST" });
+
+  try {
+
+    await axios.post("/api/auth/logout");
+
+    await signOut({
+      redirect: false,
+    });
+
     setUser(null);
-  };
+
+  } catch (error) {
+    console.log("Error during logout:");
+  }
+};
 
   return (
     <UserContext.Provider value={{ user, loading, linksLeft, setLinksLeft, refreshUser, logout }}>
