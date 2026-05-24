@@ -113,7 +113,6 @@ export const BulkAnalyticsCardItem = ({
               </div>
             </>
           ) : (
-            /* Empty State */
             <div className="flex flex-col items-center justify-center w-full h-full space-y-3 py-10">
               <div className="w-12 h-12 rounded-none bg-secondary flex items-center justify-center text-muted-foreground border border-border">
                 {icon}

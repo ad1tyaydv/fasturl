@@ -6,6 +6,7 @@ import { UserProvider } from "./components/userContext";
 import { Toaster } from "sonner";
 import "./globals.css";
 import { ThemeProvider } from "./components/theme-provider";
+import UpgradeDiscount from "./modals/upgradeDiscount";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -83,6 +84,7 @@ export default function RootLayout({
         >
           <UserProvider>
             {children}
+            <UpgradeDiscount />
             <Toaster />
           </UserProvider>
           <Analytics />

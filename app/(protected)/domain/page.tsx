@@ -109,7 +109,7 @@ export default function DomainsPage() {
       toast.error(errorMsg);
 
       if (error.response?.status === 401) {
-        // router.push("/premium"); 
+        
       }
 
     } finally {

@@ -36,7 +36,6 @@ interface MenuItem {
 export default function Navbar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const router = useRouter();
   const { theme, setTheme } = useTheme();
 
   const { user, logout, loading } = useUser();
@@ -77,7 +76,7 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="flex items-center justify-between px-6 sm:px-10 py-6 border-b border-border z-30 shrink-0 bg-background text-foreground sticky top-0 shadow-sm">
+      <nav className="flex items-center justify-between px-6 sm:px-10 py-6 border-b border-border bg-background text-foreground relative shadow-sm">
         <div className="flex items-center gap-10">
           <Link
             href="/"
@@ -86,7 +85,7 @@ export default function Navbar() {
             <img
               src="/favicon.ico"
               alt="FastURL Logo"
-              className="w-7 h-7 object-contain"
+              className="w-13 h-13 object-contain"
             />
             <h1 className="text-xl sm:text-2xl font-three font-bold tracking-tighter">
               FASTURL
@@ -134,7 +133,7 @@ export default function Navbar() {
                 <FaGithub className="w-5 h-5 text-muted-foreground group-hover:text-foreground" />
                 <div className="flex items-center gap-1 text-sm font-medium text-muted-foreground group-hover:text-foreground">
                   <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                  <span>1</span>
+                  <span>2</span>
                 </div>
               </Link>
 
@@ -204,13 +203,27 @@ export default function Navbar() {
             </>
           ) : (
             <div className="flex items-center gap-4">
-               {mounted && (
-                <button
-                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                  className="p-2 hover:bg-accent rounded-full transition-colors cursor-pointer"
-                >
-                  {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-                </button>
+              {mounted && (
+                <div className="flex items-center gap-2">
+                  <Link
+                    href="https://github.com/ad1tyaydv/fasturl"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-3 py-1.5 hover:bg-accent rounded-lg transition-all group border border-border/50 bg-secondary/30"
+                  >
+                    <FaGithub className="w-5 h-5 text-muted-foreground group-hover:text-foreground" />
+                    <div className="flex items-center gap-1 text-sm font-medium text-muted-foreground group-hover:text-foreground">
+                      <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                      <span>2</span>
+                    </div>
+                  </Link>
+                  <button
+                    onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                    className="p-2 hover:bg-accent rounded-full transition-colors cursor-pointer text-muted-foreground hover:text-foreground"
+                  >
+                    {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                  </button>
+                </div>
               )}
               <Link
                 href="/auth/signin"
@@ -297,7 +310,7 @@ export default function Navbar() {
               </div>
               <div className="flex items-center gap-1.5 text-sm bg-secondary/50 px-2.5 py-1 rounded-lg border border-border">
                 <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                <span className="font-bold text-foreground">1</span>
+                <span className="font-bold text-foreground">2</span>
               </div>
             </Link>
 

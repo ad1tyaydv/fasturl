@@ -22,6 +22,7 @@ import { toast } from "sonner";
 import { UpgradeAlert } from "./modals/upgradeAlert";
 import QrDownloadModal from "./modals/qrDownloadModal";
 
+
 const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN!;
 
 export default function Dashboard() {
@@ -30,12 +31,10 @@ export default function Dashboard() {
 
   const [activeTab, setActiveTab] = useState<"shorten" | "qr">("shorten");
   const [url, setUrl] = useState("");
-  const [longUrl, setLongUrl] = useState("");
   const [shortUrl, setShortUrl] = useState("");
   const [customAlias, setCustomAlias] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userPlan, setUserPlan] = useState("FREE");
-  const [links, setLinks] = useState<[]>([]);
   const [linksLeft, setLinksLeft] = useState<number | null>(null);
   const [qrLeft, setQrLeft] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
@@ -72,18 +71,17 @@ export default function Dashboard() {
         setIsLoggedIn(authenticated);
 
         if (authenticated) {
-          const [linksLeftRes, qrLeftRes, linksRes] = await Promise.all([
+          const [linksLeftRes, qrLeftRes] = await Promise.all([
             axios.get("/api/shortUrl/linksLeft"),
-            axios.get("/api/qrCode/qrLeft"),
-            axios.get("/api/fetchUrls")
+            axios.get("/api/qrCode/qrLeft")
           ]);
           setLinksLeft(linksLeftRes.data.linksLeft);
           setQrLeft(qrLeftRes.data.qrLeft);
-          setLinks(linksRes.data.urls);
           setUserPlan(res.data.plan || "FREE");
         }
 
       } catch (err) {
+        console.error("Auth check failed:", err);
         setIsLoggedIn(false);
 
       } finally {
@@ -112,7 +110,6 @@ export default function Dashboard() {
     }
     try {
       setLoading(true);
-      setLongUrl(originalUrl);
       const res = await axios.post("/api/shortUrl", {
         url: originalUrl,
         customDomain: selectedDomain !== NEXT_DOMAIN ? selectedDomain : null,
@@ -129,24 +126,26 @@ export default function Dashboard() {
       
       return generatedShortUrl;
 
-    } catch (error: any) {
-      if (error.response?.status === 403) {
-        if (!isLoggedIn) {
-          setModalConfig({
-            show: true,
-            title: "Limit Reached",
-            description: "Login to generate more links and access custom domains.",
-            buttonText: "Login Now",
-            action: () => router.push("/auth/signin"),
-          });
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 403) {
+          if (!isLoggedIn) {
+            setModalConfig({
+              show: true,
+              title: "Limit Reached",
+              description: "Login to generate more links and access custom domains.",
+              buttonText: "Login Now",
+              action: () => router.push("/auth/signin"),
+            });
 
-        } else {
-          setUpgradeMsg(true);
-          pricingRef.current?.scrollIntoView({ behavior: "smooth" });
-          setTimeout(() => setUpgradeMsg(false), 3000);
+          } else {
+            setUpgradeMsg(true);
+            pricingRef.current?.scrollIntoView({ behavior: "smooth" });
+            setTimeout(() => setUpgradeMsg(false), 3000);
+          }
+        } else if (error.response?.status === 430) {
+          toast.error("Too many requests under 1 minute, Please try again later");
         }
-      } else if (error.response?.status === 430) {
-        toast.error("Too many requests under 1 minute, Please try again later");
       }
       return null;
 
@@ -188,8 +187,10 @@ export default function Dashboard() {
         }
       }
 
-    } catch (error: any) {
-      if (error.response?.status === 429) setUpgradeMsg(true);
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 429) setUpgradeMsg(true);
+      }
     } finally {
       setIsLoadingQr(false);
     }
@@ -206,6 +207,7 @@ export default function Dashboard() {
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(url);
+    toast.success("Link copied successfully!");
     setCopied(true);
 
     setTimeout(() => setCopied(false), 1000);
@@ -336,10 +338,10 @@ export default function Dashboard() {
                   <button
                     onClick={handleAction}
                     disabled={loading || !url}
-                    className="w-full mt-2 bg-primary hover:bg-primary/90 disabled:opacity-60 text-white rounded-xl py-4 text-lg font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm"
+                    className="w-full mt-2 bg-black dark:bg-white hover:opacity-90 disabled:opacity-60 text-white dark:text-black rounded-xl py-4 text-lg font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm"
                   >
                     {loading ? (
-                      <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <div className="w-6 h-6 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
                     ) : (
                       <>
                         {activeTab === "shorten" ? "Shorten Link" : "Generate QR Code"}
@@ -349,7 +351,6 @@ export default function Dashboard() {
                   </button>
                 </div>
               ) : (
-                /* Success State (After Shortening/Generating) */
                 <div className="flex flex-col items-center gap-6 py-6 animate-in fade-in zoom-in duration-300">
                   <div className="w-full flex flex-col sm:flex-row gap-3">
                     <input
@@ -371,8 +372,8 @@ export default function Dashboard() {
                       )}
                       <button
                         onClick={copyToClipboard}
-                        className={`flex-1 sm:flex-none px-8 py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all duration-300 cursor-pointer ${
-                          copied ? "bg-green-600 text-white shadow-md hover:bg-green-700" : "bg-primary text-primary-foreground hover:opacity-90 shadow-sm"
+                        className={`flex-1 sm:flex-none px-5 py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all duration-300 cursor-pointer ${
+                          copied ? "bg-black dark:bg-white text-white dark:text-black shadow-md" : "bg-secondary text-foreground hover:bg-secondary/80 shadow-sm"
                         }`}
                       >
                         {copied ? <HugeiconsIcon icon={CopyCheckIcon} size={24} /> : <HugeiconsIcon icon={CopyIcon} size={24} />}
@@ -435,7 +436,7 @@ export default function Dashboard() {
                 ) : (
                   <div className="mt-2 font-one text-sm sm:text-base text-muted-foreground text-center">
                     <div className="flex flex-col sm:flex-row items-center gap-1.5 justify-center">
-                      <span>Tip: <button onClick={() => router.push("/auth/signin")} className="text-foreground underline underline-offset-2 hover:text-blue-500 transition-colors font-medium">Sign up</button> to unlock advanced features</span>
+                      <span>Tip: <button onClick={() => router.push("/auth/signin")} className="text-foreground underline underline-offset-2 cursor-pointer hover:text-blue-500 transition-colors font-medium">Sign in</button> to unlock advanced features</span>
                     </div>
                     <p className="text-xs mt-2 opacity-70">Guest limit: 1 link/day</p>
                   </div>
@@ -453,27 +454,6 @@ export default function Dashboard() {
 
       {userPlan !== "ESSENTIAL" && userPlan !== "PRO" && <PricingSection />}
       <FaqSection />
-
-      {copied && (
-        <div className="toast toast-top toast-center z-[100] animate-in fade-in slide-in-from-top-4 duration-500">
-          <div className="alert alert-success border-none shadow-lg text-white">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6 shrink-0 stroke-current"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <span className="font-medium">Link copied successfully!</span>
-          </div>
-        </div>
-      )}
 
       <UpgradeAlert
         isOpen={upgradeMsg}

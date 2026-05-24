@@ -1,6 +1,6 @@
 "use client"
 import { useMemo, useState } from "react"
-import { Globe, Search, Instagram, Twitter, Facebook, Linkedin, MessageCircle, X } from "lucide-react"
+import { X } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 
 

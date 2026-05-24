@@ -50,7 +50,6 @@ function BrowserLogo({ browser, size = "md" }: { browser: string; size?: "sm" | 
   const domain = key ? BROWSER_FAVICON_DOMAINS[key] : null
   const color = key ? BROWSER_COLORS[key] : "currentColor"
   
-  // Use a direct Safari logo from Simple Icons for better accuracy
   const iconUrl = key === 'safari'
     ? `https://cdn.simpleicons.org/safari/${BROWSER_COLORS.safari.replace('#', '')}`
     : domain

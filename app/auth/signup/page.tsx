@@ -131,7 +131,6 @@ export default function SignupPage() {
 
       <div className="w-full lg:w-1/2 p-8 lg:p-20 flex flex-col justify-center bg-background min-h-screen relative">
         
-        {/* Mobile Back Button */}
         {!showOtpScreen && (
           <button
             onClick={() => router.push("/")}

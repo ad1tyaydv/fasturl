@@ -55,7 +55,6 @@ function PremiumBlock({ children, isFree, isLoading }: { children: React.ReactNo
 }
 
 
-
 export default function AnalyticsPage() {
   const router = useRouter();
   const { user, loading: userLoading } = useUser();

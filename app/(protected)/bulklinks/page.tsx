@@ -93,12 +93,14 @@ export default function BulkCreateLinks() {
     }
   }, [user, userLoading, router]);
 
+
   const fetchPastBulkLinks = async () => {
     try {
       const res = await axios.get("/api/shortUrl/bulkLinks/fetchBulkLinks");
       setPastBulkLinks(res.data.bulkLinks || res.data || []);
+
     } catch (error) {
-      console.error("Failed to fetch past bulk links", error);
+      console.error("Failed to fetch past bulk links");
     }
   };
 
@@ -121,16 +123,19 @@ export default function BulkCreateLinks() {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile && selectedFile.type === "text/csv") {
       setFile(selectedFile);
       setStatus(null);
       setCreatedLinks([]);
+
     } else {
       alert("Please upload a valid CSV file.");
     }
   };
+
 
   const handleUpload = async () => {
     if (!checkPlanAccess()) return;
@@ -184,6 +189,7 @@ export default function BulkCreateLinks() {
     }
   };
 
+
   const handleUpdateName = async (id: string, newName: string) => {
     if (!checkPlanAccess()) return;
     if (!newName.trim()) return;
@@ -201,6 +207,7 @@ export default function BulkCreateLinks() {
       setEditingId(null);
     }
   };
+  
 
   const handleDelete = async (id: string) => {
     setDeletingId(id);

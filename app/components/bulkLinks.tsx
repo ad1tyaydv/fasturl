@@ -31,7 +31,7 @@ const getRelativeTime = (dateString?: string) => {
 };
 
 export default function BulkLinks({
-  bulkLinks, onRefresh, searchQuery, setSearchQuery, statusFilter, setStatusFilter, domain, itemCount, setIsDetailViewOpen, userTier = "FREE",
+  bulkLinks, onRefresh, searchQuery, setSearchQuery, domain, itemCount, setIsDetailViewOpen, userTier = "FREE",
   onOpenQr, onOpenPassword, onOpenCustom
 }: any) {
   const router = useRouter();
@@ -245,7 +245,6 @@ export default function BulkLinks({
                   {getRelativeTime(url.createdAt)}
                 </div>
 
-                {/* Mobile Menu */}
                 <div className="md:hidden flex justify-end w-[15%] shrink-0">
                   <button onClick={(e) => { e.stopPropagation(); setActiveMenuId(activeMenuId === url.id ? null : url.id); }} className="p-2 text-muted-foreground">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="1" /><circle cx="12" cy="5" r="1" /><circle cx="12" cy="19" r="1" /></svg>
@@ -271,7 +270,6 @@ export default function BulkLinks({
               </div>
             ))
           ) : (
-            /* EMPTY STATE */
             <div className="w-full py-20 px-4 flex flex-col items-center justify-center border-2 border-dashed border-border rounded-3xl bg-secondary/30 mt-4">
               <div className="p-4 bg-secondary rounded-2xl border border-border mb-6">
                   <HugeiconsIcon icon={File02Icon} className="w-10 h-10 text-muted-foreground" />
@@ -291,7 +289,6 @@ export default function BulkLinks({
         </div>
       )}
 
-      {/* PAGINATION CONTROLS */}
       {!selectedBatchDetails && totalPages > 1 && bulkLinks.length > 0 && (
         <div className="flex justify-center items-center gap-2 mt-8 pb-10 flex-wrap">
           <button

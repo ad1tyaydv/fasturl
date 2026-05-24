@@ -2,7 +2,6 @@
 
 import { useState, useRef } from "react";
 import axios from "axios";
-import { FcGoogle } from "react-icons/fc";
 import { useRouter } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
 import { useUser } from "@/app/components/userContext";
@@ -141,7 +140,6 @@ export default function Login() {
         }} 
       />
 
-      {/* Left Column - Hidden on Mobile */}
       <div className="hidden lg:flex w-full lg:w-1/2 bg-background p-8 lg:p-20 flex-col relative overflow-hidden lg:min-h-screen border-r border-border/50">
         
         <div 
@@ -176,7 +174,6 @@ export default function Login() {
 
       <div className="w-full lg:w-1/2 p-8 lg:p-20 flex flex-col justify-center bg-background min-h-screen relative">
         
-        {/* Mobile Back Button */}
         {!show2FA && (
           <button
             onClick={() => router.push("/")}

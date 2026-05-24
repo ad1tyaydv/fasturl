@@ -33,21 +33,26 @@ export default function ApiKeysPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
 
+
   useEffect(() => {
     fetchApiKeys();
   }, []);
+
 
   const fetchApiKeys = async () => {
     try {
       setIsLoading(true);
       const res = await axios.get("/api/api_key/fetchApi_keys");
       setApiKeys(Array.isArray(res.data) ? res.data : (res.data.apiKeys ?? []));
+
     } catch (err) {
       toast.error("Failed to fetch API keys.");
+
     } finally {
       setIsLoading(false);
     }
   };
+
 
   const handleGenerateClick = () => {
     if (user?.plan !== "PRO") {
@@ -66,22 +71,27 @@ export default function ApiKeysPage() {
       setGeneratedKey(newKey.key ?? newKey.apiKey ?? null);
       await fetchApiKeys();
       toast.success("API key generated successfully.");
+
     } catch (err: any) {
       if (err.response?.status === 403) {
         toast.error("Only PRO plan users can create API keys.");
+
       } else {
         toast.error("Failed to generate API key.");
       }
+
     } finally {
       setIsGenerating(false);
     }
   };
+
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setKeyName("");
     setGeneratedKey(null);
   };
+
 
   const handleToggle = async (id: string, currentStatus: boolean) => {
     try {
@@ -96,12 +106,15 @@ export default function ApiKeysPage() {
         )
       );
       toast.success(`Key ${!currentStatus ? "activated" : "deactivated"}.`);
+
     } catch (err) {
       toast.error("Failed to update key status.");
+
     } finally {
       setTogglingId(null);
     }
   };
+
 
   const handleDelete = async (id: string) => {
     try {
@@ -109,24 +122,29 @@ export default function ApiKeysPage() {
       await axios.post(`/api/api_key/deleteApi_key/${id}`);
       setApiKeys((prev) => prev.filter((k) => k.id !== id));
       toast.success("API key deleted.");
+
     } catch (err) {
       console.log(err);
       toast.error("Failed to delete key.");
+
     } finally {
       setDeletingId(null);
     }
   };
+
 
   const handleCopy = (key: string) => {
     navigator.clipboard.writeText(key);
     toast.success("Copied to clipboard.");
   };
 
+
   const maskKey = (key: string) => {
     if (!key) return "";
     const visible = key.slice(0, 8);
     return `${visible}${"•".repeat(24)}`;
   };
+  
 
   return (
     <div className="animate-in fade-in duration-300 font-one">

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { useParams } from "next/navigation";
-import { IoEyeOutline, IoEyeOffOutline, IoLockClosedOutline } from "react-icons/io5";
+import { IoLockClosedOutline } from "react-icons/io5";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ViewIcon, ViewOffSlashIcon } from "@hugeicons/core-free-icons";
 

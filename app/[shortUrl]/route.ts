@@ -6,8 +6,6 @@ import { redis } from "@/lib/redis";
 import { UAParser } from "ua-parser-js";
 
 
-const ANON_USER_CLICK = process.env.ANONYMOUS_USER_CLICK!;
-
 export async function GET(req: NextRequest, { params }: { params: Promise<{ shortUrl: string }> }) {
 
     try {

@@ -2,8 +2,6 @@
 
 import axios from "axios";
 import { useState, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 import { Loader2, X, AlertTriangle, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -98,7 +96,6 @@ function OtpInput({ value, onChange }: { value: string[]; onChange: (v: string[]
 
 
 export default function AuthenticationPage() {
-  const router = useRouter();
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");

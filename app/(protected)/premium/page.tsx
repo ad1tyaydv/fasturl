@@ -479,7 +479,6 @@ export default function Premium() {
     );
   }
 
-  // --- RENDER FOR FREE USERS ---
   return (
     <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
       <Navbar />
