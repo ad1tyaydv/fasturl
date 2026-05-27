@@ -1,81 +1,73 @@
-FastURL — URL Shortener, QR Generator & Link Analytics Platform
+FastURL — All-in-One Link Management Platform
 
-  
+Website: https://fasturl.in
 
-FastURL is an all-in-one link management platform built for marketers, developers, and businesses. Shorten URLs, generate dynamic QR codes, track real-time click analytics, and manage branded links — all from a single dashboard.
+FastURL is an all-in-one link management platform built for digital marketers, developers, and businesses. It combines URL shortening, QR code generation, custom branded domains, and real-time analytics into a single, easy-to-use tool.
 
-🌐 Live at: https://fasturl.in
-
-✨ Features
-
-🔗 URL Shortening
-> Instantly shorten long URLs into clean, shareable links
-> Customize slugs with your own branded keywords
-> Edit destination URLs at any time — no need to reshare
-> Set link expiration (by date or click count)
-> Add password protection to sensitive links
-
-📊 Advanced Analytics & Real-Time Tracking
-> Track total and unique clicks per link
-> Geo-location data — country, state, and city level
-> Device & browser breakdown (mobile/desktop)
-> Referral source tracking
-> Real-time dashboard — see what's working instantly
-
-📦 Bulk URL Shortener
-> Shorten hundreds of links in one shot via CSV upload or paste
-> Built for enterprise-scale link campaigns
-> Track and manage all bulk links from a unified interface
-
-🔲 Dynamic QR Code Generator
-> Generate QR codes linked to your short URLs
-> Update the destination anytime — even after printing
-> Perfect for menus, packaging, posters, and events
-
-🌐 Custom Domain Support
-> Connect your own domain (e.g., link.yourbrand.com)
-> Verify via CNAME/TXT DNS records
-> Full white-label experience — no FastURL branding
-> Up to 10 custom subdomains on the Pro plan
-
-🛠️ Developer API
-> Programmatically create and manage short links
-> Retrieve real-time analytics via API calls
-> Supports high-traffic, scalable use cases
-> API key available from account settings
-
-💰 Pricing
-<img width="935" height="405" alt="image" src="https://github.com/user-attachments/assets/6be5a90c-fbd9-487c-b5c5-d8e4ab95c1f3" />
+What Does FastURL Do?
+FastURL transforms long, complex URLs into short, clean, and shareable links. Beyond basic shortening, it provides a full suite of link management tools including tracking, QR codes, bulk operations, and custom domains — all with a focus on speed, security, and simplicity.
 
 
-🚀 Getting Started
+Core Features
 
-1. Shorten a Link (Guest)
-Go to fasturl.in, paste your URL, and hit Shorten. No signup required (1 link/day guest limit).
+1. URL Shortener
+- Instantly convert long URLs into compact short links
+- Optional custom alias/slug for personalized links
+- Guest access available (1 link/day without signing in)
+- Edit the destination of any existing short link at any time
 
-3. Create an Account
-Sign up to unlock your dashboard, analytics, and advanced features.
+2. QR Code Generator
+- Generate QR codes directly from any URL
+- Dynamic QR codes — update the destination URL anytime without reprinting the code
+- Free plan includes up to 30 dynamic QR codes/month
 
-3. Connect a Custom Domain
-Go to Dashboard → Domains
-Add your domain (e.g., go.yourbrand.com)
-Add the provided CNAME/TXT records to your DNS
-FastURL auto-verifies and activates it
+3. Bulk URL Shortener
+- Shorten hundreds of links at once via CSV upload or list paste
+- Ideal for large-scale marketing campaigns
 
-4. Use the API
-   <img width="899" height="141" alt="image" src="https://github.com/user-attachments/assets/85e9c0c0-c3c4-4e8b-abe2-c3e890155c85" />
-Full API docs: fasturl.in/docs
+4. Custom Domains & Branded Links
+- Connect your own domain (e.g., link.yourbrand.com) via DNS (CNAME + TXT records)
+- Use your brand name instead of the default fasturl.in domain
+- Essentials plan: up to 4 custom subdomains | Pro plan: up to 10
 
-🔒 Security & Privacy
-Two-Factor Authentication (2FA) for account security
-Password-protected links
-Compliant data handling per privacy regulations
-UTM parameter preservation through redirects
+5. Link Analytics Dashboard
+- Real-time click tracking
+- Data includes: total clicks, unique clicks, geographic location (country, state, city), device type (mobile/desktop), browser info, and referral sources
+- Unlimited click tracking for all created links
+- Export analytics reports as CSV
+
+6. Link Management & Customization
+- Password-protected links
+- Link expiration by date or click limit
+- Redirect editing (change destination URL anytime)
+- UTM parameter preservation for Google Analytics compatibility
+
+7. Developer API
+- Generate an API key from account settings
+- Programmatically create and manage short links
+- Available on the Pro plan
+
+8. Security
+- SSL/HTTPS encryption on all redirects
+- Built-in malware protection — automatically detects and blocks malicious destinations
+- Two-Factor Authentication (2FA) support via any standard authenticator app
 
 
-📬 Support & Contact
-📧 Email                     fasturl@tutamail.com
-📖 Docs                      fasturl.in/docs
-🌐 Website                   fasturl.in
+Platform Stats (as of May 2026)
+- 92+ Links Generated
+- 19+ QR Codes Created
+- 306+ Clicks Tracked
+- 22+ Happy Customers
 
-Support is available 24/7 for paid plan users.
+
+Support
+- Email: fasturl@tutamail.com
+- 24/7 Support (Essentials & Pro plans)
+- Feedback and Help Desk available via the website
+- 
+
+Tech Highlights
+- Cross-platform (desktop + mobile)
+- Instant redirects with industry-standard encryption
+- White label shortener capability (custom branding, no FastURL logo)
+- Geo-tracking on all clicks (geo-targeted redirects in active development)
