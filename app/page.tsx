@@ -21,6 +21,7 @@ import { DomainDropdown } from "./dropDown/domainDropDown";
 import { toast } from "sonner";
 import { UpgradeAlert } from "./modals/upgradeAlert";
 import QrDownloadModal from "./modals/qrDownloadModal";
+import LiveOn from "./components/liveOn";
 
 
 const NEXT_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN!;
@@ -473,6 +474,7 @@ export default function Dashboard() {
       />
 
       <TotalData />
+      <LiveOn />
       <Footer />
     </div>
   );

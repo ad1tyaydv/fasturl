@@ -24,6 +24,7 @@ import Footer from "@/app/components/footer";
 import { Button } from "@/components/ui/button";
 import QrDownloadModal from "@/app/modals/qrDownloadModal";
 import { useUser } from "@/app/components/userContext";
+import LiveOn from "@/app/components/liveOn";
 
 export default function QRGenerator() {
   const router = useRouter();
@@ -388,6 +389,8 @@ export default function QRGenerator() {
       <FaqSection />
 
       <TotalData />
+
+      <LiveOn />
 
       <Footer />
     </div>
