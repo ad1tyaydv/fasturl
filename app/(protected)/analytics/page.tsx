@@ -325,12 +325,13 @@ export default function AnalyticsPage() {
                 ) : (
                   <>
                     <section className="relative rounded-xl border border-border bg-card overflow-hidden shadow-2xl">
-                      {fetchingStats && (
-                        <div className="absolute inset-0 z-50 bg-background/40 backdrop-blur-[2px] flex items-center justify-center">
-                          <Loader2 className="animate-spin text-blue-500" />
-                        </div>
-                      )}
+                    {fetchingStats ? (
+                      <div className="h-[350px] w-full flex items-center justify-center bg-card">
+                        <Loader2 className="animate-spin text-blue-500 w-8 h-8" />
+                      </div>
+                    ) : (
                       <ClicksAnalytics data={analyticsData?.clicks} days={days} />
+                    )}
                     </section>
 
                     <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
