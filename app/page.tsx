@@ -14,7 +14,7 @@ export default async function Dashboard() {
   const userPlan = user?.plan || "FREE";
 
   return (
-    <div className="min-h-screen bg-background text-foreground relative transition-colors duration-300 overflow-x-hidden selection:bg-blue-500/30">
+    <main className="min-h-screen bg-background text-foreground relative transition-colors duration-300 overflow-x-hidden selection:bg-blue-500/30">
       <Navbar />
 
       <section className="max-w-7xl mx-auto px-6 pt-16 pb-20">
@@ -22,7 +22,7 @@ export default async function Dashboard() {
 
           <div className="flex-1 text-center lg:text-left lg:pt-6">
             <h1 className="text-3xl sm:text-3xl md:text-5xl font-bold mb-6 text-foreground leading-tight font-three tracking-tight">
-              <span className="text-red-500">Url Shortner,</span><br />
+              <span className="text-red-500">URL Shortener,</span><br />
               QR Generator,<br />
               Custom Domain,<br />
               Detailed Analytics.
@@ -52,6 +52,6 @@ export default async function Dashboard() {
       <TotalData />
       <LiveOn />
       <Footer />
-    </div>
+    </main>
   );
 }

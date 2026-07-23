@@ -55,8 +55,8 @@ const COMPARISON_SECTIONS: ComparisonSection[] = [
   {
     title: "Pricing",
     rows: [
-      { label: "Price per month", free: "₹0", essential: "₹300", pro: "₹1,200" },
-      { label: "Original price", free: "—", essential: "₹1,200", pro: "₹5,600" },
+      { label: "Price per month", free: "$0", essential: "$1", pro: "$3" },
+      { label: "Original price", free: "—", essential: "$2", pro: "$5" },
     ],
   },
 ];
@@ -408,7 +408,7 @@ export default function Premium() {
                       {loading === "PRO" ? <Loader2 className="w-4 h-4 animate-spin" /> : <>Upgrade to PRO <HugeiconsIcon icon={ArrowRightDoubleIcon} size={18} className="group-hover/btn:translate-x-1 transition-transform" /></>}
                     </span>
                     <span className="text-[15px] font-black tracking-tight opacity-80 group-hover:opacity-100 transition-opacity">
-                      {isAnnual ? "₹8,999 / year" : "₹1,200 / month"}
+                      {isAnnual ? "$29 / year" : "$3 / month"}
                     </span>
                   </button>
                 </div>
@@ -454,15 +454,15 @@ export default function Premium() {
                             return {
                               ...row,
                               label: isAnnual ? "Price per year" : "Price per month",
-                              essential: isAnnual ? "₹2,299" : "₹300",
-                              pro: isAnnual ? "₹8,999" : "₹1,200"
+                              essential: isAnnual ? "$9" : "$1",
+                              pro: isAnnual ? "$29" : "$3"
                             };
                           }
                           if (row.label === "Original price") {
                             return {
                               ...row,
-                              essential: isAnnual ? "₹14,400" : "₹1,200",
-                              pro: isAnnual ? "₹67,200" : "₹5,600"
+                              essential: isAnnual ? "$18" : "$2",
+                              pro: isAnnual ? "$49" : "$5"
                             };
                           }
                         }
@@ -524,7 +524,7 @@ export default function Premium() {
                 <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-secondary text-muted-foreground">Current</span>
               )}
             </div>
-            <div className="text-3xl font-bold mb-1 text-foreground">₹0</div>
+            <div className="text-3xl font-bold mb-1 text-foreground">$0</div>
             <div className="text-xs text-muted-foreground mb-5">Perfect to get started</div>
             <ul className="flex flex-col gap-3 mb-8 flex-1">
               {["100 links/month", "30 QR Codes/month", "Click tracking", "Location tracking"].map((f) => (
@@ -551,8 +551,8 @@ export default function Premium() {
               <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-blue-600/20 text-blue-700 dark:text-blue-300">Popular</span>
             </div>
             <div className="flex items-baseline gap-2 mb-0.5">
-              <span className="text-sm line-through text-muted-foreground/30">{isAnnual ? "₹14,400" : "₹1,200"}</span>
-              <span className="text-3xl font-bold text-foreground">₹{isAnnual ? "2,299" : "300"}<span className="text-base font-normal text-muted-foreground">{isAnnual ? "/yr" : "/mo"}</span></span>
+              <span className="text-sm line-through text-muted-foreground/30">{isAnnual ? "$18" : "$2"}</span>
+              <span className="text-3xl font-bold text-foreground">{isAnnual ? "$9" : "$1"}<span className="text-base font-normal text-muted-foreground">{isAnnual ? "/yr" : "/mo"}</span></span>
             </div>
             <div className="text-xs text-muted-foreground mb-5">Most popular choice</div>
             <ul className="flex flex-col gap-3 mb-8 flex-1">
@@ -588,8 +588,8 @@ export default function Premium() {
               <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-yellow-600/20 text-yellow-700 dark:text-yellow-300">Best value</span>
             </div>
             <div className="flex items-baseline gap-2 mb-0.5">
-              <span className="text-sm line-through text-muted-foreground/30">{isAnnual ? "₹67,200" : "₹5,600"}</span>
-              <span className="text-3xl font-bold text-foreground">₹{isAnnual ? "8,999" : "1,200"}<span className="text-base font-normal text-muted-foreground">{isAnnual ? "/yr" : "/mo"}</span></span>
+              <span className="text-sm line-through text-muted-foreground/30">{isAnnual ? "$49" : "$5"}</span>
+              <span className="text-3xl font-bold text-foreground">{isAnnual ? "$29" : "$3"}<span className="text-base font-normal text-muted-foreground">{isAnnual ? "/yr" : "/mo"}</span></span>
             </div>
             <div className="text-xs text-muted-foreground mb-5">For power users</div>
             <ul className="flex flex-col gap-3 mb-8 flex-1">
@@ -645,15 +645,15 @@ export default function Premium() {
                         return {
                           ...row,
                           label: isAnnual ? "Price per year" : "Price per month",
-                          essential: isAnnual ? "₹2,299" : "₹300",
-                          pro: isAnnual ? "₹8,999" : "₹1,200"
+                          essential: isAnnual ? "$9" : "$1",
+                          pro: isAnnual ? "$29" : "$3"
                         };
                       }
                       if (row.label === "Original price") {
                         return {
                           ...row,
-                          essential: isAnnual ? "₹3,599" : "₹599",
-                          pro: isAnnual ? "₹9,999" : "₹1,999"
+                          essential: isAnnual ? "$18" : "$2",
+                          pro: isAnnual ? "$49" : "$5"
                         };
                       }
                     }

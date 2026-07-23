@@ -2,24 +2,23 @@ import { Metadata } from "next";
 import DocsClient from "./DocsClient";
 
 export const metadata: Metadata = {
-  title: "FastURL - Professional Link Management",
+  title: "API Documentation - FastURL Developer Guide",
   description: "Learn how to use FastURL to shorten links, track analytics, manage custom domains, and integrate our developer API. Complete guide to professional link management.",
-  keywords: [
-    "URL shortener documentation",
-    "link analytics guide",
-    "custom domain setup",
-    "short link API reference",
-    "bulk link shortening",
-    "QR code tracking",
-    "branded links",
-    "FastURL help",
-    "link management tutorial"
-  ],
+  alternates: {
+    canonical: "/docs",
+  },
   openGraph: {
-    title: "FastURL Documentation - Mastering Link Management",
+    title: "FastURL API Documentation - Developer Guide",
     description: "Comprehensive guides and API references for the FastURL link management platform.",
     type: "website",
-    url: "https://fasturl.in/docs",
+    url: "/docs",
+    images: ["/og-image.jpg"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "FastURL API Documentation - Developer Guide",
+    description: "Comprehensive guides and API references for FastURL.",
+    images: ["/og-image.jpg"],
   },
 };
 

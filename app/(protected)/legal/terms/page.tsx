@@ -1,3 +1,25 @@
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Terms of Service",
+  description: "Read FastURL's Terms of Service. Learn about acceptable use, account responsibilities, intellectual property, and service limitations.",
+  alternates: {
+    canonical: "/legal/terms",
+  },
+  openGraph: {
+    title: "Terms of Service - FastURL",
+    description: "Read FastURL's Terms of Service covering acceptable use, account responsibilities, and service limitations.",
+    url: "/legal/terms",
+    images: ["/og-image.jpg"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Terms of Service - FastURL",
+    description: "Read FastURL's Terms of Service.",
+    images: ["/og-image.jpg"],
+  },
+};
+
 export default function TermsPage() {
   
   return (

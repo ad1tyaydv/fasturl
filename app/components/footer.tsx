@@ -82,9 +82,9 @@ export default function Footer() {
             </div>
 
             <div className="text-center lg:text-right">
-              <h2 className="text-4xl font-three font-black tracking-tighter mb-2 text-foreground">
+              <p className="text-4xl font-three font-black tracking-tighter mb-2 text-foreground">
                 FASTURL
-              </h2>
+              </p>
               <p className="text-xs text-muted-foreground font-one leading-relaxed">
                 © {currentYear} FASTURL LLC <br />
                 All Rights Reserved

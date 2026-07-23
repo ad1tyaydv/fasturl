@@ -87,9 +87,9 @@ export default function Navbar() {
               alt="FastURL Logo"
               className="w-13 h-13 object-contain"
             />
-            <h1 className="text-xl sm:text-2xl font-three font-bold tracking-tighter">
+            <span className="text-xl sm:text-2xl font-three font-bold tracking-tighter">
               FASTURL
-            </h1>
+            </span>
           </Link>
 
           <div className="hidden lg:flex items-center gap-1">
@@ -248,9 +248,9 @@ export default function Navbar() {
       >
         <div className="flex flex-col h-full">
           <div className="flex items-center justify-between px-8 py-8 mb-4">
-            <h1 className="text-2xl font-three font-bold tracking-tighter text-foreground">
+            <span className="text-2xl font-three font-bold tracking-tighter text-foreground">
               FASTURL
-            </h1>
+            </span>
 
             <div className="flex items-center gap-2">
               {mounted && (

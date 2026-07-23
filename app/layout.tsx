@@ -9,6 +9,7 @@ import { ThemeProvider } from "./components/theme-provider";
 import UpgradeDiscount from "./modals/upgradeDiscount";
 import Providers from "./components/providers";
 import GoogleAuthSync from "./components/googleAuthSync";
+import JsonLd from "./components/JsonLd";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -21,23 +22,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://fasturl.in"),
   title: {
     default: "FastURL - Free URL Shortener, Analytics & Branded Links",
     template: "%s | FastURL"
   },
   description: "FastURL is a professional link management platform to shorten URLs, create branded links, generate QR codes, and track real-time analytics. Perfect for marketing, social media, and business insights.",
-  keywords: [
-    "URL shortener",
-    "link shortener",
-    "branded links",
-    "custom domain shortener",
-    "link analytics",
-    "QR code generator",
-    "bulk link shortening",
-    "free url shortener",
-    "marketing links",
-    "track link clicks"
-  ],
   authors: [{ name: "FastURL Team" }],
   creator: "FastURL",
   publisher: "FastURL",
@@ -46,6 +36,9 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
     title: "FastURL - Professional Link Management & Analytics",
     description: "Shorten links, track clicks, and manage your brand with FastURL's advanced link management suite.",
@@ -53,11 +46,20 @@ export const metadata: Metadata = {
     siteName: "FastURL",
     locale: "en_US",
     type: "website",
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "FastURL - Shorten. Track. Brand.",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "fasturl - Professional Link Management",
+    title: "FastURL - Professional Link Management",
     description: "Shorten, track, and manage your links with ease.",
+    images: ["/og-image.jpg"],
   },
   icons: {
     icon: "/favicon.ico",
@@ -93,6 +95,7 @@ export default function RootLayout({
             </UserProvider>
             <Analytics />
             <SpeedInsights />
+            <JsonLd />
           </ThemeProvider>
         </Providers>
       </body>

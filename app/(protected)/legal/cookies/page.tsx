@@ -1,3 +1,25 @@
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Cookie Policy",
+  description: "FastURL's Cookie Policy describes how we use cookies and similar technologies. Learn about the types of cookies we use and how to manage your preferences.",
+  alternates: {
+    canonical: "/legal/cookies",
+  },
+  openGraph: {
+    title: "Cookie Policy - FastURL",
+    description: "Learn how FastURL uses cookies and similar technologies.",
+    url: "/legal/cookies",
+    images: ["/og-image.jpg"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Cookie Policy - FastURL",
+    description: "FastURL's Cookie Policy and how to manage your preferences.",
+    images: ["/og-image.jpg"],
+  },
+};
+
 export default function CookiePage() {
   
   return (

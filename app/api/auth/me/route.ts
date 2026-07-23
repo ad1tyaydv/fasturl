@@ -30,7 +30,9 @@ export async function GET(req: NextRequest) {
             decoded = jwt.verify(token, JWT_SECRET);
 
         } catch {
-            return NextResponse.json({ authenticated: false });
+            const response = NextResponse.json({ authenticated: false });
+            response.cookies.delete("token");
+            return response;
         }
 
         const user = await prisma.user.findUnique({

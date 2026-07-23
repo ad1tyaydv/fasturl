@@ -69,9 +69,9 @@ export default function PricingSection() {
       <main className="max-w-6xl mx-auto px-4 py-12">
 
         <div className="text-center mb-12">
-          <h1 className="text-3xl md:text-4xl font-bold mb-4 tracking-tight">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 tracking-tight">
             The Best URL Shortener with Analytics & Branded Links
-          </h1>
+          </h2>
           <p className="text-muted-foreground text-base max-w-2xl mx-auto">
             Stop guessing and start tracking with our professional link management platform. Unlock deep insights with real-time click tracking and geo-targeted redirects.
           </p>
@@ -117,7 +117,7 @@ export default function PricingSection() {
               )}
             </div>
 
-            <div className="text-4xl font-bold mb-1">₹0</div>
+            <div className="text-4xl font-bold mb-1">$0</div>
             <div className="text-xs text-muted-foreground mb-8">
               Perfect for simple url shortening
             </div>
@@ -163,10 +163,10 @@ export default function PricingSection() {
 
             <div className="flex items-baseline gap-2 mb-1">
               <span className="text-sm line-through text-muted-foreground/50">
-                {isAnnual ? "₹3,599" : "₹599"}
+                {isAnnual ? "$18" : "$2"}
               </span>
               <span className="text-4xl font-bold">
-                ₹{isAnnual ? "2,299" : "299"}
+                {isAnnual ? "$9" : "$1"}
                 <span className="text-base font-normal text-muted-foreground ml-1">
                   {isAnnual ? "/yr" : "/mo"}
                 </span>
@@ -220,10 +220,10 @@ export default function PricingSection() {
 
             <div className="flex items-baseline gap-2 mb-1">
               <span className="text-sm line-through text-muted-foreground/50">
-                {isAnnual ? "₹9,999" : "₹1,999"}
+                {isAnnual ? "$49" : "$5"}
               </span>
               <span className="text-4xl font-bold">
-                ₹{isAnnual ? "5,699" : "999"}
+                {isAnnual ? "$29" : "$3"}
                 <span className="text-base font-normal text-muted-foreground ml-1">
                   {isAnnual ? "/yr" : "/mo"}
                 </span>

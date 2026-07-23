@@ -1,3 +1,25 @@
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Privacy Policy",
+  description: "FastURL's Privacy Policy explains how we collect, use, and protect your personal information. Learn about data handling, cookies, and your privacy rights.",
+  alternates: {
+    canonical: "/legal/privacyPolicy",
+  },
+  openGraph: {
+    title: "Privacy Policy - FastURL",
+    description: "Learn how FastURL collects, uses, and protects your personal information.",
+    url: "/legal/privacyPolicy",
+    images: ["/og-image.jpg"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Privacy Policy - FastURL",
+    description: "Learn how FastURL handles your data and privacy.",
+    images: ["/og-image.jpg"],
+  },
+};
+
 export default function PrivacyPage() {
   
   return (

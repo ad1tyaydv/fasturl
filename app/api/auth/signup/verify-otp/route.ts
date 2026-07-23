@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
             },
             NEXTAUTH_SECRET!,
             {
-                expiresIn: "365d"
+                expiresIn: "7d"
             }
         );
 
@@ -94,7 +94,7 @@ export async function POST(req: NextRequest) {
             secure: process.env.NODE_ENV === "production",
             sameSite: "strict",
             path: "/",
-            maxAge: 60 * 60 * 24 * 365,
+            maxAge: 60 * 60 * 24 * 7,
         });
 
         return response;

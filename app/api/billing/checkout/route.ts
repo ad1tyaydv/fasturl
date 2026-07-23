@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
                 email: decoded.email,
                 name: decoded.userName,
             },
-            billing_currency: "INR",
+            billing_currency: "USD",
             return_url: returnUrl,
             metadata: {
                 user_id: decoded.userId,
